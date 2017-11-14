@@ -1,0 +1,23 @@
+{
+  "name": "kui-b4",
+  "authors": [
+    "Christian Gann <guo.guo.gan@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "moment": "^2.19.1",
+    "jquery": "^3.2.1",
+    "bootstrap": "^3.3.7",
+    "echarts": "^3.7.2"
+  }
+}

@@ -1,0 +1,155 @@
+body {
+    font-family: '微软雅黑'!important;
+    font-size:  15px;
+}
+
+/*
+ * 业务按钮
+ */
+.btn-save {
+    color: #fff;
+    background-color: #20a8d8;
+    border-color: #20a8d8;
+}
+
+.btn-save:before {
+    font-family: 'FontAwesome';
+    content: "\f0c7";
+    padding-right: 5px;
+}
+
+.btn-dismiss {
+    color: #fff;
+    background-color: #4dbd74;
+    border-color: #4dbd74;
+}
+
+.btn-dismiss:before {
+    font-family: 'FontAwesome';
+    content: "\f2d4";
+    padding-right: 5px;
+}
+
+.btn-delete {
+    color: #fff;
+    background-color: #f86c6b;
+    border-color: #f86c6b;
+}
+
+.btn-delete:before {
+    font-family: 'FontAwesome';
+    content: "\f00d";
+    padding-right: 5px;
+}
+
+.btn-new {
+    color: #fff;
+    background-color: #4dbd74;
+    border-color: #4dbd74;
+}
+
+.btn-new:before {
+    font-family: 'FontAwesome';
+    content: "\f196";
+    padding-right: 5px;
+}
+
+.btn-query {
+    color: #fff;
+    background-color: #20a8d8;
+    border-color: #20a8d8;
+}
+
+.btn-query:before {
+    font-family: 'FontAwesome';
+    content: "\f29c";
+    padding-right: 5px;
+}
+
+.btn-enable {
+    color: #fff;
+    background-color: #20a8d8;
+    border-color: #20a8d8;
+}
+
+.btn-enable:before {
+    font-family: 'simple-line-icons';
+    content: "\e099";
+    padding-right: 5px;
+}
+
+.btn-disable {
+    color: #fff;
+    background-color: #f86c6b;
+    border-color: #f86c6b;
+}
+
+.btn-disable:before {
+    font-family: 'simple-line-icons';
+    content: "\e07c";
+    padding-right: 5px;
+}
+
+.btn-download {
+    color: #fff;
+    background-color: #20a8d8;
+    border-color: #20a8d8;
+}
+
+.btn-download:before {
+    font-family: 'simple-line-icons';
+    content: "\e083";
+    padding-right: 5px;
+}
+
+.icon-action {
+    font-size: 14px;
+    height: 22px;
+    color:  #20a8d8!important;
+    margin-top:  0!important;
+    padding:  0 5px!important;
+}
+
+.icon-action:focus {
+    box-shadow: 0 0 0 0!important;
+}
+
+.form-checks {
+    padding-top: 7px;
+}
+
+.form-radios {
+    padding-top: 7px;
+}
+
+.form-buttons {
+    margin-bottom: 30px;
+}
+
+.bmap-title {
+    padding: 3px 10px;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 5px;
+    height: 32px;
+}
+
+.bmap-icon {
+    padding-top: 9px;
+    padding-left: 6px;
+    font-size:  16px;
+    cursor: pointer;
+}
+
+.bmap-num {
+    background-color: #EE5D5B;
+    position: absolute;
+    border: 1px solid #BC3B3A;
+    color: white;
+    height: 24px;
+    width: 24px;
+    padding: 2px 0;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+}
