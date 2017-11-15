@@ -1,0 +1,19 @@
+<div class="card">
+    <div class="card-header">
+       <strong>河流</strong>
+       <div class="card-actions">
+           <a class="btn btn-link" href="javascript:void(0)" onclick="svg.restore();">还原</a>
+       </div>
+    </div>
+    <div class="card-body">
+        <div id="river" class="col-12" style="height: 100%">
+        </div>
+    </div>
+</div>
+
+<script>
+    var svg = new Svg({
+        svgurl: '/demo/img/river.svg'
+    });
+    svg.render('river');
+</script>

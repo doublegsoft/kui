@@ -11,8 +11,8 @@ Alarm.prototype.start = function () {
     var source = document.createElement('source');
     source.setAttribute('src', this.mp3url);
     source.setAttribute('type', 'audio/mpeg');
-    this.audio.appendChild(source);
-    document.body.appendChild(this.audio);
+    // this.audio.appendChild(source);
+    // document.body.appendChild(this.audio);
 
     var icon = document.getElementById(this.iconId);
     icon.className = 'icon-bell bell';

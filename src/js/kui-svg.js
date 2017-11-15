@@ -8,7 +8,8 @@
  */
 function Svg(option) {
     this.svgurl = option.svgurl;
-    this.onLoaded = option.onLoaded;
+    this.onLoad = option.onLoad;
+    this.onDecorate = option.onDecorate;
 }
 
 Svg.prototype.render = function(containerId) {
@@ -21,7 +22,6 @@ Svg.prototype.render = function(containerId) {
         self.svg = svg;
 
         self.container.innerHTML = '';
-
 
         // keep the original viewBox
         self.viewBox = svg.attr('viewBox');
@@ -47,20 +47,19 @@ Svg.prototype.render = function(containerId) {
             // svg.attr('transform', d3.event.transform);
         });
 
-        if (self.onLoaded)
-            self.onLoaded(self.svg, self.dom);
+        if (self.onDecorate)
+            self.onDecorate(self.svg, self.dom);
         else
             self.container.appendChild(self.dom);
-
+        
+        if (self.onLoad)
+            self.onLoad(self.svg);
         // binding events
         d3.select(self.container).call(zoom);
-        d3.select(self.container).select('svg').on('click', function() {
-            console.log(d3.mouse(this));
-        })
     });
 };
 
-Svg.prototype.reset = function () {
+Svg.prototype.restore = function () {
     var svg = d3.select(this.container).select('svg');
     svg.attr('viewBox', this.viewBox);
 };

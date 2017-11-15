@@ -18,7 +18,7 @@ wiagram.Crsc.prototype.render = function (containerId) {
     this.containerId = containerId;
     var svg = new Svg({
         svgurl: this.svgurl,
-        onLoaded: function (svg, dom) {
+        onDecorate: function (svg, dom) {
             // 设置SVG根文档，绑定在对象实例
             self.svg = svg;
             self.dom = dom;
