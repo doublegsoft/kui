@@ -23,26 +23,40 @@ Svg.prototype.render = function(containerId) {
         container.innerHTML = '';
         container.appendChild(self.dom);
         
-        var viewBox = svg.attr('viewBox');
-        var vals = viewBox.split(' ');
+        self.viewBox = svg.attr('viewBox');
+        var vals = self.viewBox.split(' ');
         var width = parseFloat(vals[2]);
         var height = parseFloat(vals[3]);
-        svg.on('mousedown', function () {
+        self.svg.on('mousedown', function () {
             // 能够获取到具体的element
         });
 
         var zoom = d3.zoom().on('zoom', function () {
+            // console.log(d3.mouse(this));
+            // console.log(d3.event.transform);
+
+            var containerHeight = container.offsetHeight;
+            var containerWidth = container.offsetWidth;
+
+            var scaleX = width / containerWidth;
+            var scaleY = height / containerHeight;
+
             var k = d3.event.transform.k;
             var x = d3.event.transform.x;
             var y = d3.event.transform.y;
-            // svg.attr('viewBox', (-x / k) + ' ' + (-y / k) + ' ' + (width / k) + ' ' + (height / k));
+            var svg = d3.select(this).select('svg');
+            svg.attr('viewBox', (-x / k * scaleX) + ' ' + (-y / k * scaleY) + ' ' + (width / k) + ' ' + (height / k));
             // 例子中的transform，可以到处跑
-            svg.attr('transform', d3.event.transform);
+            // svg.attr('transform', d3.event.transform);
         });
 
-        self.onLoaded(svg, self.dom);
+        self.onLoaded(self.svg, self.dom, zoom);
         d3.select(container).call(zoom);
     });
+};
+
+Svg.prototype.reset = function () {
+
 };
 
 /**
