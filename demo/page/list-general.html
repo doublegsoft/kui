@@ -84,7 +84,14 @@ var table1 = new PaginationTable({
         width: '250px'
     }, {
         title: '当前水位（m）',
-        template: '{rz}'
+        displayFunction: function(obj, td) {
+            var div = $('<div class="sparkline" style="width: 100%; height: 32px;"></div>');
+//            var canvas = $('<canvas width="200px" height="30px"></canvas>');
+//            var values = [10,8,5,7,4,4,1];
+//            div.append(canvas);
+            td.append(div);
+//            $(div).sparkline(values, {composite: true});
+        }
     }, {
         title: '当前累计雨量（mm）',
         template: '{dyp}'
@@ -109,10 +116,15 @@ var table1 = new PaginationTable({
             a.on('click', function() {
                 
             });
+            a.addClass('btn btn-link');
             a.text(alarm);
             td.append(a);
         }
-    }]
+    }],
+    afterLoad: function(result) {
+        var values = [10,8,5,7,4,4,1];
+        $('.sparkline').sparkline(values, {width: '200px', height: '32px', disableTooltips: true});
+    }
 });
 table1.render('pagination-table');
 </script>

@@ -50,19 +50,29 @@
         ]
     };
     var map = new gis.Baidu('mapContainer', {lat: 29.999559, lng: 107.722063}, 9);
-    map.boundary('重庆市');
+
     map.east({
         title: '统计',
         height: '400px',
         width: '300px',
+        display: false,
         contentHtml: document.getElementById('east_chart_template').innerHTML,
         contentCallback: function () {
             var chart = echarts.init(document.getElementById('east_chart_container'));
             chart.setOption(option);
         }
     });
+
+    map.toolbar({
+        actions: [{text: '水位'}, {text: '雨量'}, {text: '工情'}, {text: '视频'}],
+        onRestore: function () {
+            init();
+        }
+    });
     
     function init() {
+        map.restore();
+        map.boundary('重庆市');
         ajax.get('/demo/data/bmap.json', {}, function(resp) {
             var data = resp.data;
             for (var i = 0; i < data.length; i++) {

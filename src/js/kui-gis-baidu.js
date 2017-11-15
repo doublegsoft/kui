@@ -198,21 +198,6 @@ gis.Baidu.prototype.polyline = function (data, coordinates, triggers) {
 /**
  * @public
  * 
- * 地图上显示工具栏，工具栏通常加载一些搜索框、监测按钮等。
- * 
- * @param {object} data - 工具栏对象
- *
- * @param {array} coordinates - 含有经纬度的坐标点集合，维度：lat，精度：lng
- *
- * @param {object} triggers - 事件方法的封装对象，包括click, mouseover, mouseout这些基本事件
- */
-gis.Baidu.prototype.toolbar = function (data) {
-    
-};
-
-/**
- * @public
- * 
  * 在地图上画出边界。
  */
 gis.Baidu.prototype.boundary = function (addv, custom) {
@@ -241,6 +226,11 @@ gis.Baidu.prototype.boundary = function (addv, custom) {
  *
  * 清除所有绘制的标记。
  */
+gis.Baidu.prototype.restore = function() {
+    this.map.clearOverlays();
+    this.map.centerAndZoom(new BMap.Point(this.centerCoordinate.lng, this.centerCoordinate.lat), this.zoom);
+};
+
 gis.Baidu.prototype.clear = function() {
     this.map.clearOverlays();
 };
@@ -250,11 +240,29 @@ gis.Baidu.prototype.getMap = function() {
 };
 
 /**
+ * 地图上显示工具栏，工具栏通常加载一些搜索框、监测按钮等。
+ *
+ * @param {object} data - 工具栏对象
+ *
+ * @param {array} coordinates - 含有经纬度的坐标点集合，维度：lat，精度：lng
+ *
+ * @param {object} triggers - 事件方法的封装对象，包括click, mouseover, mouseout这些基本事件
+ *
  * @public
- * 
+ */
+gis.Baidu.prototype.toolbar = function (option) {
+    var bar = new gis.Baidu.Toolbar(option);
+    bar.setAnchor(BMAP_ANCHOR_BOTTOM_RIGHT);
+    bar.setOffset(new BMap.Size(10, 10));
+    this.map.addControl(bar);
+};
+
+/**
  * 设置地图的东部面板（右侧面板）悬浮在地图上，可伸缩。
  * 
  * @param {object} east - 实例化东部面板的对象
+ *
+ * @public
  */
 gis.Baidu.prototype.east = function(east) {
     if (east.contentCallback) {
@@ -270,11 +278,11 @@ gis.Baidu.prototype.east = function(east) {
 };
 
 /**
- * @public
- * 
  * 设置地图的西部面板（左侧面板）悬浮在地图上，可伸缩。
  * 
  * @param {object} west - 实例化东部面板的对象
+ *
+ * @public
  */
 gis.Baidu.prototype.west = function(west) {
     if (west.contentCallback) {
@@ -289,11 +297,10 @@ gis.Baidu.prototype.west = function(west) {
     this.map.addControl(pane);
 };
 
-
 /**
- * @constructor
- * 
  * 显示数字的自定义地图覆盖物，通常用于显示统计数字，可钻取。
+ *
+ * @constructor
  */
 gis.Baidu.NumberOverlay = function (map, data, coordinate, triggers) {
     this.data = data;
@@ -305,9 +312,9 @@ gis.Baidu.NumberOverlay = function (map, data, coordinate, triggers) {
 gis.Baidu.NumberOverlay.prototype = new BMap.Overlay();
 
 /**
- * @private
- *
  * 继承实现百度地图覆盖物的初始化方法。
+ *
+ * @private
  */
 gis.Baidu.NumberOverlay.prototype.initialize = function(map) {
     var div = this.div = document.createElement('div');
@@ -330,9 +337,9 @@ gis.Baidu.NumberOverlay.prototype.initialize = function(map) {
 };
 
 /**
- * @private
- *
  * 继承实现百度地图覆盖物的绘制方法。
+ *
+ * @private
  */
 gis.Baidu.NumberOverlay.prototype.draw = function() {
     var pixel = this.map.pointToOverlayPixel(new BMap.Point(this.coordinate.lng, this.coordinate.lat));
@@ -341,10 +348,11 @@ gis.Baidu.NumberOverlay.prototype.draw = function() {
 };
 
 /**
- * @constructor
- * @private
- * 
  * 构造地图自定义控件，用于东南西北面板构造。
+ *
+ * @constructor
+ *
+ * @private
  */
 gis.Baidu.PaneControl = function(options) {
     // id
@@ -414,6 +422,7 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
         ret.style.width = '33px';
         content.style.display = 'none';
         text.style.display = 'none';
+        icon.className = 'bmap-icon icon-size-fullscreen';
     }
 
     var self = this;
@@ -445,4 +454,62 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
     return ret;
 };
 
+/**
+ * 构建工具栏，工具栏自带搜索框，可以API控制显示隐藏。
+ *
+ * @param {object} option - 工具栏配置项
+ *
+ * @constructor
+ *
+ * @private
+ */
+gis.Baidu.Toolbar = function(option) {
+    this.actions = option.actions;
+    this.onRestore = option.onRestore;
+};
 
+/**
+ * 继承于百度地图Control。
+ */
+gis.Baidu.Toolbar.prototype = new BMap.Control();
+
+/**
+ * 初始化工具栏，渲染工具栏显示内容。
+ *
+ * @param {object} map - 地图实例
+ *
+ * @returns {Element|*} 根容器对象
+ */
+gis.Baidu.Toolbar.prototype.initialize = function (map) {
+    var ret = document.createElement('div');
+    ret.innerHTML = '';
+
+    var searchbar = '' +
+    '<div class="input-group">' +
+    '    <button class="btn btn-success">全屏</button>' +
+    '    <button class="btn btn-success">还原</button>' +
+    '    <input type="text" class="form-control" style="width: 200px">' +
+    '    <span class="input-group-btn">' +
+    '       <button class="btn btn-info" type="button">' +
+    '           <i class="fa fa-search"></i>' +
+    '       </button>' +
+    '    </span>' +
+    '</div>';
+    ret.innerHTML = searchbar;
+
+    for (var i = 0; i < this.actions.length; i++) {
+        var action = this.actions[i];
+        var btn = document.createElement('button');
+        btn.className = 'btn btn-primary';
+        btn.innerText = action.text;
+        ret.children[0].appendChild(btn);
+    }
+
+    if (this.onRestore) {
+        var btnRestore = ret.children[0].children[1];
+        btnRestore.addEventListener('click', this.onRestore);
+    }
+
+    map.getContainer().appendChild(ret);
+    return ret;
+};

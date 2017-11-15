@@ -87,7 +87,10 @@ wiagram.Rsrwl.prototype.setValues = function (values) {
     this.drz = values.drz;
     this.w = values.w;
 
-    this.decorate(this.dom.cloneNode(true));
+    this.render(this.containerId);
+
+    // need rebind events, so comment it
+    // this.decorate(this.dom.cloneNode(true));
 };
 
 /**

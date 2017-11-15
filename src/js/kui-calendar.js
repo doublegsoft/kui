@@ -121,7 +121,7 @@ Calendar.prototype.prev = function () {
  */
 Calendar.prototype.datebar = function () {
     var ret = '' +
-    '<div class="col-md-12" style="height: 24px; text-align: center;">' +
+    '<div class="col-md-12" style="width: 500px; height: 24px; text-align: center;">' +
     '    <button class="btn btn-link icon-action float-left">' +
     '        <i class="icon-arrow-left-circle" style="font-size: 23px;"></i>' +
     '    </button>' +
