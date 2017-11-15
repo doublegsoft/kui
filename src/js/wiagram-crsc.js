@@ -16,11 +16,16 @@ wiagram.Crsc = function (option) {
 wiagram.Crsc.prototype.render = function (containerId) {
     var self = this;
     this.containerId = containerId;
-    d3.xml(this.svgurl).mimeType('image/svg+xml').get(function (error, xml) {
-        // 设置SVG根文档，绑定在对象实例
-        self.svg = xml.documentElement;
-        self.decorate(self.svg.cloneNode(true));
+    var svg = new Svg({
+        svgurl: this.svgurl,
+        onLoaded: function (svg, dom) {
+            // 设置SVG根文档，绑定在对象实例
+            self.svg = svg;
+            self.dom = dom;
+            self.decorate(self.dom.cloneNode(true));
+        }
     });
+    svg.render(containerId);
 };
 
 wiagram.Crsc.prototype.setValues = function (values) {

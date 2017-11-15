@@ -58,11 +58,16 @@ wiagram.Rsrwl.prototype.render = function (containerId) {
     var self = this;
     // 绑定DOM元素标识到对象上
     this.containerId = containerId;
-    d3.xml(this.svgurl).mimeType('image/svg+xml').get(function (error, xml) {
-        // 设置SVG根文档，绑定在对象实例
-        self.svg = xml.documentElement;
-        self.decorate(self.svg.cloneNode(true));
+    var svg = new Svg({
+        svgurl: this.svgurl,
+        onLoaded: function (svg, dom) {
+            // 设置SVG根文档，绑定在对象实例
+            self.svg = svg;
+            self.dom = dom;
+            self.decorate(self.dom.cloneNode(true));
+        }
     });
+    svg.render(containerId);
 };
 
 /**
@@ -82,7 +87,7 @@ wiagram.Rsrwl.prototype.setValues = function (values) {
     this.drz = values.drz;
     this.w = values.w;
 
-    this.decorate(this.svg.cloneNode(true));
+    this.decorate(this.dom.cloneNode(true));
 };
 
 /**
