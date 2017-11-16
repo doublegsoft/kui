@@ -34,7 +34,7 @@ $.fn.searchbox = function(options) {
         if (divResult.length) {
             divResult.empty();
         } else {
-            divResult = $('<divResult id="__search_result" class="dropdown-menu dropdown-menu-right" style="width: 200px" role="menu"></divResult>');
+            divResult = $('<div id="__search_result" class="dropdown-menu dropdown-menu-right" style="width: 200px" role="menu"></div>');
             $('body').append(divResult);
         }
         divResult.css('position', 'absolute');
