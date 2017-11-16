@@ -1,11 +1,18 @@
 
 $.fn.searchbox = function(options) {
     options = options || {};
+    this.direction = options.direction || 'down';
+    var self = this;
     $(this).on('keyup', function(e) {
         var input = $(this);
         var offset = input.offset();
         var left = offset.left;
-        var top = offset.top + input.height();
+        if (self.direction === 'up') {
+            var top = offset.top - input.height();
+        } else {
+            var top = offset.top + input.height();
+        }
+
         var keyword = input.val();
         if (keyword === '') return;
         $.ajax({
@@ -19,30 +26,29 @@ $.fn.searchbox = function(options) {
     });
     
     this.data = [];
+
     var self = this;
     function displayResult(data, pos) {
-        self.data = data.rs;
-        var div = $('#search_result');
-        if (div.length) {
-            div.empty();
+        self.data = data;
+        var divResult = $('#__search_result');
+        if (divResult.length) {
+            divResult.empty();
         } else {
-            div = $('<div id="search_result" class="dropdown-menu dropdown-menu-right" style="width: 200px" role="menu"></div>');
-            $('body').append(div);
+            divResult = $('<divResult id="__search_result" class="dropdown-menu dropdown-menu-right" style="width: 200px" role="menu"></divResult>');
+            $('body').append(divResult);
         }
-        div.css('position', 'absolute');
-        div.css('left', pos.left);
-        div.css('top', pos.top);
+        divResult.css('position', 'absolute');
         
         var ul = $('<ul style="list-style: none">');
-        for (var i = 0; i < data.rs.length; i++) {
-            var itm = data.rs[i];
+        for (var i = 0; i < data.length; i++) {
+            var itm = data[i];
             var li = $('<li>');
             var a = $('<a style="cursor: pointer">');
             for (var k in itm) {
                 a.attr('data-' + k, itm[k]);
             }
             a.on('click', function() {
-                div.hide();
+                divResult.hide();
                 $(self).val($(this).text());
                 var attrs = {};
                 $(this).each(function() {
@@ -61,7 +67,17 @@ $.fn.searchbox = function(options) {
             li.append(a);
             ul.append(li);
         }
-        div.append(ul);
-        div.show();
+        divResult.append(ul);
+
+        // positioning
+        if (self.direction == 'down') {
+            divResult.css('left', pos.left);
+            divResult.css('top', pos.top);
+        } else {
+            divResult.css('left', pos.left);
+            divResult.css('top', pos.top - divResult[0].offsetHeight);
+        }
+
+        divResult.show();
     }
 };

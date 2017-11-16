@@ -465,6 +465,8 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
  */
 gis.Baidu.Toolbar = function(option) {
     this.actions = option.actions;
+    this.searchUrl = option.searchUrl;
+    this.direction = option.direction;
     this.onRestore = option.onRestore;
 };
 
@@ -505,10 +507,16 @@ gis.Baidu.Toolbar.prototype.initialize = function (map) {
         ret.children[0].appendChild(btn);
     }
 
+    // bind events
     if (this.onRestore) {
         var btnRestore = ret.children[0].children[1];
         btnRestore.addEventListener('click', this.onRestore);
     }
+    $(ret.children[0].children[2]).searchbox({
+        url: this.searchUrl,
+        direction: this.direction
+    });
+
 
     map.getContainer().appendChild(ret);
     return ret;

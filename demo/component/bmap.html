@@ -65,6 +65,8 @@
 
     map.toolbar({
         actions: [{text: '水位'}, {text: '雨量'}, {text: '工情'}, {text: '视频'}],
+        searchUrl: '/demo/data/searchbox.json',
+        direction: 'up',
         onRestore: function () {
             init();
         }
