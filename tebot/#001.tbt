@@ -1,0 +1,17 @@
+goto("http://192.168.0.211:8000/demo")
+click("//span[@class='navbar-toggler-icon']")
+click("//a[text()='组件']")
+click("//a[text()='百度地图']")
+
+click("//span[text()='9']")
+click("//span[@class='BMap_Marker BMap_noprint']")
+click("//button[text()='还原']")
+
+// 测试输入
+input("//input[@class='form-control']" = "hello")
+
+click("//a[text()='页面']")
+click("//a[text()='档案']")
+
+click("//a[text()='实时监测']")
+click("//a[text()='基本资料']")
