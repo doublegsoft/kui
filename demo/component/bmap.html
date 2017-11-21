@@ -1,6 +1,12 @@
 <div id="mapContainer" style="width: 100%; height: 100%;"></div>
 
 <script id="east_chart_template" type="text/template">
+    <select class="col-md-12 form-control">
+        <option>考勤</option>
+        <option>报警</option>
+        <option>数据</option>
+        <option>问题</option>
+    </select>
     <div id="east_chart_container" style="width: 100%; height: 100%;"></div>
 </script>
 
@@ -53,18 +59,17 @@
 
     map.east({
         title: '统计',
-        height: '400px',
+        height: '500px',
         width: '300px',
-        display: false,
+        display: true,
         contentHtml: document.getElementById('east_chart_template').innerHTML,
-        contentCallback: function () {
+        onLoad: function () {
             var chart = echarts.init(document.getElementById('east_chart_container'));
             chart.setOption(option);
         }
     });
 
     map.toolbar({
-        actions: [{text: '水位'}, {text: '雨量'}, {text: '工情'}, {text: '视频'}],
         searchUrl: '/demo/data/searchbox.json',
         direction: 'up',
         onRestore: function () {

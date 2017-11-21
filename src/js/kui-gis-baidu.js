@@ -265,9 +265,9 @@ gis.Baidu.prototype.toolbar = function (option) {
  * @public
  */
 gis.Baidu.prototype.east = function(east) {
-    if (east.contentCallback) {
+    if (east.onLoad) {
         this.map.addEventListener("addcontrol", function() {
-            setTimeout(east.contentCallback(), 3000);
+            setTimeout(east.onLoad(), 3000);
         });
     }
     east.id = '__map_east_pane';
@@ -285,9 +285,9 @@ gis.Baidu.prototype.east = function(east) {
  * @public
  */
 gis.Baidu.prototype.west = function(west) {
-    if (west.contentCallback) {
+    if (west.onLoad) {
         this.map.addEventListener("addcontrol", function() {
-            setTimeout(west.contentCallback(), 3000);
+            setTimeout(west.onLoad(), 3000);
         });
     }
     west.id = '__map_west_pane';
@@ -366,7 +366,7 @@ gis.Baidu.PaneControl = function(options) {
     this.width = options.width;
 
     this.contentHtml = options.contentHtml;
-    this.contentCallback = options.contentCallback;
+    this.onLoad = options.onLoad;
     
     // 是否直接显示
     this.display = options.display || false;
@@ -385,10 +385,10 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
     }
     ret.innerHTML = '';
     
-    ret.style.overflowY = 'auto';
+    ret.style.overflow = 'hidden';
 
     // 标题
-    var title = document.createElement('div');
+    var titlebar = document.createElement('div');
 
     var text = document.createElement('div');
     text.appendChild(document.createTextNode(this.title));
@@ -397,29 +397,30 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
     var icon = document.createElement('div');
     icon.className = 'bmap-icon icon-size-actual';
 
-    title.appendChild(icon);
-    title.appendChild(text);
+    titlebar.appendChild(icon);
+    titlebar.appendChild(text);
 
-    title.className ='row col-12';
-    ret.appendChild(title);
+    titlebar.className ='row col-12 bmap-titlebar';
+    ret.appendChild(titlebar);
 
     // 定位
     ret.style.border = '1px solid gray';
     ret.style.backgroundColor = 'white';
-    ret.style.position = 'absolute';
     ret.style.width = this.width;
     ret.style.height = this.height;
 
     var content = document.createElement('div');
     content.style.width = '100%';
-    content.style.height = parseInt(this.height) - 36 + 'px';
+    content.style.overflowY = 'auto';
+    // this.height could be number + 'px'
+    content.style.height = parseInt(this.height) - 32 + 'px';
     content.innerHTML = this.contentHtml;
     
     ret.appendChild(content);
     
     if (!this.display) {
-        ret.style.height = '36px';
-        ret.style.width = '33px';
+        ret.style.height = '32px';
+        ret.style.width = '32px';
         content.style.display = 'none';
         text.style.display = 'none';
         icon.className = 'bmap-icon icon-size-fullscreen';
@@ -428,21 +429,18 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
     var self = this;
     icon.onclick = function(event) {
         if (ret.style.height == self.height) {
-            ret.style.height = '36px';
-            ret.style.width = '33px';
-            ret.style.overflowY = 'hidden';
+            ret.style.height = '32px';
+            ret.style.width = '32px';
+            
             content.style.display = 'none';
             text.style.display = 'none';
-
             icon.className = 'bmap-icon icon-size-fullscreen';
         } else {
             ret.style.height = self.height;
             ret.style.width = self.width;
 
-            ret.style.overflowY = 'auto';
             content.style.display = '';
             text.style.display = '';
-
             icon.className = 'bmap-icon icon-size-actual';
         }
     };
@@ -464,7 +462,7 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
  * @private
  */
 gis.Baidu.Toolbar = function(option) {
-    this.actions = option.actions;
+    this.actions = option.actions || [];
     this.searchUrl = option.searchUrl;
     this.direction = option.direction;
     this.onRestore = option.onRestore;

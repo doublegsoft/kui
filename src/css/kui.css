@@ -126,8 +126,18 @@ body {
     margin-bottom: 30px;
 }
 
+.bmap-titlebar {
+    padding-left: 0!important;
+    margin-left: 0!important;
+    margin-bottom: 10px;
+    height: 32px;
+    overflow: hidden;
+    color: #000;
+    background-color: #f7f7f7
+}
+
 .bmap-title {
-    padding: 3px 10px;
+    padding: 1px 10px;
     font-size: 18px;
     font-weight: bold;
     margin-right: 5px;
@@ -135,9 +145,9 @@ body {
 }
 
 .bmap-icon {
-    padding-top: 9px;
+    padding-top: 6px;
     padding-left: 6px;
-    font-size:  16px;
+    font-size:  18px;
     cursor: pointer;
 }
 
@@ -152,4 +162,18 @@ body {
     font-size: 12px;
     text-align: center;
     cursor: pointer;
+}
+
+.bmap-pane {
+	/* Initially we don't want any height, and we want the contents to be hidden */
+	max-height: 0;
+	/* Set our transitions up. */
+	-webkit-transition: max-height 0.8s;
+	-moz-transition: max-height 0.8s;
+	transition: max-height 0.8s;
+}
+
+.bmap-pane-expand {
+	/* On hover, set the max-height to something large. In this case there's an obvious limit. */
+	max-height: 600px;
 }
