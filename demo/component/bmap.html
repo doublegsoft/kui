@@ -121,7 +121,7 @@
                 width: '500px',
                 display: display || false,
                 contentHtml: resp,
-                contentCallback: function () {
+                onLoad: function () {
                     var three = document.getElementById('collapseThree');
                     if (three != null) {
                         three.innerHTML = 'script worked.'

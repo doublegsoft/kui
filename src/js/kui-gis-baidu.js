@@ -415,6 +415,8 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
     // this.height could be number + 'px'
     content.style.height = parseInt(this.height) - 32 + 'px';
     content.innerHTML = this.contentHtml;
+    // custom scroll bar
+    PerfectScrollbar.initialize(content);
     
     ret.appendChild(content);
     
@@ -449,6 +451,7 @@ gis.Baidu.PaneControl.prototype.initialize = function(map) {
         map.getContainer().appendChild(ret);
         return ret;
     }
+    
     return ret;
 };
 
