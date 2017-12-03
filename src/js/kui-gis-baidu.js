@@ -280,7 +280,7 @@ gis.Baidu.prototype.east = function(east) {
 /**
  * 设置地图的西部面板（左侧面板）悬浮在地图上，可伸缩。
  * 
- * @param {object} west - 实例化东部面板的对象
+ * @param {object} west - 实例化西部面板的对象
  *
  * @public
  */

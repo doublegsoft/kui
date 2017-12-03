@@ -95,7 +95,15 @@
                                 map.mark(child, child.coord, {
                                     click: function(data) {
                                         console.log(data);
-                                        setWest('/demo/component/bmap-reservoir.html', true);
+                                        setWest('/demo/component/bmap-reservoir.html', true, function() {
+                                            gotoView('/demo/page/profile-baseinfo.html', 'baseinfo');
+                                            gotoView('/demo/page/profile-description-mini.html', 'description');
+                                            gotoView('/demo/page/profile-images-mini.html', 'images');
+                                            gotoView('/demo/page/profile-files-mini.html', 'files');
+                                            gotoView('/demo/page/profile-monitoring.html', 'monitoring');
+                                            gotoView('/demo/page/profile-checking-mini.html', 'checking');
+                                            gotoView('/demo/page/profile-bigevent.html', 'bigevent');
+                                        });
                                     }
                                 });
                             else if (child.coords) 
@@ -113,7 +121,7 @@
         });
     }
     
-    function setWest(url, display) {
+    function setWest(url, display, onload) {
         ajax.view(url, null, {}, function (resp) {
             map.west({
                 title: '档案',
@@ -121,12 +129,7 @@
                 width: '500px',
                 display: display || false,
                 contentHtml: resp,
-                onLoad: function () {
-                    var three = document.getElementById('collapseThree');
-                    if (three != null) {
-                        three.innerHTML = 'script worked.'
-                    }
-                }
+                onLoad: onload || function () {}
             });
         });
     }
