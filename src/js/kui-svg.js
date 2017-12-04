@@ -10,6 +10,11 @@ function Svg(option) {
     this.svgurl = option.svgurl;
     this.onLoad = option.onLoad;
     this.onDecorate = option.onDecorate;
+    this.enableDrawing = option.enableDrawing || false;
+    this.isDrawingLine = false;
+    this.isDrawingPolygon = false;
+    this.lastClickedPoint = null;
+    this.clickedPoints = [];
 }
 
 Svg.prototype.render = function(containerId) {
@@ -54,6 +59,42 @@ Svg.prototype.render = function(containerId) {
         
         if (self.onLoad)
             self.onLoad(self.svg);
+        if (self.enableDrawing) {
+            svg.on('mousedown', function () {
+                var point = d3.mouse(this);
+                var newClickedPoint = {x: point[0], y: point[1]};
+                self.lastClickedPoint = newClickedPoint;
+                self.clickedPoints.push(newClickedPoint);
+
+                self.lastLine = self.svg.select('#_tmp_line');
+                if (self.lastLine.empty()) {
+                    self.lastLine = self.svg.append('line');
+                    self.lastLine.attr('id', '_tmp_line').style('stroke', 'blue')
+                        .attr('x1', newClickedPoint.x).attr('y1', newClickedPoint.y)
+                        .attr('x2', newClickedPoint.x).attr('y2', newClickedPoint.y);
+                } else {
+                    self.lastLine.attr('id', '');
+                    self.lastLine = self.svg.append('line');
+                    self.lastLine.attr('id', '_tmp_line').style('stroke', 'blue')
+                        .attr('x1', newClickedPoint.x).attr('y1', newClickedPoint.y)
+                        .attr('x2', newClickedPoint.x).attr('y2', newClickedPoint.y);
+                }
+            });
+
+            svg.on('contextmenu', function () {
+                d3.event.preventDefault();
+                self.lastClickedPoint = null;
+            });
+
+            svg.on('mousemove', function() {
+                if (!self.lastClickedPoint) {
+                    return;
+                }
+                var point = d3.mouse(this);
+
+                self.lastLine.attr('x2', point[0]).attr('y2', point[1]);
+            });
+        }
         // binding events
         d3.select(self.container).call(zoom);
     });
@@ -70,3 +111,4 @@ Svg.prototype.restore = function () {
 Svg.prototype.findClosest = function (x, y) {
     // TODO
 };
+
