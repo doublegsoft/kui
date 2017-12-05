@@ -206,32 +206,34 @@ PaginationTable.prototype.root = function(initParams) {
             var th = $('<th style="text-align: center"></th>');
             // 冻结列
             if (j < this.frozenColumnCount) th.addClass('headcol');
-            var span = $("<span class='pull-right glyphicon glyphicon-sort'></span>");
+            var span = $("<span class='pull-right fa fa-arrows-v'></span>");
             span.css("opacity", "0.3");
+            span.css('margin-top', '2px');
+            span.addClass('fa');
             span.on("click", function(evt) {
             	var sorting = "asc";
             	var span = $(evt.target);
-            	if (span.hasClass("glyphicon-sort")) {
-            		span.removeClass("glyphicon-sort");
-            		span.addClass("glyphicon-sort-by-attributes");
+            	if (span.hasClass("fa-arrows-v")) {
+            		span.removeClass("fa-arrows-v");
+            		span.addClass("fa-sort-amount-asc");
             		span.css("opacity", "0.6");
             		sorting = "asc";
-            	} else if (span.hasClass("glyphicon-sort-by-attributes")) {
-            		span.removeClass("glyphicon-sort-by-attributes");
-            		span.addClass("glyphicon-sort-by-attributes-alt");
+            	} else if (span.hasClass("fa-sort-amount-asc")) {
+            		span.removeClass("fa-sort-amount-asc");
+            		span.addClass("fa-sort-amount-desc");
             		sorting = "desc";
-            	} else if (span.hasClass("glyphicon-sort-by-attributes-alt")) {
-            		span.removeClass("glyphicon-sort-by-attributes-alt");
-            		span.addClass("glyphicon-sort-by-attributes");
+            	} else if (span.hasClass("fa-sort-amount-desc")) {
+            		span.removeClass("fa-sort-amount-desc");
+            		span.addClass("fa-sort-amount-asc");
             		sorting = "asc";
             	}
             	// 其余的重置
-            	if (!span.hasClass("glyphicon-sort")) {
+            	if (!span.hasClass("fa-arrows-v")) {
             		self.table.find("th span").each(function (idx, elm) {
             			if (span.attr("data-order") == $(elm).attr("data-order")) return;
-            			$(elm).removeClass("glyphicon-sort-by-attributes");
-            			$(elm).removeClass("glyphicon-sort-by-attributes-alt");
-            			$(elm).addClass("glyphicon-sort");
+            			$(elm).removeClass("fa-sort-amount-asc");
+            			$(elm).removeClass("fa-sort-amount-desc");
+            			$(elm).addClass("fa-arrows-v");
             			$(elm).css("opacity", "0.3");
             		});
             	}
@@ -268,11 +270,13 @@ PaginationTable.prototype.root = function(initParams) {
             	span.attr("data-order", col.order);
             	// 根据初始化的过滤条件中，显示图标
             	if (col.order === initParams["orderBy"]) {
-            		span.removeClass("glyphicon-sort");
+            		span.removeClass("fa sort");
             		if (initParams["sorting"] === "asc") {
-            			span.addClass("glyphicon-sort-by-attributes");
+            			// span.addClass("glyphicon-sort-by-attributes");
+                        span.addClass('fa fa-sort-amount-asc')
             		} else {
-            			span.addClass("glyphicon-sort-by-attributes-alt");
+            			// span.addClass("glyphicon-sort-by-attributes-alt");
+                        span.addClass('fa fa-sort-amount-desc')
             		}
             	}
             	th.append(span);
@@ -301,7 +305,7 @@ PaginationTable.prototype.pagination = function() {
     var self = this;
     var div = $('<div></div>');
     div.css('float', 'right');
-    div.css('margin', '0');
+    div.css('margin', '8px');
     var ul = $('<ul></ul>');
     ul.addClass('pagination');
     this.firstPage = $('<li></li>');

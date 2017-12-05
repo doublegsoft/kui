@@ -51,10 +51,9 @@ ajax.post = function(url, data, callback) {
         dataType: 'json',
         success: function (resp) {
             if (typeof resp.error !== 'undefined') {
-                dialog.error('保存出错！');
+                dialog.error('请求出错！');
                 return;
             }
-            dialog.success('保存成功！');
             if (typeof callback !== 'undefined') {
                 callback(resp);
             }

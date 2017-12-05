@@ -5,6 +5,8 @@ function Calendar(option) {
     this.month = option.month;
     this.tooltip = option.tooltip || function (params) { };
     this.series = option.series || [];
+    this.preferredWidth = option.preferredWidth || 500;
+    this.preferredHeight = option.preferredHeight || 500;
 }
 
 /**
@@ -16,7 +18,6 @@ function Calendar(option) {
  */
 Calendar.prototype.render = function (containerId) {
     this.containerId = containerId;
-
     var lunarData = [];
     var date = moment().set({ 'year': this.year, 'month': this.month - 1, 'date': 1 });
 
@@ -46,7 +47,7 @@ Calendar.prototype.render = function (containerId) {
         calendar: [{
             left: 'center',
             top: 'middle',
-            cellSize: [70, 70],
+            cellSize: [this.preferredWidth / 7, this.preferredWidth / 7],
             yearLabel: { show: false },
             orient: 'vertical',
             dayLabel: {
@@ -121,7 +122,7 @@ Calendar.prototype.prev = function () {
  */
 Calendar.prototype.datebar = function () {
     var ret = '' +
-    '<div style="width: 500px; height: 24px; text-align: center;">' +
+    '<div style="width: 100%; height: 24px; text-align: center;">' +
     '    <button class="btn btn-link icon-action float-left">' +
     '        <i class="icon-arrow-left-circle" style="font-size: 23px;"></i>' +
     '    </button>' +
@@ -135,13 +136,13 @@ Calendar.prototype.datebar = function () {
 
 Calendar.prototype.chart = function () {
     var chartContainer = document.createElement('div');
-    chartContainer.style.width = '500px';
-    chartContainer.style.height = '520px';
+    chartContainer.style.width = this.preferredWidth + 'px';
+    chartContainer.style.height = this.preferredHeight + 'px';
 
     var chart = echarts.init(chartContainer);
     chart.setOption(this.chartOption);
     chart.on('click', function (params) {
-        console.log(params);
+
     });
     return chartContainer;
 };

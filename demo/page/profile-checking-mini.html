@@ -1,5 +1,5 @@
-<div class="row col-sm-12">
-    <div id="calendar" class="col-md-6" style="height: 500px"></div>
+<div class="row card-body">
+    <div id="calendar" class="col-sm-12" style="height: 500px"></div>
     <div class="col-sm-12">
         <div class="card">
             <div class="card-body">
@@ -51,7 +51,9 @@
             type: 'heatmap',
             coordinateSystem: 'calendar',
             data: data
-        }]
+        }],
+        preferredWidth: 400,
+        preferredHeight: 450
     });
     cal.render('calendar');
 </script>

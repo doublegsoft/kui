@@ -128,14 +128,16 @@ var table1 = new PaginationTable({
     limit: 15,
     columns: [{
         title: '水库名称',
-        template: '{rsnm}'
+        template: '{rsnm}',
+        order: 'rsnm'
     }, {
         title: '工程规模',
-        template: '{prscnm}'
+        template: '{prscnm}',
+        order: 'prscnm'
     }, {
         title: '行政区划',
         template: '{addvnm}',
-        width: '250px'
+        order: 'addvnm'
     }, {
         title: '当前水位（m）',
         template: '{rz}'
