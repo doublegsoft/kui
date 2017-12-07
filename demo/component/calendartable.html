@@ -1,0 +1,63 @@
+<style>        
+        .headcol {
+            position:absolute; 
+            width:5em; 
+            left:0;
+            top:auto;
+            border-right: 0px none black; 
+            border-top-width:3px; /*only relevant for first row*/
+            margin-top:-3px; /*compensate for top border*/
+        }
+</style>
+<div class="card">
+    <div class="card-header">
+       <strong>日历表格</strong>
+       <small></small>
+    </div>
+    <div class="card-body">
+        <div id="calendar-table" class="height: 100%"></div>
+    </div>
+</div>
+
+<script>
+
+var table1 = new CalendarTable({
+    url: 'data/paginationtable.json',
+    limit: 15,
+    columns: [{
+        title: '水库名称',
+        template: '{rsnm}',
+        rowHeader: true
+    }, {
+        title: '工程规模',
+        template: '{prscnm}',
+        rowHeader: true
+    }, {
+        title: '行政区划',
+        template: '{addvnm}',
+        rowHeader: true
+    }, {
+        title: '报警',
+        displayFunction: function (obj, td) {
+            if (typeof obj.lvl === 'undefined') {
+                td.append('无');
+                return;
+            }
+            var alarm = '无';
+            switch(obj.lvl + '') {
+            case '1': alarm = '红色'; break;
+            case '2': alarm = '橙色'; break;
+            case '3': alarm = '黄色'; break;
+            case '4': alarm = '蓝色'; break;
+            }
+            var a = $('<a href="#">');
+            a.on('click', function() {
+                
+            });
+            a.text(alarm);
+            td.append(a);
+        }
+    }]
+});
+table1.render('calendar-table');
+</script>

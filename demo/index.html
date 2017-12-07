@@ -62,6 +62,9 @@
                                     <a class="nav-link" href="javascript:gotoPage('component/statisticstable.html', '统计表格');"><i class="icon-puzzle"></i>统计表格</a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" href="javascript:gotoPage('component/calendartable.html', '日历表格');"><i class="icon-puzzle"></i>日历表格</a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" href="javascript:gotoPage('component/tree.html', '树结构');"><i class="icon-puzzle"></i>树结构</a>
                                 </li>
                                 <li class="nav-item">
@@ -91,7 +94,7 @@
                                     <a class="nav-link" href="javascript:gotoPage('page/list-general.html', '常规型列表');" target="_top"><i class="icon-star"></i>常规型列表</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="javascript:gotoPage('page/list-statistics.html', '统计型列表');" target="_top"><i class="icon-star"></i>统计型列表</a>
+                                    <a class="nav-link" href="javascript:gotoPage('page/list-statistics.html', '混编型列表');" target="_top"><i class="icon-star"></i>混编型列表</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" href="javascript:gotoPage('page/form.html', '表单');" target="_top"><i class="icon-star"></i>表单</a>
@@ -225,6 +228,7 @@
         <script src="/src/js/kui-districtpicker.js"></script>
         <script src="/src/js/kui-paginationtable.dev.js"></script>
         <script src="/src/js/kui-statisticstable.js"></script>
+        <script src="/src/js/kui-calendartable.dev.js"></script>
         <script src="/src/js/kui-svg.js"></script>
         <script src="/src/js/kui-searchbox.js"></script>
 
@@ -240,10 +244,10 @@
         mp3url: '/demo/img/ring.mp3'
     });
     setTimeout(function () {
-        alarm.start();
+        // alarm.start();
     }, 5000);
     setTimeout(function () {
-        alarm.stop();
+        // alarm.stop();
     }, 1000 * 60 * 2);
     
 </script>
