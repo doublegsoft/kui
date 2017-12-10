@@ -26,6 +26,7 @@ var PaginationTable = function(opts) {
     this.columnHeight = opts.columnHeight || '32px';
     
     this.boundedQuery = opts.boundedQuery || null;
+    this.fixedColumns = opts.fixedColumn || 0;
     //是否只显示获取的数据长度对应的表格行数
     this.showDataRowLength = opts.showDataRowLength || false;
     this.containerId = opts.containerId;
@@ -139,6 +140,7 @@ PaginationTable.prototype.render = function(containerId, params) {
 
 PaginationTable.prototype.beforeRequest = function (initParams) {
     var _this = this;
+    
 
     //var loadding = $("<h6> 正在加载数据，请稍候....</h6>");
     var loaddingct = $("<div></div>");
@@ -186,44 +188,15 @@ PaginationTable.prototype.root = function(initParams) {
 	if (typeof initParams === "undefined") {
 		initParams = {};
 	}
-    var tableClass = 'table table-responsive-sm table-hover table-outline mb-0';
 	var ret = $('<div>');
 	ret.css('overflow', 'auto');
-    this.table = $('<table class="' + tableClass + '"></table>');
-    
-    // 参考http://issues.wenzhixin.net.cn/bootstrap-table/#extensions/fixed-columns.html
-    // 的实现，需要添加若干元素
-    this.frozenHeaderColumnsContainer = $('<div class="fixed-table-header-columns" style="display: block"></div>');
-    this.frozenHeaderColumnsTable = $('<table class="' + tableClass + '"></table>');
-    this.frozenHeaderColumnsTable.append('<thead class="thead-light"><tr></tr></thead>').append('<tbody></tbody>');
-    this.frozenHeaderColumnsContainer.append(this.frozenHeaderColumnsTable);
-    ret.append(this.frozenHeaderColumnsContainer);
-    
-    this.headerContainer = $('<div class="fixed-table-header"></div>');
-    this.headerTable = $('<table class="' + tableClass + '"></table>');
-    this.headerTable.append('<thead class="thead-light"><tr></tr></thead>').append('<tbody></tbody>');
-    this.headerContainer.append(this.headerTable);
-    ret.append(this.headerContainer);
-    
-    this.frozenBodyColumnsContainer = $('<div class="fixed-table-body-columns" style="display: block; top: 46px;"></div>');
-    this.frozenBodyColumnsTable = $('<table class="' + tableClass + '"></table>');
-    this.frozenBodyColumnsTable.append('<thead class="thead-light"><tr></tr></thead>').append('<tbody></tbody>');
-    this.frozenBodyColumnsContainer.append(this.frozenBodyColumnsTable);
-    ret.append(this.frozenBodyColumnsContainer);
-    
-    this.bodyContainer = $('<div class="fixed-table-body"></div>');
-    this.bodyTable = $('<table class="' + tableClass + '" style="margin-top: -51px;"></table>');
-    this.bodyTable.append('<thead class="thead-light"><tr></tr></thead>').append('<tbody></tbody>');
-    this.bodyContainer.append(this.bodyTable);
-    ret.append(this.bodyContainer);
-    
+    this.table = $("<table></table>");
     if (typeof this.width !== 'undefined') this.table.css('width', this.width);
     if (typeof this.height !== 'undefined') ret.css('height', this.height);
     // if (!this.frozenHeader) this.table.addClass('table');
     // this.table.addClass("table table-bordered table-striped");
-    this.table.addClass(tableClass);
+    this.table.addClass("table table-responsive-sm table-hover table-outline mb-0");
     
-    var frozenColumnsWidth = 0;
     var self = this;
     var thead = $('<thead class="thead-light"></thead>');
     for (var i = 0; i < this.columnMatrix.length; ++i) {
@@ -231,6 +204,8 @@ PaginationTable.prototype.root = function(initParams) {
         for (var j = 0; j < this.columnMatrix[i].length; ++j) {
         	var col = this.columnMatrix[i][j];
             var th = $('<th style="text-align: center"></th>');
+            // 冻结列
+            if (j < this.frozenColumnCount) th.addClass('headcol');
             var span = $("<span class='pull-right fa fa-arrows-v'></span>");
             span.css("opacity", "0.3");
             span.css('margin-top', '2px');
@@ -272,11 +247,7 @@ PaginationTable.prototype.root = function(initParams) {
             // style
             th.attr('style', col.style || "");
             // 如果设置了列宽
-            if (typeof col.width !== 'undefined') {
-                th.css('width', col.width);
-                if (j < this.frozenColumnCount + 1)
-                    frozenColumnsWidth += parseInt(col.width);
-            }
+            if (typeof col.width !== 'undefined') th.css('width', col.width);
             // 当需要冻结表头
             if (this.frozenHeader == true) {
                 thead.css('float', 'left');
@@ -310,34 +281,14 @@ PaginationTable.prototype.root = function(initParams) {
             	}
             	th.append(span);
             }
-            th.css('overflow', 'hidden');
             tr.append(th);
-            // 冻结列的设置
-            if (j < this.frozenColumnCount + 1) {
-                this.frozenHeaderColumnsTable.find('thead tr:eq(0)').append(th.clone());
-            }
-            this.headerTable.find('thead tr:eq(0)').append(th.clone());
-            this.bodyTable.find('thead tr:eq(0)').append(th.clone());
         }
         thead.append(tr);
     }
     this.table.append(thead);
     // 添加个空的表体
     this.table.append('<tbody></tbody>');
-    // ret.append(this.table);
-    
-    if (this.width) {
-        this.headerTable.css('width', this.width);
-    }
-    if (this.height) {
-        ret.css('height', this.height);
-        this.headerTable.css('height', this.height);
-        this.frozenBodyColumnsContainer.css('height', this.height);
-    }
-    this.frozenHeaderColumnsContainer.css('width', frozenColumnsWidth + 5 + 'px');
-    this.frozenBodyColumnsContainer.css('width', frozenColumnsWidth + 5 + 'px');
-    
-    ret.addClass('fixed-table-container');
+    ret.append(this.table);
     return ret;
 };
 
@@ -683,7 +634,6 @@ PaginationTable.prototype.replace = function(str, find, replace) {
  * @param the result from the server side
  */
 PaginationTable.prototype.fill = function(result) {
-    var self = this;
     this.clear();
     var mappingColumns = this.mappingColumns;
     if(result.data && result.data[0]) {
@@ -703,7 +653,7 @@ PaginationTable.prototype.fill = function(result) {
 	                var col = mappingColumns[j];
 	                var td = $("<td></td>");
 	                // 冻结列
-	                // if (j < this.frozenColumnCount) td.addClass('fixed-table-column');
+	                if (j < this.frozenColumnCount) td.addClass('headcol');
 	                if (col.style) {
 	                    td.attr("style", col.style);
 	                }else{
@@ -740,14 +690,6 @@ PaginationTable.prototype.fill = function(result) {
 	            }
 	        }
 	        tbody.append(tr);
-            var trFrozen = $('<tr>');
-            this.frozenBodyColumnsTable.append(trFrozen);
-            tr.find('td').each(function(idx, td) {
-                if (idx < self.frozenColumnCount) {
-                    trFrozen.append($(td).clone());
-                }
-            });
-            this.bodyTable.find('tbody').append(tr.clone());
 	    }
     }
 

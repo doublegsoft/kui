@@ -177,3 +177,48 @@ body {
 	/* On hover, set the max-height to something large. In this case there's an obvious limit. */
 	max-height: 600px;
 }
+
+/* */
+
+.fixed-table-container {
+    position: relative;
+    clear: both;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+}
+
+.fixed-table-header-columns,
+.fixed-table-body-columns {
+    position: absolute;
+    background-color: #fff;
+    display: none;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.fixed-table-header-columns .table,
+.fixed-table-body-columns .table {
+    border-right: 1px solid #ddd;
+}
+
+.fixed-table-header-columns .table.table-no-bordered,
+.fixed-table-body-columns .table.table-no-bordered {
+    border-right: 1px solid transparent;
+}
+
+.fixed-table-body-columns table {
+    position: absolute;
+    animation: none;
+}
+
+.fixed-table-body {
+    overflow-x: auto;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.bootstrap-table .table-hover > tbody > tr.hover > td{
+    background-color: #f5f5f5;
+}
