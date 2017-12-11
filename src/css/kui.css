@@ -219,6 +219,11 @@ body {
     height: 100%;
 }
 
+.fixed-table-footer,
+.fixed-table-header {
+    overflow: hidden;
+}
+
 .bootstrap-table .table-hover > tbody > tr.hover > td{
     background-color: #f5f5f5;
 }
