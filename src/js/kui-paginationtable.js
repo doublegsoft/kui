@@ -189,7 +189,7 @@ PaginationTable.prototype.root = function(initParams) {
 		initParams = {};
 	}
 	var ret = $('<div>');
-	ret.css('overflow', 'auto');
+	ret.css('overflow-y', 'hidden');
     this.table = $("<table></table>");
     if (typeof this.width !== 'undefined') this.table.css('width', this.width);
     if (typeof this.height !== 'undefined') ret.css('height', this.height);

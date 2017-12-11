@@ -1,7 +1,7 @@
 /**
  * 
  */
-var PaginationTable = function(opts) {
+var FrozenColumnsTable = function(opts) {
 	// 远程数据源
     this.url = opts.url;
     // 本地数据源，未封装的数据源
@@ -79,7 +79,7 @@ var PaginationTable = function(opts) {
 /**
  * Turns to the previous page.
  */
-PaginationTable.prototype.prev = function() {
+FrozenColumnsTable.prototype.prev = function() {
     if (this.start <= 0)
         return;
     this.go((this.start - this.limit) / this.limit + 1);
@@ -88,7 +88,7 @@ PaginationTable.prototype.prev = function() {
 /**
  * Turns to the next page.
  */
-PaginationTable.prototype.next = function() {
+FrozenColumnsTable.prototype.next = function() {
     if (this.start + this.limit >= this.total)
         return;
     this.go((this.start + this.limit) / this.limit + 1);
@@ -100,7 +100,7 @@ PaginationTable.prototype.next = function() {
  * @param {integer}
  *            page - the page number
  */
-PaginationTable.prototype.go = function(page, criteria) {
+FrozenColumnsTable.prototype.go = function(page, criteria) {
     if (page <= 0 || page > this.lastPageNumber())
         return;
     this.rollbackStart = this.start;
@@ -115,7 +115,7 @@ PaginationTable.prototype.go = function(page, criteria) {
  * @param {string}
  *            containerId - the container id in the dom.
  */
-PaginationTable.prototype.render = function(containerId, params) {
+FrozenColumnsTable.prototype.render = function(containerId, params) {
     if (typeof this.contaienrId === 'undefined') this.containerId = containerId;
     var cntr = $('#' + this.containerId);
     cntr.empty();
@@ -137,7 +137,7 @@ PaginationTable.prototype.render = function(containerId, params) {
     }
 };
 
-PaginationTable.prototype.beforeRequest = function (initParams) {
+FrozenColumnsTable.prototype.beforeRequest = function (initParams) {
     var _this = this;
 
     //var loadding = $("<h6> 正在加载数据，请稍候....</h6>");
@@ -170,11 +170,11 @@ PaginationTable.prototype.beforeRequest = function (initParams) {
     $(this.table.find('tbody')).append($("<tr></tr>").append($("<td></td>").attr("colspan",this.allcolumns).append(loaddingct)));
 };
 
-PaginationTable.prototype.afterRequest = function () {
+FrozenColumnsTable.prototype.afterRequest = function () {
 	
 };
 
-PaginationTable.prototype.requestError = function () {
+FrozenColumnsTable.prototype.requestError = function () {
     this.table.find("div.loaddingct").html('<h6 style="color:red">数据加载出错，请联系管理员解决...</h6>');
 };
 /**
@@ -182,7 +182,7 @@ PaginationTable.prototype.requestError = function () {
  *
  * @return {object} the jquery table
  */
-PaginationTable.prototype.root = function(initParams) {
+FrozenColumnsTable.prototype.root = function(initParams) {
 	if (typeof initParams === "undefined") {
 		initParams = {};
 	}
@@ -353,7 +353,7 @@ PaginationTable.prototype.root = function(initParams) {
  * 
  * @return {object} a pagination bar, the jquery div.
  */
-PaginationTable.prototype.pagination = function() {
+FrozenColumnsTable.prototype.pagination = function() {
 	if (this.limit <= 0) {
 		return;
 	}
@@ -471,7 +471,7 @@ PaginationTable.prototype.pagination = function() {
  * 
  * @private
  */
-PaginationTable.prototype.showPageNumber = function() {
+FrozenColumnsTable.prototype.showPageNumber = function() {
     var pagenum = this.start / this.limit + 1;
     var lastpagenum = this.lastPageNumber() , total = this.total;
     lastpagenum = lastpagenum ? lastpagenum : 0,total = total ? total : 0;
@@ -493,7 +493,7 @@ PaginationTable.prototype.showPageNumber = function() {
     }
 };
 
-PaginationTable.prototype.disablePaging = function() {
+FrozenColumnsTable.prototype.disablePaging = function() {
 	if (this.limit <= 0) {
 		return;
 	}
@@ -512,7 +512,7 @@ PaginationTable.prototype.disablePaging = function() {
  * 
  * @return the last page number
  */
-PaginationTable.prototype.lastPageNumber = function() {
+FrozenColumnsTable.prototype.lastPageNumber = function() {
     if (this.total == 0 || this.limit == -1) {
         return 1;
     }
@@ -532,7 +532,7 @@ PaginationTable.prototype.lastPageNumber = function() {
  * 
  * @private
  */
-PaginationTable.prototype.maxColSpan = function(column) {
+FrozenColumnsTable.prototype.maxColSpan = function(column) {
     var ret = 1;
     var max = 0;
     for (var i = 0; column.children && i < column.children.length; ++i) {
@@ -547,7 +547,7 @@ PaginationTable.prototype.maxColSpan = function(column) {
  * 
  * @private
  */
-PaginationTable.prototype.clear = function() {
+FrozenColumnsTable.prototype.clear = function() {
     // this.table.find("thead").remove(); // 如果手动添加了表格头部
     $(this.table.find('tbody')).empty();
 };
@@ -560,7 +560,7 @@ PaginationTable.prototype.clear = function() {
  * 
  * @private
  */
-PaginationTable.prototype.buildMappingColumns = function(columns) {
+FrozenColumnsTable.prototype.buildMappingColumns = function(columns) {
     for (var i = 0; i < columns.length; i++) {
         var col = columns[i];
         if (!col.children || col.children.length == 0) {
@@ -582,7 +582,7 @@ PaginationTable.prototype.buildMappingColumns = function(columns) {
  * 
  * @private
  */
-PaginationTable.prototype.buildMatrix = function(columns, index) {
+FrozenColumnsTable.prototype.buildMatrix = function(columns, index) {
     if (!columns)
         return;
     var currentIndex = index;
@@ -601,7 +601,7 @@ PaginationTable.prototype.buildMatrix = function(columns, index) {
 /**
  * 
  */
-PaginationTable.prototype.request = function(others) {
+FrozenColumnsTable.prototype.request = function(others) {
     var self = this;
     var params = {};
     if (self.boundedQuery != null) {
@@ -662,7 +662,7 @@ PaginationTable.prototype.request = function(others) {
 /**
  * 加载本地数据分页显示。
  */
-PaginationTable.prototype.loadLocal = function () {
+FrozenColumnsTable.prototype.loadLocal = function () {
 	this.total = this.local.total;
 	var result = {};
 	result.total = this.local.total;
@@ -675,15 +675,15 @@ PaginationTable.prototype.loadLocal = function () {
     this.afterLoad(result);
 };
 
-PaginationTable.prototype.addFilter = function(name, value) {
+FrozenColumnsTable.prototype.addFilter = function(name, value) {
     this.filters[name] = value;
 };
 
-PaginationTable.prototype.clearFilters = function() {
+FrozenColumnsTable.prototype.clearFilters = function() {
     this.filters = {};
 };
 
-PaginationTable.prototype.replace = function(str, find, replace) {
+FrozenColumnsTable.prototype.replace = function(str, find, replace) {
     return str.replace(new RegExp(find, 'g'), replace);
 };
 
@@ -692,7 +692,7 @@ PaginationTable.prototype.replace = function(str, find, replace) {
  * 
  * @param the result from the server side
  */
-PaginationTable.prototype.fill = function(result) {
+FrozenColumnsTable.prototype.fill = function(result) {
     var self = this;
     this.clear();
     var mappingColumns = this.mappingColumns;

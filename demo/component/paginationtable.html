@@ -10,8 +10,18 @@
 
 <div class="card">
     <div class="card-header">
+        <strong>分页表格</strong>
+        <small>固定表头</small>
+    </div>
+    <div class="card-body">
+        <div id="frozen-headers-pagination-table" class="height: 100%"></div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
        <strong>分页表格</strong>
-       <small>固定表头</small>
+       <small>固定表头和列头</small>
     </div>
     <div class="card-body">
         <div id="fixed-pagination-table" class="height: 100%"></div>
@@ -19,7 +29,7 @@
 </div>
 
 <script>
-var table = new PaginationTable({
+var table = new FrozenColumnsTable({
     url: 'data/paginationtable.json',
     containerId: 'fixed-pagination-table',
     frozenHeader: false,
@@ -160,4 +170,65 @@ var table1 = new PaginationTable({
     }]
 });
 table1.render('pagination-table');
+
+var table3 = new PaginationTable({
+    url: 'data/paginationtable.json',
+    containerId: 'frozen-headers-pagination-table',
+    frozenHeader: true,
+    width: '1300px',
+    height: '400px',
+    tbodyHeight: '350px',
+    limit: 15,
+    columns: [{
+        title: '水库名称',
+        template: '{rsnm}',
+        width: '130px',
+        order: 'rsnm'
+    }, {
+        title: '工程规模',
+        template: '{prscnm}',
+        width: '130px',
+        order: 'prscnm'
+    }, {
+        title: '行政区划',
+        template: '{addvnm}',
+        width: '130px',
+        order: 'addvnm'
+    }, {
+        title: '当前水位（m）',
+        width: '130px',
+        template: '{rz}'
+    }, {
+        title: '当前累计雨量（mm）',
+        width: '180px',
+        template: '{dyp}'
+    }, {
+        title: '最新水位上报时间',
+        width: '250px',
+        template: '{dt}'
+    }, {
+        title: '报警',
+        width: '130px',
+        displayFunction: function (obj, td) {
+            if (typeof obj.lvl === 'undefined') {
+                td.append('无');
+                return;
+            }
+            var alarm = '无';
+            switch(obj.lvl + '') {
+                case '1': alarm = '红色'; break;
+                case '2': alarm = '橙色'; break;
+                case '3': alarm = '黄色'; break;
+                case '4': alarm = '蓝色'; break;
+            }
+            var a = $('<a href="#">');
+            a.on('click', function() {
+
+            });
+            a.text(alarm);
+            td.append(a);
+        }
+    }]
+});
+table3.render('frozen-headers-pagination-table');
 </script>

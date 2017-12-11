@@ -183,7 +183,7 @@ body {
 .fixed-table-container {
     position: relative;
     clear: both;
-    border: 1px solid #dddddd;
+    border: 0px solid #dddddd;
     border-radius: 4px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -200,7 +200,7 @@ body {
 
 .fixed-table-header-columns .table,
 .fixed-table-body-columns .table {
-    border-right: 1px solid #ddd;
+    border-right: 0px solid #ddd;
 }
 
 .fixed-table-header-columns .table.table-no-bordered,
