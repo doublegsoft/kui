@@ -31,6 +31,10 @@
 	display: block;
 }
 
+.toc-h3 {
+  padding-left: 20px;
+}
+
 .toc-entry a {
 	display: block;
 	padding: .125rem 1.5rem;
