@@ -186,7 +186,7 @@ FrozenColumnsTable.prototype.root = function(initParams) {
 	if (typeof initParams === "undefined") {
 		initParams = {};
 	}
-    var tableClass = 'table table-responsive-sm table-hover table-outline mb-0';
+    var tableClass = 'table table-responsive-sm table-outline mb-0';
 	var ret = $('<div class="fixed-table-container"></div>');
 	// ret.css('overflow-y', 'hidden');
     this.table = $('<table class="' + tableClass + '"></table>');
@@ -716,8 +716,8 @@ FrozenColumnsTable.prototype.fill = function(result) {
 	                // if (j < this.frozenColumnCount) td.addClass('fixed-table-column');
 	                if (col.style) {
 	                    td.attr("style", col.style);
-	                }else{
-                        td.attr("style", "text-align: center; vertical-align:middle");
+	                } else {
+                        td.attr("style", "text-align: center; vertical-align:middle;");
                     }
 	                if (typeof col.width !== 'undefined') td.css('width', col.width);
 	                if (this.frozenHeader == true) {
