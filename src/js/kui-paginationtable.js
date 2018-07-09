@@ -14,7 +14,7 @@ var PaginationTable = function (opts) {
   this.limit = opts.limit || 25;
   this.cache = opts.cache || "server";
   this.style = opts.style || "full";
-
+  this.headless = opts.headless || false;
   // 高度和宽度，用来固定表头和列的参数
   this.width = opts.width;
   this.height = opts.height;
@@ -189,7 +189,7 @@ PaginationTable.prototype.root = function (initParams) {
     initParams = {};
   }
   var ret = $('<div>');
-  ret.css('overflow-y', 'hidden');
+  ret.css('overflow-y', 'auto');
   this.table = $("<table></table>");
   if (typeof this.width !== 'undefined') this.table.css('width', this.width);
   if (typeof this.height !== 'undefined') ret.css('height', this.height);
@@ -254,7 +254,7 @@ PaginationTable.prototype.root = function (initParams) {
         th.css('float', 'left');
       }
       // 默认居中
-      th.css('text-align', 'center');
+      // th.css('text-align', 'center');
       if (typeof col.headerClick === "undefined") {
         //th.text(col.title);
         th.append(col.title);
@@ -285,7 +285,8 @@ PaginationTable.prototype.root = function (initParams) {
     }
     thead.append(tr);
   }
-  this.table.append(thead);
+  if (!this.headless)
+    this.table.append(thead);
   // 添加个空的表体
   this.table.append('<tbody></tbody>');
   ret.append(this.table);
@@ -365,7 +366,7 @@ PaginationTable.prototype.pagination = function () {
   li = $('<li class=disabled></li>');
   a = $('<a></a>');
   a.attr('style', 'cursor: default');
-
+  /*
   this.pagenum = $('<input/>');
   this.pagenum.attr('size', 1);
   this.pagenum.attr('style', 'font-size: 11px; text-align: right; width: 25px; height: 20px;');
@@ -399,6 +400,7 @@ PaginationTable.prototype.pagination = function () {
     li.append(a);
     ul.append(li);
   }
+  */
 
   if (this.style === 'none') {
     return;
@@ -681,16 +683,18 @@ PaginationTable.prototype.fill = function (result) {
           }
           tr.append(td);
         }
+        tbody.append(tr);
       } else {
-        if (this.limit <= 0) {
-          break;
-        }
-        for (var j = 0; j < mappingColumns.length; ++j) {
-          var td = $("<td>&nbsp;</td>");
-          tr.append(td);
-        }
+        
+//        if (this.limit <= 0) {
+//          break;
+//        }
+//        for (var j = 0; j < mappingColumns.length; ++j) {
+//          var td = $("<td>&nbsp;</td>");
+//          tr.append(td);
+//        }
       }
-      tbody.append(tr);
+      
     }
   }
 

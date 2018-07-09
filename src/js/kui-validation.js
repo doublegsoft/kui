@@ -118,7 +118,7 @@ Validation = {
         });
         // 下拉框
         container.find('select').each(function(idx, el) {
-            if ($(el).prop('required') && $(el).val() === '-1') {
+            if ($(el).prop('required') && $(el).val() == '-1') {
                 var label = Validation.getLabel(el);
                 var msg = label + '必须选择！';
                 msg = $(el).attr('required-message') ? $(el).attr('required-message') : msg;
