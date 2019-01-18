@@ -1,67 +1,66 @@
 <div class="animated fadeIn card">
-    <div class="card-header">
-       <strong>查询列表</strong>
+  <div class="card-header"> <strong>查询列表</strong> </div>
+  <div class="card-body">
+    <div id="validation-form" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">水库名称：</label>
+        <div class="col-md-4">
+          <input class="form-control" name="required" required label='必须要填'>
+        </div>
+        <label class="col-form-label col-md-2">行政区划：</label>
+        <div class="col-md-4 form-group">
+          <select class="form-control">
+            <option>不限</option>
+            <option>渝北区</option>
+            <option>渝中区</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">水库功能：</label>
+        <div class="col-md-4 form-checks">
+          <label class="custom-control checkbox checkbox-info">
+            <input type="checkbox" class="custom-control-input">
+            <span class="custom-control-indicator"></span> 
+            <span class="custom-control-description">供水</span> 
+          </label>
+          <label class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input">
+            <span class="custom-control-indicator"></span> 
+            <span class="custom-control-description">灌溉</span> 
+          </label>
+          <label class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input">
+            <span class="custom-control-indicator"></span> 
+            <span class="custom-control-description">发电</span> 
+          </label>
+        </div>
+        <label class="col-form-label col-md-2">注册登记：</label>
+        <div class="col-md-4 form-radios">
+          <label class="custom-control custom-radio">
+            <input type="radio" name="radio" class="custom-control-input" checked>
+            <span class="custom-control-indicator"></span> 
+            <span class="custom-control-description">是</span> 
+          </label>
+          <label class="custom-control custom-radio">
+            <input type="radio" name="radio" class="custom-control-input">
+            <span class="custom-control-indicator"></span> 
+            <span class="custom-control-description">否</span> 
+          </label>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-        <div id="validation-form" class="form form-horizontal">
-            <div class="form-group row">
-                <label class="col-form-label col-md-2">水库名称：</label>
-                <div class="col-md-4"><input class="form-control" name="required" required label='必须要填'></div>
-                <label class="col-form-label col-md-2">行政区划：</label>
-                <div class="col-md-4">
-                    <select class="form-control">
-                        <option>不限</option>
-                        <option>渝北区</option>
-                        <option>渝中区</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group row">
-                <label class="col-form-label col-md-2">水库功能：</label>
-                <div class="col-md-4 form-checks">
-                    <label class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">供水</span>
-                    </label>
-                    <label class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">灌溉</span>
-                    </label>
-                    <label class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">发电</span>
-                    </label>
-                </div>
-                <label class="col-form-label col-md-2">注册登记：</label>
-                <div class="col-md-4 form-radios">
-                    <label class="custom-control custom-radio">
-                        <input type="radio" name="radio" class="custom-control-input" checked>
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">是</span>
-                    </label>
-                    <label class="custom-control custom-radio">
-                        <input type="radio" name="radio" class="custom-control-input">
-                        <span class="custom-control-indicator"></span>
-                        <span class="custom-control-description">否</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 form-buttons">
-            <div class="float-right">
-                <button class="btn btn-query">查  询</button>
-                <button class="btn btn-new">新  建</button>
-            </div>
-        </div>
-        <div class="row col-12" style="padding-right: 0px;">
-            <div id="pagination-table" style="width: 100%; height: 100%; margin-top:  10px;"></div>
-        </div>
+    <div class="col-12 form-buttons">
+      <div class="float-right">
+        <button class="btn btn-query">查  询</button>
+        <button class="btn btn-new">新  建</button>
+      </div>
     </div>
+    <div class="row col-12" style="padding-right: 0px;">
+      <div id="pagination-table" style="width: 100%; height: 100%; margin-top:  10px;"></div>
+    </div>
+  </div>
 </div>
-
 <script>
 
 

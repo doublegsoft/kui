@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-copy": "^1.0.0",
+    "gulp-jasmine": "^2.4.2",
+    "gulp-minify": "0.0.15",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^2.1.2",
+    "gulp-uglifycss": "^1.0.8",
+    "gulp-watch": "^4.3.11",
+    "jasmine": "^2.6.0",
+    "jsdom": "^10.1.0"
+  },
+  "scripts": {
+    "test": "jasmine"
+  }
+}

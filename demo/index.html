@@ -19,62 +19,26 @@
 
 <!-- Main styles for this application -->
 <link href="/src/css/coreui.css" rel="stylesheet">
+<link href="/src/css/kui-coreui.css" rel="stylesheet">
 <link href="/src/css/kui.css" rel="stylesheet">
 <link href="/src/css/kui-timeline.css" rel="stylesheet">
 <link href="/src/css/kui-toc.css" rel="stylesheet">
 <link href="/src/css/kui-districtpicker.css" rel="stylesheet">
 <link href="/src/css/kui-alarm.css" rel="stylesheet">
+<link href="/src/css/kui-checks.css" rel="stylesheet">
 </head>
 
-<body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden" style="overflow-y: hidden">
+<body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show" style="overflow-y: hidden">
 <div class="app-body">
+ 
+  <!-- side menu -->
   <div class="sidebar">
-    <nav class="sidebar-nav">
-      <ul class="nav">
-        <li class="nav-item"> <a class="nav-link" href="javascript:ajax.view('dashboard.html', $('#container'));"><i class="icon-speedometer"></i>总览概况<span class="badge badge-primary">NEW</span></a> </li>
-        <li class="nav-title">组件示例</li>
-        <li class="nav-item nav-dropdown"> <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-puzzle"></i>组件</a>
-          <ul class="nav-dropdown-items">
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/validation.html', '表单及验证');"><i class="icon-puzzle"></i>表单及验证</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/buttons.html', '业务按钮');"><i class="icon-puzzle"></i>业务按钮</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/collapsible.html', '折叠面板');"><i class="icon-puzzle"></i>折叠面板</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/calendar.html', '日历');"><i class="icon-puzzle"></i>日历</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/bmap.html', '百度地图');"><i class="icon-puzzle"></i>百度地图</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/paginationtable.html', '分页表格');"><i class="icon-puzzle"></i>分页表格</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/statisticstable.html', '统计表格');"><i class="icon-puzzle"></i>统计表格</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/calendartable.html', '日历表格');"><i class="icon-puzzle"></i>日历表格</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/tree.html', '树结构');"><i class="icon-puzzle"></i>树结构</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/tabs.html', '分页签');"><i class="icon-puzzle"></i>分页签</a> </li>
-          </ul>
-        </li>
-        <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/river.html', '河流');"><i class="icon-puzzle"></i>河流</a> </li>
-        <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/reservoir.html', '水库');"><i class="icon-puzzle"></i>水库</a> </li>
-        <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/workflow.html', '工艺流程');"><i class="icon-puzzle"></i>工艺流程</a> </li>
-        <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('component/3d.html', '3D');"><i class="icon-puzzle"></i>3D</a> </li>
-        <li class="divider"></li>
-        <li class="nav-title">页面示例</li>
-        <li class="nav-item nav-dropdown"> <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-star"></i>页面</a>
-          <ul class="nav-dropdown-items">
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('page/list-general.html', '常规型列表');" target="_top"><i class="icon-star"></i>常规型列表</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('page/list-statistics.html', '混编型列表');" target="_top"><i class="icon-star"></i>混编型列表</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('page/form.html', '表单');" target="_top"><i class="icon-star"></i>表单</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('page/profile.html', '档案');" target="_top"><i class="icon-star"></i>档案</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('page/report.html', '监测报告');" target="_top"><i class="icon-star"></i>监测报告</a> </li>
-          </ul>
-        </li>
-        <li class="divider"></li>
-        <li class="nav-title">业务示例</li>
-        <li class="nav-item nav-dropdown"> <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-star"></i>应用</a>
-          <ul class="nav-dropdown-items">
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('app/wfct.html', '水厂');" target="_top"><i class="icon-star"></i>水厂</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('app/river.html', '河长制');" target="_top"><i class="icon-star"></i>河长制</a> </li>
-            <li class="nav-item"> <a class="nav-link" href="javascript:gotoPage('app/workflow.html', '工作流设计器');" target="_top"><i class="icon-star"></i>工作流设计器</a> </li>
-          </ul>
-        </li>
-      </ul>
+    <nav id="sidemenu" class="sidebar-nav ps">
+      
     </nav>
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>
   </div>
+  
   <!-- Main content -->
   <main class="main header-fixed" style="overflow-y: hidden">
     <header class="app-header navbar">
@@ -83,11 +47,11 @@
       <ol id="navigator" class="breadcrumb">
       </ol>
       <ul class="nav navbar-nav ml-auto">
-        <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"> <i id="alarm_notification" class="icon-bell"></i> 
-          <!--
-                                <span class="badge badge-pill badge-danger">5</span>
-                                --> 
-          </a> </li>
+        <li class="nav-item d-md-down-none"> 
+          <a class="nav-link" href="#"> 
+            <i id="alarm_notification" class="icon-bell"></i> 
+          </a> 
+        </li>
         <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-list"></i></a> </li>
         <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-location-pin"></i></a> </li>
         <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"> <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com"> </a>
@@ -106,12 +70,6 @@
   </main>
   <aside class="aside-menu"> </aside>
 </div>
-<!--
-        <footer class="app-footer">
-            <span><a href="http://coreui.io">CoreUI</a> © 2017 creativeLabs.</span>
-            <span class="ml-auto">Powered by <a href="http://coreui.io">CoreUI</a></span>
-        </footer>
-        --> 
 
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=8d6c8b8f3749aed6b1aff3aad6f40e37&services=true"></script> 
 <script src="/3rd/jquery/jquery-3.2.1.min.js"></script> 
@@ -123,12 +81,16 @@
 <script src="/3rd/three/controls/TrackballControls.js"></script> 
 <script src="/3rd/layer/layer.js"></script> 
 <script src="/3rd/jstree/jstree.min.js"></script> 
-<script src="/3rd/moment/moment.min.js"></script> 
-<script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script> 
+<script src="/3rd/moment/moment.min.js"></script>
+<script src="/3rd/handlebars/handlebars-v4.0.11.js"></script> 
+
+<script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/3rd/bootstrap-datetimepicker/js/zh-cn.js"></script>  
 <script src="/3rd/bootstrap-fileinput/js/fileinput.min.js"></script> 
 <script src="/3rd/bootstrap-fileinput/js/locales/zh.js"></script> 
 <script src="/3rd/bootstrap-fileinput/themes/fa/theme.min.js"></script> 
 <script src="/3rd/bootstrap-lightbox/ekko-lightbox.min.js"></script> 
+
 <script src="/3rd/sparkline/jquery.sparkline.min.js"></script> 
 <script src="/3rd/trumbowyg/trumbowyg.min.js"></script> 
 <script src="/3rd/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
@@ -141,8 +103,7 @@
 <script src="/src/js/kui-alarm.js"></script> 
 <script src="/src/js/kui-dialog.js"></script> 
 <script src="/src/js/kui-formdata.js"></script> 
-<script src="/src/js/kui-validation.js"></script> 
-<script src="/src/js/kui-gis-baidu.js"></script> 
+<script src="/src/js/kui-validation.js"></script>  
 <script src="/src/js/kui-calendar.js"></script> 
 <script src="/src/js/kui-districtpicker.data.js"></script> 
 <script src="/src/js/kui-districtpicker.js"></script> 
@@ -159,16 +120,68 @@
 <script src="/src/js/wiagram-crsc.js"></script>
 </body>
 </html>
+
+<script id="sidemenu-template" type="text/x-handlebars-template">
+<ul class="nav">
+  {{#if home}}
+  <li class="nav-item">
+    <a class="nav-link" href="{{home.url}}">
+      <i class="{{home.icon}}"></i>{{home.text}}
+    </a>
+  </li>
+  {{/if}}
+  {{#each groups}}
+  <li class="nav-title">{{title}}</li>
+    {{#each menus}}
+  <li class="nav-item nav-dropdown"> 
+    <a class="nav-link nav-dropdown-toggle" href="#">
+      <i class="{{icon}}"></i>{{text}}
+    </a>
+    <ul class="nav-dropdown-items">
+      {{#each items}}
+      <li class="nav-item"> 
+        <a class="nav-link" href="{{url}}">
+          <i class="{{icon}}"></i>{{text}}
+        </a> 
+      </li>
+      {{/each}}
+    </ul>
+  </li>
+    {{/each}}
+  {{/each}}
+</ul>
+</script>
+
 <script>
-    var alarm = new Alarm({
-        iconId: 'alarm_notification',
-        mp3url: '/demo/img/ring.mp3'
-    });
-    setTimeout(function () {
-        // alarm.start();
-    }, 5000);
-    setTimeout(function () {
-        // alarm.stop();
-    }, 1000 * 60 * 2);
+  
+// alarm  
+var alarm = new Alarm({
+  iconId: 'alarm_notification',
+  mp3url: '/demo/img/ring.mp3'
+});
+setTimeout(function () {
+  // alarm.start();
+}, 5000);
+setTimeout(function () {
+  // alarm.stop();
+}, 1000 * 60 * 2);
+  
+// load menus
+ajax.post('/demo/data/menu.json', {}, function(resp) {
+  var source = document.getElementById('sidemenu-template').innerHTML;
+  var template = Handlebars.compile(source);
+  var html = template(resp);
+  $('#sidemenu').append(html);
+  
+  // 由于后加载数据，所以事件无法由bootstrap加载，只能自己加载
+  $('#sidemenu .nav-dropdown').on('click', function(e) {
+    var dropdown = $(e.target).parent();
+    if (dropdown.hasClass('open')) {
+      dropdown.removeClass('open');
+    } else {
+      dropdown.addClass('open');
+    }
+  });
+});
     
 </script>
