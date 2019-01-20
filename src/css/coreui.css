@@ -81,7 +81,7 @@ body {
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #23282c;
+  color: #373b3f;
   text-align: left;
   background-color: #e4e5e6;
 }
@@ -258,8 +258,11 @@ button {
 }
 
 button:focus {
+  outline: none!important;
+  /*
   outline: 1px dotted;
   outline: 5px auto -webkit-focus-ring-color;
+  */
 }
 
 input,
@@ -3901,6 +3904,7 @@ input[type="button"].btn-block {
 
 .nav-link:hover, .nav-link:focus {
   text-decoration: none;
+  outline: none;
 }
 
 .nav-link.disabled {
@@ -12799,7 +12803,7 @@ html[dir="rtl"] .aside-menu {
 
 @media (min-width: 992px) {
   .header-fixed .app-header {
-    position: fixed;
+    /*position: fixed;*/
     z-index: 1020;
     width: 100%;
   }

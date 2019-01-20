@@ -1,2 +1,5 @@
-
+\.svn/
 \.idea/
+node_modules/
+.gitignore
+package-lock.json

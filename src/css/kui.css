@@ -26,7 +26,7 @@ body {
 }
 
 #container {
-  margin-top: 75px; 
+  margin-top: 20px; 
 }
 
 .form-control-static {
@@ -43,6 +43,10 @@ body {
 
 .text-green {
   color: #21ba45!important;
+}
+
+.icon-gap {
+	padding-right: 4px;
 }
 
 /*
@@ -300,4 +304,22 @@ input.query-check {
   display: inline-block;
   width: 240px;
   height: 320px;
+}
+
+.avatar-portrait {
+  position: relative;
+  display: inline-block;
+  width: 228px;
+  height: 228px;
+}
+
+.avatar-portrait .avatar-status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: block;
+  width: 228px;
+  height: 228px;
+  border: 1px solid #fff;
+  border-radius: 50em;
 }

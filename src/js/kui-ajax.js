@@ -78,19 +78,72 @@ ajax.get = function(url, data, callback) {
   });
 };
 
-ajax.view = function(url, cntr, data, callback) {
+/**
+ * 
+ */
+ajax.text = function(url, data, callback) {
+  $.ajax({
+    url : url,
+    data : data,
+    success : function(resp) {
+      if (typeof callback !== 'undefined') {
+        callback(resp);
+      }
+    }
+  });
+};
+
+ajax.view = function(url, containerId, data, callback) {
   if (typeof data === 'undefined')
     data = {};
   $.ajax({
     url : url,
     data : data,
     success : function(resp) {
-      if (cntr) {
-        cntr.empty();
-        cntr.html(resp);
+      var container = document.getElementById(containerId);
+      if (container) {
+        utils.append(container, resp);
       }
       if (callback)
         callback(resp);
+    }
+  });
+};
+
+/**
+ * Uses handlebars template engine to render a template block after 
+ * getting data from backend.
+ * 
+ * @param {string} url 
+ *        the http url to get data
+ * 
+ * @param {string} containerId
+ *        the id of container to append rendered source
+ * 
+ * @param {string} templateId
+ *        the id of template html block
+ * 
+ * @param {object} data 
+ *        the http request data
+ * 
+ * @param {function} callback
+ *        the callback function after rendering
+ */
+ajax.template = function(url, containerId, templateId, data, callback) {
+  $.ajax({
+    url : url,
+    data : data,
+    success : function(resp) {
+      if (containerId) {
+        var source = document.getElementById(templateId).innerHTML;
+        var template = Handlebars.compile(source);
+        var html = template(resp);
+
+        var container = document.getElementById(containerId);
+        container.innerHTML = html;
+      }
+      if (callback)
+        callback();
     }
   });
 };
