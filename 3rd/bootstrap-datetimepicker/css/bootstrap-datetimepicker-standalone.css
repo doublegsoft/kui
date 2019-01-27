@@ -44,11 +44,11 @@
     display: none;
 }
 
-    .collapse.in {
-        display: block;
-    }
+.collapse.in {
+    display: block;
+}
 
-.dropdown-menu {
+.datetimepicker-dropdown-menu {
     position: absolute;
     left: 0;
     z-index: 1000;
