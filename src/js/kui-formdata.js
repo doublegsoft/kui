@@ -15,10 +15,10 @@ $.fn.formdata = function(initial) {
     }
     var params = obj;
     for ( var key in params) {
-      var elemtNodeName;
+      var elementNodeName;
       this.find('[name=' + key + ']').each(function() {
-        elemtNodeName = $(this)[0].nodeName;
-        if (elemtNodeName == "INPUT" && ($(this).attr("type") == "radio" || $(this).attr("type") == "checkbox")) {
+        elementNodeName = $(this)[0].nodeName;
+        if (elementNodeName == "INPUT" && ($(this).attr("type") == "radio" || $(this).attr("type") == "checkbox")) {
           if (params[key].constructor == Array) {
             var arr = params[key];
             for (var i = 0; i < arr.length; i++) {
@@ -31,7 +31,7 @@ $.fn.formdata = function(initial) {
               $(this).prop("checked", true);
             }
           }
-        } else if (elemtNodeName == "INPUT" && ($(this).attr("type") == "file" || $(this).attr("type") == "button")) {
+        } else if (elementNodeName == "INPUT" && ($(this).attr("type") == "file" || $(this).attr("type") == "button")) {
           // 无需回显
         } else {
           $(this).val(params[key]);

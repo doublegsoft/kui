@@ -195,7 +195,7 @@ PaginationTable.prototype.root = function (initParams) {
   if (typeof this.height !== 'undefined') ret.css('height', this.height);
   // if (!this.frozenHeader) this.table.addClass('table');
   // this.table.addClass("table table-bordered table-striped");
-  this.table.addClass("table table-responsive-sm table-hover table-outline mb-0");
+  this.table.addClass("table table-responsive-sm table-hover table-striped table-outline mb-0");
 
   var self = this;
   var thead = $('<thead class="thead-light"></thead>');
@@ -309,8 +309,8 @@ PaginationTable.prototype.pagination = function () {
   div.css('margin', '8px');
   var ul = $('<ul></ul>');
   ul.addClass('pagination');
-  this.firstPage = $('<li></li>');
-  var a = $('<a></a>');
+  this.firstPage = $('<li class="page-item"></li>');
+  var a = $('<a class="page-link"></a>');
   a.attr('href', 'javascript:void(0)');
   a.text('首页');
   a.on('click', function () {
@@ -322,8 +322,8 @@ PaginationTable.prototype.pagination = function () {
     ul.append(this.firstPage);
   }
 
-  this.prevPage = $('<li></li>');
-  a = $('<a></a>');
+  this.prevPage = $('<li class="page-item"></li>');
+  a = $('<a class="page-link"></a>');
   a.attr('href', 'javascript:void(0)');
   a.text('上一页');
   a.on('click', function () {
@@ -332,17 +332,17 @@ PaginationTable.prototype.pagination = function () {
   this.prevPage.append(a);
   ul.append(this.prevPage);
 
-  li = $('<li></li>');
+  li = $('<li class="page-item"></li>');
   li.addClass('disabled');
-  this.pagebar = $('<a></a>');
+  this.pagebar = $('<a class="page-link"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
   this.pagebar.attr('style', 'cursor: default');
   this.pagebar.text("0/0");
   li.append(this.pagebar);
   ul.append(li);
 
-  this.nextPage = $('<li></li>');
-  a = $('<a></a>');
+  this.nextPage = $('<li class="page-item"></li>');
+  a = $('<a class="page-link"></a>');
   a.attr('href', 'javascript:void(0)');
   a.text('下一页');
   a.on('click', function () {
@@ -351,8 +351,8 @@ PaginationTable.prototype.pagination = function () {
   this.nextPage.append(a);
   ul.append(this.nextPage);
 
-  this.lastPage = $('<li></li>');
-  a = $('<a></a>');
+  this.lastPage = $('<li class="page-item"></li>');
+  a = $('<a class="page-link"></a>');
   a.attr('href', 'javascript:void(0)');
   a.text('末页');
   a.on('click', function () {
@@ -363,8 +363,8 @@ PaginationTable.prototype.pagination = function () {
     ul.append(this.lastPage);
   }
 
-  li = $('<li class=disabled></li>');
-  a = $('<a></a>');
+  li = $('<li class="page-item disabled"></li>');
+  a = $('<a class="page-link"></a>');
   a.attr('style', 'cursor: default');
   /*
   this.pagenum = $('<input/>');
@@ -576,9 +576,8 @@ PaginationTable.prototype.request = function (others) {
   // params['criteria'] = JSON.stringify(this.filters);
   // this.setCookie();
   if (typeof this.url !== "undefined") {
-    $.ajax({
+    xhr.post({
       url: this.url,
-      type: 'POST',
       data: params,
       success: function (resp) {
         var result;
@@ -678,8 +677,8 @@ PaginationTable.prototype.fill = function (result) {
             }
             td.html(html);
           }
-          if (col.displayFunction) {
-            col.displayFunction(row, td, j);
+          if (col.display) {
+            col.display(row, td, j);
           }
           tr.append(td);
         }

@@ -58,3 +58,27 @@ xhr.delete = function (opts) {
 xhr.connect = function (opts) {
   xhr.request(opts, 'CONNECT');
 };
+
+xhr.postx = function (opts) {
+
+  var url = opts.url;
+  var data = opts.data;
+  var type = opts.type || 'json';
+  var success = opts.success;
+  var error = opts.error;
+
+  // var result = await new Promise(resolved => {
+  //   var req  = new XMLHttpRequest();
+  //   req.open(method, url, true);
+  //   req.onload = function () {
+  //     var resp = req.responseText;
+  //     if (type == 'json') 
+  //       resp = JSON.parse(resp);
+  //     if (req.readyState == 4 && req.status == "200") {
+  //       if (success) success(resp);
+  //     } else {
+  //       if (error) error(resp);
+  //     }
+  //   }
+  // });
+}
