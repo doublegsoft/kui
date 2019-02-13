@@ -140,7 +140,6 @@ PaginationTable.prototype.render = function (containerId, params) {
 PaginationTable.prototype.beforeRequest = function (initParams) {
   var _this = this;
 
-
   //var loadding = $("<h6> 正在加载数据，请稍候....</h6>");
   var loaddingct = $("<div></div>");
   loaddingct.attr("class", "loaddingct");
@@ -585,6 +584,10 @@ PaginationTable.prototype.request = function (others) {
           result = $.parseJSON(resp);
         } else {
           result = resp;
+        }
+        if (!result.total) {
+          result.total = 0;
+          result.data = [];
         }
         self.total = result.total;
         self.fill(result);
