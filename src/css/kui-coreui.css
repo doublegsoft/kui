@@ -51,3 +51,10 @@
 .collapse.show {
   display: block;
 }
+
+
+.btn-link {
+  font-weight: 400;
+  color: #20a8d8!important;
+  background-color: transparent;
+}

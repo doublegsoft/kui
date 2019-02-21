@@ -130,10 +130,10 @@ ajax.view = function(url, containerId, data, callback) {
  *        the callback function after rendering
  */
 ajax.template = function(url, containerId, templateId, data, callback) {
-  $.ajax({
-    url : url,
-    data : data,
-    success : function(resp) {
+  xhr.post({
+    url: url,
+    data: data,
+    success: function(resp) {
       if (containerId) {
         var source = document.getElementById(templateId).innerHTML;
         var template = Handlebars.compile(source);

@@ -19,7 +19,7 @@ xhr.request = function (opts, method) {
   var error = opts.error;
 
   var req  = new XMLHttpRequest();
-  req.open(method, url, true);
+  req.open(method, url, false);
   req.onload = function () {
     var resp = req.responseText;
     if (type == 'json') 
