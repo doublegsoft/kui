@@ -1,0 +1,22 @@
+<div id="rsrwl" class="row col-12">
+    
+</div>
+
+<script>
+    var diagram = new wiagram.Rsrwl({
+        svgurl: '/demo/img/dam.svg',
+        crel: 102.88,
+        maxdmhg: 32.12,
+        ddwl: 82.19,
+        flsscnwl: 100.23,
+        nrstwl: 100.23,
+        rz: 101.34,
+        w: 1100.34
+    });
+    diagram.render('rsrwl');
+
+    // 3秒后更新
+    setTimeout(function () {
+        diagram.setValues({ rz: 102.33, w: 1247.45 });
+    }, 3000)
+</script>

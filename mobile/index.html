@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="shortcut icon" href="img/favicon.png">
+<title>KUI-BS4展示应用</title>
+<link href="/3rd/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+<link href="/3rd/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+<link href="/3rd/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
+<link href="/3rd/jstree/themes/default/style.min.css" rel="stylesheet">
+<link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+<link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker-standalone.css" rel="stylesheet">
+<link href="/3rd/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
+<link href="/3rd/bootstrap-lightbox/ekko-lightbox.css" rel="stylesheet">
+<link href="/3rd/trumbowyg/ui/trumbowyg.min.css" rel="stylesheet">
+<link href="/3rd/perfect-scrollbar/css/perfect-scrollbar.min.css" rel="stylesheet">
+
+<!-- Main styles for this application -->
+<link href="/src/css/coreui.css" rel="stylesheet">
+<link href="/src/css/kui-coreui.css" rel="stylesheet">
+<link href="/src/css/kui.css" rel="stylesheet">
+<link href="/src/css/kui-timeline.css" rel="stylesheet">
+<link href="/src/css/kui-toc.css" rel="stylesheet">
+<link href="/src/css/kui-districtpicker.css" rel="stylesheet">
+<link href="/src/css/kui-alarm.css" rel="stylesheet">
+<link href="/src/css/kui-checks.css" rel="stylesheet">
+</head>
+
+<body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show" style="overflow-y: hidden">
+<div class="app-body">
+ 
+  <!-- side menu -->
+  <div class="sidebar">
+    <nav id="sidemenu" class="sidebar-nav ps">
+      
+    </nav>
+    <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+  </div>
+  
+  <!-- Main content -->
+  <main class="main header-fixed" style="overflow-y: hidden">
+    <header class="app-header navbar">
+      <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button"> <span class="navbar-toggler-icon"></span> </button>
+      <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button"> <span class="navbar-toggler-icon"></span> </button>
+      <ol id="navigator" class="breadcrumb">
+      </ol>
+      <ul class="nav navbar-nav ml-auto">
+        <li class="nav-item d-md-down-none"> 
+          <a class="nav-link" href="#"> 
+            <i id="alarm_notification" class="icon-bell"></i> 
+          </a> 
+        </li>
+        <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-list"></i></a> </li>
+        <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-location-pin"></i></a> </li>
+        <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"> <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com"> </a>
+          <div class="dropdown-menu dropdown-menu-right">
+            <div class="dropdown-header text-center"> <strong>Account</strong> </div>
+            <a class="dropdown-item" href="#"><i class="fa fa-bell-o"></i> Updates<span class="badge badge-info">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-envelope-o"></i> Messages<span class="badge badge-success">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-tasks"></i> Tasks<span class="badge badge-danger">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-comments"></i> Comments<span class="badge badge-warning">42</span></a>
+            <div class="dropdown-header text-center"> <strong>Settings</strong> </div>
+            <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a> <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Settings</a> <a class="dropdown-item" href="#"><i class="fa fa-usd"></i> Payments<span class="badge badge-secondary">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-file"></i> Projects<span class="badge badge-primary">42</span></a>
+            <div class="divider"></div>
+            <a class="dropdown-item" href="#"><i class="fa fa-shield"></i> Lock Account</a> <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> Logout</a> </div>
+        </li>
+      </ul>
+      <button class="navbar-toggler aside-menu-toggler" type="button"> <span class="navbar-toggler-icon"></span> </button>
+    </header>
+    <div id="container" class="container-fluid" style="width: 100%; height: 900px; overflow-y: auto"> </div>
+  </main>
+  <aside class="aside-menu"> </aside>
+</div>
+
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=8d6c8b8f3749aed6b1aff3aad6f40e37&services=true"></script> 
+<script src="/3rd/jquery/jquery-3.2.1.min.js"></script> 
+<script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script> 
+<script src="/3rd/echarts/echarts.min.js"></script> 
+<script src="/3rd/d3/d3.min.js"></script> 
+<script src="/3rd/three/three.js"></script> 
+<script src="/3rd/three/loaders/OBJLoader.js"></script> 
+<script src="/3rd/three/controls/TrackballControls.js"></script> 
+<script src="/3rd/layer/layer.js"></script> 
+<script src="/3rd/jstree/jstree.min.js"></script> 
+<script src="/3rd/moment/moment.min.js"></script>
+<script src="/3rd/handlebars/handlebars-v4.0.11.js"></script> 
+
+<script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/3rd/bootstrap-datetimepicker/js/zh-cn.js"></script>  
+<script src="/3rd/bootstrap-fileinput/js/fileinput.min.js"></script> 
+<script src="/3rd/bootstrap-fileinput/js/locales/zh.js"></script> 
+<script src="/3rd/bootstrap-fileinput/themes/fa/theme.min.js"></script> 
+<script src="/3rd/bootstrap-lightbox/ekko-lightbox.min.js"></script> 
+
+<script src="/3rd/sparkline/jquery.sparkline.min.js"></script> 
+<script src="/3rd/trumbowyg/trumbowyg.min.js"></script> 
+<script src="/3rd/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
+<script src="/3rd/raphael/raphael.min.js"></script>
+<script src="/3rd/flowchart/flowchart.min.js"></script>
+
+<script src="/src/js/kui-mainframe.js"></script> 
+<script src="/src/js/kui-bootstrap.js"></script> 
+<script src="/src/js/kui-ajax.js"></script> 
+<script src="/src/js/kui-alarm.js"></script> 
+<script src="/src/js/kui-dialog.js"></script> 
+<script src="/src/js/kui-formdata.js"></script> 
+<script src="/src/js/kui-validation.js"></script>  
+<script src="/src/js/kui-calendar.js"></script> 
+<script src="/src/js/kui-districtpicker.data.js"></script> 
+<script src="/src/js/kui-districtpicker.js"></script> 
+<script src="/src/js/kui-frozencolumnstable.js"></script> 
+<script src="/src/js/kui-paginationtable.js"></script> 
+<script src="/src/js/kui-statisticstable.js"></script> 
+<script src="/src/js/kui-calendartable.dev.js"></script> 
+<script src="/src/js/kui-svg.js"></script> 
+<script src="/src/js/kui-searchbox.js"></script>
+<script src="/src/js/kui-workflow.js"></script>
+<script src="/src/js/kui-utils.js"></script>
+ 
+<script src="/src/js/wiagram-utils.js"></script> 
+<script src="/src/js/wiagram-rsrwl.js"></script> 
+<script src="/src/js/wiagram-crsc.js"></script>
+</body>
+</html>
+
+<script id="sidemenu-template" type="text/x-handlebars-template">
+<ul class="nav">
+  {{#if home}}
+  <li class="nav-item">
+    <a class="nav-link" href="{{home.url}}">
+      <i class="{{home.icon}}"></i>{{home.text}}
+    </a>
+  </li>
+  {{/if}}
+  {{#each groups}}
+  <li class="nav-title">{{title}}</li>
+    {{#each menus}}
+  <li class="nav-item nav-dropdown"> 
+    <a class="nav-link nav-dropdown-toggle" href="#">
+      <i class="{{icon}}"></i>{{text}}
+    </a>
+    <ul class="nav-dropdown-items">
+      {{#each items}}
+      <li class="nav-item"> 
+        <a class="nav-link" href="{{url}}">
+          <i class="{{icon}}"></i>{{text}}
+        </a> 
+      </li>
+      {{/each}}
+    </ul>
+  </li>
+    {{/each}}
+  {{/each}}
+</ul>
+</script>
+
+<script>
+  
+// alarm  
+var alarm = new Alarm({
+  iconId: 'alarm_notification',
+  mp3url: '/demo/img/ring.mp3'
+});
+setTimeout(function () {
+  // alarm.start();
+}, 5000);
+setTimeout(function () {
+  // alarm.stop();
+}, 1000 * 60 * 2);
+  
+// load menus
+ajax.post('/demo/data/menu.json', {}, function(resp) {
+  var source = document.getElementById('sidemenu-template').innerHTML;
+  var template = Handlebars.compile(source);
+  var html = template(resp);
+  $('#sidemenu').append(html);
+  
+  // 由于后加载数据，所以事件无法由bootstrap加载，只能自己加载
+  $('#sidemenu .nav-dropdown').on('click', function(e) {
+    var dropdown = $(e.target).parent();
+    if (dropdown.hasClass('open')) {
+      dropdown.removeClass('open');
+    } else {
+      dropdown.addClass('open');
+    }
+  });
+});
+    
+</script>

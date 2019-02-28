@@ -1,0 +1,36 @@
+<div class="card">
+    <div class="card-header" data-toggle="collapse" href="#collapsible" aria-expanded="true" aria-controls="collapsible" style="cursor: pointer">
+       <strong>日历</strong>
+       <small>近似热力图</small>
+    </div>
+    <div id="collapsible" class="card-body collapse show">
+        <div id="calendar" class="col-md-4" style="height: 600px;">
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    var data = [];
+    var date = moment({ year: 2017, month: 7 - 1 });
+    for (var i = 1; i <= date.daysInMonth(); i++) {
+        data[i - 1] = [];
+        data[i - 1][0] = '2017-7-' + i;
+        data[i - 1][1] = i;
+    }
+    var cal = new Calendar({ 
+        year: 2017, 
+        month: 7,
+        tooltip: function(params) {
+            return '巡检次数：' + params.value[1];
+        },
+        series: [{
+            name: '检查次数',
+            type: 'heatmap',
+            coordinateSystem: 'calendar',
+            data: data
+        }],
+        preferredWidth: 500
+    });
+    cal.render('calendar');
+</script>

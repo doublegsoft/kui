@@ -1,0 +1,59 @@
+<div class="row card-body">
+    <div id="calendar" class="col-sm-12" style="height: 500px"></div>
+    <div class="col-sm-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="card-title mb-0">巡检记录表</h4>
+                        <div class="small text-muted">2017年11月08日</div>
+                    </div>
+                    <!--/.col-->
+                    <div class="col-sm-12 d-none d-md-block">
+                        <button type="button" class="btn btn-primary float-right"><i class="icon-cloud-download"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row col-12">
+    <div class="col-md-12">
+        <h4>最近图片</h4>
+    </div>
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+    <img src="http://via.placeholder.com/200x200" class="img-thumbnail" style="margin-right:  5px; margin-bottom: 5px;">
+</div>
+
+<script>
+    var data = [];
+    var date = moment({ year: 2017, month: 7 - 1 });
+    for (var i = 1; i <= date.daysInMonth(); i++) {
+        data[i - 1] = [];
+        data[i - 1][0] = '2017-7-' + i;
+        data[i - 1][1] = i;
+    }
+    var cal = new Calendar({ 
+        year: 2017, 
+        month: 7,
+        tooltip: function(params) {
+            return '巡检次数：' + params.value[1];
+        },
+        series: [{
+            name: '检查次数',
+            type: 'heatmap',
+            coordinateSystem: 'calendar',
+            data: data
+        }],
+        preferredWidth: 400,
+        preferredHeight: 450
+    });
+    cal.render('calendar');
+</script>

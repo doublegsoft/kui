@@ -1,0 +1,320 @@
+<div class="animated fadeIn card">
+    <div class="card-header">
+        <strong>统计信息</strong>
+        <div class="float-right">
+            <button type="button" class="btn btn-transparent mb-0 icon-action">
+                <i class="fa fa-file-word-o" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="btn  btn-transparent mb-0 icon-action" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fa fa-ellipsis-h" aria-hidden="true"></i>
+            </button>
+            <div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; transform: translate3d(32px, 23px, 0px); top: 0px; left: 0px; will-change: transform;">
+                <a class="dropdown-item" href="#">水位上报</a>
+                <a class="dropdown-item" href="#">雨量上报</a>
+                <a class="dropdown-item" href="#">巡检上报</a>
+                <a class="dropdown-item" href="#">工情上报</a>
+            </div>
+        </div>
+    </div>
+    <div class="card-body row">
+        <div id="district" class="col-4" style="height: 400px;">
+        </div>
+        <div id="stat-table" class="col-8" style="height:  400px;">
+        </div>
+        <div id="stattable" class="col-12">
+        </div>
+    </div>
+</div>
+
+<script>
+    var chart = echarts.init(document.getElementById('district'));
+    chart.showLoading();
+
+$.getJSON('/demo/data/jiangxi.map.json', function(geoJson) {
+    echarts.registerMap('jiangxi', geoJson);
+    chart.hideLoading();
+    var geoCoordMap = {
+        '赣州市': [114.940278, 25.85097],
+        '吉安市': [114.986373, 27.111699],
+        '上饶市': [117.971185, 28.44442],
+        '九江市': [115.992811, 29.712034],
+        '抚州市': [116.358351, 27.98385],
+        '宜春市': [114.391136, 27.8043],
+        '南昌市': [115.892151, 28.676493],
+        '景德镇市': [117.214664, 29.29256],
+        '萍乡市': [113.852186, 27.622946],
+        '鹰潭市': [117.033838, 28.238638],
+        '新余市': [114.930835, 27.810834],
+    }
+    var data = [{
+        name: '赣州市',
+        value: 199
+    }, {
+        name: '吉安市',
+        value: 39
+    }, {
+        name: '上饶市',
+        value: 152
+    }, {
+        name: '九江市',
+        value: 299
+    }, {
+        name: '抚州市',
+        value: 89
+    }, {
+        name: '宜春市',
+        value: 52
+    }, {
+        name: '南昌市',
+        value: 9
+    }, {
+        name: '景德镇市',
+        value: 352
+    }, {
+        name: '萍乡市',
+        value: 99
+    }, {
+        name: '鹰潭市',
+        value: 39
+    }, {
+        name: '新余市',
+        value: 480
+    }, ];
+    var max = 480,
+        min = 9; // todo 
+    var maxSize4Pin = 100,
+        minSize4Pin = 20;
+
+    var convertData = function(data) {
+        var res = [];
+        for (var i = 0; i < data.length; i++) {
+            var geoCoord = geoCoordMap[data[i].name];
+            if (geoCoord) {
+                res.push({
+                    name: data[i].name,
+                    value: geoCoord.concat(data[i].value)
+                });
+            }
+        }
+        return res;
+    };
+
+    option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: function(params) {
+                if (typeof(params.value)[2] == "undefined") {
+                    return params.name + ' : ' + params.value;
+                } else {
+                    return params.name + ' : ' + params.value[2];
+                }
+            }
+        },
+        geo: {
+            show: true,
+            map: 'jiangxi',
+            label: {
+                normal: {
+                    show: false
+                },
+                emphasis: {
+                    show: false,
+                }
+            },
+            roam: false,
+            itemStyle: {
+                normal: {
+                    areaColor: '#031525',
+                    borderColor: '#3B5077',
+                },
+                emphasis: {
+                    areaColor: '#2B91B7',
+                }
+            }
+        },
+        series: [{
+            selectedMode: 'single',
+            type: 'map',
+            data: []
+        }]
+    };
+    chart.setOption(option);
+    chart.on('geoselectchanged', function(params) {
+        console.log(params);
+    });
+});
+
+var dataAxis = ['点', '击', '柱', '子', '或', '者', '两', '指', '在', '触', '屏', '上', '滑', '动', '能', '够', '自', '动', '缩', '放'];
+var data = [220, 182, 191, 234, 290, 330, 310, 123, 442, 321, 90, 149, 210, 122, 133, 334, 198, 123, 125, 220];
+var yMax = 500;
+var dataShadow = [];
+
+for (var i = 0; i < data.length; i++) {
+    dataShadow.push(yMax);
+}
+
+var option2 = {
+    title: {
+        text: '特性示例：渐变色 阴影 点击缩放',
+        subtext: 'Feature Sample: Gradient Color, Shadow, Click Zoom'
+    },
+    xAxis: {
+        data: dataAxis,
+        axisLabel: {
+            inside: true,
+            textStyle: {
+                color: '#fff'
+            }
+        },
+        axisTick: {
+            show: false
+        },
+        axisLine: {
+            show: false
+        },
+        z: 10
+    },
+    yAxis: {
+        axisLine: {
+            show: false
+        },
+        axisTick: {
+            show: false
+        },
+        axisLabel: {
+            textStyle: {
+                color: '#999'
+            }
+        }
+    },
+    dataZoom: [
+        {
+            type: 'inside'
+        }
+    ],
+    series: [
+        { // For shadow
+            type: 'bar',
+            itemStyle: {
+                normal: {color: 'rgba(0,0,0,0.05)'}
+            },
+            barGap:'-100%',
+            barCategoryGap:'40%',
+            data: dataShadow,
+            animation: false
+        },
+        {
+            type: 'bar',
+            itemStyle: {
+                normal: {
+                    color: new echarts.graphic.LinearGradient(
+                        0, 0, 0, 1,
+                        [
+                            {offset: 0, color: '#83bff6'},
+                            {offset: 0.5, color: '#188df0'},
+                            {offset: 1, color: '#188df0'}
+                        ]
+                    )
+                },
+                emphasis: {
+                    color: new echarts.graphic.LinearGradient(
+                        0, 0, 0, 1,
+                        [
+                            {offset: 0, color: '#2378f7'},
+                            {offset: 0.7, color: '#2378f7'},
+                            {offset: 1, color: '#83bff6'}
+                        ]
+                    )
+                }
+            },
+            data: data
+        }
+    ]
+};
+
+var myChart = echarts.init(document.getElementById('stat-table'));
+myChart.setOption(option2);
+
+myChart.on('brushSelected', renderBrushed);
+
+function renderBrushed(params) {
+    var brushed = [];
+    var brushComponent = params.batch[0];
+
+    for (var sIdx = 0; sIdx < brushComponent.selected.length; sIdx++) {
+        var rawIndices = brushComponent.selected[sIdx].dataIndex;
+        brushed.push('[Series ' + sIdx + '] ' + rawIndices.join(', '));
+    }
+
+    myChart.setOption({
+        title: {
+            backgroundColor: '#333',
+            text: 'SELECTED DATA INDICES: \n' + brushed.join('\n'),
+            bottom: 0,
+            right: 0,
+            width: 100,
+            textStyle: {
+                fontSize: 12,
+                color: '#fff'
+            }
+        }
+    });
+}
+
+var richTable = new PaginationTable({
+    url: 'data/list-statistics.json',
+    containerId: 'stattable',
+    limit: 5,
+    columns: [{
+        title: '图片',
+        template: '<div><img src="{image}"></div>'
+    }, {
+        title: '基本信息',
+        template: '<div>{rsnm}</div><div class="small text-muted"><span>{addvnm}</span> | {prscnm}</div>'
+    }, {
+        title: '环境监测',
+        displayFunction: function(obj, td) {
+            var root = $('<div class="row"></div>');
+            var div = $(
+            '<div class="col-3"><div class="card">' + 
+            '    <div class="card-body p-3 clearfix">' + 
+            '       <div class="h5 mb-0 mt-2"></div>' + 
+            '       <div class="text-muted text-uppercase font-weight-bold font-xs"></div>' + 
+            '</div></div></div>');
+            $(td).append(root);
+            if (obj.rz) {
+                var divRz = div.clone();
+                divRz.find('div.h5').text(obj.rz + 'm');
+                divRz.find('div.text-muted').text('坝前水位');
+                divRz.find('div.card-body').addClass('bg-primary');
+                root.append(divRz);
+            }
+            if (obj.dyp) {
+                var divDyp = div.clone();
+                divDyp.find('div.h5').text(obj.dyp + 'mm');
+                divDyp.find('div.text-muted').text('当日累计雨量');
+                divDyp.find('div.card-body').addClass('bg-success');
+                root.append(divDyp);
+            }
+            if (obj.tmp) {
+                var divTmp = div.clone();
+                divTmp.find('div.h5').text(obj.tmp + '℃');
+                divTmp.find('div.text-muted').text('温度');
+                divTmp.find('div.card-body').addClass('bg-danger');
+                root.append(divTmp);
+            }
+            if (obj.hmd) {
+                var divHmd = div.clone();
+                divHmd.find('div.h5').text(obj.hmd);
+                divHmd.find('div.text-muted').text('湿度');
+                divHmd.find('div.card-body').addClass('bg-info');
+                root.append(divHmd);
+            }
+        }
+    }, {
+        title: '操作',
+        template: '<a class="btn btn-link" href="#">查看详情</a>'
+    }]
+});
+richTable.render('stattable');
+</script>

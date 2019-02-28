@@ -1,0 +1,30 @@
+{
+  "home": {
+    "text": "首页",
+    "icon": "nav-icon icon-speedometer",
+    "url": "javascript:ajax.view('dashboard.html', 'container');"
+  },
+  "groups": [{
+    "title": "组件示例",
+    "menus": [{
+      "text": "普通组件",
+      "icon": "nav-icon fa fa-cubes",
+      "items": [{
+        "text": "表单验证",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view('component/validation.html', 'container');"
+      }]  
+    }]
+  }, {
+    "title": "页面示例",
+    "menus": [{
+      "text": "行业应用",
+      "icon": "nav-icon fa fa-industry",
+      "items": [{
+        "text": "人员信息",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('/demo/page/business/person.html', 'container');"
+      }]  
+    }]
+  }]
+}

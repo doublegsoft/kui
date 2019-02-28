@@ -1,0 +1,60 @@
+{"total": 6, "data": [{
+"image": "http://via.placeholder.com/160x90",
+"rsnm": "元旦水库",
+"prscnm": "小（2）型",
+"dt": "2017-06-05 23:08:23",
+"addvnm": "渝北区",
+"tmp": 27.8,
+"rz": 24.456,
+"dyp": 30,
+"lvl": 2
+},{
+"image": "http://via.placeholder.com/160x90",
+"rsnm": "劳动水库",
+"prscnm": "小（2）型",
+"dt": "2017-06-05 23:08:23",
+"addvnm": "渝北区",
+"rz": 24.456,
+"dyp": 30,
+"tmp": 27.8,
+"hmd": "60%",
+"lvl": 2
+},{
+"image": "http://via.placeholder.com/160x90",
+"rsnm": "儿童水库",
+"prscnm": "小（2）型",
+"dt": "2017-06-05 23:08:23",
+"addvnm": "渝北区",
+"rz": 24.456,
+"dyp": 30,
+"tmp": 27.8,
+"hmd": "60%",
+"lvl": 2
+},{
+"image": "http://via.placeholder.com/160x90",
+"rsnm": "建党水库",
+"prscnm": "小（2）型",
+"dt": "2017-06-05 23:08:23",
+"addvnm": "渝北区",
+"rz": 24.456,
+"dyp": 30,
+"lvl": 2
+},{
+"image": "http://via.placeholder.com/160x90",
+"rsnm": "建军水库",
+"prscnm": "小（2）型",
+"dt": "2017-06-05 23:08:23",
+"addvnm": "渝北区",
+"rz": 24.456,
+"dyp": 30,
+"lvl": 2
+},{
+"image": "http://via.placeholder.com/160x90",
+"rsnm": "国庆水库",
+"prscnm": "小（2）型",
+"dt": "2017-06-05 23:08:23",
+"addvnm": "渝北区",
+"rz": 24.456,
+"dyp": 30,
+"lvl": 2
+}]}
