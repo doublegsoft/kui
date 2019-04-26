@@ -1,30 +1,138 @@
 {
-  "home": {
-    "text": "首页",
-    "icon": "nav-icon icon-speedometer",
-    "url": "javascript:ajax.view('dashboard.html', 'container');"
-  },
-  "groups": [{
-    "title": "组件示例",
-    "menus": [{
-      "text": "普通组件",
-      "icon": "nav-icon fa fa-cubes",
-      "items": [{
-        "text": "表单验证",
-        "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view('component/validation.html', 'container');"
-      }]  
-    }]
-  }, {
-    "title": "页面示例",
-    "menus": [{
-      "text": "行业应用",
-      "icon": "nav-icon fa fa-industry",
-      "items": [{
-        "text": "人员信息",
-        "icon": "nav-icon fa fa-user",
-        "url": "javascript:ajax.view('/demo/page/business/person.html', 'container');"
-      }]  
-    }]
-  }]
+  "total": 18,
+  "data": [
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "A01",
+      "lmt": "",
+      "funid1": "A01",
+      "funpid": "",
+      "funnm": "首页",
+      "funtyp": "E",
+      "ico": "nav-icon icon-speedometer",
+      "entpt": "javascript:ajax.view('\/page\/home\/dashboard.html', 'container');"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B",
+      "lmt": "",
+      "funid1": "B",
+      "funpid": "",
+      "funnm": "部门章程",
+      "funtyp": "C",
+      "ico": "",
+      "entpt": ""
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B01",
+      "lmt": "",
+      "funid1": "B01",
+      "funpid": "",
+      "funnm": "部门规范",
+      "funtyp": "C",
+      "ico": "nav-icon fa fa-code-branch",
+      "entpt": ""
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B0101",
+      "lmt": "",
+      "funid1": "B0101",
+      "funpid": "B01",
+      "funnm": "开发规范",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-stream",
+      "entpt": "javascript:ajax.view('\/page\/specification\/view.html', 'container', {}, function(resp) {viewSpecificationBase();} );"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B0102",
+      "lmt": "",
+      "funid1": "B0102",
+      "funpid": "B01",
+      "funnm": "管理思路",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-campground",
+      "entpt": "javascript:ajax.view('\/page\/specification\/view.html', 'container', {}, function(resp) {viewSpecificationManagement();} );"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B0103",
+      "lmt": "",
+      "funid1": "B0103",
+      "funpid": "B01",
+      "funnm": "工作计划",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-heartbeat",
+      "entpt": "javascript:ajax.view('\/page\/specification\/view.html', 'container', {}, function(resp) {viewSpecificationPlan();} );"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B02",
+      "lmt": "",
+      "funid1": "B02",
+      "funpid": "",
+      "funnm": "工具介绍",
+      "funtyp": "C",
+      "ico": "nav-icon fa fa-laptop-code",
+      "entpt": ""
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "B0201",
+      "lmt": "",
+      "funid1": "B0201",
+      "funpid": "B02",
+      "funnm": "常用工具",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-superscript",
+      "entpt": "javascript:ajax.view('\/page\/specification\/view.html', 'container', {}, function(resp) {viewSpecificationTools();} );"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "C",
+      "lmt": "",
+      "funid1": "C",
+      "funpid": "",
+      "funnm": "研发管理",
+      "funtyp": "C",
+      "ico": "",
+      "entpt": ""
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "C01",
+      "lmt": "",
+      "funid1": "C01",
+      "funpid": "",
+      "funnm": "项目实施",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-tasks",
+      "entpt": "javascript:ajax.view('\/page\/development\/summary.html', 'container');"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "C02",
+      "lmt": "",
+      "funid1": "C02",
+      "funpid": "",
+      "funnm": "行业研究",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-medkit",
+      "entpt": "javascript:ajax.view('\/page\/under-construction.html', 'container');"
+    },
+    {
+      "usrid": "AFBD3670-B3E8-487B-8C91-0178D077F585",
+      "funid": "C03",
+      "lmt": "",
+      "funid1": "C03",
+      "funpid": "",
+      "funnm": "技术预研",
+      "funtyp": "E",
+      "ico": "nav-icon fa fa-bug",
+      "entpt": "javascript:ajax.view('\/page\/under-construction.html', 'container');"
+    }
+  ],
+  "count": 18
 }
