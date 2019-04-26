@@ -28,48 +28,85 @@
 <link href="/src/css/kui-checks.css" rel="stylesheet">
 </head>
 
-<body class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show" style="overflow-y: hidden">
-<div class="app-body">
- 
-  <!-- side menu -->
-  <div class="sidebar">
-    <nav id="sidemenu" class="sidebar-nav ps">
-      
-    </nav>
-    <button class="sidebar-minimizer brand-minimizer" type="button"></button>
-  </div>
-  
-  <!-- Main content -->
-  <main class="main header-fixed" style="overflow-y: hidden">
-    <header class="app-header navbar">
-      <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button"> <span class="navbar-toggler-icon"></span> </button>
-      <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button"> <span class="navbar-toggler-icon"></span> </button>
-      <ol id="navigator" class="breadcrumb">
-      </ol>
-      <ul class="nav navbar-nav ml-auto">
-        <li class="nav-item d-md-down-none"> 
-          <a class="nav-link" href="#"> 
-            <i id="alarm_notification" class="icon-bell"></i> 
+<body id="body" class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show" style="overflow-y: hidden">
+
+  <header class="app-header navbar">
+    <a class="navbar-brand" href="#">
+      <img class="navbar-brand-full" src="/desktop/img/logo.png" width="145" height="45">
+    </a>
+    <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button"> 
+      <span class="navbar-toggler-icon"></span> 
+    </button>
+    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button"> 
+      <span class="navbar-toggler-icon"></span> 
+    </button>
+    <ul class="nav navbar-nav ml-auto">
+      <li class="nav-item d-md-down-none"> 
+        <a class="nav-link" href="#"> 
+          <i id="alarm_notification" class="icon-bell"></i> 
+        </a> 
+      </li>
+      <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-list"></i></a> </li>
+      <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-location-pin"></i></a> </li>
+      <li class="nav-item dropdown"> 
+        <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"> 
+          <img id="avatar" src="/desktop/img/avatars/drew_brees.jpg" class="img-avatar"> 
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+          <div class="dropdown-header text-center"> 
+            <strong>账户信息</strong> 
+          </div>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-bell-o"></i>新消息<span class="badge badge-info">42</span>
+          </a>
+          <a class="dropdown-item" href="#">
+            <i class="fa fa-tasks"></i>工作任务
+            <span class="badge badge-danger">42</span>
           </a> 
-        </li>
-        <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-list"></i></a> </li>
-        <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-location-pin"></i></a> </li>
-        <li class="nav-item dropdown"> <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"> <img src="img/avatars/6.jpg" class="img-avatar" alt="admin@bootstrapmaster.com"> </a>
-          <div class="dropdown-menu dropdown-menu-right">
-            <div class="dropdown-header text-center"> <strong>Account</strong> </div>
-            <a class="dropdown-item" href="#"><i class="fa fa-bell-o"></i> Updates<span class="badge badge-info">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-envelope-o"></i> Messages<span class="badge badge-success">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-tasks"></i> Tasks<span class="badge badge-danger">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-comments"></i> Comments<span class="badge badge-warning">42</span></a>
-            <div class="dropdown-header text-center"> <strong>Settings</strong> </div>
-            <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a> <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Settings</a> <a class="dropdown-item" href="#"><i class="fa fa-usd"></i> Payments<span class="badge badge-secondary">42</span></a> <a class="dropdown-item" href="#"><i class="fa fa-file"></i> Projects<span class="badge badge-primary">42</span></a>
-            <div class="divider"></div>
-            <a class="dropdown-item" href="#"><i class="fa fa-shield"></i> Lock Account</a> <a class="dropdown-item" href="#"><i class="fa fa-lock"></i> Logout</a> </div>
-        </li>
-      </ul>
-      <button class="navbar-toggler aside-menu-toggler" type="button"> <span class="navbar-toggler-icon"></span> </button>
-    </header>
-    <div id="container" class="container-fluid" style="width: 100%; height: 900px; overflow-y: auto"> </div>
-  </main>
-  <aside class="aside-menu"> </aside>
-</div>
+          <div class="dropdown-header text-center"> 
+            <strong>设置</strong> 
+          </div>
+          <a class="dropdown-item" href="javascript:gotoPersonalInformation();">
+            <i class="fa fa-user"></i>个人信息
+          </a> 
+          <a class="dropdown-item" href="javascript:changePassword();">
+            <i class="fa fa-file"></i>修改密码
+          </a>
+          <div class="divider"></div>
+          <a class="dropdown-item" href="javascript:logout()">
+            <i class="fa fa-lock"></i>退出
+          </a> 
+        </div>
+      </li>
+    </ul>
+    <button class="navbar-toggler aside-menu-toggler" onclick="toggleRightBar();"> 
+      <span class="navbar-toggler-icon"></span> 
+    </button>
+  </header>
+  
+  <div class="app-body">
+    <!-- side menu -->
+    <div class="sidebar">
+      <nav id="sidemenu" class="sidebar-nav ps ps--active-y"></nav>
+      <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+    </div>
+  
+    <!-- Main content -->
+    <main class="main header-fixed" style="overflow-y: hidden">
+      <div id="container" class="container-fluid" style="width: 100%; overflow-y: auto"></div>
+    </main>
+    <aside class="aside-menu"></aside>
+  </div>
+  <footer class="app-footer">
+    <div>
+      <a href="#">Good Manager</a>
+      <span>© 2018 Christian Gann.</span>
+    </div>
+    <div class="ml-auto">
+      <span>Powered by</span>
+      <a href="https://github.com/doublegsoft/kui-bs4">KUI</a>
+    </div>
+  </footer>
 
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=8d6c8b8f3749aed6b1aff3aad6f40e37&services=true"></script> 
 <script src="/3rd/jquery/jquery-3.2.1.min.js"></script> 
@@ -96,6 +133,7 @@
 <script src="/3rd/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
 <script src="/3rd/raphael/raphael.min.js"></script>
 <script src="/3rd/flowchart/flowchart.min.js"></script>
+<script src="/3rd/konva/konva.min.js"></script>
 
 <script src="/src/js/kui-mainframe.js"></script> 
 <script src="/src/js/kui-bootstrap.js"></script> 
@@ -115,6 +153,7 @@
 <script src="/src/js/kui-searchbox.js"></script>
 <script src="/src/js/kui-workflow.js"></script>
 <script src="/src/js/kui-utils.js"></script>
+<script src="/src/js/kui-xhr.js"></script>
  
 <script src="/src/js/wiagram-utils.js"></script> 
 <script src="/src/js/wiagram-rsrwl.js"></script> 
@@ -168,7 +207,7 @@ setTimeout(function () {
 }, 1000 * 60 * 2);
   
 // load menus
-ajax.post('/demo/data/menu.json', {}, function(resp) {
+ajax.post('/desktop/data/menu.json', {}, function(resp) {
   var source = document.getElementById('sidemenu-template').innerHTML;
   var template = Handlebars.compile(source);
   var html = template(resp);
@@ -184,5 +223,19 @@ ajax.post('/demo/data/menu.json', {}, function(resp) {
     }
   });
 });
-    
+
+$('.navbar-toggler').on('click', function(evt) {
+  var body = $('#body');
+  if (body.hasClass('sidebar-lg-show')) {
+    body.removeClass('sidebar-lg-show');
+  } else {
+    body.addClass('sidebar-lg-show');
+  }
+});    
+
+// 重算容器高度
+document.getElementById('container').style.height = (document.body.clientHeight - 56 - 25) + 'px';
+
+new PerfectScrollbar('.sidebar-nav');
+new PerfectScrollbar('.container-fluid');
 </script>

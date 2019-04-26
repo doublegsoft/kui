@@ -13,6 +13,10 @@
         "text": "表单验证",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view('component/validation.html', 'container');"
+      }, {
+        "text": "分页表格",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view('component/paginationtable.html', 'container');"
       }]  
     }]
   }, {
@@ -21,9 +25,40 @@
       "text": "行业应用",
       "icon": "nav-icon fa fa-industry",
       "items": [{
+        "text": "报表设计",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/business/report-designer.html', 'container');"
+      }, {
         "text": "人员信息",
         "icon": "nav-icon fa fa-user",
-        "url": "javascript:ajax.view('/demo/page/business/person.html', 'container');"
+        "url": "javascript:ajax.view('page/business/person.html', 'container');"
+      }, {
+        "text": "水库概览",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/list-statistics.html', 'container');"
+      }, {
+        "text": "水库列表",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/list-general.html', 'container');"
+      }]  
+    }]
+  }, {
+    "title": "样式设计",
+    "menus": [{
+      "text": "列表单项",
+      "icon": "nav-icon fa fa-industry",
+      "items": [{
+        "text": "人员信息",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/business/person.html', 'container');"
+      }, {
+        "text": "水库概览",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/list-statistics.html', 'container');"
+      }, {
+        "text": "水库列表",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/list-general.html', 'container');"
       }]  
     }]
   }]

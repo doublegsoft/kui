@@ -19,41 +19,36 @@
       <div class="form-group row">
         <label class="col-form-label col-md-2">水库功能：</label>
         <div class="col-md-4 form-checks">
-          <label class="custom-control checkbox checkbox-info">
-            <input type="checkbox" class="custom-control-input">
-            <span class="custom-control-indicator"></span> 
-            <span class="custom-control-description">供水</span> 
-          </label>
-          <label class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input">
-            <span class="custom-control-indicator"></span> 
-            <span class="custom-control-description">灌溉</span> 
-          </label>
-          <label class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input">
-            <span class="custom-control-indicator"></span> 
-            <span class="custom-control-description">发电</span> 
-          </label>
+          <div class="form-check form-check-inline mr-1">
+            <input class="form-check-input" checked type="checkbox" value="MALE" name="inline-radios">
+            <label class="form-check-label">供水</label>
+          </div>
+          <div class="form-check form-check-inline mr-1">
+            <input class="form-check-input" type="checkbox" value="FEMALE" name="inline-radios">
+            <label class="form-check-label" >发电</label>
+          </div>
+          <div class="form-check form-check-inline mr-1">
+            <input class="form-check-input" type="checkbox" value="FEMALE" name="inline-radios">
+            <label class="form-check-label" >灌溉</label>
+          </div>
         </div>
         <label class="col-form-label col-md-2">注册登记：</label>
         <div class="col-md-4 form-radios">
-          <label class="custom-control custom-radio">
-            <input type="radio" name="radio" class="custom-control-input" checked>
-            <span class="custom-control-indicator"></span> 
-            <span class="custom-control-description">是</span> 
-          </label>
-          <label class="custom-control custom-radio">
-            <input type="radio" name="radio" class="custom-control-input">
-            <span class="custom-control-indicator"></span> 
-            <span class="custom-control-description">否</span> 
-          </label>
+          <div class="form-check form-check-inline mr-1">
+            <input class="form-check-input" checked type="radio" value="MALE" name="inline-radios">
+            <label class="form-check-label">是</label>
+          </div>
+          <div class="form-check form-check-inline mr-1">
+            <input class="form-check-input" type="radio" value="FEMALE" name="inline-radios">
+            <label class="form-check-label" >否</label>
+          </div>
         </div>
       </div>
     </div>
     <div class="col-12 form-buttons">
       <div class="float-right">
-        <button class="btn btn-query">查  询</button>
-        <button class="btn btn-new">新  建</button>
+        <button class="btn btn-query">查 询</button>
+        <button class="btn btn-new">新 建</button>
       </div>
     </div>
     <div class="row col-12" style="padding-right: 0px;">
@@ -64,7 +59,7 @@
 <script>
 
 
-var table1 = new PaginationTable({
+  var table1 = new PaginationTable({
     url: 'data/paginationtable.json',
     containerId: 'pagination-table',
     limit: 10,
@@ -72,58 +67,58 @@ var table1 = new PaginationTable({
     // frozenColumnCount: 1,
     limit: 15,
     columns: [{
-        title: '水库名称',
-        template: '{rsnm}'
+      title: '水库名称',
+      template: '{rsnm}'
     }, {
-        title: '工程规模',
-        template: '{prscnm}'
+      title: '工程规模',
+      template: '{prscnm}'
     }, {
-        title: '行政区划',
-        template: '{addvnm}',
-        width: '250px'
+      title: '行政区划',
+      template: '{addvnm}',
+      width: '250px'
     }, {
-        title: '当前水位（m）',
-        displayFunction: function(obj, td) {
-            var div = $('<div class="sparkline" style="width: 100%; height: 32px;"></div>');
-//            var canvas = $('<canvas width="200px" height="30px"></canvas>');
-//            var values = [10,8,5,7,4,4,1];
-//            div.append(canvas);
-            td.append(div);
-//            $(div).sparkline(values, {composite: true});
-        }
-    }, {
-        title: '当前累计雨量（mm）',
-        template: '{dyp}'
-    }, {
-        title: '最新水位上报时间',
-        template: '{dt}'
-    }, {
-        title: '报警',
-        displayFunction: function (obj, td) {
-            if (typeof obj.lvl === 'undefined') {
-                td.append('无');
-                return;
-            }
-            var alarm = '无';
-            switch(obj.lvl + '') {
-            case '1': alarm = '红色'; break;
-            case '2': alarm = '橙色'; break;
-            case '3': alarm = '黄色'; break;
-            case '4': alarm = '蓝色'; break;
-            }
-            var a = $('<a href="#">');
-            a.on('click', function() {
-                
-            });
-            a.addClass('btn btn-link');
-            a.text(alarm);
-            td.append(a);
-        }
-    }],
-    afterLoad: function(result) {
+      title: '当前水位（m）',
+      display: function (obj, td) {
+        var div = $('<div class="sparkline" style="width: 100%; height: 32px;"></div>');
+        var canvas = $('<canvas width="200px" height="30px"></canvas>');
         var values = [10,8,5,7,4,4,1];
-        $('.sparkline').sparkline(values, {width: '200px', height: '32px', disableTooltips: true});
+        div.append(canvas);
+        td.append(div);
+        $(div).sparkline(values, {composite: true});
+      }
+    }, {
+      title: '当前累计雨量（mm）',
+      template: '{dyp}'
+    }, {
+      title: '最新水位上报时间',
+      template: '{dt}'
+    }, {
+      title: '报警',
+      display: function (obj, td) {
+        if (typeof obj.lvl === 'undefined') {
+          td.append('无');
+          return;
+        }
+        var alarm = '无';
+        switch (obj.lvl + '') {
+          case '1': alarm = '红色'; break;
+          case '2': alarm = '橙色'; break;
+          case '3': alarm = '黄色'; break;
+          case '4': alarm = '蓝色'; break;
+        }
+        var a = $('<a href="#">');
+        a.on('click', function () {
+
+        });
+        a.addClass('btn btn-link');
+        a.text(alarm);
+        td.append(a);
+      }
+    }],
+    afterLoad: function (result) {
+      var values = [10, 8, 5, 7, 4, 4, 1];
+      $('.sparkline').sparkline(values, { width: '200px', height: '32px', disableTooltips: true });
     }
-});
-table1.render('pagination-table');
+  });
+  table1.render('pagination-table');
 </script>

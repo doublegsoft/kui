@@ -1,0 +1,314 @@
+<style>
+label {
+  margin-bottom: 0;
+}
+</style>
+
+<div class="row">
+  <div class="col-md-2">
+    <ul class="list-group">
+      <li id="text-part" draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">文本</li>
+      <li id="image-part" draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图片</li>
+      <li id="chart-part" draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图表</li>
+      <li id="table-part" draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">表格</li>
+    </ul>
+  </div>
+  <div class="col-md-8" id="canvas_container" style="background-color: #fff"></div>
+  <div class="col-md-2">
+    <div class="form">
+      <div class="form-group">
+        <label>标识</label>
+        <input class="form-control" id="name" type="text">
+      </div>
+      <div class="form-group">
+        <label>文本</label>
+        <input class="form-control" id="name" type="text">
+      </div>
+      <div class="form-group">
+        <label>字体</label>
+        <div class="input-group">
+          <input class="form-control" id="date" type="text">
+          <span class="input-group-append">
+            <span class="input-group-text" style="padding: 0;">
+              <a class="btn btn-sm btn-link">设置</a>
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>位置（顶边，左边，长，宽）</label>
+        <div class="input-group">
+          <input class="form-control" id="date" type="text">
+          <span class="input-group-append">
+            <span class="input-group-text" style="padding: 0;">
+              <a class="btn btn-sm btn-link">设置</a>
+            </span>
+          </span>
+        </div>
+      </div>
+    </table>
+  </div>
+</div>
+
+<script>
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  // var data = ev.dataTransfer.getData("text");
+  // ev.target.appendChild(document.getElementById(data));
+  layer.add(new Konva.Text({
+    text: 'Droped text',
+    x:300,
+    y:400,
+    fontSize: 20,
+    draggable: true,
+    width: 200
+  }));
+}
+
+var width = window.innerWidth;
+var height = window.innerHeight;
+
+var stage = new Konva.Stage({
+  container: 'canvas_container',
+  width: width,
+  height: height
+});
+
+var layer = new Konva.Layer();
+stage.add(layer);
+
+var textNode = new Konva.Text({
+  text: 'Some text here',
+  x: 50,
+  y: 80,
+  fontSize: 20,
+  draggable: true,
+  width: 200
+});
+
+layer.add(textNode);
+
+textNode = new Konva.Text({
+  text: 'Another text here',
+  x: 200,
+  y: 400,
+  fontSize: 20,
+  draggable: true,
+  width: 200
+});
+
+layer.add(textNode);
+
+var tr = new Konva.Transformer({
+  node: textNode,
+  enabledAnchors: ['middle-left', 'middle-right'],
+  // set minimum width of text
+  boundBoxFunc: function(oldBox, newBox) {
+    newBox.width = Math.max(30, newBox.width);
+    return newBox;
+  }
+});
+
+textNode.on('transform', function() {
+  // reset scale, so only with is changing by transformer
+  textNode.setAttrs({
+    width: textNode.width() * textNode.scaleX(),
+    scaleX: 1
+  });
+});
+
+layer.add(tr);
+
+layer.draw();
+
+textNode.on('dblclick', () => {
+  // hide text node and transformer:
+  textNode.hide();
+  tr.hide();
+  layer.draw();
+
+  // create textarea over canvas with absolute position
+  // first we need to find position for textarea
+  // how to find it?
+
+  // at first lets find position of text node relative to the stage:
+  var textPosition = textNode.absolutePosition();
+
+  // then lets find position of stage container on the page:
+  var stageBox = stage.container().getBoundingClientRect();
+
+  // so position of textarea will be the sum of positions above:
+  var areaPosition = {
+    x: stageBox.left + textPosition.x,
+    y: stageBox.top + textPosition.y
+  };
+
+  // create textarea and style it
+  var textarea = document.createElement('textarea');
+  document.body.appendChild(textarea);
+
+  // apply many styles to match text on canvas as close as possible
+  // remember that text rendering on canvas and on the textarea can be different
+  // and sometimes it is hard to make it 100% the same. But we will try...
+  textarea.value = textNode.text();
+  textarea.style.position = 'absolute';
+  textarea.style.top = areaPosition.y + 'px';
+  textarea.style.left = areaPosition.x + 'px';
+  textarea.style.width = textNode.width() - textNode.padding() * 2 + 'px';
+  textarea.style.height =
+  textNode.height() - textNode.padding() * 2 + 5 + 'px';
+  textarea.style.fontSize = textNode.fontSize() + 'px';
+  textarea.style.border = 'none';
+  textarea.style.padding = '0px';
+  textarea.style.margin = '0px';
+  textarea.style.overflow = 'hidden';
+  textarea.style.background = 'none';
+  textarea.style.outline = 'none';
+  textarea.style.resize = 'none';
+  textarea.style.lineHeight = textNode.lineHeight();
+  textarea.style.fontFamily = textNode.fontFamily();
+  textarea.style.transformOrigin = 'left top';
+  textarea.style.textAlign = textNode.align();
+  textarea.style.color = textNode.fill();
+  rotation = textNode.rotation();
+  var transform = '';
+  if (rotation) {
+    transform += 'rotateZ(' + rotation + 'deg)';
+  }
+
+  var px = 0;
+  // also we need to slightly move textarea on firefox
+  // because it jumps a bit
+  var isFirefox =
+    navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+  if (isFirefox) {
+    px += 2 + Math.round(fontSize / 20);
+  }
+  transform += 'translateY(-' + px + 'px)';
+
+  textarea.style.transform = transform;
+
+  // reset height
+  textarea.style.height = 'auto';
+  // after browsers resized it we can set actual value
+  textarea.style.height = textarea.scrollHeight + 3 + 'px';
+
+  textarea.focus();
+
+  function removeTextarea() {
+    textarea.parentNode.removeChild(textarea);
+    window.removeEventListener('click', handleOutsideClick);
+    textNode.show();
+    tr.show();
+    tr.forceUpdate();
+    layer.draw();
+  }
+
+  function setTextareaWidth(newWidth) {
+    if (!newWidth) {
+      // set width for placeholder
+      newWidth = textNode.placeholder.length * textNode.fontSize();
+    }
+    // some extra fixes on different browsers
+    var isSafari = /^((?!chrome|android).)*safari/i.test(
+      navigator.userAgent
+    );
+    var isFirefox =
+      navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+    if (isSafari || isFirefox) {
+      newWidth = Math.ceil(newWidth);
+    }
+
+    var isEdge =
+      document.documentMode || /Edge/.test(navigator.userAgent);
+    if (isEdge) {
+      newWidth += 1;
+    }
+    textarea.style.width = newWidth + 'px';
+  }
+
+  textarea.addEventListener('keydown', function(e) {
+    // hide on enter
+    // but don't hide on shift + enter
+    if (e.keyCode === 13 && !e.shiftKey) {
+      textNode.text(textarea.value);
+      removeTextarea();
+    }
+    // on esc do not set value back to node
+    if (e.keyCode === 27) {
+      removeTextarea();
+    }
+  });
+
+  textarea.addEventListener('keydown', function(e) {
+    scale = textNode.getAbsoluteScale().x;
+    setTextareaWidth(textNode.width() * scale);
+    textarea.style.height = 'auto';
+    textarea.style.height =
+      textarea.scrollHeight + textNode.fontSize() + 'px';
+  });
+
+  function handleOutsideClick(e) {
+    if (e.target !== textarea) {
+      removeTextarea();
+    }
+  }
+  setTimeout(() => {
+    window.addEventListener('click', handleOutsideClick);
+  });
+});
+
+// canvas的事件绑定
+var canvas = document.getElementById("canvas_container").getElementsByTagName('canvas')[0];
+canvas.addEventListener('drop', drop);
+canvas.addEventListener('dragover', allowDrop);
+
+var context = canvas.getContext('2d');
+
+var vw = canvas.width;
+var vh = canvas.height;
+
+function drawGrid(){
+  var cellW = 10,
+      cellH = 10;
+  
+  // vertical lines
+  for (var x = 0; x <= vw; x += cellW) {
+      context.moveTo(x, 0); // x, y
+      context.lineTo(x, vh);
+  }
+  
+  // horizontal lines
+  for (var y = 0; y <= vh; y += cellH) {
+      context.moveTo(0, y); // x, y
+      context.lineTo(vw, y);
+  }
+
+  context.strokeStyle = "#cccccc";
+  context.stroke();
+}
+// drawGrid();
+
+// dots
+function drawDots() {
+  var r = 2,
+      cw = 30,
+      ch = 30;
+  
+  for (var x = 20; x < vw; x+=cw) {
+    for (var y = 20; y < vh; y+=ch) {
+        context.fillStyle = '#000000';   
+        context.fillRect(x-r/2,y-r/2,r,r);
+      }
+  }
+}
+drawDots();
+</script>
