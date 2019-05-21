@@ -1,0 +1,184 @@
+<div class="card">
+  <div class="card-header">
+    <i class="far fa-edit"></i>
+    <strong>报表选择</strong>
+    <div class="button-group float-right">
+      <button class="btn btn-sm btn-new" style="color: #fff">新建</button>
+      <button class="btn btn-sm btn-save">保存</button>
+      <button class="btn btn-sm btn-danger">发布</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="form form-horizontal">
+      <input type="hidden" name="stoprcid">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">报表名称：</label>
+        <div class="col-md-4">
+          <input class="form-control" name="rptnm" required label='必须要填'>
+        </div>
+        <label class="col-form-label col-md-2">存储过程：</label>
+        <div class="col-md-4">
+          <div class="input-group">
+            <input class="form-control" name="stoprcnm">
+            <span class="input-group-append">
+              <button class="btn btn-primary" type="button">同步</button>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">说明：</label>
+        <div class="col-md-10">
+          <textarea name='nt' rows="5" class="form-control"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <i class="far fa-edit"></i>
+    <strong>查询条件设置</strong>
+  </div>
+  <div id="report_parameters" class="card-body">
+    
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <i class="far fa-edit"></i>
+    <strong>结果集显示设置</strong>
+    <div class="button-group float-right">
+      <button class="btn btn-sm btn-success" style="color: #fff" onclick='addResultColumn();'>新增</button>
+      <button class="btn btn-sm btn-primary">保存</button>
+    </div>
+  </div>
+  <div id="report_result_columns" class="card-body">
+  </div>
+</div>
+
+<script>
+
+var report_parameters = new PaginationTable({
+  containerId: 'report_parameters',
+  url: './app/report-designer/stored_procedure_parameters.json',
+  limit: -1,
+  columns: [{
+    title: '参数名称',
+    style: 'text-align: left;',
+    template: '{stoprcparamnm}'
+  }, {
+    title: '参数显示文本',
+    style: 'text-align: left;',
+    display: function(obj, td) {
+      var input = $('<input class="form-control">');
+      $(td).append(input);
+    }
+  }, {
+    title: '数据类型',
+    style: 'text-align: left;',
+    template: '{dtatyp}'
+  }, {
+    title: '条件设置',
+    style: 'text-align: center;',
+    display: function(obj, td) {
+      var a = $('<a class="btn btn-link">');
+      a.on('click', function() {
+        openParameter(obj.stoprcparamid);
+      });
+      a.text('设置');
+      $(td).append(a);
+    }
+  }]
+});
+report_parameters.render('report_parameters');
+
+var report_result_columns = new PaginationTable({
+  containerId: 'report_result_columns',
+  url: './app/report-designer/stored_procedure_columns.json',
+  limit: -1,
+  columns: [{
+    title: '列名称',
+    style: 'text-align: left;',
+    display: function(obj, td) {
+      var input = $('<input class="form-control">');
+      $(td).append(input);
+    }
+  }, {
+    title: '列显示文本',
+    display: function(obj, td) {
+      var input = $('<input class="form-control">');
+      $(td).append(input);
+    }
+  }, {
+    title: '列显示设置',
+    style: 'text-align: center;',
+    display: function(obj, td) {
+      var a = $('<a class="btn btn-link">');
+      a.on('click', function() {
+        openResultColumn();
+      });
+      a.text('设置');
+      $(td).append(a);
+
+      a = $('<a class="btn btn-link">');
+      a.on('click', function() {
+        openResultColumn();
+      });
+      a.text('删除');
+      $(td).append(a);
+    }
+  }]
+});
+report_result_columns.render('report_result_columns');
+
+$('#report_parameters table').removeClass('table-striped');
+$('#report_result_columns table').removeClass('table-striped');
+
+function openParameter(stoprcparamid) {
+  ajax.dialog('参数设置', './app/report-designer/parameter.html', {}, 500, 420, function() {
+    var layerContent = document.querySelector('.layui-layer-content');
+    layerContent.style += '; overflow: hidden;'
+  });
+}
+
+function openResultColumn(stoprcparamid) {
+  ajax.dialog('结果集列设置', './app/report-designer/result-column.html', {}, 500, 400, function() {
+    var layerContent = document.querySelector('.layui-layer-content');
+    layerContent.style += '; overflow: hidden;'
+  });
+}
+
+function addResultColumn() {
+  var table = $('#report_result_columns table');
+  
+  var tr = $('<tr></tr>');
+  var td = $('<td>');
+  var input = $('<input class="form-control">');
+  td.append(input);
+  tr.append(td);
+
+  td = $('<td>');
+  input = $('<input class="form-control">');
+  td.append(input);
+  tr.append(td);
+  
+  td = $('<td style="text-align: center;">');
+  var a = $('<a class="btn btn-link">');
+  a.on('click', function() {
+    openResultColumn();
+  });
+  a.text('设置');
+  td.append(a);
+
+  a = $('<a class="btn btn-link">');
+  a.on('click', function() {
+    $(this).parent().parent().remove();
+  });
+  a.text('删除');
+  td.append(a);
+  tr.append(td);
+
+  table.append(tr);
+}
+</script>

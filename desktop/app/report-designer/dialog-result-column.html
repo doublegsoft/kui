@@ -1,0 +1,105 @@
+<!-- 单个参数设置界面 -->
+<div class="col-md-12 justify-content-center" style="margin-top: 15px;">
+  <div class="form form-horizontal">
+    <div id="field_dmntyp" class="form-group row">
+      <label class="col-form-label col-md-4">业务类型：</label>
+      <div class="col-md-8">
+        <select class="form-control" name="dmntyp">
+          <option value="text">文本</option>
+          <option value="date">日期</option>
+          <option value="number">数值</option>
+          <option value="value">值域</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-form-label col-md-4">列宽：</label>
+      <div class="col-md-8">
+        <div class="input-group">
+          <input class="form-control" name="wid">
+          <div class="input-group-append">
+            <span class="input-group-text">px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="field_fmt" class="form-group row hide">
+      <label class="col-form-label col-md-4">显示格式：</label>
+      <div class="col-md-8">
+        <input class="form-control" name="fmt">
+      </div>
+    </div>
+    <div id="field_valtyp" class="form-group row hide">
+      <label class="col-form-label col-md-4">值域结构：</label>
+      <div class="col-md-8 col-form-label">
+        <div class="form-check form-check-inline mr-1">
+          <input class="form-check-input" id="valtyp-list" type="radio" name="valtyp" value="list" checked>
+          <label class="form-check-label" for="valtyp-list">列表</label>
+        </div>
+        <div class="form-check form-check-inline mr-1">
+          <input class="form-check-input" id="valtyp-tree" type="radio" name="valtyp" value="tree">
+          <label class="form-check-label" for="valtyp-tree">树结构</label>
+        </div>
+      </div>
+    </div>
+    <div id="field_subttlgrptm" class="form-group row hide">
+      <label class="col-form-label col-md-4">小计周期：</label>
+      <div class="col-md-8">
+        <select class="form-control" name="subttlgrptm">
+          <option value="Y">年</option>
+          <option value="M">月</option>
+          <option value="D">日</option>
+          <option value="H">时</option>
+        </select>
+      </div>
+    </div>
+    <div id="field_subttlgrp" class="form-group row hide">
+      <label class="col-form-label col-md-4">小计值域列：</label>
+      <div class="col-md-8">
+        <div class="form-check form-check-inline"  style="padding-top: 8px;">
+          <input class="form-check-input" id="subttlgrp" type="checkbox" name="subttlgrp">
+          <label class="form-check-label" for="subttlgrp">是</label>
+        </div>
+      </div>
+    </div>
+    <div id="field_subttl" class="form-group row hide">
+      <label class="col-form-label col-md-4">小计列：</label>
+      <div class="col-md-8">
+        <div class="form-check form-check-inline" style="padding-top: 8px;">
+          <input class="form-check-input" id="subttl" type="checkbox" name="subttl">
+          <label class="form-check-label" for="subttl">是</label>
+        </div>
+      </div>
+    </div>
+    <div class="button-group float-right">
+      <button class="btn btn-save" onclick="savePosition();">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// 显示控制
+$('#field_dmntyp select').on('change', function() {
+  var val = $(this).val();
+  $('#field_valtyp').addClass('hide');
+  $('#field_subttlgrp').addClass('hide');
+  $('#field_subttl').addClass('hide');
+  $('#field_subttlgrptm').addClass('hide');
+  $('#field_fmt').addClass('hide');
+  $('#field_fmt input').val('');
+  if (val == 'number') {
+    $('#field_subttl').removeClass('hide');
+    $('#field_fmt').removeClass('hide');
+    $('#field_fmt input').val('###.##');
+  } else if (val == 'value') {
+    $('#field_valtyp').removeClass('hide');
+    $('#field_subttlgrp').removeClass('hide');
+  } else if (val == 'date') {
+    $('#field_subttlgrptm').removeClass('hide');
+    $('#field_subttlgrp').removeClass('hide');
+    $('#field_fmt').removeClass('hide');
+    $('#field_fmt input').val('YYYY年MM月DD日');
+  }
+});
+</script>

@@ -1,0 +1,187 @@
+<div class="card">
+  <div class="card-header">
+    <i class="far fa-edit"></i>
+    <strong>报表布局</strong>
+    <div class="button-group float-right">
+      <button class="btn btn-sm btn-success" style="color: #fff">选择</button>
+      <button class="btn btn-sm btn-primary">保存</button>
+      <button class="btn btn-sm btn-danger">发布</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-4" style="height: 200px; text-align: center; vertical-align: middle">
+        <a href="javascript:changeLayout(1);" class="btn">
+          <img src="./img/report-designer/1-1.png" width="100%" height="200px" onclick='changeLayout(1)'>
+        </a>
+      </div>
+      <div class="col-md-4" style="height: 200px; text-align: center; vertical-align: middle">
+        <a href="javascript:changeLayout(2);" class="btn">
+          <img src="./img/report-designer/2-1.png" width="100%" height="200px">
+        </a>
+      </div>
+      <div class="col-md-4" style="height: 200px; text-align: center; vertical-align: middle">
+        <a href="javascript:changeLayout(3);" class="btn">
+          <img src="./img/report-designer/3-1.png" width="100%" height="200px">
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <i class="far fa-edit"></i>
+    <strong>布局设置</strong>
+    <div class="button-group float-right">
+      <button class="btn btn-sm btn-warning" style="color: #fff">预览</button>
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div id="chart-first" class="col-md-4" style="height: 300px; text-align: center;">
+        <button class="btn btn-link" onclick='openChart()'>设置</button>
+        <div id="chart0" style="width: 100%; height: 100%">
+
+        </div>
+      </div>
+      <div id="chart-second" class="col-md-4" style="height: 300px; text-align: center;">
+        <button class="btn btn-link" onclick='openChart()'>设置</button>
+        <div id="chart1" style="width: 100%; height: 100%">
+
+        </div>
+      </div>
+      <div id="chart-third" class="col-md-4" style="height: 300px; text-align: center;">
+        <button class="btn btn-link" onclick='openChart()'>设置</button>
+        <div id="chart2" style="width: 100%; height: 100%">
+
+        </div>
+      </div>
+      <div class="col-md-12" id="data-report" style="padding-top: 65px;">
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openChart(stoprcparamid) {
+  ajax.dialog('参数设置', './app/report-designer/dialog-chart.html', {}, 500, 360, function() {
+    var layerContent = document.querySelector('.layui-layer-content');
+    layerContent.style += '; overflow: hidden;'
+  });
+}
+
+var table = new FrozenColumnsTable({
+  url: 'data/chart.json',
+  containerId: 'data-report',
+  frozenHeader: false,
+  frozenColumnCount: 1,
+  width: '1200px',
+  height: '500px',
+  tbodyHeight: '280px',
+  limit: 15,
+  columns: [{
+    title: '类型',
+    template: '{type}',
+    width: '250px'
+  }, {
+    title: '日期',
+    template: '{date}',
+    width: '250px'
+  }, {
+    title: '数量',
+    template: '{amount}',
+    width: '250px'
+  }]
+});
+table.render('data-report');
+
+/**
+ * 页面样式布局。
+ */
+function changeLayout(num) {
+  if (num == 1) {
+    $('#chart-second').addClass('hide');
+    $('#chart-third').addClass('hide');
+    
+    $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
+    $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
+    $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
+
+    $('#chart-first').addClass('col-md-12');
+    renderChart0();
+  } else if (num == 2) {
+    $('#chart-second').removeClass('hide');
+    $('#chart-third').addClass('hide');
+    
+    $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
+    $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
+    $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
+
+    $('#chart-first').addClass('col-md-6');
+    $('#chart-second').addClass('col-md-6');
+    renderChart0();
+    renderChart1();
+  } else if (num == 3) {
+    $('#chart-second').removeClass('hide');
+    $('#chart-third').removeClass('hide');
+    
+    $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
+    $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
+    $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
+
+    $('#chart-first').addClass('col-md-4');
+    $('#chart-second').addClass('col-md-4');
+    $('#chart-third').addClass('col-md-4');
+    renderChart0();
+    renderChart1();
+    renderChart2();
+  }
+}
+
+function renderChart0() {
+  var chart0 = new SimpleChart({
+    title: '总量统计',
+    url: './data/chart.json',
+    containerId: 'chart0',
+    valueField: 'type',
+    numberField: 'amount',
+    dateField: 'date',
+    chartType: 'pie'
+  });
+  chart0.render();
+}
+
+function renderChart1() {
+  var chart1 = new SimpleChart({
+    title: '数量统计',
+    url: './data/chart.json',
+    containerId: 'chart1',
+    valueField: 'type',
+    numberField: 'amount',
+    dateField: 'date',
+    chartType: 'bar',
+    statIndex: 'count'
+  });
+  chart1.render();
+}
+
+function renderChart2() {
+  var chart2 = new SimpleChart({
+    title: '类型趋势',
+    url: './data/chart.json',
+    containerId: 'chart2',
+    valueField: 'type',
+    numberField: 'amount',
+    dateField: 'date',
+    chartType: 'line'
+  });
+  chart2.render();
+}
+
+renderChart0();
+renderChart1();
+renderChart2();
+
+</script>
+  

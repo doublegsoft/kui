@@ -1,0 +1,55 @@
+<div class="row" style="margin-top: 15px; padding: 0 15px 0 15px">
+  <div class="col-md-12">
+    <div class="form form-horizontal" id="position_editor">
+      <input type="hidden" name='id'>
+      <div class="form-group row">
+        <label class="col-md-3">X坐标：</label>
+        <div class="col-md-9">
+          <input class="form-control" name="x" type="text">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-md-3">Y坐标：</label>
+        <div class="col-md-9">
+          <input class="form-control" name="y" type="text">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-md-3">宽：</label>
+        <div class="col-md-9">
+          <input class="form-control" name="width" type="text">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-md-3">高：</label>
+        <div class="col-md-9">
+          <input class="form-control" name="height" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="button-group float-right">
+      <button class="btn btn-save" onclick="savePosition();">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function savePosition() {
+  var container = document.getElementById('position_editor');
+  var input = container.querySelector('input[name="x"]');
+  designer.selected.x = isNaN(parseInt(input.value)) ? designer.selected.x : parseInt(input.value);
+
+  input = container.querySelector('input[name="y"]');
+  designer.selected.y = isNaN(parseInt(input.value)) ? designer.selected.y : parseInt(input.value);
+
+  input = container.querySelector('input[name="width"]');
+  designer.selected.width = isNaN(parseInt(input.value)) ? designer.selected.width : parseInt(input.value);
+
+  input = container.querySelector('input[name="height"]');
+  designer.selected.height = isNaN(parseInt(input.value)) ? designer.selected.height : parseInt(input.value);
+
+  // 重绘
+  designer.render();
+}
+
+</script>

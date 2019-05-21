@@ -1,0 +1,29 @@
+<div class="row" style="margin-top: 15px; padding: 0 15px 0 15px">
+  <div class="col-md-12">
+    <div class="form form-horizontal" id="font_editor">
+      <input type="hidden" name='id'>
+      <div class="form-group row">
+        <label class="col-md-3">大小：</label>
+        <div class="col-md-9">
+          <input class="form-control" name="size" type="text">
+        </div>
+      </div>
+    </div>
+    <div class="button-group float-right">
+      <button class="btn btn-save" onclick="saveFont();">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function saveFont() {
+  var container = document.getElementById('font_editor');
+  var input = container.querySelector('input[name="size"]');
+  designer.selected.height = parseInt(input.value);
+  designer.selected.font = input.value + 'px ' + designer.selected.fontFamily;
+
+  // 重绘
+  designer.render();
+}
+
+</script>

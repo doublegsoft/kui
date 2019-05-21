@@ -1,0 +1,111 @@
+<style>
+  label {
+    margin-bottom: 0;
+  }
+  </style>
+  
+<div id="designer_container" class="row">
+  <div class="col-md-2">
+    <ul class="list-group">
+      <li id="text-part" data-type='text' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">文本</li>
+      <li id="image-part" data-type='image' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图片</li>
+      <li id="chart-part" data-type='chart' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图表</li>
+      <li id="table-part" data-type='table' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">表格</li>
+    </ul>
+  </div>
+  <div class="col-md-8" id="canvas_container" style="background-color: #fff"></div>
+  <div class="col-md-2">
+    <div class="form" id='properties_editor'>
+      <div class="form-group">
+        <label>标识</label>
+        <input class="form-control" name="id" type="text" readonly>
+      </div>
+      <div class="form-group">
+        <label>文本</label>
+        <input class="form-control" name="text" type="text">
+      </div>
+      <div class="form-group">
+        <label>字体</label>
+        <div class="input-group">
+          <input class="form-control" name="font" type="text" readonly>
+          <span class="input-group-append">
+            <span class="input-group-text" style="padding: 0;">
+              <a class="btn btn-sm btn-link" href="javascript:setFont();">设置</a>
+            </span>
+          </span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>位置（顶边，左边，长，宽）</label>
+        <div class="input-group">
+          <input class="form-control" name="position" type="text" readonly>
+          <span class="input-group-append">
+            <span class="input-group-text" style="padding: 0;">
+              <a class="btn btn-sm btn-link" href="javascript:setPosition();">设置</a>
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div id="imager_container" style="display: none">
+      <img id="test_image" src="./img/hp.jpg">
+      <img id="chart_line" src="./img/chart/line.png">
+      <img id="chart_bar" src="./img/chart/bar.png">
+      <img id="chart_gauge" src="./img/chart/gauge.png">
+      <img id="chart_pie" src="./img/chart/pie.png">
+      <img id="chart_stack" src="./img/chart/stack.png">
+    </div>
+  </div>
+</div>
+  
+<script>
+  
+  function drag(ev) {
+    designer.drag(ev);
+  }
+  
+  var designerContainer = document.getElementById('designer_container');
+  var canvasContainer = document.getElementById('canvas_container');
+  var height = 900;// document.body.clientHeight - 100;
+  designerContainer.style.height = height + 'px';
+  canvasContainer.style.height= height + 'px';
+  
+  window.designer = new ReportDesigner({
+    containerId: 'canvas_container',
+    canvasHeight: height,
+    propertiesEditorId: 'properties_editor',
+    fontEditorId: 'font_editor'
+  });
+
+  function setPosition() {
+    if (!designer.selected) return;
+    ajax.dialog('设置位置', 'app/report-designer/position.html', {}, 400, 330, function() {
+      var selected = designer.selected;
+      var container = document.getElementById('position_editor');
+      var input = container.querySelector('input[name="x"]');
+      input.value = parseInt(selected.x);
+      input = container.querySelector('input[name="y"]');
+      input.value = parseInt(selected.y);
+      input = container.querySelector('input[name="width"]');
+      input.value = selected.width;
+      input = container.querySelector('input[name="height"]');
+      input.value = selected.height;
+
+      var layerContent = document.querySelector('.layui-layer-content');
+      layerContent.style += '; overflow: hidden;'
+    });
+  }
+
+  function setFont() {
+    if (!designer.selected) return;
+    ajax.dialog('设置位置', 'app/report-designer/font.html', {}, 400, 200, function() {
+      var selected = designer.selected;
+      var container = document.getElementById('font_editor');
+      var input = container.querySelector('input[name="size"]');
+      input.value = selected.height;
+
+      var layerContent = document.querySelector('.layui-layer-content');
+      layerContent.style += '; overflow: hidden;'
+    });
+  }
+</script>

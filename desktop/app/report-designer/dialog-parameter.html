@@ -1,0 +1,66 @@
+<!-- 单个参数设置界面 -->
+<div class="col-md-12 justify-content-center" style="margin-top: 15px;">
+  <div class="form form-horizontal">
+    <input type="hidden" name="stoprcid">
+    <div id="field_dmntyp" class="form-group row">
+      <label class="col-form-label col-md-4">业务类型：</label>
+      <div class="col-md-8">
+        <select name="dmntyp" class="form-control">
+          <option value="text">文本</option>
+          <option value="date">日期</option>
+          <option value="number">数值</option>
+          <option value="value">值域</option>
+        </select>
+      </div>
+    </div>
+    <div id="field_valsql" class="form-group row hide">
+      <label class="col-form-label col-md-4">值域SQL：</label>
+      <div class="col-md-8">
+        <textarea class="form-control" name="valsql" rows="4"></textarea>
+      </div>
+    </div>
+    <div id="field_valvals" class="form-group row hide">
+      <label class="col-form-label col-md-4">值域枚举：</label>
+      <div class="col-md-8">
+        <input class="form-control" name="valvals" required label='必须要填'>
+      </div>
+    </div>
+    <div id="field_valtyp" class="form-group row hide">
+      <label class="col-form-label col-md-4">值域结构：</label>
+      <div class="col-md-8 col-form-label">
+        <div class="form-check form-check-inline mr-1">
+          <input class="form-check-input" id="inline-radio1" type="radio" name="valtyp" checked>
+          <label class="form-check-label" for="inline-radio1">列表</label>
+        </div>
+        <div class="form-check form-check-inline mr-1">
+          <input class="form-check-input" id="inline-radio2" type="radio" name="valtyp">
+          <label class="form-check-label" for="inline-radio2">树结构</label>
+        </div>
+      </div>
+    </div>
+    <div class="button-group float-right">
+      <button class="btn btn-save" onclick="savePosition();">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// 显示控制
+$('#field_dmntyp select').on('change', function() {
+  var val = $(this).val();
+  $('#field_valtyp').addClass('hide');
+  $('#field_valvals').addClass('hide');
+  $('#field_valsql').addClass('hide');
+  if (val == 'number') {
+    
+  } else if (val == 'value') {
+    $('#field_valtyp').removeClass('hide');
+    $('#field_valvals').removeClass('hide');
+    $('#field_valsql').removeClass('hide');
+  } else if (val == 'date') {
+    
+  }
+});
+
+</script>
