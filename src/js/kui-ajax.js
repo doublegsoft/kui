@@ -161,11 +161,11 @@ ajax.template = function(url, containerId, templateId, data, callback) {
  * 
  * @param {integer} height - 高度
  */
-ajax.dialog = function(title, url, data, width, height, callback) {
+ajax.dialog = function(title, url, data, width, height, success, end) {
   $.ajax({
     url : url,
     data : data,
-    async : false,
+    async : true,
     success : function(html) {
       layer.open({
         type : 1,
@@ -174,7 +174,8 @@ ajax.dialog = function(title, url, data, width, height, callback) {
         skin : 'layui-layer-rim', //加上边框
         area : [ width + 'px', height + 'px' ], //宽高
         content : html,
-        end: callback || function () {}
+        success: success || function () {},
+        end: end || function () {}
       });
     }
   });

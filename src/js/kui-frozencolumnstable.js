@@ -368,7 +368,7 @@ FrozenColumnsTable.prototype.pagination = function() {
     var ul = $('<ul></ul>');
     ul.addClass('pagination');
     this.firstPage = $('<li></li>');
-    var a = $('<a></a>');
+    var a = $('<a class="page-link"></a>');
     a.attr('href', 'javascript:void(0)');
     a.text('首页');
     a.on('click', function() {
@@ -381,7 +381,7 @@ FrozenColumnsTable.prototype.pagination = function() {
     }
 
     this.prevPage = $('<li></li>');
-    a = $('<a></a>');
+    a = $('<a class="page-link"></a>');
     a.attr('href', 'javascript:void(0)');
     a.text('上一页');
     a.on('click', function() {
@@ -392,7 +392,7 @@ FrozenColumnsTable.prototype.pagination = function() {
 
     li = $('<li></li>');
     li.addClass('disabled');
-    this.pagebar = $('<a></a>');
+    this.pagebar = $('<a class="page-link"></a>');
     this.pagebar.attr('href', 'javascript:void(0)');
     this.pagebar.attr('style', 'cursor: default');
     this.pagebar.text("0/0");
@@ -400,7 +400,7 @@ FrozenColumnsTable.prototype.pagination = function() {
     ul.append(li);
 
     this.nextPage = $('<li></li>');
-    a = $('<a></a>');
+    a = $('<a class="page-link"></a>');
     a.attr('href', 'javascript:void(0)');
     a.text('下一页');
     a.on('click', function() {
@@ -410,7 +410,7 @@ FrozenColumnsTable.prototype.pagination = function() {
     ul.append(this.nextPage);
 
     this.lastPage = $('<li></li>');
-    a = $('<a></a>');
+    a = $('<a class="page-link"></a>');
     a.attr('href', 'javascript:void(0)');
     a.text('末页');
     a.on('click', function() {
@@ -420,22 +420,23 @@ FrozenColumnsTable.prototype.pagination = function() {
     if (this.style === 'full') {
         ul.append(this.lastPage);
     }
-
+    
+    /*
     li = $('<li class=disabled></li>');
-    a = $('<a></a>');
+    a = $('<a class="page-link"></a>');
     a.attr('style', 'cursor: default');
 
     this.pagenum = $('<input/>');
     this.pagenum.attr('size', 1);
     this.pagenum.attr('style', 'font-size: 11px; text-align: right; width: 25px; height: 20px;');
     if (this.style === 'full') {
-        a.append(this.pagenum);
-        li.append(a);
-        ul.append(li);
+      a.append(this.pagenum);
+      li.append(a);
+      ul.append(li);
     }
 
     li = $('<li></li>');
-    a = $('<a></a>');
+    a = $('<a class="page-link"></a>');
     a.attr('href', 'javascript:void(0)');
     a.text('跳转');
     a.on('click', function() {
@@ -458,6 +459,7 @@ FrozenColumnsTable.prototype.pagination = function() {
         li.append(a);
         ul.append(li);
     }
+    */
 
     if (this.style === 'none') {
         return;

@@ -5,6 +5,33 @@
     "url": "javascript:ajax.view('dashboard.html', 'container');"
   },
   "groups": [{
+    "title": "应用示例",
+    "menus": [{
+      "text": "工具应用",
+      "icon": "nav-icon fa fa-cubes",
+      "items": [{
+        "text": "报表设计",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view('app/report-designer/main.html', 'container');"
+      }]  
+    }, {
+      "text": "报表定义",
+      "icon": "nav-icon fa fa-cubes",
+      "items": [{
+        "text": "报表设置",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view('app/report-designer/setting.html', 'container');"
+      }, {
+        "text": "报表布局",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view('app/report-designer/layout.html', 'container');"
+      }, {
+        "text": "报表查看",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view('app/report-designer/main.html', 'container');"
+      }]  
+    }]
+  }, {
     "title": "组件示例",
     "menus": [{
       "text": "普通组件",
@@ -25,10 +52,6 @@
       "text": "行业应用",
       "icon": "nav-icon fa fa-industry",
       "items": [{
-        "text": "报表设计",
-        "icon": "nav-icon fa fa-user",
-        "url": "javascript:ajax.view('page/business/report-designer.html', 'container');"
-      }, {
         "text": "人员信息",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view('page/business/person.html', 'container');"
