@@ -4,22 +4,22 @@
     <strong>报表选择</strong>
     <div class="button-group float-right">
       <button class="btn btn-sm btn-new" style="color: #fff">新建</button>
-      <button class="btn btn-sm btn-save">保存</button>
-      <button class="btn btn-sm btn-danger">发布</button>
+      <button class="btn btn-sm btn-save" onclick="saveReport();">保存</button>
+      <button class="btn btn-sm btn-danger" onclick="publishReport();">发布</button>
     </div>
   </div>
   <div class="card-body">
-    <div class="form form-horizontal">
+    <div id="form_report" class="form form-horizontal">
       <input type="hidden" name="stoprcid">
       <div class="form-group row">
         <label class="col-form-label col-md-2">报表名称：</label>
         <div class="col-md-4">
-          <input class="form-control" name="rptnm" required label='必须要填'>
+          <input class="form-control" name="rptnm" required label="报表名称">
         </div>
         <label class="col-form-label col-md-2">存储过程：</label>
         <div class="col-md-4">
           <div class="input-group">
-            <input class="form-control" name="stoprcnm">
+            <input class="form-control" name="stoprcnm" required label="存储过程">
             <span class="input-group-append">
               <button class="btn btn-primary" type="button">同步</button>
             </span>
@@ -180,5 +180,19 @@ function addResultColumn() {
   tr.append(td);
 
   table.append(tr);
+}
+
+/**
+ *
+ */
+function saveReport() {
+  var errs = ('#form_report').validate();
+  if (errs && errs.length > 0) {
+    dialog.error();
+  }
+}
+
+function publishReport() {
+
 }
 </script>

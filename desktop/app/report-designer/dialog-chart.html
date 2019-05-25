@@ -5,15 +5,15 @@
       <label class="col-form-label col-md-4">图表：</label>
       <div class="col-md-8 col-form-label">
         <div class="form-check form-check-inline mr-1">
-          <input class="form-check-input" id="inline-radio1" type="radio" name="valtyp" checked>
+          <input class="form-check-input" id="inline-radio1" type="radio" name="chart-type" value="pie" checked>
           <label class="form-check-label" for="inline-radio1">饼图</label>
         </div>
         <div class="form-check form-check-inline mr-1">
-          <input class="form-check-input" id="inline-radio2" type="radio" name="valtyp">
+          <input class="form-check-input" id="inline-radio2" type="radio" name="chart-type" value="line">
           <label class="form-check-label" for="inline-radio2">折线图</label>
         </div>
         <div class="form-check form-check-inline mr-1">
-          <input class="form-check-input" id="inline-radio3" type="radio" name="valtyp">
+          <input class="form-check-input" id="inline-radio3" type="radio" name="chart-type" value="bar">
           <label class="form-check-label" for="inline-radio3">柱状图</label>
         </div>
       </div>
@@ -52,7 +52,17 @@
       </div>
     </div>
     <div class="button-group float-right">
-      <button class="btn btn-save" onclick="savePosition();">保存</button>
+      <button class="btn btn-save" onclick="saveChartSettings();">保存</button>
     </div>
   </div>
 </div>
+
+<script>
+var chartId = window.param_chart_id;
+xhr.post({
+  url: '',
+  data: {
+    chartId: chartId
+  }
+})
+</script>

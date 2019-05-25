@@ -39,19 +39,19 @@
   <div class="card-body">
     <div class="row">
       <div id="chart-first" class="col-md-4" style="height: 300px; text-align: center;">
-        <button class="btn btn-link" onclick='openChart()'>设置</button>
+        <button class="btn btn-link" onclick="openChartSettings('0')">设置</button>
         <div id="chart0" style="width: 100%; height: 100%">
 
         </div>
       </div>
       <div id="chart-second" class="col-md-4" style="height: 300px; text-align: center;">
-        <button class="btn btn-link" onclick='openChart()'>设置</button>
+        <button class="btn btn-link" onclick="openChartSettings('1')">设置</button>
         <div id="chart1" style="width: 100%; height: 100%">
 
         </div>
       </div>
       <div id="chart-third" class="col-md-4" style="height: 300px; text-align: center;">
-        <button class="btn btn-link" onclick='openChart()'>设置</button>
+        <button class="btn btn-link" onclick="openChartSettings('2')">设置</button>
         <div id="chart2" style="width: 100%; height: 100%">
 
         </div>
@@ -64,8 +64,16 @@
 </div>
 
 <script>
-function openChart(stoprcparamid) {
-  ajax.dialog('参数设置', './app/report-designer/dialog-chart.html', {}, 500, 360, function() {
+
+var layout = {};
+layout.columns = 3;
+layout["0"] = {type: 'pie', containerId: 'chart0'};
+layout["1"] = {type: 'bar', containerId: 'chart1'};
+layout["2"] = {type: 'line', containerId: 'chart2'};
+
+function openChartSettings(chartId) {
+  window.param_chart_id = chartId;
+  ajax.dialog('图表设置', './app/report-designer/dialog-chart.html', {}, 500, 360, function() {
     var layerContent = document.querySelector('.layui-layer-content');
     layerContent.style += '; overflow: hidden;'
   });
@@ -100,88 +108,107 @@ table.render('data-report');
  * 页面样式布局。
  */
 function changeLayout(num) {
+  layout.columns = num;
+
+  // reset all
+  $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
+  $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
+  $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
+
   if (num == 1) {
     $('#chart-second').addClass('hide');
     $('#chart-third').addClass('hide');
-    
-    $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
-    $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
-    $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
 
     $('#chart-first').addClass('col-md-12');
-    renderChart0();
   } else if (num == 2) {
     $('#chart-second').removeClass('hide');
     $('#chart-third').addClass('hide');
-    
-    $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
-    $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
-    $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
 
     $('#chart-first').addClass('col-md-6');
     $('#chart-second').addClass('col-md-6');
-    renderChart0();
-    renderChart1();
   } else if (num == 3) {
     $('#chart-second').removeClass('hide');
     $('#chart-third').removeClass('hide');
     
-    $('#chart-first').removeClass('col-md-4 col-md-6 col-md-12');
-    $('#chart-second').removeClass('col-md-4 col-md-6 col-md-12');
-    $('#chart-third').removeClass('col-md-4 col-md-6 col-md-12');
-
     $('#chart-first').addClass('col-md-4');
     $('#chart-second').addClass('col-md-4');
     $('#chart-third').addClass('col-md-4');
-    renderChart0();
-    renderChart1();
-    renderChart2();
+  }
+  renderCharts();
+}
+
+function renderCharts() {
+  if (layout.columns >= 1) {
+    renderChart(layout["0"]);
+  } 
+  if (layout.columns >= 2) {
+    renderChart(layout["1"]);
+  } 
+  if (layout.columns == 3) {
+    renderChart(layout["2"]);
   }
 }
 
-function renderChart0() {
-  var chart0 = new SimpleChart({
+function renderChart(chart) {
+  if (chart.type == 'pie') {
+    renderChartPie(chart.containerId);
+  } else if (chart.type == 'bar') {
+    renderChartBar(chart.containerId);
+  } else if (chart.type == 'line') {
+    renderChartLine(chart.containerId);
+  }
+}
+
+function renderChartPie(containerId) {
+  var chartPie = new SimpleChart({
     title: '总量统计',
     url: './data/chart.json',
-    containerId: 'chart0',
+    containerId: containerId,
     valueField: 'type',
     numberField: 'amount',
     dateField: 'date',
     chartType: 'pie'
   });
-  chart0.render();
+  chartPie.render();
 }
 
-function renderChart1() {
-  var chart1 = new SimpleChart({
+function renderChartBar(containerId) {
+  var chartBar = new SimpleChart({
     title: '数量统计',
     url: './data/chart.json',
-    containerId: 'chart1',
+    containerId: containerId,
     valueField: 'type',
     numberField: 'amount',
     dateField: 'date',
     chartType: 'bar',
     statIndex: 'count'
   });
-  chart1.render();
+  chartBar.render();
 }
 
-function renderChart2() {
-  var chart2 = new SimpleChart({
+function renderChartLine(containerId) {
+  var chartLine = new SimpleChart({
     title: '类型趋势',
     url: './data/chart.json',
-    containerId: 'chart2',
+    containerId: containerId,
     valueField: 'type',
     numberField: 'amount',
     dateField: 'date',
     chartType: 'line'
   });
-  chart2.render();
+  chartLine.render();
 }
 
-renderChart0();
-renderChart1();
-renderChart2();
+function saveChartSettings() {
+  var type = $('input[name="chart-type"]:checked').val();
+
+  var chartId = window.param_chart_id;
+  layout[chartId].type = type;
+  layer.close(layer.index);
+  renderCharts();
+}
+
+renderCharts();
 
 </script>
   
