@@ -1,0 +1,128 @@
+<div class="row">
+  <div id="cont_frm_report" class="col-md-12 ">
+    <div class="card">
+      <div class="card-header">
+        <strong>报表表格</strong>
+        <div class="button-group float-right">
+          <button id="btn_report_query" class="btn btn-sm btn-query">查询</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="qry_report" class="form-horizontal">
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label">报表名称：</label>
+            <div class="col-md-4">
+            <input class="form-control" name="rptnm" type="text" label="报表名称">
+            </div>
+            <label class="col-md-2 col-form-label">报表类型：</label>
+            <div class="col-md-4">
+            <select name="rpttyp" class="form-control" label="报表类型">
+              <option value="-1">不限</option>
+            </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label">数据源类型：</label>
+            <div class="col-md-4">
+            <div class="col-form-label">
+              <div class="form-check form-check-inline mr-1">
+                <input id="inline-radio-dtasrctyp-0" class="form-check-input" checked type="radio" value="M" name="dtasrctyp" label="数据源类型">
+                <label for="inline-radio-dtasrctyp-0" class="form-check-label">方法</label>
+              </div>
+              <div class="form-check form-check-inline mr-1">
+                <input id="inline-radio-dtasrctyp-1" class="form-check-input" type="radio" value="A" name="dtasrctyp" label="数据源类型">
+                <label for="inline-radio-dtasrctyp-1" class="form-check-label">接口</label>
+              </div>
+              <div class="form-check form-check-inline mr-1">
+                <input id="inline-radio-dtasrctyp-2" class="form-check-input" type="radio" value="P" name="dtasrctyp" label="数据源类型">
+                <label for="inline-radio-dtasrctyp-2" class="form-check-label">存储过程</label>
+              </div>
+              <div class="form-check form-check-inline mr-1">
+                <input id="inline-radio-dtasrctyp-3" class="form-check-input" type="radio" value="S" name="dtasrctyp" label="数据源类型">
+                <label for="inline-radio-dtasrctyp-3" class="form-check-label">程序脚本</label>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <div id="tab_report"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+var tab_report = new PaginationTable({
+  url: '/api/v1/report/find',
+  limit: 10,
+  containerId: 'tab_report',
+  columns: [{
+    title: '报表名称',
+    // template: '{rptnm}',
+    display: function(row, td) {
+      var rptnm = row.rptnm;
+      $(td).append(rptnm);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '报表类型',
+    // template: '{rpttyp}',
+    display: function(row, td) {
+      var rpttyp = row.rpttyp;
+      $(td).append(rpttyp);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '数据源类型',
+    // template: '{dtasrctyp}',
+    display: function(row, td) {
+      var dtasrctyp = row.dtasrctyp;
+      $(td).append(dtasrctyp);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '数据源名称',
+    // template: '{dtasrcbnm}',
+    display: function(row, td) {
+      var dtasrcbnm = row.dtasrcbnm;
+      $(td).append(dtasrcbnm);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '说明',
+    // template: '{nt}',
+    display: function(row, td) {
+      var nt = row.nt;
+      $(td).append(nt);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '操作',
+    // template: '{TODO}',
+    display: function(row, td) {
+      var a = $('<a class="btn btn-link">编辑</a>');
+      a.on('click', function() {
+        var rptid = row.rptid;
+        window.parameters.rptid = rptid;
+        xhr.post({
+          url: '/api/v1/table/edit',
+          data: {
+            rptid: rptid
+          },
+          success: function(resp) {
+            if (resp.error) {
+              dialog.error(resp.error.message);
+              return;
+            }
+          }
+        });
+      });
+    },
+    style: 'text-align: left'
+  }]
+});
+tab_report.render('tab_report', {});
+
+</script>
