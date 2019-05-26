@@ -1,0 +1,129 @@
+<div class="row">
+  <div id="cont_frm_report" class="col-md-12 ">
+    <div class="card">
+      <div class="card-header">
+        <strong>报表表单编辑</strong>
+      </div>
+      <div class="card-body">
+        <div id="frm_report" class="form-horizontal ">
+          <input name="rptid" type="hidden" value="">
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label">报表名称：</label>
+            <div class="col-md-4">
+              <input class="form-control" name="rptnm" type="text" label="报表名称" required>
+            </div>
+            <label class="col-md-2 col-form-label">报表类型：</label>
+            <div class="col-md-4">
+              <select name="rpttyp" class="form-control" label="报表类型" required>
+                <option value="-1">请选择...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label">数据源类型：</label>
+            <div class="col-md-4">
+              <div class="col-form-label">
+                <div class="form-check form-check-inline mr-1">
+                  <input id="inline-radio-dtasrctyp-0" class="form-check-input" checked type="radio" value="M" name="dtasrctyp" label="数据源类型">
+                  <label for="inline-radio-dtasrctyp-0" class="form-check-label">方法</label>
+                </div>
+                <div class="form-check form-check-inline mr-1">
+                  <input id="inline-radio-dtasrctyp-1" class="form-check-input" type="radio" value="A" name="dtasrctyp" label="数据源类型">
+                  <label for="inline-radio-dtasrctyp-1" class="form-check-label">接口</label>
+                </div>
+                <div class="form-check form-check-inline mr-1">
+                  <input id="inline-radio-dtasrctyp-2" class="form-check-input" type="radio" value="P" name="dtasrctyp" label="数据源类型">
+                  <label for="inline-radio-dtasrctyp-2" class="form-check-label">存储过程</label>
+                </div>
+                <div class="form-check form-check-inline mr-1">
+                  <input id="inline-radio-dtasrctyp-3" class="form-check-input" type="radio" value="S" name="dtasrctyp" label="数据源类型">
+                  <label for="inline-radio-dtasrctyp-3" class="form-check-label">程序脚本</label>
+                </div>
+              </div>
+            </div>
+            <label class="col-md-2 col-form-label">数据源名称：</label>
+            <div class="col-md-4">
+              <input class="form-control" name="dtasrcbnm" type="text" label="数据源名称" required>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label">说明：</label>
+            <div class="col-md-4">
+              <textarea class="form-control" name="nt" rows="5"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="button-group float-right">
+          <button id="btn_frm_report_reset" class="btn btn">重置</button>
+          <button id="btn_frm_report_save" class="btn btn-primary">保存</button>
+          <button id="btn_frm_report_delete" class="btn btn-delete">删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+/**
+ *
+ */
+$('#btn_frm_report_reset').on('click', function(){
+  $('#frm_report').formdata({
+    'rptid': '',
+    'rptnm': '',
+    'rpttyp': '',
+    'dtasrctyp': '',
+    'dtasrcbnm': '',
+    'nt': ''
+  });
+  $('#frm_report [name=rptnm]').removeClass('is-invalid');
+  $('#frm_report [name=rpttyp]').removeClass('is-invalid');
+  $('#frm_report [name=dtasrctyp]').removeClass('is-invalid');
+  $('#frm_report [name=dtasrcbnm]').removeClass('is-invalid');
+});
+/**
+ *
+ */
+$('#btn_frm_report_save').on('click', function(){
+  var errors = $('#frm_report').validate();
+  if (errors && errors.length > 0) {
+    dialog.error(utils.message(errors));
+    utils.prompt(errors);
+    return;
+  }
+  var data_frm_report = $('#frm_report').formdata();
+  xhr.post({
+    url: '/api/v1/report/save',
+    data: data_frm_report,
+    success: function(resp) {
+      if (!resp || resp.error) {
+        dialog.error('信息保存出错！');
+        return;
+      }
+      $('#rptid').val(resp.data.rptid);
+      dialog.success('信息保存成功！');
+    }
+  });
+});
+/**
+ *
+ */
+$('#btn_frm_report_delete').on('click', function(){
+  xhr.post({
+    url: '/api/v1/report/delete',
+    data: {
+      rptid: $('#frm_report input[name=rptid]').val()
+    },
+    success: function(resp) {
+      if (!resp || resp.error) {
+        dialog.error('信息删除出错！');
+        return;
+      }
+      dialog.success('信息删除成功！');
+    }
+  });
+});
+
+</script>

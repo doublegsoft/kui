@@ -84,5 +84,16 @@
         "url": "javascript:ajax.view('page/list-general.html', 'container');"
       }]  
     }]
+  }, {
+    "title": "测试",
+    "menus": [{
+      "text": "测试",
+      "icon": "nav-icon fa fa-industry",
+      "items": [{
+        "text": "测试",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/test.html', 'container');"
+      }]  
+    }]
   }]
 }
