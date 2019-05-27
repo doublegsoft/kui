@@ -1,0 +1,52 @@
+<div class="row">
+  <div id="cont_frm_report" class="col-md-12 ">
+    <div class="card">
+      <div class="card-header">
+        <strong>报表查看</strong>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div id="tr_report" class="col-md-3" style="height: 600px"></div>
+          <div id="tab_report" class="col-md-9" style="height: 600px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+var tab_report = new PaginationTable({
+  url: 'TODO',
+  limit: 10,
+  containerId: 'tab_report',
+  columns: [{
+    title: '日期',
+    // template: '{dt}',
+    display: function(row, td) {
+      var dt = row.dt;
+      $(td).append(dt);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '项目名称',
+    // template: '{prj}',
+    display: function(row, td) {
+      var prj = row.prj;
+      $(td).append(prj);
+    },
+    style: 'text-align: left'
+  }, {
+    title: '金额',
+    // template: '{amt}',
+    display: function(row, td) {
+      var amt = row.amt;
+      $(td).append(amt);
+    },
+    style: 'text-align: left'
+  }]
+});
+tab_report.render('tab_report', {});
+
+</script>
