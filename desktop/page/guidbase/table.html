@@ -2,12 +2,12 @@
   <div id="cont_frm_report" class="col-md-12 ">
     <div class="card">
       <div class="card-header">
-        <strong>报表表格</strong>
+        <strong>报表查询</strong>
+      </div>
+      <div class="card-body">
         <div class="button-group float-right">
           <button id="btn_report_query" class="btn btn-sm btn-query">查询</button>
         </div>
-      </div>
-      <div class="card-body">
         <div id="qry_report" class="form-horizontal">
           <div class="form-group row">
             <label class="col-md-2 col-form-label">报表名称：</label>
@@ -45,7 +45,7 @@
             </div>
           </div>
         </div>
-        <div id="tab_report"></div>
+        <div id="tab_report" class="col-md-0" style="height: 0px"></div>
       </div>
     </div>
   </div>
@@ -54,8 +54,14 @@
 
 <script>
 
+/**
+ * 点击【查询】按钮的处理方法。
+ */
+$('#btn_report_query').on('click', function() {
+});
+
 var tab_report = new PaginationTable({
-  url: '/api/v1/report/find',
+  url: 'TODO',
   limit: 10,
   containerId: 'tab_report',
   columns: [{
@@ -107,7 +113,7 @@ var tab_report = new PaginationTable({
         var rptid = row.rptid;
         window.parameters.rptid = rptid;
         xhr.post({
-          url: '/api/v1/table/edit',
+          url: '/api/v1/report/edit',
           data: {
             rptid: rptid
           },
@@ -119,6 +125,25 @@ var tab_report = new PaginationTable({
           }
         });
       });
+      $(td).append(a);
+      var a = $('<a class="btn btn-link">删除</a>');
+      a.on('click', function() {
+        var rptid = row.rptid;
+        window.parameters.rptid = rptid;
+        xhr.post({
+          url: '/api/v1/report/delete',
+          data: {
+            rptid: rptid
+          },
+          success: function(resp) {
+            if (resp.error) {
+              dialog.error(resp.error.message);
+              return;
+            }
+          }
+        });
+      });
+      $(td).append(a);
     },
     style: 'text-align: left'
   }]

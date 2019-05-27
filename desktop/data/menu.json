@@ -97,6 +97,10 @@
         "text": "表格",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view('page/guidbase/table.html', 'container');"
+      }, {
+        "text": "树",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/guidbase/tree.html', 'container');"
       }]  
     }]
   }]
