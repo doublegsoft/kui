@@ -6,7 +6,17 @@
       </div>
       <div class="card-body">
         <div class="row">
-          <div id="tr_report" class="col-md-3" style="height: 600px"></div>
+          <div id="tr_report" class="col-md-3" style="height: 600px">
+            <ul>
+              <li>Root node 1
+                <ul>
+                  <li id="child_node_1">Child node 1</li>
+                  <li>Child node 2</li>
+                </ul>
+              </li>
+              <li>Root node 2</li>
+            </ul>
+          </div>
           <div id="tab_report" class="col-md-9" style="height: 600px"></div>
         </div>
       </div>
@@ -15,7 +25,23 @@
 
 </div>
 
+<script id="template_tr_report" type="text/x-handlebars-template">
+<ul>
+  {{#each children}}
+  <li data-id="{{id}}">{{text}}
+    {{#if children}}
+    <ul>
+      <li id="child_node_1">Child node 1</li>
+      <li>Child node 2</li>
+    </ul>
+  </li>
+  {{/each}}
+</ul>
+</script>
+
 <script>
+
+$('#tr_report').jstree();
 
 var tab_report = new PaginationTable({
   url: 'TODO',
@@ -25,8 +51,8 @@ var tab_report = new PaginationTable({
     title: '日期',
     // template: '{dt}',
     display: function(row, td) {
-      var dt = row.dt;
-      $(td).append(dt);
+      var dt = moment(row.dt);
+      $(td).append(dt.format('YYYY-MM-DD'));
     },
     style: 'text-align: left'
   }, {

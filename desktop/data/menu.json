@@ -101,6 +101,14 @@
         "text": "树",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view('page/guidbase/tree.html', 'container');"
+      }, {
+        "text": "图表",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/guidbase/chart.html', 'container');"
+      }, {
+        "text": "列表",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view('page/guidbase/list.html', 'container');"
       }]  
     }]
   }]
