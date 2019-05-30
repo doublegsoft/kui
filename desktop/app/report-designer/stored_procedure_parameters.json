@@ -1,10 +1,8 @@
 {
-  "total": 5,
+  "total": 3,
   "data": [
-    {"stoprcparamnm": "A", "dtatyp": "varchar(64)"},
-    {"stoprcparamnm": "B", "dtatyp": "varchar(64)"},
-    {"stoprcparamnm": "C", "dtatyp": "varchar(64)"},
-    {"stoprcparamnm": "D", "dtatyp": "varchar(64)"},
-    {"stoprcparamnm": "E", "dtatyp": "varchar(64)"}
+    {"stoprcparamnm": "收费日期", "dtatyp": "varchar(64)"},
+    {"stoprcparamnm": "收费项目", "dtatyp": "varchar(64)"},
+    {"stoprcparamnm": "科室", "dtatyp": "varchar(64)"}
   ]
 }

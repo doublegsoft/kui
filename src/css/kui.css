@@ -74,7 +74,7 @@ body {
 }
 
 .btn-save:before {
-	font-family: 'FontAwesome';
+	font-family: 'Font Awesome 5 Free';
 	content: "\f0c7";
 	padding-right: 5px;
 }
@@ -86,7 +86,7 @@ body {
 }
 
 .btn-dismiss:before {
-	font-family: 'FontAwesome';
+	font-family: 'Font Awesome 5 Free';
 	content: "\f14d";
 	padding-right: 5px;
 }
@@ -98,7 +98,7 @@ body {
 }
 
 .btn-delete:before {
-	font-family: 'FontAwesome';
+	font-family: 'Font Awesome 5 Free';
 	content: "\f00d";
 	padding-right: 5px;
 }
@@ -110,7 +110,7 @@ body {
 }
 
 .btn-new:before {
-	font-family: 'FontAwesome';
+	font-family: 'Font Awesome 5 Free';
 	content: "\f196";
 	padding-right: 5px;
 }
@@ -122,7 +122,7 @@ body {
 }
 
 .btn-query:before {
-	font-family: 'FontAwesome';
+	font-family: 'Font Awesome 5 Free';
 	content: "\f002";
 	padding-right: 5px;
 }
@@ -134,7 +134,7 @@ body {
 }
 
 .btn-export:before {
-  font-family: 'FontAwesome';
+  font-family: 'Font Awesome 5 Free';
   content: "\f016";
   padding-right: 5px;
 }

@@ -1,4 +1,11 @@
 {
-  "total": 0,
-  "data": []
+  "total": 3,
+  "data": [
+    {"rsltcolnm": "收费日期", "rsltcoltxt": "收费日期"},
+    {"rsltcolnm": "收费项目", "rsltcoltxt": "收费项目"},
+    {"rsltcolnm": "开单科室", "rsltcoltxt": "开单科室"},
+    {"rsltcolnm": "执行科室", "rsltcoltxt": "执行科室"},
+    {"rsltcolnm": "病人科室", "rsltcoltxt": "病人科室"},
+    {"rsltcolnm": "金额", "rsltcoltxt": "金额"}
+  ]
 }
