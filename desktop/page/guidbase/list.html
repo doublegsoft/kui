@@ -1,0 +1,53 @@
+<div class="row">
+  <div id="cont_list" class="col-md-12 ">
+    <div class="card">
+      <div class="card-header">
+        <strong>报告列表</strong>
+      </div>
+      <div class="card-body">
+        <div id="lst_report" class="col-md-12" style="height: 0px"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script id="template_lst_report" type="text/x-handlebars-template">
+<div class="col-md-12">
+  <div class="row">
+    <div class="col-md-3">{{rptnm}}</div>
+    <div class="col-md-9">
+      <div class="row">
+        <div class="col-md-4">{{t1}}</div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">{{t2}}</div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">{{t3}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+</script>
+
+<script>
+
+var lst_report = new PaginationTable({
+  url: '/api/v1/report/find',
+  limit: 10,
+  headless: true,
+  containerId: 'lst_report',
+  columns: [{
+    title: '报告列表',
+    display: function(row, td) {
+      var source = document.getElementById("template_lst_report").innerHTML;
+      var template = Handlebars.compile(source);
+      var html = template(context);
+      $(td).html(html);
+    }
+  }]
+});
+lst_report.render('lst_report', {});
+
+</script>
