@@ -3,3 +3,5 @@
 node_modules/
 .gitignore
 package-lock.json
+mac_web_server
+.gitignore

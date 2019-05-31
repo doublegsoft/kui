@@ -21,7 +21,7 @@
  */
 
 body {
-	font-family: '微软雅黑' !important;
+	font-family: "微软雅黑" !important;
 	font-size: 15px;
 }
 
@@ -74,7 +74,7 @@ body {
 }
 
 .btn-save:before {
-	font-family: 'Font Awesome 5 Free';
+	font-family: "Font Awesome 5 Free";
 	content: "\f0c7";
 	padding-right: 5px;
 }
@@ -86,7 +86,7 @@ body {
 }
 
 .btn-dismiss:before {
-	font-family: 'Font Awesome 5 Free';
+	font-family: "Font Awesome 5 Free";
 	content: "\f14d";
 	padding-right: 5px;
 }
@@ -98,9 +98,22 @@ body {
 }
 
 .btn-delete:before {
-	font-family: 'Font Awesome 5 Free';
+	font-family: "Font Awesome 5 Free";
 	content: "\f00d";
 	padding-right: 5px;
+}
+
+.btn-publish {
+	color: #fff;
+	background-color: #f86c6b;
+	border-color: #f86c6b;
+}
+
+.btn-publish:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f093";
+	padding-right: 5px;
+	font-weight: 900;
 }
 
 .btn-new {
@@ -110,8 +123,8 @@ body {
 }
 
 .btn-new:before {
-	font-family: 'Font Awesome 5 Free';
-	content: "\f196";
+	font-family: "Font Awesome 5 Free";
+	content: "\f0fe";
 	padding-right: 5px;
 }
 
@@ -122,9 +135,10 @@ body {
 }
 
 .btn-query:before {
-	font-family: 'Font Awesome 5 Free';
+	font-family: "Font Awesome 5 Free";
 	content: "\f002";
 	padding-right: 5px;
+	font-weight: 900;
 }
 
 .btn-export {
@@ -134,7 +148,7 @@ body {
 }
 
 .btn-export:before {
-  font-family: 'Font Awesome 5 Free';
+  font-family: "Font Awesome 5 Free";
   content: "\f016";
   padding-right: 5px;
 }
@@ -146,7 +160,7 @@ body {
 }
 
 .btn-enable:before {
-	font-family: 'simple-line-icons';
+	font-family: "simple-line-icons";
 	content: "\e099";
 	padding-right: 5px;
 }
@@ -158,7 +172,7 @@ body {
 }
 
 .btn-disable:before {
-	font-family: 'simple-line-icons';
+	font-family: "simple-line-icons";
 	content: "\e07c";
 	padding-right: 5px;
 }
@@ -170,13 +184,13 @@ body {
 }
 
 .btn-download:before {
-	font-family: 'simple-line-icons';
+	font-family: "simple-line-icons";
 	content: "\e083";
 	padding-right: 5px;
 }
 
 .btn-download:before {
-  font-family: 'simple-line-icons';
+  font-family: "simple-line-icons";
   content: "\e083";
   padding-right: 5px;
 }
@@ -244,7 +258,7 @@ body {
 }
 
 .bmap-pane {
-	/* Initially we don't want any height, and we want the contents to be hidden */
+	/* Initially we don"t want any height, and we want the contents to be hidden */
 	max-height: 0;
 	/* Set our transitions up. */
 	-webkit-transition: max-height 0.8s;
@@ -253,7 +267,7 @@ body {
 }
 
 .bmap-pane-expand {
-	/* On hover, set the max-height to something large. In this case there's an obvious limit. */
+	/* On hover, set the max-height to something large. In this case there"s an obvious limit. */
 	max-height: 600px;
 }
 
