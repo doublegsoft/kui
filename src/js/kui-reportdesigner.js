@@ -21,8 +21,6 @@ function ReportDesigner(options) {
   this.propertyIdInput = this.propertiesEditor.querySelector('input[name="id"]');
   this.propertyPositionInput = this.propertiesEditor.querySelector('input[name="position"]');
 
-  this.font
-
   /*
    * 加入发生改变时，画布上的文本内容实时发生改变。
    */
@@ -35,42 +33,14 @@ function ReportDesigner(options) {
   // not working
   // this.conatinerHeight = this.container.style.height;
 
-  this.canvas = document.createElement('canvas');
+  this.bindDragOverEventListener();
+  this.bindDropEventListener(this, this.drop);
+  this.bindMouseDownEventListener(this, this.select);
+  this.bindMouseMoveEventListener(this, this.move);
+  this.bindMouseUpEventListener();
+
   this.canvas.setAttribute('width', this.containerWidth);
   this.canvas.setAttribute('height', options.canvasHeight);
-
-  this.canvas.addEventListener('dragover', function(ev) {
-    ev.preventDefault();
-  });
-
-  this.canvas.addEventListener('drop', function (ev) {
-    ev.preventDefault();
-    self.drop(ev);
-  });
-
-  this.canvas.addEventListener('mousedown', function(ev) {
-    // reset selected object to null in this designer
-    self.selected = null;
-    // and use coordinate algorithm to select object
-    self.select(ev);
-  });
-
-  this.canvas.addEventListener('mousemove', function(ev) {
-    if (self.selected == null) {
-      return;
-    }
-    if (!self.moving) {
-      return;
-    }
-    self.move(ev);
-    if (self.selected != null) {
-      self.moving = true;
-    }
-  });
-
-  this.canvas.addEventListener('mouseup', function(ev) {
-    self.moving = false;
-  });
 
   // 初始化设置
   this.container.innerHTML = '';
@@ -86,6 +56,8 @@ function ReportDesigner(options) {
 
   this.render();
 }
+
+ReportDesigner.prototype = new DesignCanvas();
 
 ReportDesigner.TEXT_FONT = '18px 宋体';
 ReportDesigner.STROKE_STYLE_SELECTED = 'red';
@@ -347,94 +319,96 @@ ReportDesigner.prototype.render = function () {
   }
 };
 
+/**
+ * 
+ */
 ReportDesigner.prototype.drag = function (ev) {
   var target = ev.target;
-  this.dragging = target;
+  self.dragging = target;
 
-  this.dragX = ev.layerX;
-  this.dragY = ev.layerY;
+  self.dragX = ev.layerX;
+  self.dragY = ev.layerY;
 
   ev.dataTransfer.setData('drag-type', ev.target.getAttribute('data-type'));
 };
 
-ReportDesigner.prototype.drop = function (ev) {
-  ev.preventDefault();
-  var rect = this.canvas.getBoundingClientRect();
+ReportDesigner.prototype.drop = function (self, ev) {
+  var rect = self.canvas.getBoundingClientRect();
   var x = ev.clientX - rect.left;
   var y = ev.clientY - rect.top;
 
   var dragType = ev.dataTransfer.getData('drag-type');
   if (dragType == 'text') {
-    this.addText('这里是标题', x, y);
+    self.addText('这里是标题', x, y);
   } else if (dragType == 'table') {
-    this.addTable(x, y);
+    self.addTable(x, y);
   } else if (dragType == 'image') {
-    this.addImage(x, y);
+    self.addImage(x, y);
   } else if (dragType == 'chart') {
-    this.addChart(x, y);
+    self.addChart(x, y);
   }
 };
 
-ReportDesigner.prototype.select = function (ev) {
+ReportDesigner.prototype.select = function (self, ev) {
   if (ev.button != 0) return;
-  var rect = this.canvas.getBoundingClientRect();
+  var rect = self.canvas.getBoundingClientRect();
   var clickX = ev.clientX - rect.left;
   var clickY = ev.clientY - rect.top;
 
   // reset selected object in designer
-  this.selected = null;
+  self.selected = null;
 
   // reset each object selected property to false
-  for (var i = 0; i < this.objects.length; i++) {
-    var obj = this.objects[i];
+  for (var i = 0; i < self.objects.length; i++) {
+    var obj = self.objects[i];
     obj.selected = false;
   }
 
-  for (var i = 0; i < this.objects.length; i++) {
-    var obj = this.objects[i];
+  for (var i = 0; i < self.objects.length; i++) {
+    var obj = self.objects[i];
     // check the mouse position is or not in the object shape.
     if ((clickX >= obj.x && clickX <= (obj.x + obj.width)) &&
         (clickY >= obj.y && clickY <= (obj.y + obj.height))) {
       obj.selected = true;
-      this.selected = obj;
+      self.selected = obj;
       // allow to move
-      this.moving = true;
-      this.offsetMoveX = clickX - this.selected.x;
-      this.offsetMoveY = clickY - this.selected.y;
+      self.moving = true;
+      self.offsetMoveX = clickX - self.selected.x;
+      self.offsetMoveY = clickY - self.selected.y;
       break;
     }
   }
 
   // 显示选择的空间属性
-  if (this.selected) {
-    if (this.selected.text) {
-      this.propertyTextInput.value = this.selected.text;
+  if (self.selected) {
+    if (self.selected.text) {
+      self.propertyTextInput.value = self.selected.text;
     }
-    this.propertyIdInput.value = this.selected.id;
-    this.propertyPositionInput.value = this.selected.position();
+    self.propertyIdInput.value = self.selected.id;
+    self.propertyPositionInput.value = self.selected.position();
   } else {
-    this.propertyTextInput.value = '';
-    this.propertyIdInput.value = '';
-    this.propertyPositionInput.value = '';
+    self.propertyTextInput.value = '';
+    self.propertyIdInput.value = '';
+    self.propertyPositionInput.value = '';
   }
 
   // 重新渲染，如果选择了则显示选择的边框；如果没有，则消除选择的边框
-  this.render();
+  self.render();
 };
 
-ReportDesigner.prototype.move = function (ev) {
-  if (this.selected == null) return;
-  if (!this.moving) return;
+ReportDesigner.prototype.move = function (self, ev) {
+  if (self.selected == null) return;
+  if (!self.moving) return;
 
-  var rect = this.canvas.getBoundingClientRect();
+  var rect = self.canvas.getBoundingClientRect();
   var moveX = ev.clientX - rect.left;
   var moveY = ev.clientY - rect.top;
   
-  this.selected.x = moveX - this.offsetMoveX;
-  this.selected.y = moveY - this.offsetMoveY;
+  self.selected.x = moveX - self.offsetMoveX;
+  self.selected.y = moveY - self.offsetMoveY;
 
   // 实时更新位置属性
-  this.propertyPositionInput.value = this.selected.position();
+  self.propertyPositionInput.value = self.selected.position();
 
-  this.render();
+  self.render();
 };

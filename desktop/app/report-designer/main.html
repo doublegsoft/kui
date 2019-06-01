@@ -79,7 +79,7 @@
 
   function setPosition() {
     if (!designer.selected) return;
-    ajax.dialog('设置位置', 'app/report-designer/position.html', {}, 400, 330, function() {
+    ajax.dialog('设置位置', 'app/report-designer/dialog-position.html', {}, 400, 330, function() {
       var selected = designer.selected;
       var container = document.getElementById('position_editor');
       var input = container.querySelector('input[name="x"]');
@@ -98,7 +98,7 @@
 
   function setFont() {
     if (!designer.selected) return;
-    ajax.dialog('设置位置', 'app/report-designer/font.html', {}, 400, 200, function() {
+    ajax.dialog('设置位置', 'app/report-designer/dialog-font.html', {}, 400, 200, function() {
       var selected = designer.selected;
       var container = document.getElementById('font_editor');
       var input = container.querySelector('input[name="size"]');
