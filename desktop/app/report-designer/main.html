@@ -66,24 +66,23 @@ var height = 900;// document.body.clientHeight - 100;
 designerContainer.style.height = height + 'px';
 canvasContainer.style.height= height + 'px';
 
-window.designer = new ReportDesigner({
-  containerId: 'canvas_container',
-  canvasHeight: height,
-  propertiesEditorId: 'properties_editor',
-  fontEditorId: 'font_editor'
-});
-
-var props = new PropertiesEditor({
+var propertiesEditor = new PropertiesEditor({
   containerId: 'properties_container',
   properties: [{
     id: 'id',
     label: '标识',
     input: 'text',
-    readonly: true
+    readonly: true,
+    display: function(obj) {
+      return obj.id;
+    }
   }, {
     id: 'text',
     label: '文本',
     input: 'text',
+    display: function(obj) {
+      return obj.text;
+    }
   }, {
     id: 'font',
     label: '字体',
@@ -92,24 +91,33 @@ var props = new PropertiesEditor({
     handle: function() {
       setFont();
     },
-    display: function() {
+    display: function(obj) {
       return '';
     }
   }, {
-    id: '位置',
+    id: 'position',
     label: '位置（顶边，左边，长，宽）',
     input: 'dialog',
     readonly: true,
     handle: function() {
       setPosition();
     },
-    display: function() {
-      return '';
+    display: function(obj) {
+      return '(' + parseInt(obj.x) + ", " + parseInt(obj.y) + ", " 
+               + parseInt(obj.width) + ', ' +  parseInt(obj.height) + ')';
     }
   }]
 });
 
-props.render();
+propertiesEditor.render();
+
+window.designer = new ReportDesigner({
+  containerId: 'canvas_container',
+  canvasHeight: height,
+  propertiesEditor: propertiesEditor,
+  // propertiesEditorId: 'properties_editor',
+  // fontEditorId: 'font_editor'
+});
 
 function setPosition() {
   if (!designer.selected) return;

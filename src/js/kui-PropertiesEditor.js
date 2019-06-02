@@ -20,6 +20,7 @@
 function PropertiesEditor(options) {
   this.containerId = options.containerId;
   this.properties = options.properties || [];
+  this.selected = null;
 }
 
 /**
@@ -72,8 +73,17 @@ PropertiesEditor.prototype.render = function() {
  * 设置当前编辑的对象实例。
  * 
  * @param {object} obj
- *        当前编辑的对象实例
+ *        当前编辑的对象实例，实例的定义由设计器来决定
  */
-PropertiesEditor.prototype.setObject = function (obj) {
-
+PropertiesEditor.prototype.setSelected = function (obj) {
+  this.selected = obj;
+  for (var i = 0; i < this.properties.length; i++) {
+    var prop = this.properties[i];
+    // 通过判断对象是否含有
+    if (obj && obj[prop.id]) {
+      $('#' + this.containerId + ' input[name=' + prop.id + ']').val(prop.display(obj));
+    } else {
+      $('#' + this.containerId + ' input[name=' + prop.id + ']').val('');
+    }
+  }
 };

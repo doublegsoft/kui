@@ -1,6 +1,10 @@
 
 /**
  * 报表设计器构造函数。
+ * <p>
+ * 参数包括：
+ * 1. containerId           容器的DOM标识
+ * 2. propertiesEditor      属性编辑器实例
  * 
  * @param {object} options 
  */
@@ -13,22 +17,21 @@ function ReportDesigner(options) {
   this.containerWidth = this.container.clientWidth;
 
   // 属性编辑器
-  this.propertiesEditorId = options.propertiesEditorId;
-  this.propertiesEditor = document.getElementById(this.propertiesEditorId);
+  this.propertiesEditor = options.propertiesEditor;
 
   // div[id="' + this.propertiesEditorId + '"] 
-  this.propertyTextInput = this.propertiesEditor.querySelector('input[name="text"]');
-  this.propertyIdInput = this.propertiesEditor.querySelector('input[name="id"]');
-  this.propertyPositionInput = this.propertiesEditor.querySelector('input[name="position"]');
+  // this.propertyTextInput = this.propertiesEditor.querySelector('input[name="text"]');
+  // this.propertyIdInput = this.propertiesEditor.querySelector('input[name="id"]');
+  // this.propertyPositionInput = this.propertiesEditor.querySelector('input[name="position"]');
 
   /*
    * 加入发生改变时，画布上的文本内容实时发生改变。
    */
-  this.propertyTextInput.addEventListener("keyup", function(evt) {
-    if (!self.selected) return;
-    self.selected.text = self.propertyTextInput.value;
-    self.render();
-  })
+  // this.propertyTextInput.addEventListener("keyup", function(evt) {
+  //   if (!self.selected) return;
+  //   self.selected.text = self.propertyTextInput.value;
+  //   self.render();
+  // })
 
   // not working
   // this.conatinerHeight = this.container.style.height;
@@ -380,17 +383,18 @@ ReportDesigner.prototype.select = function (self, ev) {
   }
 
   // 显示选择的空间属性
-  if (self.selected) {
-    if (self.selected.text) {
-      self.propertyTextInput.value = self.selected.text;
-    }
-    self.propertyIdInput.value = self.selected.id;
-    self.propertyPositionInput.value = self.selected.position();
-  } else {
-    self.propertyTextInput.value = '';
-    self.propertyIdInput.value = '';
-    self.propertyPositionInput.value = '';
-  }
+  // if (self.selected) {
+  //   if (self.selected.text) {
+  //     self.propertyTextInput.value = self.selected.text;
+  //   }
+  //   self.propertyIdInput.value = self.selected.id;
+  //   self.propertyPositionInput.value = self.selected.position();
+  // } else {
+  //   self.propertyTextInput.value = '';
+  //   self.propertyIdInput.value = '';
+  //   self.propertyPositionInput.value = '';
+  // }
+  self.propertiesEditor.setSelected(self.selected);
 
   // 重新渲染，如果选择了则显示选择的边框；如果没有，则消除选择的边框
   self.render();
@@ -408,7 +412,7 @@ ReportDesigner.prototype.move = function (self, ev) {
   self.selected.y = moveY - self.offsetMoveY;
 
   // 实时更新位置属性
-  self.propertyPositionInput.value = self.selected.position();
+  self.propertiesEditor.setSelected(self.selected);
 
   self.render();
 };
