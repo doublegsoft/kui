@@ -79,15 +79,53 @@ body {
 	padding-right: 5px;
 }
 
-.btn-dismiss {
+.btn-back {
 	color: #fff;
 	background-color: #4dbd74;
 	border-color: #4dbd74;
 }
 
-.btn-dismiss:before {
+.btn-back:before {
 	font-family: "Font Awesome 5 Free";
-	content: "\f14d";
+	content: "\f55a";
+	padding-right: 5px;
+	font-weight: 900;
+}
+
+.btn-refresh {
+	color: #fff;
+	background-color: #4dbd74;
+	border-color: #4dbd74;
+}
+
+.btn-refresh:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f079";
+	padding-right: 5px;
+	font-weight: 900;
+}
+
+.btn-confirm {
+	color: #fff;
+	background-color: #20a8d8;
+	border-color: #20a8d8;
+}
+
+.btn-confirm:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f14a";
+	padding-right: 5px;
+}
+
+.btn-close {
+	color: #fff;
+	background-color: #4dbd74;
+	border-color: #4dbd74;
+}
+
+.btn-close:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f410";
 	padding-right: 5px;
 }
 
@@ -99,7 +137,7 @@ body {
 
 .btn-delete:before {
 	font-family: "Font Awesome 5 Free";
-	content: "\f00d";
+	content: "\f2ed";
 	padding-right: 5px;
 }
 
@@ -149,8 +187,9 @@ body {
 
 .btn-export:before {
   font-family: "Font Awesome 5 Free";
-  content: "\f016";
-  padding-right: 5px;
+  content: "\f56e";
+	padding-right: 5px;
+	font-weight: 900;
 }
 
 .btn-enable {
@@ -160,9 +199,10 @@ body {
 }
 
 .btn-enable:before {
-	font-family: "simple-line-icons";
-	content: "\e099";
+	font-family: "Font Awesome 5 Free";
+	content: "\f2f9";
 	padding-right: 5px;
+	font-weight: 900;
 }
 
 .btn-disable {
@@ -172,9 +212,10 @@ body {
 }
 
 .btn-disable:before {
-	font-family: "simple-line-icons";
-	content: "\e07c";
+	font-family: "Font Awesome 5 Free";
+	content: "\f05e";
 	padding-right: 5px;
+	font-weight: 900;
 }
 
 .btn-download {
@@ -184,15 +225,23 @@ body {
 }
 
 .btn-download:before {
-	font-family: "simple-line-icons";
-	content: "\e083";
+	font-family: "Font Awesome 5 Free";
+	content: "\f381";
 	padding-right: 5px;
+	font-weight: 900;
 }
 
-.btn-download:before {
-  font-family: "simple-line-icons";
-  content: "\e083";
-  padding-right: 5px;
+.btn-upload {
+	color: #fff;
+	background-color: #20a8d8;
+	border-color: #20a8d8;
+}
+
+.btn-upload:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f382";
+	padding-right: 5px;
+	font-weight: 900;
 }
 
 .icon-action {

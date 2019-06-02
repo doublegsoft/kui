@@ -14,7 +14,7 @@
     </ul>
   </div>
   <div class="col-md-8" id="canvas_container" style="background-color: #fff"></div>
-  <div class="col-md-2">
+  <div class="col-md-2" id="properties_container">
     <div class="form" id='properties_editor'>
       <div class="form-group">
         <label>标识</label>
@@ -47,65 +47,103 @@
         </div>
       </div>
     </div>
-    <div id="imager_container" style="display: none">
-      <img id="test_image" src="./img/hp.jpg">
-      <img id="chart_line" src="./img/chart/line.png">
-      <img id="chart_bar" src="./img/chart/bar.png">
-      <img id="chart_gauge" src="./img/chart/gauge.png">
-      <img id="chart_pie" src="./img/chart/pie.png">
-      <img id="chart_stack" src="./img/chart/stack.png">
-    </div>
+  </div>
+  <div id="imager_container" style="display: none">
+    <img id="test_image" src="./img/hp.jpg">
+    <img id="chart_line" src="./img/chart/line.png">
+    <img id="chart_bar" src="./img/chart/bar.png">
+    <img id="chart_gauge" src="./img/chart/gauge.png">
+    <img id="chart_pie" src="./img/chart/pie.png">
+    <img id="chart_stack" src="./img/chart/stack.png">
   </div>
 </div>
   
 <script>
-  
-  function drag(ev) {
-    designer.drag(ev);
-  }
-  
-  var designerContainer = document.getElementById('designer_container');
-  var canvasContainer = document.getElementById('canvas_container');
-  var height = 900;// document.body.clientHeight - 100;
-  designerContainer.style.height = height + 'px';
-  canvasContainer.style.height= height + 'px';
-  
-  window.designer = new ReportDesigner({
-    containerId: 'canvas_container',
-    canvasHeight: height,
-    propertiesEditorId: 'properties_editor',
-    fontEditorId: 'font_editor'
+
+var designerContainer = document.getElementById('designer_container');
+var canvasContainer = document.getElementById('canvas_container');
+var height = 900;// document.body.clientHeight - 100;
+designerContainer.style.height = height + 'px';
+canvasContainer.style.height= height + 'px';
+
+window.designer = new ReportDesigner({
+  containerId: 'canvas_container',
+  canvasHeight: height,
+  propertiesEditorId: 'properties_editor',
+  fontEditorId: 'font_editor'
+});
+
+var props = new PropertiesEditor({
+  containerId: 'properties_container',
+  properties: [{
+    id: 'id',
+    label: '标识',
+    input: 'text',
+    readonly: true
+  }, {
+    id: 'text',
+    label: '文本',
+    input: 'text',
+  }, {
+    id: 'font',
+    label: '字体',
+    input: 'dialog',
+    readonly: true,
+    handle: function() {
+      setFont();
+    },
+    display: function() {
+      return '';
+    }
+  }, {
+    id: '位置',
+    label: '位置（顶边，左边，长，宽）',
+    input: 'dialog',
+    readonly: true,
+    handle: function() {
+      setPosition();
+    },
+    display: function() {
+      return '';
+    }
+  }]
+});
+
+props.render();
+
+function setPosition() {
+  if (!designer.selected) return;
+  ajax.dialog('设置位置', 'app/report-designer/dialog-position.html', {}, 400, 330, function() {
+    var selected = designer.selected;
+    var container = document.getElementById('position_editor');
+    var input = container.querySelector('input[name="x"]');
+    input.value = parseInt(selected.x);
+    input = container.querySelector('input[name="y"]');
+    input.value = parseInt(selected.y);
+    input = container.querySelector('input[name="width"]');
+    input.value = selected.width;
+    input = container.querySelector('input[name="height"]');
+    input.value = selected.height;
+
+    var layerContent = document.querySelector('.layui-layer-content');
+    layerContent.style += '; overflow: hidden;'
   });
+}
 
-  function setPosition() {
-    if (!designer.selected) return;
-    ajax.dialog('设置位置', 'app/report-designer/dialog-position.html', {}, 400, 330, function() {
-      var selected = designer.selected;
-      var container = document.getElementById('position_editor');
-      var input = container.querySelector('input[name="x"]');
-      input.value = parseInt(selected.x);
-      input = container.querySelector('input[name="y"]');
-      input.value = parseInt(selected.y);
-      input = container.querySelector('input[name="width"]');
-      input.value = selected.width;
-      input = container.querySelector('input[name="height"]');
-      input.value = selected.height;
+function setFont() {
+  if (!designer.selected) return;
+  ajax.dialog('设置位置', 'app/report-designer/dialog-font.html', {}, 400, 200, function() {
+    var selected = designer.selected;
+    var container = document.getElementById('font_editor');
+    var input = container.querySelector('input[name="size"]');
+    input.value = selected.height;
 
-      var layerContent = document.querySelector('.layui-layer-content');
-      layerContent.style += '; overflow: hidden;'
-    });
-  }
+    var layerContent = document.querySelector('.layui-layer-content');
+    layerContent.style += '; overflow: hidden;'
+  });
+}
 
-  function setFont() {
-    if (!designer.selected) return;
-    ajax.dialog('设置位置', 'app/report-designer/dialog-font.html', {}, 400, 200, function() {
-      var selected = designer.selected;
-      var container = document.getElementById('font_editor');
-      var input = container.querySelector('input[name="size"]');
-      input.value = selected.height;
-
-      var layerContent = document.querySelector('.layui-layer-content');
-      layerContent.style += '; overflow: hidden;'
-    });
-  }
+function drag(ev) {
+  designer.drag(ev);
+}
 </script>
