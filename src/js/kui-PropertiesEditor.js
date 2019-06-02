@@ -29,6 +29,7 @@ function PropertiesEditor(options) {
  * @since 1.0
  */
 PropertiesEditor.prototype.render = function() {
+  var self = this;
   var form = $('<div class="form"></div>');
   for (var i = 0; i < this.properties.length; i++) {
     var prop = this.properties[i];
@@ -41,8 +42,17 @@ PropertiesEditor.prototype.render = function() {
     var input = $('<input>');
     input.attr('name', prop.id);
     input.addClass('form-control');
+    input.attr('pe-prop-id', prop.id);
     if (prop.readonly) {
       input.prop('readonly', true);
+    } else {
+      input.on('keyup', function(ev) {
+        var input = $(ev.target);
+        var propId = input.attr('pe-prop-id')
+        if (self.selected && self.selected[propId]) {
+          self.selected[propId] = input.val();
+        }
+      });
     }
     
     if (prop.input == 'dialog') {
@@ -53,9 +63,7 @@ PropertiesEditor.prototype.render = function() {
           '    <a class="btn btn-sm btn-link" href="javascript:void(0);">设置</a>' + 
           '  </span>' + 
           '</span>');
-      link.find('a.btn-link').on('click', function() {
-        prop.handle();
-      });
+      link.find('a.btn-link').on('click', prop.handle);
       inputGroup.append(input);
       inputGroup.append(link);
       formItem.append(inputGroup);
@@ -86,4 +94,11 @@ PropertiesEditor.prototype.setSelected = function (obj) {
       $('#' + this.containerId + ' input[name=' + prop.id + ']').val('');
     }
   }
+};
+
+/**
+ * 
+ */
+PropertiesEditor.prototype.openDialog = function (prop) {
+
 };

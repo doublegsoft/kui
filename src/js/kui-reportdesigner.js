@@ -19,23 +19,6 @@ function ReportDesigner(options) {
   // 属性编辑器
   this.propertiesEditor = options.propertiesEditor;
 
-  // div[id="' + this.propertiesEditorId + '"] 
-  // this.propertyTextInput = this.propertiesEditor.querySelector('input[name="text"]');
-  // this.propertyIdInput = this.propertiesEditor.querySelector('input[name="id"]');
-  // this.propertyPositionInput = this.propertiesEditor.querySelector('input[name="position"]');
-
-  /*
-   * 加入发生改变时，画布上的文本内容实时发生改变。
-   */
-  // this.propertyTextInput.addEventListener("keyup", function(evt) {
-  //   if (!self.selected) return;
-  //   self.selected.text = self.propertyTextInput.value;
-  //   self.render();
-  // })
-
-  // not working
-  // this.conatinerHeight = this.container.style.height;
-
   this.bindDragOverEventListener();
   this.bindDropEventListener(this, this.drop);
   this.bindMouseDownEventListener(this, this.select);
@@ -67,7 +50,10 @@ ReportDesigner.STROKE_STYLE_SELECTED = 'red';
 ReportDesigner.STROKE_STYLE_DEFAULT = 'black';
 
 /**
+ * 添加设计器上的对象到设计器对象对对象的管理容器。
  * 
+ * @param {object} obj
+ *        设计器新增加的对象
  */
 ReportDesigner.prototype.addObject = function (obj) {
   obj.position = function() {
@@ -78,7 +64,7 @@ ReportDesigner.prototype.addObject = function (obj) {
 }
 
 /**
- * Adds a text to a canvas.
+ * 添加默认的文本到画布对象中。
  * 
  * @param {string} text
  *        the text
@@ -108,10 +94,10 @@ ReportDesigner.prototype.addText = function (text, x, y) {
 };
 
 /**
- * Renders a text object in canvas.
+ * 在画布对象中渲染一个文本对象。
  * 
  * @param {object} textObj
- *        the text object
+ *        文本对象
  */
 ReportDesigner.prototype.renderText = function (textObj) {
   var ctx = this.canvas.getContext('2d');
