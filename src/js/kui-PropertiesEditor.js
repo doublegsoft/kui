@@ -9,8 +9,7 @@
  *   2.2. label       属性的显示文本
  *   2.3. input       属性的输入类型，可以为text或者dialog
  *   2.4. readonly    属性编辑框不可编辑，为只读 
- *   2.5. handle      如果为input为dialog，点击【设置】按钮触发的函数
- *   2.6. display     属性在输入框中的显示内容
+ *   2.5. display     属性在输入框中的显示内容
  * 
  * @param {object} options
  *        属性编辑器的构造参数
@@ -63,7 +62,19 @@ PropertiesEditor.prototype.render = function() {
           '    <a class="btn btn-sm btn-link" href="javascript:void(0);">设置</a>' + 
           '  </span>' + 
           '</span>');
-      link.find('a.btn-link').on('click', prop.handle);
+      link.find('a.btn-link').attr('pe-prop-id', prop.id);
+      link.find('a.btn-link').on('click', function(ev) {
+        var link = $(ev.target);
+        var propId = link.attr('pe-prop-id')
+        if (self.selected && self.selected[propId]) {
+          for (var i = 0; i < self.properties.length; i++) {
+            var prop = self.properties[i];
+            if (prop.id == propId) {
+              self.openDialog(prop);
+            }
+          }
+        }
+      });
       inputGroup.append(input);
       inputGroup.append(link);
       formItem.append(inputGroup);
@@ -99,6 +110,102 @@ PropertiesEditor.prototype.setSelected = function (obj) {
 /**
  * 
  */
-PropertiesEditor.prototype.openDialog = function (prop) {
+PropertiesEditor.prototype.openDialog = function (parentProp) {
+  if (!this.selected) return;
+  var self = this;
+
+  var dialog = $('<div class="row" style="margin-top: 15px; padding: 0 15px 0 15px"></div>');
+  var col12 = $('<div class="col-md-12"></div>');
+  var form = $('<div class="form form-horizontal"></div>');
+
+  dialog.append(col12);
+  col12.append(form);
+
+  var buttons = $(
+    '<div class="button-group float-right">' + 
+    '  <button class="btn btn-sm btn-confirm">确认</button>' + 
+    '  <button class="btn btn-sm btn-close" onclick="layer.close(layer.index);">关闭</button>' + 
+    '</div>'
+  );
+  buttons.find('.btn-confirm').on('click', function () {
+    self.confirmDialog();
+  });
+  var height = 110;
+  for (var i = 0; i < parentProp.properties.length; i++) {
+    var prop = parentProp.properties[i];
+    var formItem = $('<div class="form-group row"></div>');
+    var col9 = $('<div class="col-md-9"></div>');
+
+    var group = $('<div class="input-group"></div>');
+    var unit = $(
+      '<div class="input-group-append">' + 
+      '  <span class="input-group-text">' + prop.unit + '</span>' + 
+      '</div>'
+    );
+
+    var label = $('<label class="col-form-label col-md-3"></label>');
+    label.text(prop.label + '：');
+
+    var input = $('<input>');
+    input.attr('name', prop.id);
+    input.addClass('form-control');
+    input.attr('pe-prop-id', prop.id);
+    // input.on('keyup', function(ev) {
+    //   var input = $(ev.target);
+    //   var propId = input.attr('pe-prop-id')
+    //   if (self.selected && self.selected[propId]) {
+    //     self.selected[propId] = input.val();
+    //   }
+    // });
+    input.val(this.selected[prop.id]);
+    if (prop.unit) {
+      col9.append(group);
+      group.append(input);
+      group.append(unit);
+    } else {
+      col9.append(input);
+    }
+
+    formItem.append(label);
+    formItem.append(col9);
+
+    form.append(formItem);
+    // 行高，包括margin
+    height += 52.5;
+  }
+  form.append(buttons);
+
+  layer.open({
+    type : 1,
+    title : parentProp.label + '属性编辑',
+    shadeClose : false,
+    skin : 'layui-layer-rim', //加上边框
+    area : [ 480 + 'px', height + 'px' ], //宽高
+    content : '<div id="dialog"></div>',
+    success: function () {
+      // 重新设置样式
+      var layerContent = document.querySelector('.layui-layer-content');
+      layerContent.style += '; overflow: hidden;';
+      
+      // 加载对话框的JQuery对象
+      $('#dialog').append(dialog);
+    },
+    end: function () {}
+  });
 
 };
+
+/**
+ * 确认修改，在子对话框中
+ */
+PropertiesEditor.prototype.confirmDialog = function () {
+  var self = this;
+  $('#dialog input').each(function(idx, el) {
+    var input = $(el);
+    var propId = input.attr('pe-prop-id');
+    if (self.selected && self.selected[propId]) {
+      self.selected[propId] = parseInt(input.val());
+    }
+  }); 
+  layer.close(layer.index);
+}

@@ -45,7 +45,8 @@ function ReportDesigner(options) {
 
 ReportDesigner.prototype = new DesignCanvas();
 
-ReportDesigner.TEXT_FONT = '18px 宋体';
+ReportDesigner.TEXT_FONT_SIZE = '18';
+ReportDesigner.TEXT_FONT_FAMILY = '宋体';
 ReportDesigner.STROKE_STYLE_SELECTED = 'red';
 ReportDesigner.STROKE_STYLE_DEFAULT = 'black';
 
@@ -59,6 +60,9 @@ ReportDesigner.prototype.addObject = function (obj) {
   obj.position = function() {
     return '(' + parseInt(this.x) + ", " + parseInt(this.y) + ", " 
                + parseInt(this.width) + ', ' +  parseInt(this.height) + ')';
+  }
+  obj.font = function() {
+    return obj.fontSize + 'px ' + obj.fontFamily; 
   }
   this.objects.push(obj);
 }
@@ -80,11 +84,11 @@ ReportDesigner.prototype.addText = function (text, x, y) {
     id: 'text-' + moment().valueOf(),
     text: text,
     type: 'text',
-    font: ReportDesigner.TEXT_FONT,
-    fontFamily: '宋体',
+    fontSize: ReportDesigner.TEXT_FONT_SIZE,
+    fontFamily: ReportDesigner.TEXT_FONT_FAMILY,
     x: x,
     y: y,
-    height: 18,
+    height: parseInt(ReportDesigner.TEXT_FONT_SIZE),
     selected: false
   };
   
@@ -102,15 +106,18 @@ ReportDesigner.prototype.addText = function (text, x, y) {
 ReportDesigner.prototype.renderText = function (textObj) {
   var ctx = this.canvas.getContext('2d');
   ctx.fillStyle = textObj.color || ReportDesigner.STROKE_STYLE_DEFAULT;
-  ctx.font = textObj.font || ReportDesigner.TEXT_FONT;
+  ctx.font = textObj.font();
 
   ctx.fillText(textObj.text, textObj.x, textObj.y + textObj.height);
   
   textObj.width = ctx.measureText(textObj.text).width;
-
+  // 文本的高度设置特殊性
+  textObj.height = parseInt(textObj.fontSize);
+  
   if (textObj.selected) {
     var offsetX = 5;
     var offsetY = 2;
+    
     ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
     ctx.beginPath();
     // left-top
@@ -132,6 +139,8 @@ ReportDesigner.prototype.addTable = function (x, y) {
   var tableObj = {
     id: 'table-' + now.valueOf(),
     type: 'table',
+    fontSize: ReportDesigner.TEXT_FONT_SIZE,
+    fontFamily: ReportDesigner.TEXT_FONT_FAMILY,
     columns: [{
       title: '列标题1'
     }, {
@@ -153,6 +162,7 @@ ReportDesigner.prototype.addTable = function (x, y) {
 
 ReportDesigner.prototype.renderTable = function (tableObj) {
   var ctx = this.canvas.getContext('2d');
+  ctx.font = tableObj.font();
 
   if (tableObj.selected) {
     ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
@@ -174,7 +184,7 @@ ReportDesigner.prototype.renderTable = function (tableObj) {
   ctx.stroke();
   
   ctx.strokeStyle = 'black';
-  ctx.font = ReportDesigner.TEXT_FONT;
+  ctx.font = tableObj.font();
 
   for (var i = 0; i < tableObj.columns.length; i++) {
     ctx.fillText(tableObj.columns[i].title, tableObj.x + 30 + (150 * i), tableObj.y + 30);

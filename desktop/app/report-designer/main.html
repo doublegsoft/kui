@@ -14,40 +14,7 @@
     </ul>
   </div>
   <div class="col-md-8" id="canvas_container" style="background-color: #fff"></div>
-  <div class="col-md-2" id="properties_container">
-    <div class="form" id='properties_editor'>
-      <div class="form-group">
-        <label>标识</label>
-        <input class="form-control" name="id" type="text" readonly>
-      </div>
-      <div class="form-group">
-        <label>文本</label>
-        <input class="form-control" name="text" type="text">
-      </div>
-      <div class="form-group">
-        <label>字体</label>
-        <div class="input-group">
-          <input class="form-control" name="font" type="text" readonly>
-          <span class="input-group-append">
-            <span class="input-group-text" style="padding: 0;">
-              <a class="btn btn-sm btn-link" href="javascript:setFont();">设置</a>
-            </span>
-          </span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>位置（顶边，左边，长，宽）</label>
-        <div class="input-group">
-          <input class="form-control" name="position" type="text" readonly>
-          <span class="input-group-append">
-            <span class="input-group-text" style="padding: 0;">
-              <a class="btn btn-sm btn-link" href="javascript:setPosition();">设置</a>
-            </span>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="col-md-2" id="properties_container"></div>
   <div id="imager_container" style="display: none">
     <img id="test_image" src="./img/hp.jpg">
     <img id="chart_line" src="./img/chart/line.png">
@@ -88,24 +55,47 @@ var propertiesEditor = new PropertiesEditor({
     label: '字体',
     input: 'dialog',
     readonly: true,
-    handle: function() {
-      setFont();
-    },
     display: function(obj) {
+      if (obj.fontSize)
+        return obj.fontSize + 'px ' + obj.fontFamily;
       return '';
-    }
+    },
+    properties: [{
+      id: 'fontSize',
+      input: 'text',
+      label: '字体大小',
+      unit: 'px'
+    }]
   }, {
     id: 'position',
     label: '位置（顶边，左边，长，宽）',
     input: 'dialog',
     readonly: true,
-    handle: function() {
-      setPosition();
-    },
     display: function(obj) {
       return '(' + parseInt(obj.x) + ", " + parseInt(obj.y) + ", " 
                + parseInt(obj.width) + ', ' +  parseInt(obj.height) + ')';
-    }
+    },
+    properties: [{
+      id: 'x',
+      input: 'text',
+      label: 'X坐标',
+      unit: 'px'
+    }, {
+      id: 'y',
+      input: 'text',
+      label: 'Y坐标',
+      unit: 'px'
+    }, {
+      id: 'width',
+      input: 'text',
+      label: '宽度',
+      unit: 'px'
+    }, {
+      id: 'height',
+      input: 'text',
+      label: '高度',
+      unit: 'px'
+    }]
   }]
 });
 
@@ -114,9 +104,7 @@ propertiesEditor.render();
 window.designer = new ReportDesigner({
   containerId: 'canvas_container',
   canvasHeight: height,
-  propertiesEditor: propertiesEditor,
-  // propertiesEditorId: 'properties_editor',
-  // fontEditorId: 'font_editor'
+  propertiesEditor: propertiesEditor
 });
 
 function setPosition() {
