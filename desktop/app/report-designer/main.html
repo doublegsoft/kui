@@ -96,7 +96,10 @@ var propertiesEditor = new PropertiesEditor({
       label: '高度',
       unit: 'px'
     }]
-  }]
+  }],
+  confirm: function () {
+    designer.render();
+  }
 });
 
 propertiesEditor.render();

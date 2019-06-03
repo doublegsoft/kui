@@ -10,6 +10,7 @@
  *   2.3. input       属性的输入类型，可以为text或者dialog
  *   2.4. readonly    属性编辑框不可编辑，为只读 
  *   2.5. display     属性在输入框中的显示内容
+ * 3. confirm         对话框确认后的回调函数
  * 
  * @param {object} options
  *        属性编辑器的构造参数
@@ -19,6 +20,7 @@
 function PropertiesEditor(options) {
   this.containerId = options.containerId;
   this.properties = options.properties || [];
+  this.confirm = options.confirm || function () {};
   this.selected = null;
 }
 
@@ -108,7 +110,10 @@ PropertiesEditor.prototype.setSelected = function (obj) {
 };
 
 /**
+ * 打开设置对话框。
  * 
+ * @param {object} parentProp
+ *        含有子属性的属性
  */
 PropertiesEditor.prototype.openDialog = function (parentProp) {
   if (!this.selected) return;
@@ -196,7 +201,7 @@ PropertiesEditor.prototype.openDialog = function (parentProp) {
 };
 
 /**
- * 确认修改，在子对话框中
+ * 设置对话框确认修改。
  */
 PropertiesEditor.prototype.confirmDialog = function () {
   var self = this;
@@ -208,4 +213,5 @@ PropertiesEditor.prototype.confirmDialog = function () {
     }
   }); 
   layer.close(layer.index);
+  self.confirm();
 }
