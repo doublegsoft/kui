@@ -378,18 +378,6 @@ ReportDesigner.prototype.select = function (self, ev) {
     }
   }
 
-  // 显示选择的空间属性
-  // if (self.selected) {
-  //   if (self.selected.text) {
-  //     self.propertyTextInput.value = self.selected.text;
-  //   }
-  //   self.propertyIdInput.value = self.selected.id;
-  //   self.propertyPositionInput.value = self.selected.position();
-  // } else {
-  //   self.propertyTextInput.value = '';
-  //   self.propertyIdInput.value = '';
-  //   self.propertyPositionInput.value = '';
-  // }
   self.propertiesEditor.setSelected(self.selected);
 
   // 重新渲染，如果选择了则显示选择的边框；如果没有，则消除选择的边框
