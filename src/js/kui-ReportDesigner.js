@@ -28,6 +28,23 @@ function ReportDesigner(options) {
   this.canvas.setAttribute('width', this.containerWidth);
   this.canvas.setAttribute('height', options.canvasHeight);
 
+  document.addEventListener('keyup', function(ev) {
+    if (ev.keyCode == 46 /*DEL*/) {
+      if (!self.selected) return;
+      for (var i = 0; i < self.objects.length; i++) {
+        if (self.objects[i].id == self.selected.id) {
+          self.objects.splice(i, 1);
+          break;
+        }
+      }
+      self.selected = null;
+      self.propertiesEditor.setSelected(null);
+      self.render();
+      
+      self.drawArrow(20, 20, 200, 100, [0, 1, -10, 1, -10, 5]);
+    }
+  });
+
   // 初始化设置
   this.container.innerHTML = '';
   this.container.appendChild(this.canvas);
@@ -107,12 +124,12 @@ ReportDesigner.prototype.renderText = function (textObj) {
   var ctx = this.canvas.getContext('2d');
   ctx.fillStyle = textObj.color || ReportDesigner.STROKE_STYLE_DEFAULT;
   ctx.font = textObj.font();
-
-  ctx.fillText(textObj.text, textObj.x, textObj.y + textObj.height);
-  
+ 
   textObj.width = ctx.measureText(textObj.text).width;
   // 文本的高度设置特殊性
   textObj.height = parseInt(textObj.fontSize);
+
+  ctx.fillText(textObj.text, textObj.x, textObj.y + textObj.height);
   
   if (textObj.selected) {
     var offsetX = 5;
