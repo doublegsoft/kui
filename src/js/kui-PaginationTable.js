@@ -15,18 +15,14 @@ var PaginationTable = function (opts) {
   this.cache = opts.cache || "server";
   this.style = opts.style || "full";
   this.headless = opts.headless || false;
+
   // 高度和宽度，用来固定表头和列的参数
   this.width = opts.width;
   this.height = opts.height;
   this.tbodyHeight = opts.tbodyHeight;
 
-  // 冻结的列数量，基于零开始冻结
-  this.frozenColumnCount = opts.frozenColumnCount || 0;
-  this.frozenHeader = opts.frozenHeader || false;
-  this.columnHeight = opts.columnHeight || '32px';
-
   this.boundedQuery = opts.boundedQuery || null;
-  this.fixedColumns = opts.fixedColumn || 0;
+
   //是否只显示获取的数据长度对应的表格行数
   this.showDataRowLength = opts.showDataRowLength || false;
   this.containerId = opts.containerId;
@@ -178,6 +174,7 @@ PaginationTable.prototype.afterRequest = function () {
 PaginationTable.prototype.requestError = function () {
   this.table.find("div.loaddingct").html('<h6 style="color:red">数据加载出错，请联系管理员解决...</h6>');
 };
+
 /**
  * Gets the html source for this pagination table object.
  *

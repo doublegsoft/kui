@@ -192,6 +192,18 @@ body {
 	font-weight: 900;
 }
 
+.btn-reset {
+	color: #fff;
+	background-color: #4dbd74;
+	border-color: #4dbd74;
+}
+
+.btn-reset:before {
+	font-family: "Font Awesome 5 Free";
+	content: "\f2d2";
+	padding-right: 5px;
+}
+
 .btn-enable {
 	color: #fff;
 	background-color: #20a8d8;

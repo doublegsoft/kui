@@ -1,0 +1,50 @@
+<div class="row">
+  <div id="cont_frm_report" class="col-md-12 ">
+    <div class="card">
+      <div class="card-header">
+        <strong>主题线</strong>
+      </div>
+      <div class="card-body">
+        <div class="col-md-12">
+          <div class="row">
+            <div id="calendar_date" class="col-md-6"></div>
+            <div class="col-md-6">
+            	<h4>主题线</h4>
+            	<ul id="thread_news" class="thread">
+            	</ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script id="template_thread_news" type="text/x-handlebars-template">
+{{#data}}
+<li>
+  <a href="#">{{title}}</a>
+  <a href="#" class="float-right">{{date}}</a>
+  <p>{{description}}</p>
+</li>
+{{/data}}
+</script>
+
+<script>
+
+$('#calendar_date').datetimepicker({
+  format: 'YYYY-MM-DD',
+  inline: true,
+  locale: 'zh-CN',
+  sideBySide: true,
+  useCurrent: false
+});
+$('#calendar_date').on('dp.change', function(ev) {
+  console.log(ev);
+});
+
+ajax.template('/desktop/data/thread.json', 'thread_news', 'template_thread_news', {}, function(resp) {
+});
+
+</script>

@@ -143,7 +143,7 @@ ajax.template = function(url, containerId, templateId, data, callback) {
         container.innerHTML = html;
       }
       if (callback)
-        callback();
+        callback(resp);
     }
   });
 };

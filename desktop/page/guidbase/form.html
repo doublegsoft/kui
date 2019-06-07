@@ -5,7 +5,7 @@
         <strong>报表表单编辑</strong>
       </div>
       <div class="card-body">
-        <div id="frm_report" class="col-md-0 form-horizontal ">
+        <div id="frm_report" class="col-md-12 form-horizontal ">
           <input name="rptid" type="hidden" value="">
           <div class="form-group row">
             <label class="col-md-2 col-form-label">报表名称：</label>
@@ -17,6 +17,16 @@
               <select name="rpttyp" class="form-control" label="报表类型" required>
                 <option value="-1">请选择...</option>
               </select>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-md-2 col-form-label">执行日期：</label>
+            <div class="col-md-4">
+              <input class="form-control" name="excdt" type="text" label="执行日期" required>
+            </div>
+            <label class="col-md-2 col-form-label">执行时间：</label>
+            <div class="col-md-4">
+              <input class="form-control" name="exctm" type="text" label="执行时间" required>
             </div>
           </div>
           <div class="form-group row">
@@ -54,8 +64,8 @@
           </div>
         </div>
         <div class="button-group float-right">
-          <button id="btn_frm_report_reset" class="btn btn">重置</button>
-          <button id="btn_frm_report_save" class="btn btn-primary">保存</button>
+          <button id="btn_frm_report_reset" class="btn btn-reset">重置</button>
+          <button id="btn_frm_report_save" class="btn btn-save">保存</button>
           <button id="btn_frm_report_delete" class="btn btn-delete">删除</button>
         </div>
       </div>
@@ -66,6 +76,18 @@
 
 <script>
 
+// excdt日期选择
+$('#frm_report input[name=excdt]').datetimepicker({
+  format: 'YYYY-MM-DD',
+  locale: 'zh-CN',
+  useCurrent: false
+});
+
+// exctm时间选择
+$('#frm_report input[name=exctm]').datetimepicker({
+  format: 'HH:mm'
+});
+
 /**
  *
  */
@@ -74,12 +96,16 @@ $('#btn_frm_report_reset').on('click', function(){
     'rptid': '',
     'rptnm': '',
     'rpttyp': '',
+    'excdt': '',
+    'exctm': '',
     'dtasrctyp': '',
     'dtasrcbnm': '',
     'nt': ''
   });
   $('#frm_report [name=rptnm]').removeClass('is-invalid');
   $('#frm_report [name=rpttyp]').removeClass('is-invalid');
+  $('#frm_report [name=excdt]').removeClass('is-invalid');
+  $('#frm_report [name=exctm]').removeClass('is-invalid');
   $('#frm_report [name=dtasrctyp]').removeClass('is-invalid');
   $('#frm_report [name=dtasrcbnm]').removeClass('is-invalid');
 });
