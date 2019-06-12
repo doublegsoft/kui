@@ -39,3 +39,24 @@ $.fn.select = function (opts) {
     }
   });
 };
+
+$.fn.autocomplete = function (opts) {
+  var value = opts.value;
+  var text = opts.text;
+  var self = $(this);
+  xhr.post({
+    url: opts.url,
+    data: opts.params || {},
+    success: function (resp) {
+      if (!resp.data) return;
+      for (var i = 0; i < resp.data.length; i++) {
+        var item = resp.data[i];
+        var option = $('<option></option>');
+        option.attr('value', item[value]);
+        option.text(item[text]);
+        self.append(option);
+      }
+      self.select2({});
+    }
+  });
+};
