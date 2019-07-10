@@ -5,6 +5,8 @@
 function DesignCanvas() {
 // 在画布上选中的对象
   this.selected = null;
+  this.objects = [];
+  this.alignmentLine = null;
   this.isMoving = false;
   this.isResizing = false;
   this.resizeType = 'none';
@@ -44,6 +46,9 @@ DesignCanvas.prototype.bindMouseDownEventListener = function (self, callback) {
     // 重置已经选择的对象
     self.selected = null;
     
+    // 绘制对齐辅助线
+    self.drawAlignmentLine();
+
     // 利用坐标体系算法获取当前的选择对象
     callback(self, ev);
   });
@@ -70,6 +75,7 @@ DesignCanvas.prototype.bindMouseMoveEventListener = function (self, callback) {
     }
     if (!self.isMoving && !self.isResizing)  return;
     
+    self.drawAlignmentLine();
     callback(self, ev);
     if (self.selected != null) {
       self.isMoving = true;
@@ -86,6 +92,7 @@ DesignCanvas.prototype.bindMouseUpEventListener = function () {
     self.isMoving = false;
     self.isResizing = false;
     self.resizeType = 'none';
+    self.alignmentLine = null;
     self.canvas.style.cursor = 'default';
   });
 };
@@ -176,6 +183,47 @@ DesignCanvas.prototype.showResizeCursor = function (ev) {
 };
 
 /**
+ * 画辅助对齐线。
+ */
+DesignCanvas.prototype.drawAlignmentLine = function() {
+  var threshhold = 10;
+  this.alignmentLine = null;
+  if (!this.selected) {
+    return;
+  }
+  
+  var topX = this.selected.x;
+  var topY = this.selected.y;
+  var botX = this.selected.x + this.selected.width;
+  var botY = this.selected.y + this.selected.height;
+
+  for (var i = 0; i < this.objects.length; i++) {
+    var obj = this.objects[i];
+    if (obj.id == this.selected.id) {
+      continue;
+    }
+    var objTopX = obj.x;
+    var objTopY = obj.y;
+    var objBotX = obj.x + obj.width;
+    var objBotY = obj.y + obj.height;
+    // left to left
+    if (Math.abs(topX - objTopX) <= threshhold) {
+      this.alignmentLine = {x: objTopX};
+      break;
+    } else if (Math.abs(botX - objBotX) <= threshhold) {
+      this.alignmentLine = {x: objBotX};
+      break;
+    } else if (Math.abs(topY - objTopY) <= threshhold) {
+      this.alignmentLine = {y: objTopY};
+      break;
+    } else if (Math.abs(botY - objBotY) <= threshhold) {
+      this.alignmentLine = {y: objBotY};
+      break;
+    } 
+  }
+};
+
+/**
  * 计算点到线的垂直距离。
  * 
  * @param {number} pointX
@@ -209,4 +257,5 @@ DesignCanvas.prototype.calculateVerticalDistance = function (pointX, pointY, lin
   var xd = (linePointX1 - linePointX2);
   var b = (linePointX1 * linePointY2 - linePointX2 * linePointY1 - linePointX2 * linePointY1 + linePointX2 * linePointY2);
   var k = (linePointY1 - linePointY2);
+  // TODO
 };

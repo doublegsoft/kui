@@ -50,9 +50,6 @@ function ReportDesigner(options) {
   this.container.appendChild(this.canvas);
 
   // 数据结构定义
-  this.objects = [];
-  this.selected = null;
-  this.moving = false;
   this.dragging = null;
 
   // 画布的其他设置
@@ -65,6 +62,7 @@ ReportDesigner.prototype = new DesignCanvas();
 ReportDesigner.TEXT_FONT_SIZE = '18';
 ReportDesigner.TEXT_FONT_FAMILY = '宋体';
 ReportDesigner.STROKE_STYLE_SELECTED = 'red';
+ReportDesigner.STROKE_STYLE_ALIGNMENT = 'blue';
 ReportDesigner.STROKE_STYLE_DEFAULT = 'black';
 
 /**
@@ -331,6 +329,22 @@ ReportDesigner.prototype.render = function () {
       this.renderImage(obj);
     } else if (obj.type == 'chart') {
       this.renderChart(obj);
+    }
+  }
+
+  if (this.alignmentLine) {
+    var ctx = this.canvas.getContext('2d');
+    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_ALIGNMENT;
+    ctx.lineWidth = '1px';
+    var line = this.alignmentLine;
+    if (line.x) {
+      ctx.moveTo(line.x, 0);
+      ctx.lineTo(line.x, this.canvas.height);
+      ctx.stroke();
+    } else {
+      ctx.moveTo(0, line.y);
+      ctx.lineTo(this.canvas.width, line.y);
+      ctx.stroke();
     }
   }
 };
