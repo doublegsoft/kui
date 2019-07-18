@@ -1,10 +1,12 @@
 
 function SimpleChart(opts) {
   this.url = opts.url;
+  this.data = opts.data || [];
   this.title = opts.title || '';
   this.numberField = opts.numberField;
   this.dateField = opts.dateField;
   this.valueField = opts.valueField;
+  
   this.statIndex = opts.statIndex || 'sum';
 
   this.chartType = opts.chartType;
@@ -21,19 +23,29 @@ SimpleChart.prototype.render = function() {
 
 SimpleChart.prototype.request = function(params) {
   var self = this;
-  xhr.post({
-    url: this.url,
-    data: params,
-    success: function(resp) {
-      if (self.chartType == 'pie') {
-        self.chart.setOption(self.pie(resp));
-      } else if (self.chartType == 'line') {
-        self.chart.setOption(self.line(resp));
-      } else if (self.chartType == 'bar') {
-        self.chart.setOption(self.bar(resp));
+  if (this.url) {
+    xhr.post({
+      url: this.url,
+      data: params,
+      success: function(resp) {
+        if (self.chartType == 'pie') {
+          self.chart.setOption(self.pie(resp));
+        } else if (self.chartType == 'line') {
+          self.chart.setOption(self.line(resp));
+        } else if (self.chartType == 'bar') {
+          self.chart.setOption(self.bar(resp));
+        }
       }
+    });
+  } else {
+    if (this.chartType == 'pie') {
+      this.chart.setOption(this.pie(this.data));
+    } else if (this.chartType == 'line') {
+      this.chart.setOption(this.line(this.data));
+    } else if (this.chartType == 'bar') {
+      this.chart.setOption(this.bar(this.data));
     }
-  });
+  }
 }
 
 SimpleChart.prototype.pie = function(resp) {

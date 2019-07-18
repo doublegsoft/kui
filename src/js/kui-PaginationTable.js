@@ -22,6 +22,12 @@ var PaginationTable = function (opts) {
   this.tbodyHeight = opts.tbodyHeight;
 
   this.boundedQuery = opts.boundedQuery || null;
+  
+  /*!
+  ** 报表需要小计、合计功能
+  */
+  this.groupField = opts.groupField;
+  this.totalFields = opts.totalFields || [];
 
   //是否只显示获取的数据长度对应的表格行数
   this.showDataRowLength = opts.showDataRowLength || false;
@@ -184,7 +190,7 @@ PaginationTable.prototype.root = function (initParams) {
   if (typeof initParams === "undefined") {
     initParams = {};
   }
-  var ret = $('<div>');
+  var ret = $('<div class="col-md-12">');
   ret.css('overflow-y', 'auto');
   this.table = $("<table></table>");
   if (typeof this.width !== 'undefined') this.table.css('width', this.width);
@@ -634,13 +640,87 @@ PaginationTable.prototype.replace = function (str, find, replace) {
  * Fills the table with the result.
  * 
  * @param the result from the server side
+ * 
+ * @version 3.0.0 - 增加表格的小计合计功能
  */
 PaginationTable.prototype.fill = function (result) {
   this.clear();
+  var self = this;
+  /*!
+  ** 
+  */
+  function incrementTotalOrSubtotalColumns(totalRow, subtotalRow, rawRow) {
+    for (var i = 0; i < self.totalFields.length; i++) {
+      var rc = self.totalFields[i];
+      var value = parseFloat(rawRow[rc]);
+      if (isNaN(value)) {
+        value = 0;
+      }
+      
+      var totalValue = parseFloat(totalRow[rc]);
+      if (isNaN(totalValue)) {
+        totalValue = 0;
+      }
+      totalValue += value;
+      totalRow[rc] = totalValue;
+      
+      if (subtotalRow) {
+        var subtotalValue = parseFloat(subtotalRow[rc]);
+        if (isNaN(subtotalValue)) {
+          subtotalValue = 0;
+        }
+        subtotalValue += value;
+        subtotalRow[rc] = subtotalValue;
+      }
+    }
+  }
+  
+  //
+  // 如果需要统计功能，则需要出现小计、合计列
+  //
+  var resultNew = {
+    total: result.total,
+    data: []
+  };
+  var previousGroupValue = null;
+  var totalRow = {};
+  var subtotalRow = {};
+  for (var i = 0; i < result.data.length; i++) {
+    if (this.totalFields.length == 0) {
+      continue;
+    }
+    // 计算小计、合计
+    var row = result.data[i];
+    var groupValue = row[this.groupField];
+    if (previousGroupValue == null) {
+      previousGroupValue = groupValue;
+    }
+    if (groupValue != previousGroupValue) {
+      previousGroupValue = groupValue;
+      subtotalRow[this.mappingColumns[0].title] = '小计';
+      
+      resultNew.data.push(subtotalRow);
+      resultNew.data.push(result.data[i]);
+      
+      subtotalRow = {};
+      subtotalRow[this.mappingColumns[0].title] = '小计';
+    } else {
+      resultNew.data.push(result.data[i]);
+    }
+    incrementTotalOrSubtotalColumns(totalRow, subtotalRow, row);
+  }
+  // 判断小计行是否有值
+  if (subtotalRow[this.mappingColumns[0].title]) {
+    subtotalRow[this.mappingColumns[0].title] = "小计";
+    resultNew.data.push(subtotalRow);
+  }
+  totalRow[this.mappingColumns[0].title] = "合计";
+  resultNew.data.push(totalRow);
+  
   var mappingColumns = this.mappingColumns;
-  if (result.data && result.data[0]) {
+  if (resultNew.data && resultNew.data[0]) {
     var limit = this.limit;
-    limit = limit < 0 ? result.data.length : limit;
+    limit = limit < 0 ? resultNew.data.length : limit;
     var tbody = $(this.table.find('tbody'));
     if (typeof this.tbodyHeight !== 'undefined') {
       tbody.css('height', this.tbodyHeight);
@@ -649,8 +729,8 @@ PaginationTable.prototype.fill = function (result) {
     for (var i = 0; i < limit; ++i) {
       var tr = $("<tr></tr>");
       tr.css('height', this.columnHeight)
-      if (i < result.data.length) {
-        var row = result.data[i];
+      if (i < resultNew.data.length) {
+        var row = resultNew.data[i];
         for (var j = 0; j < mappingColumns.length; ++j) {
           var col = mappingColumns[j];
           var td = $("<td></td>");
@@ -683,17 +763,7 @@ PaginationTable.prototype.fill = function (result) {
           tr.append(td);
         }
         tbody.append(tr);
-      } else {
-        
-//        if (this.limit <= 0) {
-//          break;
-//        }
-//        for (var j = 0; j < mappingColumns.length; ++j) {
-//          var td = $("<td>&nbsp;</td>");
-//          tr.append(td);
-//        }
-      }
-      
+      } // if (i < result.data.length)  
     }
   }
 

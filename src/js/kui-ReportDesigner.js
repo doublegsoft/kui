@@ -50,6 +50,9 @@ function ReportDesigner(options) {
   this.container.appendChild(this.canvas);
 
   // 数据结构定义
+  this.objects = [];
+  this.selected = null;
+  this.moving = false;
   this.dragging = null;
 
   // 画布的其他设置
@@ -62,7 +65,6 @@ ReportDesigner.prototype = new DesignCanvas();
 ReportDesigner.TEXT_FONT_SIZE = '18';
 ReportDesigner.TEXT_FONT_FAMILY = '宋体';
 ReportDesigner.STROKE_STYLE_SELECTED = 'red';
-ReportDesigner.STROKE_STYLE_ALIGNMENT = 'blue';
 ReportDesigner.STROKE_STYLE_DEFAULT = 'black';
 
 /**
@@ -104,7 +106,7 @@ ReportDesigner.prototype.addText = function (text, x, y) {
     x: x,
     y: y,
     height: parseInt(ReportDesigner.TEXT_FONT_SIZE),
-    isSelected: false
+    selected: false
   };
   
   this.addObject(textObj);
@@ -129,7 +131,7 @@ ReportDesigner.prototype.renderText = function (textObj) {
 
   ctx.fillText(textObj.text, textObj.x, textObj.y + textObj.height);
   
-  if (textObj.isSelected) {
+  if (textObj.selected) {
     var offsetX = 5;
     var offsetY = 2;
     
@@ -167,7 +169,7 @@ ReportDesigner.prototype.addTable = function (x, y) {
     y: y,
     width: 500,
     height: 300,
-    isSelected: false
+    selected: false
   };
 
   this.addObject(tableObj);
@@ -179,7 +181,7 @@ ReportDesigner.prototype.renderTable = function (tableObj) {
   var ctx = this.canvas.getContext('2d');
   ctx.font = tableObj.font();
 
-  if (tableObj.isSelected) {
+  if (tableObj.selected) {
     ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
   } else {
     ctx.strokeStyle = ReportDesigner.STROKE_STYLE_DEFAULT;
@@ -217,7 +219,7 @@ ReportDesigner.prototype.addChart = function (x, y) {
     y: y,
     width: 500,
     height: 300,
-    isSelected: false
+    selected: false
   };
 
   this.addObject(chartObj);
@@ -234,7 +236,7 @@ ReportDesigner.prototype.renderChart = function (chartObj) {
 
   ctx.drawImage(img, 0, 0, sWidth, sHeight, chartObj.x, chartObj.y, chartObj.width, chartObj.height);
   
-  if (chartObj.isSelected) {
+  if (chartObj.selected) {
     var offsetX = 2;
     var offsetY = 2;
     ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
@@ -276,7 +278,7 @@ ReportDesigner.prototype.renderImage = function (imageObj) {
   var sHeight = img.naturalHeight;
   ctx.drawImage(img, 0, 0, sWidth, sHeight, imageObj.x, imageObj.y, imageObj.width, imageObj.height);
 
-  if (imageObj.isSelected) {
+  if (imageObj.selected) {
     var offsetX = 2;
     var offsetY = 2;
     ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
@@ -331,22 +333,6 @@ ReportDesigner.prototype.render = function () {
       this.renderChart(obj);
     }
   }
-
-  if (this.alignmentLine) {
-    var ctx = this.canvas.getContext('2d');
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_ALIGNMENT;
-    ctx.lineWidth = '1px';
-    var line = this.alignmentLine;
-    if (line.x) {
-      ctx.moveTo(line.x, 0);
-      ctx.lineTo(line.x, this.canvas.height);
-      ctx.stroke();
-    } else {
-      ctx.moveTo(0, line.y);
-      ctx.lineTo(this.canvas.width, line.y);
-      ctx.stroke();
-    }
-  }
 };
 
 /**
@@ -379,9 +365,6 @@ ReportDesigner.prototype.drop = function (self, ev) {
   }
 };
 
-/**
- * 鼠标按下事件的回调函数，业务化响应鼠标按下事件。
- */
 ReportDesigner.prototype.select = function (self, ev) {
   if (ev.button != 0) return;
   var rect = self.canvas.getBoundingClientRect();
@@ -394,7 +377,7 @@ ReportDesigner.prototype.select = function (self, ev) {
   // reset each object selected property to false
   for (var i = 0; i < self.objects.length; i++) {
     var obj = self.objects[i];
-    obj.isSelected = false;
+    obj.selected = false;
   }
 
   for (var i = 0; i < self.objects.length; i++) {
@@ -402,10 +385,10 @@ ReportDesigner.prototype.select = function (self, ev) {
     // check the mouse position is or not in the object shape.
     if ((clickX >= obj.x && clickX <= (obj.x + obj.width)) &&
         (clickY >= obj.y && clickY <= (obj.y + obj.height))) {
-      obj.isSelected = true;
+      obj.selected = true;
       self.selected = obj;
       // allow to move
-      self.isMoving = true;
+      self.moving = true;
       self.offsetMoveX = clickX - self.selected.x;
       self.offsetMoveY = clickY - self.selected.y;
       break;
@@ -414,59 +397,23 @@ ReportDesigner.prototype.select = function (self, ev) {
 
   self.propertiesEditor.setSelected(self.selected);
 
-  // 光标改变
-  if (self.selected) {
-    var resizeType = self.showResizeCursor(ev);
-    if (resizeType == 'none' || self.selected.type == 'text') {
-      self.isMoving = true;
-      self.canvas.style.cursor = 'move';
-    } else {
-      self.resizeType = resizeType;
-      self.isResizing = true;
-    }
-  }
-
   // 重新渲染，如果选择了则显示选择的边框；如果没有，则消除选择的边框
   self.render();
 };
 
-/**
- * 鼠标移动事件的回调函数，业务化的鼠标移动控制。
- */
 ReportDesigner.prototype.move = function (self, ev) {
-  // 没有选择
   if (self.selected == null) return;
-  if (!self.isMoving && !self.isResizing) return;
+  if (!self.moving) return;
 
-  var resizeType = self.resizeType;
-  
   var rect = self.canvas.getBoundingClientRect();
   var moveX = ev.clientX - rect.left;
   var moveY = ev.clientY - rect.top;
-
-  if (resizeType == 'east') {
-    var offsetX = moveX - self.selected.x - self.selected.width;
-    self.selected.width = self.selected.width + offsetX;
-  } else if (resizeType == 'west') {
-    var offsetX = self.selected.x - moveX;
-    self.selected.x = moveX;
-    self.selected.width = self.selected.width + offsetX;
-  } else if (resizeType == 'north') {
-    var offsetY = self.selected.y - moveY;
-    self.selected.y = moveY;
-    self.selected.height = self.selected.height + offsetY;
-  } else if (resizeType == 'south') {
-    var offsetY = moveY - self.selected.y - self.selected.height;
-    self.selected.height = self.selected.height + offsetY;
-  } else {
-    self.canvas.style.cursor = 'move';
-    self.selected.x = moveX - self.offsetMoveX;
-    self.selected.y = moveY - self.offsetMoveY;
-  }
+  
+  self.selected.x = moveX - self.offsetMoveX;
+  self.selected.y = moveY - self.offsetMoveY;
 
   // 实时更新位置属性
   self.propertiesEditor.setSelected(self.selected);
 
-  // 渲染
   self.render();
 };
