@@ -687,6 +687,7 @@ PaginationTable.prototype.fill = function (result) {
   var subtotalRow = {};
   for (var i = 0; i < result.data.length; i++) {
     if (this.totalFields.length == 0) {
+      resultNew.data.push(result.data[i]);
       continue;
     }
     // 计算小计、合计
