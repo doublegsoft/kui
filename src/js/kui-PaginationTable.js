@@ -711,12 +711,14 @@ PaginationTable.prototype.fill = function (result) {
     incrementTotalOrSubtotalColumns(totalRow, subtotalRow, row);
   }
   // 判断小计行是否有值
-  if (subtotalRow[this.mappingColumns[0].title]) {
+  if (this.totalFields.length > 0) {
     subtotalRow[this.mappingColumns[0].title] = "小计";
     resultNew.data.push(subtotalRow);
   }
-  totalRow[this.mappingColumns[0].title] = "合计";
-  resultNew.data.push(totalRow);
+  if (this.totalFields.length > 0) {
+    totalRow[this.mappingColumns[0].title] = "合计";
+    resultNew.data.push(totalRow);
+  }
   
   var mappingColumns = this.mappingColumns;
   if (resultNew.data && resultNew.data[0]) {
