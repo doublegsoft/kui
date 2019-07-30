@@ -197,6 +197,10 @@ SimpleChart.prototype.line = function(resp) {
 
 SimpleChart.prototype.bar = function(resp) {
   var option = {
+    tooltip : {
+      trigger: 'item',
+      formatter: "{b} : {c}"
+    },
     title : {
       text: this.title,
       subtext: '',

@@ -174,7 +174,11 @@ ajax.dialog = function(title, url, data, width, height, success, end) {
         skin : 'layui-layer-rim', //加上边框
         area : [ width + 'px', height + 'px' ], //宽高
         content : html,
-        success: success || function () {},
+        success: function () {
+          var layerContent = document.querySelector('.layui-layer-content');
+          layerContent.style += '; overflow: hidden;';
+          if (success) success();
+        },
         end: end || function () {}
       });
     }
