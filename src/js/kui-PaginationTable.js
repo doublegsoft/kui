@@ -190,7 +190,7 @@ PaginationTable.prototype.root = function (initParams) {
   if (typeof initParams === "undefined") {
     initParams = {};
   }
-  var ret = $('<div class="col-md-12">');
+  var ret = $('<div class="">');
   ret.css('overflow-y', 'auto');
   this.table = $("<table></table>");
   if (typeof this.width !== 'undefined') this.table.css('width', this.width);
