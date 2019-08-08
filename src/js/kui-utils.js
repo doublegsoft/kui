@@ -29,3 +29,12 @@ utils.prompt = function (errors) {
     $(errors[i].element).addClass('is-invalid');
   }
 };
+
+utils.render = function (containerId, templateId, data) {
+  var source = document.getElementById(templateId).innerHTML;
+  var template = Handlebars.compile(source);
+  var html = template(data);
+
+  var container = document.getElementById(containerId);
+  container.innerHTML = html;
+};

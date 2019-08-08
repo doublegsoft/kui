@@ -122,7 +122,8 @@ SimpleChart.prototype.line = function(resp) {
       trigger: 'axis'
     },
     legend: {
-      y: 'bottom',
+      y: 'top',
+      x: 'right',
       data:[]
     },
     grid: {
