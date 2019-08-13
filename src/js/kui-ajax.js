@@ -96,6 +96,11 @@ ajax.text = function(url, data, callback) {
 ajax.view = function(url, containerId, data, callback) {
   if (typeof data === 'undefined')
     data = {};
+  if (window.parameters) {
+    for (var k in data) {
+      window.parameters[k] = data[k];
+    }
+  }
   $.ajax({
     url : url,
     data : data,
