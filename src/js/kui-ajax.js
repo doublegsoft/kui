@@ -9,7 +9,42 @@ var ajax = {};
  * 
  * @param {function} callback - 回调函数
  */
-ajax.save = function(url, form, callback) {
+// ajax.save = function(url, form, callback) {
+//   var errors = form.validate();
+//   var errmsg = '';
+//   for (var i = 0; i < errors.length; i++) {
+//     errmsg += errors[i].message + '<br>';
+//   }
+//   if (errmsg != '') {
+//     dialog.error(errmsg);
+//     return;
+//   }
+//   var data = form.formdata();
+//   $.ajax({
+//     url : url,
+//     data : data,
+//     method : 'POST',
+//     dataType : 'json',
+//     success : function(resp) {
+//       if (typeof resp.error !== 'undefined') {
+//         dialog.error('保存出错！');
+//         return;
+//       }
+//       dialog.success('保存成功！');
+//       if (typeof callback !== 'undefined') {
+//         callback(resp);
+//       }
+//     }
+//   });
+// };
+
+ajax.save = function(opts) {
+
+  var url = opts.url || '';
+  var form = opts.form;
+  var button = opts.button;
+  var success = opts.success;
+
   var errors = form.validate();
   var errmsg = '';
   for (var i = 0; i < errors.length; i++) {
@@ -19,6 +54,10 @@ ajax.save = function(url, form, callback) {
     dialog.error(errmsg);
     return;
   }
+
+  if (button) 
+    button.prop('disabled', true);
+
   var data = form.formdata();
   $.ajax({
     url : url,
@@ -27,13 +66,22 @@ ajax.save = function(url, form, callback) {
     dataType : 'json',
     success : function(resp) {
       if (typeof resp.error !== 'undefined') {
-        dialog.error('保存出错！');
+        dialog.error('保存信息出错！');
+        if (button)
+          button.prop('disabled', false);
         return;
       }
-      dialog.success('保存成功！');
-      if (typeof callback !== 'undefined') {
-        callback(resp);
+      dialog.success('保存信息成功！');
+      if (typeof success !== 'undefined') {
+        success(resp);
       }
+      if (button)
+        button.prop('disabled', false);
+    },
+    error: function () {
+      dialog.error('系统异常！');
+      if (button)
+        button.prop('disabled', false);
     }
   });
 };
@@ -93,7 +141,12 @@ ajax.text = function(url, data, callback) {
   });
 };
 
-ajax.view = function(url, containerId, data, callback) {
+ajax.view = function(opts) {
+  var url = opts.url;
+  var containerId = opts.containerId;
+  var data = opts.params;
+  var callback = opts.success;
+
   if (typeof data === 'undefined')
     data = {};
   if (window.parameters) {
@@ -134,7 +187,13 @@ ajax.view = function(url, containerId, data, callback) {
  * @param {function} callback
  *        the callback function after rendering
  */
-ajax.template = function(url, containerId, templateId, data, callback) {
+ajax.template = function(opts) {
+  var url = opts.url; 
+  var containerId = opts.containerId;
+  var templateId = opts.templateId;
+  var data = opts.params;
+  var callback = opts.success;
+
   xhr.post({
     url: url,
     data: data,
@@ -166,7 +225,50 @@ ajax.template = function(url, containerId, templateId, data, callback) {
  * 
  * @param {integer} height - 高度
  */
-ajax.dialog = function(title, url, data, width, height, success, end) {
+// ajax.dialog = function(title, url, data, width, height, success, end) {
+//   for (var key in data) {
+//     window.parameters[key] = data[key];
+//   }
+//   $.ajax({
+//     url : url,
+//     data : data,
+//     async : true,
+//     success : function(html) {
+//       layer.open({
+//         type : 1,
+//         title : title,
+//         shadeClose : false,
+//         skin : 'layui-layer-rim', //加上边框
+//         area : [ width + 'px', height + 'px' ], //宽高
+//         content : html,
+//         success: function (layero, index) {
+//           var layerContent = document.querySelector('.layui-layer-content');
+//           layerContent.style += '; overflow: hidden;';
+//           if (success) success();
+//         },
+//         end: end || function () {}
+//       });
+//     }
+//   });
+// };
+
+/**
+ * 直接打开页面窗口。
+ * 
+ * @param {object} opts - 配置项，包括title, url, params, success, end
+ */
+ajax.dialog = function(opts) {
+  var title = opts.title || '';
+  var url = opts.url || '';
+  var data = opts.params || {};
+  var callback = opts.success;
+  var end = opts.end;
+
+  if (window.parameters) {
+    for (var key in data) {
+      window.parameters[key] = data[key];
+    }
+  }
   $.ajax({
     url : url,
     data : data,
@@ -174,15 +276,17 @@ ajax.dialog = function(title, url, data, width, height, success, end) {
     success : function(html) {
       layer.open({
         type : 1,
+        offset: '120px',
         title : title,
+        closeBtn: 1,
         shadeClose : false,
-        skin : 'layui-layer-rim', //加上边框
-        area : [ width + 'px', height + 'px' ], //宽高
+        area : ['50%', ''],
         content : html,
         success: function (layero, index) {
           var layerContent = document.querySelector('.layui-layer-content');
           layerContent.style += '; overflow: hidden;';
-          if (success) success();
+          $('.kui-dialog').css('padding', '15px 25px 50px 25px');
+          if (callback) callback();
         },
         end: end || function () {}
       });
