@@ -9360,7 +9360,7 @@ a.text-dark:hover, a.text-dark:focus {
 
 .breadcrumb-menu .btn {
   padding: 0 0.75rem;
-  color: #73818f;
+  /*color: #73818f;*/
   vertical-align: top;
   border: 0;
 }

@@ -14,7 +14,7 @@ $.fn.formdata = function(initial) {
       obj = initial;
     }
     var params = obj;
-    for ( var key in params) {
+    for (var key in params) {
       var elementNodeName;
       this.find('[name=' + key + ']').each(function() {
         elementNodeName = $(this)[0].nodeName;
@@ -33,6 +33,18 @@ $.fn.formdata = function(initial) {
           }
         } else if (elementNodeName == "INPUT" && ($(this).attr("type") == "file" || $(this).attr("type") == "button")) {
           // 无需回显
+        } else if (elementNodeName == "SELECT") {
+          var found = false;
+          $(this).find('option').each(function() {
+            var option = $(this);
+            if (option.attr('value') == params[key]) {
+              option.prop('selected', true);
+              found = true;
+            }
+          });
+          if (!found) {
+            $(this).val($($(this).find("option:first")).val());
+          }
         } else {
           $(this).val(params[key]);
         }
@@ -43,6 +55,7 @@ $.fn.formdata = function(initial) {
   var ret = {};
   this.find('input[type!=checkbox][type!=radio][type!=button]').each(function(idx, el) {
     var name = $(el).attr('name');
+    if (!name) return;
     var value = $(el).val();
     if (name.indexOf('[]') != -1) {
       if (typeof ret[name] === 'undefined') ret[name] = []; 

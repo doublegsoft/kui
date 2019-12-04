@@ -7,3 +7,5 @@ mac_web_server
 .gitignore
 mongoose/
 .DS_Store
+.DS_Store
+.gitignore
