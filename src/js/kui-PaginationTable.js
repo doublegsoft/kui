@@ -308,7 +308,7 @@ PaginationTable.prototype.pagination = function () {
   var self = this;
   var div = $('<div></div>');
   div.css('float', 'right');
-  div.css('margin', '8px');
+  div.css('margin-top', '8px');
   var ul = $('<ul></ul>');
   ul.addClass('pagination');
   this.firstPage = $('<li class="page-item"></li>');

@@ -1,0 +1,48 @@
+<div class="row">
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-list"></i>
+        <strong>任务列表</strong>
+      </div>
+      <div class="card-body row">
+        <div id="treelikeTable" class="col-md-12"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var treelikeTable = new TreelikeTable({
+  url: 'data/tree.json',
+  fields: {
+    name: 'name',
+    id: 'id',
+    parentId: 'parentId'
+  },
+  columns: [{
+    title: '任务名称',
+  }, {
+    title: '开发进度',
+    display: function(row, td) {
+      let html = '<div class="clearfix">\n' +
+        '        <div class="float-left"><strong>50%</strong></div>\n' +
+        '        <div class="float-right"><small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small></div>\n' +
+        '      </div>\n' +
+        '      <div class="progress progress-xs">\n' +
+        '        <div class="progress-bar bg-gradient-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div> \n' +
+        '      </div>';
+      td.innerHTML = html;
+    }
+  }, {
+    title: '责任人',
+    display: function(row, td) {
+      let a = document.createElement('a');
+      a.classList.add('btn', 'text-success');
+      a.innerText = row.principalName;
+      td.append(a);
+    }
+  }]
+});
+treelikeTable.render('treelikeTable', {});
+</script>

@@ -19,12 +19,17 @@ xhr.request = function (opts, method) {
   var error = opts.error;
 
   var req  = new XMLHttpRequest();
-  req.open(method, url, false);
+  req.open(method, url, true);
   req.setRequestHeader("Content-Type", "application/json");
   req.onload = function () {
     var resp = req.responseText;
-    if (type == 'json') 
-      resp = JSON.parse(resp);
+    if (type == 'json')
+      try {
+        resp = JSON.parse(resp);
+      } catch (err) {
+        if (error) error(resp);
+        return;
+      }
     if (req.readyState == 4 && req.status == "200") {
       if (success) success(resp);
     } else {

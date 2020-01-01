@@ -1,0 +1,85 @@
+{
+  "total": 20,
+  "data": [{
+    "id": "01",
+    "name": "开发基于Chromium的自定义网页应用桌面程序",
+    "startDate": "2017-06-05",
+    "principalName": "袁璐山",
+    "status": "进行中",
+    "progress": 85,
+    "children": [{
+      "id": "0101",
+      "parentId": "01",
+      "name": "Off-Screen Rendering技术开发",
+      "startDate": "2017-09-09",
+      "progress": 50,
+      "principalName": "胡庆龄"
+    },{
+      "id": "0102",
+      "parentId": "01",
+      "name": "下载处理程序",
+      "startDate": "2017-09-09",
+      "completionDate": "2017-10-10",
+      "progress": 100,
+      "principalName": "胡庆龄"
+    },{
+      "id": "0103",
+      "parentId": "01",
+      "name": "自定义提示框",
+      "startDate": "2017-09-09",
+      "completionDate": "2017-10-10",
+      "progress": 100,
+      "principalName": "胡庆龄"
+    },{
+      "id": "0104",
+      "parentId": "01",
+      "name": "同步更新静态资源",
+      "startDate": "2017-09-09",
+      "completionDate": "2017-10-10",
+      "progress": 100,
+      "principalName": "胡庆龄"
+    }]
+  },{
+    "id": "02",
+    "name": "3D地图建模",
+    "startDate": "2017-09-09",
+    "progress": 50,
+    "principalName": "杜玲浪"
+  },{
+    "id": "03",
+    "name": "ERP系统后端开发",
+    "startDate": "2017-09-09",
+    "progress": 50,
+    "principalName": "张新全",
+    "children": [{
+      "id": "0301",
+      "parentId": "03",
+      "name": "后端API开发",
+      "startDate": "2017-09-09",
+      "progress": 50,
+      "principalName": "杜浪伟"
+    },{
+      "id": "0302",
+      "parentId": "03",
+      "name": "前端UI开发",
+      "startDate": "2017-09-09",
+      "progress": 50,
+      "principalName": "沈丽",
+      "children": [{
+        "id": "030201",
+        "parentId": "0302",
+        "name": "前端组件开发",
+        "startDate": "2017-09-09",
+        "progress": 50,
+        "principalName": "杜浪伟"
+      },{
+        "id": "030202",
+        "parentId": "0302",
+        "name": "前端组件事件开发",
+        "startDate": "2017-09-09",
+        "progress": 50,
+        "principalName": "沈丽"
+      }]
+    }]
+  }]
+}

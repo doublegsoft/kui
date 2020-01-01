@@ -16,6 +16,7 @@
 <link href="/3rd/trumbowyg/ui/trumbowyg.min.css" rel="stylesheet">
 <link href="/3rd/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
 <link href="/3rd/select2/css/select2.min.css" rel="stylesheet">
+<link href="/3rd/ztree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet">
 
 <!-- Main styles for this application -->
 <link href="/src/css/coreui.css" rel="stylesheet">
@@ -140,6 +141,7 @@
 <script src="/3rd/flowchart/flowchart.min.js"></script>
 <script src="/3rd/konva/konva.min.js"></script>
 <script src="/3rd/select2/js/select2.min.js"></script>
+<script src="/3rd/ztree/js/jquery.ztree.all.js"></script>
 
 <script src="/src/js/kui-mainframe.js"></script> 
 <script src="/src/js/kui-bootstrap.js"></script> 
@@ -171,7 +173,12 @@
 <script src="/src/js/kui-PropertiesEditor.js"></script> 
 
 <script src="/src/js/kui-statisticstable.js"></script> 
-<script src="/src/js/kui-calendartable.dev.js"></script> 
+<script src="/src/js/kui-calendartable.dev.js"></script>
+<script src="/src/js/kui-checktree.js"></script>
+
+<script src="/src/js/kui-Checklist.js"></script>
+<script src="/src/js/kui-FileUpload.js"></script>
+<script src="/src/js/kui-TreelikeTable.js"></script>
 </body>
 </html>
 
@@ -195,6 +202,7 @@
       {{#each items}}
       <li class="nav-item"> 
         <a class="nav-link" href="{{url}}">
+          <span style="padding-left: 16px"></span>
           <i class="{{icon}}"></i>{{text}}
         </a> 
       </li>
@@ -221,21 +229,25 @@ setTimeout(function () {
 }, 1000 * 60 * 2);
   
 // load menus
-ajax.post('/desktop/data/menu.json', {}, function(resp) {
-  var source = document.getElementById('sidemenu-template').innerHTML;
-  var template = Handlebars.compile(source);
-  var html = template(resp);
-  $('#sidemenu').append(html);
-  
-  // 由于后加载数据，所以事件无法由bootstrap加载，只能自己加载
-  $('#sidemenu .nav-dropdown').on('click', function(e) {
-    var dropdown = $(e.target).parent();
-    if (dropdown.hasClass('open')) {
-      dropdown.removeClass('open');
-    } else {
-      dropdown.addClass('open');
-    }
-  });
+xhr.post({
+  url: '/desktop/data/menu.json',
+  data: {},
+  success: function(resp) {
+    var source = document.getElementById('sidemenu-template').innerHTML;
+    var template = Handlebars.compile(source);
+    var html = template(resp);
+    $('#sidemenu').append(html);
+
+    // 由于后加载数据，所以事件无法由bootstrap加载，只能自己加载
+    $('#sidemenu .nav-dropdown').on('click', function(e) {
+      var dropdown = $(e.target).parent();
+      if (dropdown.hasClass('open')) {
+        dropdown.removeClass('open');
+      } else {
+        dropdown.addClass('open');
+      }
+    });
+  }
 });
 
 $('.navbar-toggler').on('click', function(evt) {

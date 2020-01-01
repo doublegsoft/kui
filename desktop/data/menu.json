@@ -5,6 +5,33 @@
     "url": "javascript:ajax.view('dashboard.html', 'container');"
   },
   "groups": [{
+    "title": "组件示例",
+    "menus": [{
+      "text": "表单组件",
+      "icon": "nav-icon fa fa-cubes",
+      "items": [{
+        "text": "可选择列表",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/component/checklist.html', containerId: 'container'});"
+      }, {
+        "text": "可选择树",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/component/checktree.html', containerId: 'container'});"
+      }, {
+        "text": "文件上传",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/component/fileupload.html', containerId: 'container'});"
+      }]
+    },{
+      "text": "复合组件",
+      "icon": "nav-icon fa fa-cubes",
+      "items": [{
+        "text": "树表",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/component/treelike-table.html', containerId: 'container'});"
+      }]
+    }]
+  }, {
     "title": "应用示例",
     "menus": [{
       "text": "工具应用",

@@ -13,6 +13,15 @@ $.fn.formdata = function(initial) {
     } else {
       obj = initial;
     }
+    $(this).find('input').each(function(idx, elm) {
+      $(this).val('');
+    });
+    $(this).find('input[type=checkbox]').each(function(idx, elm) {
+      $(this).prop('checked', false);
+    });
+    $(this).find('textarea').each(function(idx, elm) {
+      $(this).text('');
+    });
     var params = obj;
     for (var key in params) {
       var elementNodeName;

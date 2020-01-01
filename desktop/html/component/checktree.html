@@ -1,0 +1,27 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body row">
+        <div class="col-md-3">
+          <div class="card-title title-bordered">
+            <h6>可选择树</h6>
+          </div>
+          <div id="checktree0" class="ztree" style="height: 300px; overflow-y: auto"></div>
+          <button id="buttonPrint" type="button" class="btn btn-sm btn-success">打印</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var opts = {
+  url: 'data/tree.json',
+  fields: {name: 'name', id: 'id', parentId: 'parentId'}
+};
+$('#checktree0').checktree(opts);
+
+$('#buttonPrint').on('click', function() {
+  console.log(opts.tree.getCheckedNodes());
+});
+</script>

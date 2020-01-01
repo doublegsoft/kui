@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <div class="form-buttons float-right">
+            <button id="buttonUpload" type="custom" class="btn btn-sm btn-link">
+              <i class="fas fa-arrow-circle-up"></i>上传
+            </button>
+            <input id="fileUpload" type="file" style="position: absolute; opacity: 0; right: 0px; top: 0;"/>
+          </div>
+          <h6>附件</h6>
+        </div>
+        <div id="fileupload0" class="height300 full-width"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var fileupload = new FileUpload({
+  url: {
+    upload: 'http://www.google.com',
+    download: ''
+  },
+  buttonId: 'buttonUpload',
+  fileId: 'fileUpload'
+}).render('fileupload0', {});
+</script>

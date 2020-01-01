@@ -95,10 +95,10 @@ ajax.save = function(opts) {
  * 
  * @param {function} callback - 回调函数
  */
-ajax.post = function(url, data, callback) {
+ajax.post = function(opts) {
   $.ajax({
-    url : url,
-    data : data,
+    url : opts.url,
+    data : opts.data,
     method : 'POST',
     dataType : 'json',
     success : function(resp) {
@@ -106,21 +106,21 @@ ajax.post = function(url, data, callback) {
         dialog.error('请求出错！');
         return;
       }
-      if (typeof callback !== 'undefined') {
-        callback(resp);
+      if (typeof opts.success !== 'undefined') {
+        opts.success(resp);
       }
     }
   });
 };
 
-ajax.get = function(url, data, callback) {
+ajax.get = function(opts) {
   $.ajax({
-    url : url,
-    data : data,
+    url : opts.url,
+    data : opts.data,
     dataType : 'json',
     success : function(resp) {
-      if (typeof callback !== 'undefined') {
-        callback(resp);
+      if (typeof opts.success !== 'undefined') {
+        opts.success(resp);
       }
     }
   });
@@ -278,14 +278,14 @@ ajax.dialog = function(opts) {
         type : 1,
         offset: '120px',
         title : title,
-        closeBtn: 1,
+        closeBtn: 0,
         shadeClose : false,
         area : ['50%', ''],
         content : html,
         success: function (layero, index) {
           var layerContent = document.querySelector('.layui-layer-content');
           layerContent.style += '; overflow: hidden;';
-          $('.kui-dialog').css('padding', '15px 25px 50px 25px');
+          $('.kui-dialog').css('padding', '15px 25px 25px 25px');
           if (callback) callback();
         },
         end: end || function () {}
