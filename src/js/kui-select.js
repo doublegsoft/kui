@@ -20,22 +20,68 @@
  * SOFTWARE.
  */
 
-$.fn.select = function (opts) {
-  var value = opts.value;
-  var text = opts.text;
-  var self = $(this);
+$.fn.simpleselect = function (opts) {
+  let value = opts.fields.value;
+  let text = opts.fields.text;
+  let selection = opts.selection || '-1';
+  let self = $(this);
+  let dotIndex = value.indexOf('.');
+  let objname = value.substr(0, dotIndex);
+  let attrname = value.substr(dotIndex + 1);
   xhr.post({
     url: opts.url,
-    data: opts.params || {},
+    data: opts.data || {},
     success: function (resp) {
       if (!resp.data) return;
-      for (var i = 0; i < resp.data.length; i++) {
-        var item = resp.data[i];
-        var option = $('<option></option>');
-        option.attr('value', item[value]);
+      for (let i = 0; i < resp.data.length; i++) {
+        let item = resp.data[i];
+        let option = $('<option></option>');
+        if (dotIndex == -1) {
+          option.prop('selected', selection == item[value]);
+          option.attr('value', item[value]);
+        } else {
+          option.prop('selected', selection == item[objname][attrname]);
+          option.attr('value', item[objname][attrname]);
+        }
         option.text(item[text]);
         self.append(option);
       }
+    }
+  });
+};
+
+$.fn.searchselect = function (opts) {
+  let value = opts.fields.value;
+  let text = opts.fields.text;
+  let selection = opts.selection || '-1';
+  let self = $(this);
+  let dotIndex = value.indexOf('.');
+  let objname = value.substr(0, dotIndex);
+  let attrname = value.substr(dotIndex + 1);
+
+  xhr.post({
+    url: opts.url,
+    data: opts.data || {},
+    success: function (resp) {
+      if (!resp.data) {
+        return;
+      }
+      for (let i = 0; i < resp.data.length; i++) {
+        let item = resp.data[i];
+        let option = $('<option></option>');
+        if (dotIndex == -1) {
+          option.prop('selected', selection == item[value]);
+          option.attr('value', item[value]);
+        } else {
+          option.prop('selected', selection == item[objname][attrname]);
+          option.attr('value', item[objname][attrname]);
+        }
+        option.text(item[text]);
+        self.append(option);
+      }
+      self.select2({
+        liveSearch: true
+      });
     }
   });
 };
