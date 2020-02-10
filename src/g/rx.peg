@@ -1,0 +1,47 @@
+/**
+ *
+ */
+Root
+  = root:(Trigger / Observer) {
+    return root;
+  }
+
+Trigger
+  = event:Event _ '=>' _ object:Id {
+    return {
+      event: name,
+      object: object
+    };
+  }
+
+Observer
+  = element:Element _ '=>' _ procedure:Procedure {
+    return {
+      element: element,
+      procedure: procedure
+    }
+  }
+
+Event
+  = '(' id:Id ')' {
+    return id;
+  }
+
+Element
+  = '[' id:Id ']' {
+  	return id;
+  }
+
+Procedure
+  = id:Id '(' ')' {
+  	return id
+  }
+
+Id
+  = [a-zA-Z]+ ('.' [a-zA-Z]+)? {
+  	return text();
+  }
+
+
+_ 'whitespace'
+  = [ \t\r\n]*
