@@ -1,95 +1,71 @@
-function FileUpload(opts) {
-  this.buttonId = opts.buttonId;
-  this.fileId = opts.fileId;
 
-  this.uploadUrl = opts.url.upload;
-  this.downloadUrl = opts.url.download;
+const FILE_TYPE_EXCEL = '<i class="far fa-file-excel"></i>';
+const FILE_TYPE_WORD = '<i class="far fa-file-word"></i>';
+const FILE_TYPE_POWERPOINT = '<i class="far fa-file-powerpoint"></i>';
+const FILE_TYPE_PDF = '<i class="far fa-file-pdf"></i>';
+const FILE_TYPE_VIDEO = '<i class="far fa-file-video"></i>';
+const FILE_TYPE_AUDIO = '<i class="far fa-file-audio"></i>';
+const FILE_TYPE_IMAGE = '<i class="far fa-file-image"></i>';
+const FILE_TYPE_ARCHIVE = '<i class="far fa-file-archive"></i>';
+const FILE_TYPE_FILE = '<i class="far fa-file-alt"></i>';
 
-  this.normalText = '<i class="fas fa-arrow-circle-up"></i>上传';
-  this.loadingText = '<i class="fa fa-spinner fa-spin"></i>文件上传中……';
+function FileList(opts) {
+  // upload url
+  this.fetchUrl = opts.url.fetch;
+  this.usecase = opts.usecase;
+  this.uploadUrl = opts.url.upload
+  this.local = opts.local || [];
+}
 
-  this.initialize();
-};
-
-FileUpload.prototype.render = function(containerId, params) {
-  this.container = document.getElementById(containerId);
-  this.container.innerHTML = '';
-
-  let ul = document.createElement('ul');
-  ul.classList.add('list-group');
-
-  this.container.append(ul);
-};
-
-FileUpload.prototype.initialize = function() {
-  let button = document.getElementById(this.buttonId);
-  let file = document.getElementById(this.fileId);
+FileList.prototype.fetch = function (containerId) {
   let self = this;
-
-  button.addEventListener('click', function(ev) {
-    file.click(ev);
-  });
-
-  file.addEventListener('change', function(ev) {
-    if (!('files' in file)) return;
-    if (file.files.length == 0) return;
-
-    let form = new FormData();
-    form.append("file", file.files[0]);
-
-    button.innerHTML = self.loadingText;
-    button.classList.add('disabled');
-
-    let ajax = new XMLHttpRequest();
-    ajax.upload.addEventListener("progress", function (ev) {
-      let loaded = ev.loaded;
-      let total = ev.total;
-    }, false);
-
-    // complete
-    ajax.addEventListener("load", function(ev) {
-      let resp = JSON.parse(ev.target.responseText);
-      let data = resp.data;
-      let input = document.createElement('input');
-      input.setAttribute('name', '');
-      input.setAttribute('type', 'hidden');
-      input.setAttribute('value', data.id);
-      self.container.append(input);
-      self.addFileItem(file.files[0]);
-      button.classList.remove('disabled');
-      button.innerHTML = self.normalText;
-    }, false);
-
-    // error
-    ajax.addEventListener("error", function() {
-      dialog.error('文件上传出错！');
-      button.classList.remove('disabled');
-      button.innerHTML = self.normalText;
-    }, false);
-
-    // abort
-    ajax.addEventListener("abort", function() {
-      button.classList.remove('disabled');
-      button.innerHTML = self.normalText;
-    }, false);
-
-    ajax.open("POST", self.uploadUrl);
-    ajax.send(form);
-
+  xhr.post({
+    url: this.fetchUrl,
+    usecase: this.usecase,
+    success: function (resp) {
+      self.local = resp.data;
+      self.render(containerId);
+    }
   });
 };
 
-FileUpload.prototype.addFileItem = function(fl) {
-  let ul = this.container.querySelector('ul');
-  let li = document.createElement('li');
-  li.classList.add('list-group-item');
-  li.style.padding = '0';
+FileList.prototype.append = function (item) {
+  let ul = dom.find('ul', this.container);
+  let li = dom.create('li', 'list-group-item', 'list-group-item-input');
+  let link = dom.create('link', 'btn', 'btn-link');
+  link.innerText = 'item.name';
+  let icon = null;
+  if (item.extension === '.xls' || item.extension === '.xlsx') {
+    icon = dom.element(FILE_TYPE_EXCEL);
+  } else if (item.extension === '.doc' || item.extension === '.docx') {
+    icon = dom.element(FILE_TYPE_EXCEL);
+  } else if (item.extension === '.ppt' || item.extension === '.pptx') {
+    icon = dom.element(FILE_TYPE_POWERPOINT);
+  } else if (item.extension === '.pdf') {
+    icon = dom.element(FILE_TYPE_PDF);
+  } else if (item.extension === '.png' || item.extension === '.jpg') {
+    icon = dom.element(FILE_TYPE_IMAGE);
+  } else {
+    icon = dom.element(FILE_TYPE_FILE);
+  }
+  li.appendChild(icon);
+  li.appendChild(link);
+};
 
-  let a = document.createElement('a');
-  a.classList.add('btn', 'btn-link');
-  a.setAttribute('href', 'javascript:void(0)');
-  a.text = fl.name;
-
-  li.append(a);
-  ul.append(li);
+FileList.prototype.render = function(containerId) {
+  if (typeof this.local === 'undefined') {
+    this.fetch(containerId);
+    return;
+  }
+  if (typeof containerId === 'string')
+    this.container = document.querySelector(containerId);
+  else
+    this.container = container;
+  this.container.innerHTML = '';
+  let ul = dom.create('ul', 'list-group');
+  this.container.appendChild(ul);
+  for (let i = 0; i < this.local.length; i++) {
+    let item = this.local[i];
+    this.append(item);
+  }
 };

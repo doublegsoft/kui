@@ -1,0 +1,311 @@
+<div class="card">
+  <div class="card-header">
+    <strong>示例：必填项</strong>
+  </div>
+  <div class="card-body">
+    <div id="formRequired" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">必填项*：</label>
+        <div class="col-md-4"><input class="form-control" name="required" data-required='必填项'></div>
+        <label class="col-form-label col-md-2">任意项：</label>
+        <div class="col-md-4"><input class="form-control" name="optional"></div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：特殊项</strong>
+  </div>
+  <div class="card-body">
+    <div id="formSpecial" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">电子邮箱：</label>
+        <div class="col-md-4">
+          <input value='hello.world' class="form-control" name="email" data-domain-type='email' data-required='电子邮箱'>
+        </div>
+        <label class="col-form-label col-md-2">正则式：</label>
+        <div class="col-md-4">
+          <input value="1898331977X" class="form-control" name="string3" data-domain-type="regexp(^\d$)" data-required='regexp(^\d$)'
+                 data-invalid-message="regexp(^\d$)表示只允许填写数字"></div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：数字验证</strong>
+  </div>
+  <div class="card-body">
+    <div id="formNumber" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">number(5)：</label>
+        <div class="col-md-4">
+          <input value="123456.12" class="form-control" name="number1" data-domain-type="number(5)" data-required='最长为5位的整数'>
+        </div>
+        <label class="col-form-label col-md-2">number(5, 2)：</label>
+        <div class="col-md-4">
+          <input value="1234.12" class="form-control" name="number6" data-domain-type="number(5, 2)" data-required='最长5位但允许2位小数的浮点数'>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">-number(5,2)：</label>
+        <div class="col-md-4">
+          <input value="-1234.12" class="form-control" name="number2" data-domain-type="-number(5,2)" data-required='最长5位但允许2位小数的浮点负数'>
+        </div>
+        <label class="col-form-label col-md-2">+number(5,2)：</label>
+        <div class="col-md-4">
+          <input value="123.12" class="form-control" name="number3" data-domain-type="+number(5,2)" data-required='最长5位但允许2位小数的浮点正数'>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">值比较：</label>
+        <div class="col-md-4">
+          <input value="12.2" class="form-control" name="val2" data-domain-type="cmpexp(number(10,2), val2 > number1 && val2 > number6)" data-required='cmpexp(number(10,2), val2 > val1 && val2 > val0)'
+                 data-invalid-message='这个值必须大于number(5)和number(5, 2)里面的值'>
+        </div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：区间值验证</strong>
+  </div>
+  <div class="card-body">
+    <div id="formRange" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">range(10, 1000)：</label>
+        <div class="col-md-4">
+          <input value="10" class="form-control" name="number4" data-domain-type="range(10, 1000)" data-required='range(10, 1000)' data-invalid-message='值必须大于10并且小于1000'>
+        </div>
+        <label class="col-form-label col-md-2">range[10, 1000)：</label>
+        <div class="col-md-4">
+          <input value="1000" class="form-control" name="number4" data-domain-type="range[10, 1000)" data-required='range[10, 1000)'
+                 data-invalid-message='值必须大于等于10并且小于1000'>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">range(-100, 100)：</label>
+        <div class="col-md-4">
+          <input value="100" class="form-control" name="number5" data-domain-type="range(-100, 100)" data-required='range(-100, 100)'>
+        </div>
+        <label class="col-form-label col-md-2">range(-100, 100]：</label>
+        <div class="col-md-4">
+          <input value="200" class="form-control" name="number5" data-domain-type="range(-100, 100]" data-required='range(-100, 100]'>
+        </div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：字符串</strong>
+  </div>
+  <div class="card-body">
+    <div id="formString" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">string(2,5)：</label>
+        <div class="col-md-4">
+          <input value="尼可" class="form-control" name="string1" data-domain-type="string(2,5)" data-required='string(2,5)'
+                 data-invalid-message="string(2,5)表示字符串长度必须大于2小于5">
+        </div>
+        <label class="col-form-label col-md-2">string(0,5)：</label>
+        <div class="col-md-4">
+          <input value="尼可基德曼" class="form-control" name="string2" data-domain-type="string(0,5)" data-required='string(0,5)'
+                 data-invalid-message="string(0,5)表示字符串长度必须大于0小于5">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">string(10)测试：</label>
+        <div class="col-md-4">
+          <input value="这个人是不是尼可基德曼" class="form-control" name="string3" data-domain-type="string(10)" data-required='string(10)'
+                 data-invalid-message="string(10)表示字符串不能大于10">
+        </div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：日期</strong>
+  </div>
+  <div class="card-body">
+    <div id="formDate" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">开始日期：</label>
+        <div class="col-md-4">
+          <input value="2020-05-01" class="form-control" name="startDate" data-domain-type="cmpexp(date, 'startDate' <= 'endDate')" data-required='开始日期'
+                 data-format-message='开始日期格式不符合要求'
+                 data-invalid-message='开始日期必须小于等于结束日期'></div>
+        <label class="col-form-label col-md-2">结束日期：</label>
+        <div class="col-md-4">
+          <input value="2020-04-01" class="form-control" name="endDate" data-domain-type="cmpexp(date, 'startDate' <= 'endDate')" data-required='结束日期'
+                 data-format-message='结束日期格式不符合要求'
+                 data-invalid-message='结束日期必须大于等于开始日期'></div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">开始时间：</label>
+        <div class="col-md-4">
+          <input value="13:00" class="form-control" name="startTime" data-domain-type="cmpexp(time, 'startTime' <= 'endTime')" data-required='开始时间'
+                 data-format-message='开始时间格式不符合要求'
+                 data-invalid-message='开始时间必须小于等于结束时间'>
+        </div>
+        <label class="col-form-label col-md-2">结束时间：</label>
+        <div class="col-md-4">
+          <input value="12:00 " class="form-control" name="endTime" data-domain-type="cmpexp(time, 'startTime' <= 'endTime')" data-required='结束时间'
+                 data-format-message='结束时间格式不符合要求'
+                 data-invalid-message='结束时间必须大于等于开始时间'>
+        </div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：其他（有BUG）</strong>
+  </div>
+  <div class="card-body">
+    <div id="formOther" class="form form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">下拉框测试：</label>
+        <div class="col-md-4">
+          <select class="form-control" data-required="下拉框">
+            <option value=''>请选择</option>
+            <option value='A'>A</option>
+            <option value='B'>B</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">复选框测试*: </label>
+        <div class="col-md-4 form-inline">
+          <label class="checkbox-inline">
+            <input type='checkbox' name='cb' data-required='复选框' value='A'>A
+          </label>
+          <label class="checkbox-inline">
+            <input name='cb' type='checkbox' value='B'>B
+          </label>
+        </div>
+        <label class="col-form-label col-md-2">复选框测试: </label>
+        <div class="col-md-4 form-inline">
+          <label class="checkbox-inline">
+            <input type='checkbox' name='cb1' value='C'>C
+          </label>
+          <label class="checkbox-inline">
+            <input name='cb1' type='checkbox' value='D'>D
+          </label>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">单选框测试*：</label>
+        <div class="col-md-4 form-inline">
+          <label class="radio-inline">
+            <input type='radio' name='rb' data-required='单选框' value='A'>A
+          </label>
+          <label class="radio-inline">
+            <input name='rb' type='radio' value='B'>B
+          </label>
+        </div>
+        <label class="col-form-label col-md-2">单选框测试：</label>
+        <div class="col-md-4 form-inline">
+          <label class="radio-inline">
+            <input type='radio' name='rb1' value='C'>C
+          </label>
+          <label class="radio-inline">
+            <input name='rb1' type='radio' value='D'>D
+          </label>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">文件测试*：</label>
+        <div class="col-md-4">
+          <input class="form-control" type='file' data-required='文件'>
+        </div>
+        <label class="col-form-label col-md-2">文件测试：</label>
+        <div class="col-md-4">
+          <input class="form-control" type='file'>
+        </div>
+      </div>
+      <div class="float-right">
+        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+
+  $('#formRequired button[data-role=save]').on('click', function() {
+    let errors = $('#formRequired').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+
+  $('#formSpecial button[data-role=save]').on('click', function() {
+    let errors = $('#formSpecial').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+
+  $('#formNumber button[data-role=save]').on('click', function() {
+    let errors = $('#formNumber').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+
+  $('#formRange button[data-role=save]').on('click', function() {
+    let errors = $('#formRange').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+
+  $('#formString button[data-role=save]').on('click', function() {
+    let errors = $('#formString').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+
+  $('#formDate button[data-role=save]').on('click', function() {
+    let errors = $('#formDate').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+
+  $('#formOther button[data-role=save]').on('click', function() {
+    let errors = $('#formOther').validate();
+    if (errors.length > 0) {
+      dialog.error(utils.message(errors));
+      return;
+    }
+  });
+</script>

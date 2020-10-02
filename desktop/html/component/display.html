@@ -1,0 +1,100 @@
+<div class="card">
+  <div class="card-header">
+    <strong>示例：进度</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-3">
+      <div class="progress-circle p10">
+        <span>10%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="progress-circle over50 p55">
+        <span>55%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：电子表</strong>
+  </div>
+  <div class="card-body height100" style="background: #0091EA;">
+    <div class="clock">
+      <div class="numbers">
+        <p class="hours"></p>
+        <p class="placeholder">88</p>
+      </div>
+      <div class="colon">
+        <p>:</p>
+      </div>
+      <div class="numbers">
+        <p class="minutes"></p>
+        <p class="placeholder">88</p>
+      </div>
+      <div class="colon">
+        <p>:</p>
+      </div>
+      <div class="numbers">
+        <p class="seconds"></p>
+        <p class="placeholder">88</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：标签</strong>
+  </div>
+  <div class="card-body row">
+    <a class="ui tag label ml-5">正常</a>
+    <a class="ui tag label bg-success text-white ml-5">不错</a>
+    <a class="ui tag label bg-danger text-white ml-5">警告</a>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：可删除标签</strong>
+  </div>
+  <div class="card-body row">
+    <div class="chip">CSS
+      <i class="fas fa-times chip-action"></i>
+    </div>
+    <div class="chip">HTML
+      <i class="fas fa-times chip-action text-danger"></i>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：两个文本化选项切换</strong>
+  </div>
+  <div class="card-body row">
+    <div class="text-switch">
+      <label class="mb-0 checked">
+        <input name="text-switch" type="radio" style="display: none"/>年度
+      </label>
+      <label class="mb-0">
+        <input name="text-switch" type="radio" style="display: none"/>月度
+      </label>
+    </div>
+  </div>
+</div>
+
+
+<script src="/3rd/clock/javascript/main.js"></script>
+
+<script>
+  setTimeout(function() {
+    schedule.stop();
+  }, 5000);
+</script>
+

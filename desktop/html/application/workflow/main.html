@@ -1,0 +1,53 @@
+
+<div class="row">
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <button class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
+    <button class="btn btn-primary" type="button"><i class="fa fa-file-export"></i></button>
+    <button class="btn btn-primary" type="button"><i class="fa fa-trash-alt"></i></button>
+  </div>
+</div>
+<div id="designer_container" class="row">
+  <div class="col-md-2" style="padding: 0">
+    <ul class="list-group">
+      <li id="text-part" data-type='text' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">文本</li>
+      <li id="longtext-part" data-type='longtext' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">长文本</li>
+      <li id="image-part" data-type='image' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图片</li>
+      <li id="chart-part" data-type='chart' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图表</li>
+      <li id="table-part" data-type='table' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">表格</li>
+    </ul>
+  </div>
+  <div class="col-md-8" id="canvas_container" style="background-color: #fff; padding: 0;"></div>
+  <div id="properties_container" class="col-md-2 properties-container">
+  </div>
+
+  <div id="image_container" style="display: none">
+    <img id="image_sample" src="./img/report-designer/placeholder.jpg">
+  </div>
+</div>
+
+<script>
+
+var designerContainer = document.getElementById('designer_container');
+var canvasContainer = document.getElementById('canvas_container');
+var height = 900;// document.body.clientHeight - 100;
+designerContainer.style.height = height + 'px';
+canvasContainer.style.height = height + 'px';
+
+var propertiesEditor = new PropertiesEditor({
+  containerId: 'properties_container',
+  confirm: function () {
+    designer.render();
+  }
+});
+
+window.designer = new ReportDesigner({
+  containerId: 'canvas_container',
+  canvasHeight: height,
+  propertiesEditor: propertiesEditor
+});
+
+function drag(ev) {
+  designer.drag(ev);
+}
+
+</script>

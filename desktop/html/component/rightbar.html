@@ -1,0 +1,93 @@
+<div id="formTest" class="card b-a-0">
+  <div class="card-body">
+  </div>
+</div>
+
+<script>
+layout.form('#formTest div.card-body', {
+  columnCount: 1,
+  fields: [{
+    title: '隐藏标识',
+    name: 'anyId',
+    input: 'hidden',
+  },{
+    title: '文本',
+    name: 'anyText',
+    input: 'text',
+    required: true
+  },{
+    title: '日期',
+    name: 'anyDate',
+    input: 'date',
+    required: true
+  },{
+    title: '任意整数',
+    name: 'anyNumber',
+    input: 'number',
+    required: true
+  },{
+    title: '允许两位小数',
+    name: 'anyFloat',
+    input: 'number(6,2)',
+    required: true
+  },{
+    title: '选择',
+    name: 'anySelect',
+    input: 'select',
+    required: true,
+    options: {
+      url: 'data/checklist.json',
+      placeholder: '请选择...',
+      searchable: false,
+      fields: {value: 'id', text: 'name'}
+    }
+  },{
+    title: '级联选择',
+    name: 'anyCascade',
+    input: 'cascade',
+    required: true,
+    options: {
+      fields: {
+        name: 'name'
+      },
+      levels: [{
+        name: 'departmentId',
+        fields: {
+          id: 'id',
+          name: 'name'
+        },
+        text: '部门',
+        width: 'calc(49% - 3px)',
+        url: 'data/component/form/department.json'
+      }, {
+        name: 'employeeId',
+        fields: {
+          id: 'id',
+          name: 'name'
+        },
+        text: '员工',
+        width: 'calc(49% - 3px)',
+        url: 'data/component/form/employee.json'
+      }]
+    }
+  },{
+    title: '文件',
+    name: 'anyFile',
+    input: 'file',
+    required: true
+  }],
+  actions: [{
+    text: '保存',
+    role: 'save',
+    click: function(event) {
+
+    }
+  },{
+    text: '关闭',
+    role: 'close',
+    click: function(event) {
+      dom.find('.sidebar-right').classList.add('out');
+    }
+  }]
+});
+</script>
