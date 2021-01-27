@@ -1,0 +1,116 @@
+<div id="pageProjectView" class="card b-a-0">
+  <div id="formProject" class="card-body mb-3">
+  </div>
+</div>
+
+<script>
+
+function PageProjectView() {
+  this.formProject = new FormLayout({
+    columnCount: 1,
+    readonly: true,
+    allowClose: true,
+    save: {
+      url: 'data/chart.json',
+      usecase: 'test'
+    },
+    fields: [{
+      title: '隐藏标识',
+      name: 'anyId',
+      input: 'hidden'
+    },{
+      title: '文本',
+      name: 'anyText',
+      input: 'text',
+      required: true
+    },{
+      title: '日期',
+      name: 'anyDate',
+      input: 'date',
+      required: true
+    },{
+      title: '任意整数',
+      name: 'anyNumber',
+      input: 'number',
+      required: true
+    },{
+      title: '允许两位小数',
+      name: 'anyFloat',
+      input: 'number(6,2)',
+      required: true
+    },{
+      title: '选择',
+      name: 'anySelect',
+      input: 'select',
+      required: true,
+      options: {
+        url: 'data/checklist.json',
+        placeholder: '请选择...',
+        searchable: false,
+        fields: {value: 'id', text: 'name'}
+      }
+    },{
+      title: '级联选择',
+      name: 'anyCascade',
+      input: 'cascade',
+      required: true,
+      options: {
+        levels: [{
+          name: 'departmentId',
+          fields: {
+            value: 'id',
+            text: 'name'
+          },
+          text: '部门',
+          width: 'calc(49% - 3px)',
+          url: 'data/component/form/department.json'
+        }, {
+          name: 'employeeId',
+          fields: {
+            value: 'id',
+            text: 'name'
+          },
+          text: '员工',
+          width: 'calc(49% - 3px)',
+          url: 'data/component/form/employee.json'
+        }]
+      }
+    },{
+      title: '文件',
+      name: 'anyFile',
+      input: 'file',
+      required: true,
+      tooltip: '需要上传的Excel文件'
+    },{
+      title: '项目成员',
+      name: 'projectMemberId',
+      input: 'checklist',
+      options: {
+        url: 'data/checklist.json',
+        fields: {text: 'name', value: 'id'}
+      }
+    }]
+  });
+}
+
+PageProjectView.prototype.show = function (projectId) {
+  this.setup(projectId);
+};
+
+PageProjectView.prototype.setup = function (projectId) {
+  this.formProject.render('#formProject', null, {
+    anyText: '',
+    anyDate: 1593937164685,
+    anySelect: '5',
+    anyFile: 'abc',
+    anyFloat: 12.23,
+    anyNumber: 123,
+    departmentId: {id: '2', name: '市场部'},
+    employeeId: {id: '4', name: '热苏斯'},
+    projectMemberId: [{id: '1'},{id: '2'},{id: '3'}]
+  });
+};
+
+pageProjectView = new PageProjectView();
+
+</script>

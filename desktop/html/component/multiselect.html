@@ -1,0 +1,98 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-list"></i>
+        <strong>多选</strong>
+      </div>
+      <div class="card-body row">
+        <div class="col-md-4">
+          <div class="card-title title-bordered full-width">
+            <h6>可选择树</h6>
+          </div>
+          <div id="checktree0" class="ztree full-width" style="height: 300px; overflow-y: auto"></div>
+          <button id="buttonPrint" type="button" class="btn btn-sm btn-success">打印</button>
+        </div>
+        <div class="col-md-4">
+          <div class="card-title title-bordered full-width">
+            <h6>可选择列表</h6>
+          </div>
+          <div id="checklist0" class="height300 full-width"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-list"></i>
+        <strong>瓦片式布局的多项选择器</strong>
+      </div>
+      <div id="tiledmultiselect" class="card-body row">
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <i class="fa fa-list"></i>
+        <strong>可删除的标签</strong>
+      </div>
+      <div class="card-body row">
+        <div class="tag-removeable">字段D
+          <i class="fa fa-times hide"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Split(['#one', '#two'], {
+  //   sizes: [300, 300],
+  //   gutterSize: 10,
+  //   minSize: [0, 0],
+  //   expandToMin: true,
+  //   gutterStyle: (dimension, gutterSize) => ({
+  //     'flex-basis':  `${gutterSize}px`,
+  //   }),
+  // });
+
+$('#tiledmultiselect').tiledmultiselect({
+  fields: {value: 'id', text: 'name'},
+  local: [{
+    id: '1', name: '字段A'
+  }, {
+    id: '2', name: '字段B'
+  }, {
+    id: '3', name: '字段C', checked: true
+  }, {
+    id: '4', name: '字段D', checked: true
+  }]
+});
+
+new Checktree({
+  url: 'data/tree.json',
+  data: {},
+  fields: {name: 'name', id: 'id', parentId: 'parentId'},
+  callback: {
+    onCheck: function(event, treeId, node) {
+      console.log(node)
+    }
+  }
+}).render('#checktree0');
+
+$('#buttonPrint').on('click', function() {
+  console.log(opts.tree.getCheckedNodes());
+});
+
+new Checklist({
+  url: 'data/checklist.json',
+  fields: {text: 'name', value: 'id'},
+  onCheck: function() {
+
+  }
+}).render('#checklist0');
+</script>

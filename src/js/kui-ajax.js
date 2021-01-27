@@ -102,10 +102,10 @@ ajax.post = function(opts) {
     method : 'POST',
     dataType : 'json',
     success : function(resp) {
-      if (typeof resp.error !== 'undefined') {
-        dialog.error('请求出错！');
-        return;
-      }
+      // if (typeof resp.error !== 'undefined') {
+      //   dialog.error('请求出错！');
+      //   return;
+      // }
       if (typeof opts.success !== 'undefined') {
         opts.success(resp);
       }
@@ -141,31 +141,403 @@ ajax.text = function(url, data, callback) {
   });
 };
 
-ajax.view = function(opts) {
-  var url = opts.url;
-  var containerId = opts.containerId;
-  var data = opts.params;
-  var callback = opts.success;
+/**
+ * 加载服务器端的页面，替换现有容器中的元素。支持独立页面和数据库配置页面的加载。
+ *
+ * @param opt
+ *        配置选项
+ */
+ajax.view = function(opt) {
+  if (typeof schedule !== 'undefined' && opt.clear)
+    schedule.stop();
+  let url = opt.url;
+  let empty = false;
+  if (typeof opt.empty === 'undefined')
+    empty = true;
+  else
+    empty = opt.empty;
+  let page = opt.page;
+  if (url && url.indexOf(":") == 0) {
+    page = url.substring(1);
+    url = null;
+  }
+
+  let title = opt.title || '';
+  let containerId = opt.containerId;
+  let data = opt.params;
+  let callback = opt.success;
+
+  let container = null;
+  if (typeof containerId === 'string') {
+    container = document.getElementById(containerId.trim());
+    if (container == null) {
+      container = document.querySelector(containerId.trim());
+    }
+  } else {
+    container = containerId;
+  }
 
   if (typeof data === 'undefined')
     data = {};
   if (window.parameters) {
-    for (var k in data) {
+    for (let k in data) {
       window.parameters[k] = data[k];
     }
   }
-  $.ajax({
-    url : url,
-    data : data,
-    success : function(resp) {
-      var container = document.getElementById(containerId);
-      if (container) {
-        utils.append(container, resp);
+
+  if (url) {
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let fragment = null;
+        if (container) {
+          fragment = utils.append(container, resp, empty);
+        }
+        if (callback)
+          callback(title, fragment);
       }
+    });
+  } else if (page) {
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: page
+      },
+      success: function (resp) {
+        let script = resp.data.script
+        let fragment = null;
+        if (container) {
+          fragment = utils.append(container, script, empty);
+        }
+        if (callback)
+          callback(title, fragment);
+      }
+    });
+  }
+};
+
+/**
+ * 添加服务器端页面到指定容器中，同样支持独立页面和数据库配置页面的加载。
+ * <p>
+ * 该模式只有在存在顶部可关闭菜单的情况下才有效。
+ *
+ * @param opts
+ *        配置项
+ */
+ajax.append = function(opts) {
+  if (typeof schedule !== 'undefined' && opts.clear)
+    schedule.stop();
+
+  let tabsMain = dom.find('#tabsMain');
+  let tabsOthers = dom.find('#tabsOthers');
+
+  if (tabsMain == null) {
+    ajax.view(opts);
+    return;
+  }
+
+  let currentCount = tabsMain.children.length;
+
+  let url = opts.url;
+  let title = opts.title || '';
+  let containerId = opts.containerId;
+  let data = opts.params;
+  let callback = opts.success;
+
+  let container = null;
+  if (typeof containerId === 'string') {
+    container = document.getElementById(containerId.trim());
+    if (container == null) {
+      container = document.querySelector(containerId.trim());
+    }
+  } else {
+    container = containerId;
+  }
+
+  if (typeof data === 'undefined')
+    data = {};
+  if (window.parameters) {
+    for (let k in data) {
+      window.parameters[k] = data[k];
+    }
+  }
+
+  clearActive();
+
+  let existing = container.querySelector('div[data-url="' + url + '"]');
+  if (existing != null) {
+    // display page
+    existing.classList.remove('hide');
+    setTimeout(function() {
+      existing.classList.add('show')
+    }, 150);
+    // highlight tab
+    let link = dom.find('a[data-url="' + url + '"]', tabsMain);
+    if (link != null) {
+      link.classList.add('active');
+      return;
+    }
+    dom.find('a[data-url="' + url + '"]', tabsOthers).classList.add('active');
+    return;
+  }
+
+  function clearActive() {
+    container.querySelectorAll('div[data-url]').forEach(elm => {
+      elm.classList.remove('show');
+      elm.classList.add('hide', 'fade', 'fadeIn');
+    });
+    // remove existing active
+    tabsMain.querySelectorAll('a.active').forEach(a => {
+      a.classList.remove('active');
+    });
+    tabsOthers.querySelectorAll('a.active').forEach(a => {
+      a.classList.remove('active');
+    });
+  }
+
+  function shiftToOthers(tab) {
+    dom.find('a', tab).classList.add('pointer');
+    dom.find('a', tab).classList.remove('nav-link');
+    dom.find('a', tab).classList.add('dropdown-item');
+    dom.find('i', tab).classList.remove('ml-1');
+    dom.find('i', tab).classList.add('float-right');
+    if (tabsOthers.children.length == 0)
+      tabsOthers.appendChild(tab);
+    else
+      tabsOthers.insertBefore(tab, tabsOthers.children[0]);
+  }
+
+  function shiftToMain(tab) {
+    dom.find('a', tab).classList.add('nav-link');
+    dom.find('a', tab).classList.remove('dropdown-item');
+    dom.find('i', tab).classList.add('ml-1');
+    dom.find('i', tab).classList.remove('float-right');
+    tabsMain.appendChild(tab);
+  }
+
+  function appendHeadLink(title, url) {
+    if (title == '' || tabsMain == null) return;
+    let tab = dom.element(`
+      <li class="nav-item">
+        <a class="nav-link head-link">
+          <span></span>
+          <i class="fas fa-times-circle ml-1"></i>
+        </a>
+      </li>
+    `);
+
+    dom.find('a', tab).setAttribute('data-url', url);
+
+    // close page and tab
+    dom.bind(dom.find('i', tab), 'click', event => {
+      event.preventDefault();
+      event.stopPropagation();
+      let link = event.target.parentElement;
+      let existing = container.querySelector('div[data-url="' + link.getAttribute('data-url') + '"]');
+      if (existing) existing.remove();
+      event.target.parentElement.parentElement.remove();
+
+      let opens = container.querySelectorAll('div[data-url]');
+      if (opens.length > 0) {
+        tabsMain.children[0].click();
+      }
+
+      // shift to main
+      if (tabsOthers.children.length > 0) {
+        let tabShift = tabsOthers.children[0];
+        tabShift.remove();
+        shiftToMain(tabShift);
+      }
+    });
+
+    // activate listener
+    dom.bind(dom.find('a', tab), 'click', event => {
+      let link = dom.ancestor(event.target, 'a')
+      if (link.classList.contains('active')) return;
+      clearActive();
+      link.classList.add('active');
+      displayPage(a.getAttribute('data-url'));
+    });
+
+    // check tab existing
+    let existing = false;
+    tabsMain.querySelectorAll('li').forEach(li => {
+      if (dom.find('span', li).innerText == title) {
+        existing = true;
+        dom.find('a', li).classList.add('active');
+      }
+    });
+    if (existing) return;
+
+    // insert first
+    if (currentCount == 0)
+      tabsMain.appendChild(tab);
+    else if (currentCount + 1 > MAX_HEAD_LINK_COUNT) {
+      // shift last head link from main to others
+      let tabShift = dom.find('li:last-child', tabsMain);
+      tabShift.remove();
+      shiftToOthers(tabShift);
+    }
+    tabsMain.insertBefore(tab, tabsMain.children[0]);
+
+
+    // render text and style
+    let span = dom.find('span', tab);
+    let a = dom.find('a', tab);
+    a.classList.add('active');
+    span.innerText = title;
+  }
+
+  function displayPage(url) {
+    container.querySelectorAll('div[data-url]').forEach(elm => {
+      elm.classList.remove('show');
+      elm.classList.add('hide');
+    });
+    let existing = container.querySelector('div[data-url="' + url + '"]');
+    if (existing != null) {
+      // display page
+      existing.classList.remove('hide');
+      setTimeout(function() {
+        existing.classList.add('show')
+      }, 150);
+      // highlight tab
+      let link = dom.find('a[data-url="' + url + '"]', tabsMain);
+      if (link != null) {
+        link.classList.add('active');
+        return;
+      }
+      dom.find('a[data-url="' + url + '"]', tabsOthers).classList.add('active');
+      return;
+    }
+
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let range = document.createRange();
+        let fragment = range.createContextualFragment(resp);
+        container.appendChild(fragment);
+
+        for (let i = container.children.length - 1; i >= 0; i--) {
+          let div = container.children[i];
+          if (div.tagName == 'DIV') {
+            div.setAttribute('data-url', url);
+            setTimeout(function () {
+              div.classList.add('show')
+            }, 150);
+            break;
+          }
+        }
+        appendHeadLink(title, url);
+        if (callback)
+          callback(title, resp);
+      }
+    });
+  }
+
+  if (url.indexOf(':') == 0) {
+    let customWindowId = url.substring(1);
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: customWindowId
+      },
+      success: function (resp) {
+        let script = resp.data.script
+        let fragment = null;
+        if (container) {
+          let range = document.createRange();
+          fragment = range.createContextualFragment(script);
+          container.appendChild(fragment);
+        }
+        for (let i = container.children.length - 1; i >= 0; i--) {
+          let div = container.children[i];
+          if (div.tagName == 'DIV') {
+            div.setAttribute('data-url', url);
+            setTimeout(function () {
+              div.classList.add('show')
+            }, 150);
+            break;
+          }
+        }
+        appendHeadLink(title, url);
+        stdbiz.render(customWindowId, container.querySelector('[data-url="' + url + '"]'), {});
+      }
+    });
+  } else {
+    displayPage(url);
+  }
+};
+
+/**
+ * 弹出式显示全屏页面，屏蔽现有页面但不替换。
+ *
+ * @param opts
+ *        配置项
+ */
+ajax.shade = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let callback = opts.success;
+
+  xhr.get({
+    url : url,
+    success : function(resp) {
+      let range = document.createRange();
+      let fragment = range.createContextualFragment(resp);
+      document.body.appendChild(fragment);
       if (callback)
         callback(resp);
     }
   });
+};
+
+/**
+ * 叠加远程页面到现有容器中，不替换现有页面，只隐藏现有页面。
+ *
+ * @param opt
+ *        配置项
+ */
+ajax.stack = function(opt) {
+  if (typeof schedule !== 'undefined' && opt.clear)
+    schedule.stop();
+
+  let pageId = opt.pageId;
+  let containerId = opt.containerId;
+
+  let container = null;
+  if (typeof containerId === 'string') {
+    container = document.getElementById(containerId.trim());
+    if (container == null) {
+      container = document.querySelector(containerId.trim());
+    }
+  } else {
+    container = containerId;
+  }
+
+  if (typeof data === 'undefined')
+    data = {};
+  if (window.parameters) {
+    for (let k in data) {
+      window.parameters[k] = data[k];
+    }
+  }
+
+  let existing = false;
+  for (let i = 0; i < container.children.length; i++) {
+    let page = container.children[i];
+    page.classList.remove('show');
+    page.classList.add('hide');
+    if (page.id == pageId) {
+      page.classList.remove('hide');
+      page.classList.add('show');
+      existing = true;
+    }
+  }
+  if (!existing) {
+    opt.empty = false;
+    ajax.view(opt);
+  }
 };
 
 /**
@@ -188,14 +560,16 @@ ajax.view = function(opts) {
  *        the callback function after rendering
  */
 ajax.template = function(opts) {
-  var url = opts.url; 
-  var containerId = opts.containerId;
-  var templateId = opts.templateId;
-  var data = opts.params;
-  var callback = opts.success;
+  let url = opts.url;
+  let usecase = opts.usecase;
+  let containerId = opts.containerId;
+  let templateId = opts.templateId;
+  let data = opts.data;
+  let callback = opts.success;
 
   xhr.post({
     url: url,
+    usecase: usecase,
     data: data,
     success: function(resp) {
       if (containerId) {
@@ -279,7 +653,48 @@ ajax.dialog = function(opts) {
         offset: '120px',
         title : title,
         closeBtn: 0,
-        shadeClose : false,
+        shadeClose : true,
+        area : ['50%', ''],
+        content : html,
+        success: function (layero, index) {
+          var layerContent = document.querySelector('.layui-layer-content');
+          layerContent.style += '; overflow: hidden;';
+          $('.kui-dialog').css('padding', '15px 25px 25px 25px');
+          if (callback) callback();
+        },
+        end: end || function () {}
+      });
+    }
+  });
+};
+
+/**
+ * 支持shade close。
+ */
+ajax.dialog2 = function(opts) {
+  var title = opts.title || '';
+  var url = opts.url || '';
+  var data = opts.params || {};
+  var callback = opts.success;
+  var end = opts.end;
+
+  if (window.parameters) {
+    for (var key in data) {
+      window.parameters[key] = data[key];
+    }
+  }
+  $.ajax({
+    url : url,
+    data : data,
+    async : true,
+    success : function(html) {
+      layer.open({
+        type : 1,
+        offset: '120px',
+        title : title,
+        closeBtn: 0,
+        shade: 0.3,
+        shadeClose : true,
         area : ['50%', ''],
         content : html,
         success: function (layero, index) {
@@ -341,15 +756,16 @@ ajax.svg = function(url, cntr, data, callback) {
 /**
  * 利用ajax上传文件。
  */
-ajax.upload = function(url, data, onSuccess, onProgress, onError) {
+ajax.upload = function(opts) {
+  let data = opts.data;
   if (typeof data === 'undefined')
     data = {};
-  var formdata = new FormData();
-  for (var k in data) {
+  let formdata = new FormData();
+  for (let k in data) {
     formdata.append(k, data[k]);
   }
   $.ajax({
-    url : url,
+    url : opts.url,
     data : formdata,
     method : 'POST',
     cache: false,
@@ -357,23 +773,166 @@ ajax.upload = function(url, data, onSuccess, onProgress, onError) {
     processData : false,
     xhr: function() {
       var ret = $.ajaxSettings.xhr();
-      if(ret.upload && onProgress){
+      if(ret.upload && opts.progress){
         ret.upload.addEventListener('progress', function(e) {
           if(e.lengthComputable){
-            if (onProgress)
-              onProgress(e.total, e.loaded);
+            if (opts.progress)
+              opts.progress(e.total, e.loaded);
           }  
         }, false);
       }
       return ret;
     },
     success: function(resp) {
-      if (onSuccess)
-        onSuccess(resp);
+      if (opts.success)
+        opts.success(resp);
     },
     error: function(resp) {
-      if (onError)
-        onError(resp);
+      if (opts.error)
+        opts.error(resp);
     }
   });
+};
+
+ajax.sidebar = function(opt) {
+  let container = document.querySelector(opt.containerId);
+  let success = opt.success || function() {};
+  let sidebar = dom.find('.rightbar', container);
+  let allowClose = opt.allowClose || false;
+  if (sidebar != null) sidebar.remove();
+  sidebar = dom.element(`
+    <div class="rightbar fade show">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="card-header pt-2 pb-2">
+            <button type="button" class="close text-danger">
+              <i class="fas fa-times"></i>
+            </button>
+            <h5 class="modal-title"></h5>
+          </div>
+          <div class="modal-body" style="overflow-y: auto"></div>
+        </div>
+      </div>
+    </div>
+  `);
+  container.appendChild(sidebar);
+  if (opt.url) {
+    xhr.get({
+      url: opt.url,
+      success: function (resp) {
+        dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
+        if (!allowClose && !opt.close) {
+          dom.find('button.close', sidebar).classList.add('hidden');
+        }
+        dom.find('button.close', sidebar).addEventListener('click', function () {
+          dom.find('.rightbar').classList.add('out');
+          // 关闭回调
+          if (opt.close)
+            opt.close();
+        });
+        utils.append(dom.find('.modal-body', sidebar), resp);
+        if (success) success(resp);
+        setTimeout(function () {
+          sidebar.classList.remove('out');
+          sidebar.classList.add('in');
+        }, 200);
+      }
+    });
+  } else {
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: opt.page
+      },
+      success: function (resp) {
+        let script = resp.data.script;
+        utils.append(dom.find('.modal-body', sidebar), script);
+        dom.find('.modal-title', sidebar).innerHTML = opt.title;
+        if (!allowClose && !opt.close) {
+          dom.find('button.close', sidebar).classList.add('hidden');
+        }
+        dom.find('button.close', sidebar).addEventListener('click', function () {
+          dom.find('.rightbar').classList.add('out');
+          // 关闭回调
+          if (opt.close)
+            opt.close();
+        });
+        if (success) success(resp);
+        setTimeout(function () {
+          sidebar.classList.remove('out');
+          sidebar.classList.add('in');
+        }, 200);
+      }
+    });
+  }
+};
+
+ajax.tabs = function(opts) {
+  let container = document.querySelector(opts.containerId);
+  let tabs = opts.tabs;
+  let closeable = opts.closeable || false;
+  let ul = dom.create('ul', 'nav', 'nav-tabs');
+  let div = dom.create('div', 'tab-content');
+
+  let buttons = dom.create('div', 'float-right');
+  let refresh = dom.create('button', 'btn', 'btn-link');
+  buttons.appendChild(refresh);
+
+  function reload(container, url, page, data) {
+    ajax.view({
+      url: url,
+      containerId: container,
+      success: function() {
+        if (window[page])
+          window[page].show(data);
+      }
+    });
+  }
+
+  dom.bind(refresh, 'click', function() {
+    let link = dom.find('li.active link', this.parentElement.parentElement);
+    let url = link.getAttribute('data-model-url');
+    let page = link.getAttribute('data-model-page');
+    let data = JSON.parse('data-model-data');
+    let pane = dom.find('div.tab-content div[data-model-url=\'' + url + '\']', this.parentElement.parentElement);
+    reload(pane, url, page, data);
+  });
+
+  for (let i = 0; i < tabs.length; i++) {
+    let tab = tabs[i];
+    let li = dom.create('li', 'nav-item');
+    let link = dom.create('a', 'nav-link');
+    if (i == 0) {
+      link.classList.add('active');
+    }
+    link.setAttribute('data-model-url', tab.url);
+    link.setAttribute('data-model-data', JSON.stringify(tab.data || {}));
+    link.setAttribute('data-model-page', tab.page);
+    link.innerHTML = tab.title;
+    dom.bind(link, 'click', function() {
+      if (this.classList.contains('active')) return;
+      dom.find('a.active', this.parentElement.parentElement.parentElement).classList.remove('active');
+      dom.find('div.active', this.parentElement.parentElement.parentElement).classList.remove('active');
+      let url = link.getAttribute('data-model-url');
+      let data = JSON.parse(link.getAttribute('data-model-data'));
+      let page = link.getAttribute('data-model-page');
+      let pane = dom.find('div.tab-content div[data-model-url=\'' + url + '\']', this.parentElement.parentElement.parentElement);
+
+      this.classList.add('active');
+      pane.classList.add('active');
+      if (pane.innerHTML.trim() === '') reload(pane, url, page, data);
+    });
+    li.appendChild(link);
+    ul.appendChild(li);
+    let pane = dom.create('div', 'tab-pane');
+    if (i == 0) {
+      pane.classList.add('active');
+      reload(pane, tab.url, tab.page, tab.data);
+    }
+    pane.setAttribute('data-model-url', tab.url);
+    div.append(pane);
+  }
+  container.appendChild(buttons);
+  container.appendChild(ul);
+  container.appendChild(div);
 };

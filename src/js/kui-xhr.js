@@ -5,24 +5,27 @@
  * 
  * @version 1.0.0 - Created on Jan 26, 2019.
  */
-var xhr = {};
+let xhr = {};
 
 /**
  * @private
  */
 xhr.request = function (opts, method) {
+  let url = opts.url;
+  let data = opts.data || opts.params;
+  let type = opts.type || 'json';
+  let success = opts.success;
+  let error = opts.error;
 
-  var url = opts.url;
-  var data = opts.data;
-  var type = opts.type || 'json';
-  var success = opts.success;
-  var error = opts.error;
+  let usecase = opts.usecase || '';
 
-  var req  = new XMLHttpRequest();
+  let req  = new XMLHttpRequest();
   req.open(method, url, true);
+  req.timeout = 15 * 1000;
   req.setRequestHeader("Content-Type", "application/json");
+  req.setRequestHeader("usecase", usecase);
   req.onload = function () {
-    var resp = req.responseText;
+    let resp = req.responseText;
     if (type == 'json')
       try {
         resp = JSON.parse(resp);
@@ -35,7 +38,13 @@ xhr.request = function (opts, method) {
     } else {
       if (error) error(resp);
     }
-  }
+  };
+  req.onerror = function () {
+    if (error) error({error: {code: -500, message: '网络请求错误！'}});
+  };
+  req.ontimeout = function () {
+    if (error) error({error: {code: -501, message: '网络请求超时！'}});
+  };
   if (data)
     req.send(JSON.stringify(data));
   else 
@@ -46,10 +55,30 @@ xhr.request = function (opts, method) {
  * @see xhr.request
  */
 xhr.get = function (opts) {
-  xhr.request(opts, 'GET');
+  let url = opts.url;
+  let data = opts.data;
+  let success = opts.success;
+  let error = opts.error;
+
+  let req  = new XMLHttpRequest();
+  req.open('GET', url, true);
+  req.onload = function () {
+    let resp = req.responseText;
+    if (req.readyState == 4 && req.status == "200") {
+      if (success) success(resp);
+    } else {
+      if (error) error(resp);
+    }
+  };
+  req.send(null);
 };
 
 xhr.post = function (opts) {
+  let url = opts.url;
+  if (typeof window.HOST !== 'undefined' && url.indexOf('http') == -1) {
+    url = window.HOST + url;
+    opts.url = url;
+  }
   xhr.request(opts, 'POST');
 };
 
@@ -65,26 +94,31 @@ xhr.connect = function (opts) {
   xhr.request(opts, 'CONNECT');
 };
 
-xhr.postx = function (opts) {
+xhr.chain = function(opts) {
+  if (opts.length == 0) return;
+  let xhrOpts = opts[0];
+  let successProxy = xhrOpts.success;
+  let then = function(resp) {
+    successProxy(resp);
+    xhr.chain(opts.slice(1));
+  };
+  xhr.promise(xhrOpts, then);
+};
 
-  var url = opts.url;
-  var data = opts.data;
-  var type = opts.type || 'json';
-  var success = opts.success;
-  var error = opts.error;
+xhr.promise = function(xhrOpt, then) {
+  let resolveProxy = null;
+  xhrOpt.success = function (resp) {
+    if (resp.error) {
+      dialog.error(resp.error.message);
+      return;
+    }
+    resolveProxy(resp);
+  };
+  new Promise(function(resolve) {
+    resolveProxy = resolve;
+    xhr.post(xhrOpt);
+  }).then(then);
+};
 
-  // var result = await new Promise(resolved => {
-  //   var req  = new XMLHttpRequest();
-  //   req.open(method, url, true);
-  //   req.onload = function () {
-  //     var resp = req.responseText;
-  //     if (type == 'json') 
-  //       resp = JSON.parse(resp);
-  //     if (req.readyState == 4 && req.status == "200") {
-  //       if (success) success(resp);
-  //     } else {
-  //       if (error) error(resp);
-  //     }
-  //   }
-  // });
-}
+if (typeof module !== 'undefined')
+  module.exports = xhr;

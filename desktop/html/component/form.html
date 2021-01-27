@@ -1,17 +1,68 @@
 <div class="card">
   <div class="card-header">
+    <strong>示例：动态表单1</strong>
+  </div>
+  <div id="formDynamic1" class="card-body">
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：级联选择</strong>
+  </div>
+  <div class="card-body">
+    <div class="col-md-12 form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">地区：</label>
+        <div class="col-md-4 input-group">
+          <div id="selectDistrict" class="form-control">
+          </div>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-asterisk icon-required"></i>
+            </span>
+          </div>
+        </div>
+        <label class="col-form-label col-md-2">人员：</label>
+        <div class="col-md-4 input-group">
+          <div id="selectEmployee" class="form-control" name="district">
+          </div>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-asterisk icon-required"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 pr-0 pl-0">
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
     <strong>示例：必填项</strong>
   </div>
   <div class="card-body">
-    <div id="formRequired" class="form form-horizontal">
+    <div id="formRequired" class="col-md-12 form-horizontal">
       <div class="form-group row">
-        <label class="col-form-label col-md-2">必填项*：</label>
-        <div class="col-md-4"><input class="form-control" name="required" data-required='必填项'></div>
+        <label class="col-form-label col-md-2">必填项：</label>
+        <div class="col-md-4 input-group">
+          <input class="form-control" name="required" data-required='必填项'>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-asterisk icon-required"></i>
+            </span>
+          </div>
+        </div>
         <label class="col-form-label col-md-2">任意项：</label>
         <div class="col-md-4"><input class="form-control" name="optional"></div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -21,19 +72,33 @@
     <strong>示例：特殊项</strong>
   </div>
   <div class="card-body">
-    <div id="formSpecial" class="form form-horizontal">
+    <div id="formSpecial" class="col-md-12 form-horizontal">
       <div class="form-group row">
         <label class="col-form-label col-md-2">电子邮箱：</label>
-        <div class="col-md-4">
+        <div class="col-md-4 input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="far fa-envelope"></i>
+            </span>
+          </div>
           <input value='hello.world' class="form-control" name="email" data-domain-type='email' data-required='电子邮箱'>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-asterisk icon-required"></i>
+            </span>
+          </div>
         </div>
         <label class="col-form-label col-md-2">正则式：</label>
         <div class="col-md-4">
           <input value="1898331977X" class="form-control" name="string3" data-domain-type="regexp(^\d$)" data-required='regexp(^\d$)'
                  data-invalid-message="regexp(^\d$)表示只允许填写数字"></div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -43,7 +108,7 @@
     <strong>示例：数字验证</strong>
   </div>
   <div class="card-body">
-    <div id="formNumber" class="form form-horizontal">
+    <div id="formNumber" class="col-md-12 form-horizontal">
       <div class="form-group row">
         <label class="col-form-label col-md-2">number(5)：</label>
         <div class="col-md-4">
@@ -71,8 +136,12 @@
                  data-invalid-message='这个值必须大于number(5)和number(5, 2)里面的值'>
         </div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -82,7 +151,7 @@
     <strong>示例：区间值验证</strong>
   </div>
   <div class="card-body">
-    <div id="formRange" class="form form-horizontal">
+    <div id="formRange" class="col-md-12 form-horizontal">
       <div class="form-group row">
         <label class="col-form-label col-md-2">range(10, 1000)：</label>
         <div class="col-md-4">
@@ -104,8 +173,12 @@
           <input value="200" class="form-control" name="number5" data-domain-type="range(-100, 100]" data-required='range(-100, 100]'>
         </div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -115,7 +188,7 @@
     <strong>示例：字符串</strong>
   </div>
   <div class="card-body">
-    <div id="formString" class="form form-horizontal">
+    <div id="formString" class="col-md-12 form-horizontal">
       <div class="form-group row">
         <label class="col-form-label col-md-2">string(2,5)：</label>
         <div class="col-md-4">
@@ -135,8 +208,12 @@
                  data-invalid-message="string(10)表示字符串不能大于10">
         </div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -146,7 +223,7 @@
     <strong>示例：日期</strong>
   </div>
   <div class="card-body">
-    <div id="formDate" class="form form-horizontal">
+    <div id="formDate" class="col-md-12 form-horizontal">
       <div class="form-group row">
         <label class="col-form-label col-md-2">开始日期：</label>
         <div class="col-md-4">
@@ -173,8 +250,12 @@
                  data-invalid-message='结束时间必须大于等于开始时间'>
         </div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -184,128 +265,340 @@
     <strong>示例：其他（有BUG）</strong>
   </div>
   <div class="card-body">
-    <div id="formOther" class="form form-horizontal">
+    <div id="formOther" class="col-md-12 form-horizontal">
       <div class="form-group row">
         <label class="col-form-label col-md-2">下拉框测试：</label>
-        <div class="col-md-4">
-          <select class="form-control" data-required="下拉框">
-            <option value=''>请选择</option>
+        <div class="col-md-4 input-group">
+          <select name="select" class="form-control" data-required="下拉框">
             <option value='A'>A</option>
             <option value='B'>B</option>
           </select>
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-asterisk icon-required"></i>
+            </span>
+          </div>
         </div>
       </div>
       <div class="form-group row">
         <label class="col-form-label col-md-2">复选框测试*: </label>
-        <div class="col-md-4 form-inline">
-          <label class="checkbox-inline">
-            <input type='checkbox' name='cb' data-required='复选框' value='A'>A
-          </label>
-          <label class="checkbox-inline">
-            <input name='cb' type='checkbox' value='B'>B
-          </label>
+        <div class="col-md-4 col-form-label">
+          <div class="form-check form-check-inline">
+            <input id="cb_A" name="cb[]" value="A" type="checkbox" data-required="复选框"
+                   class="form-check-input checkbox color-primary is-outline">
+            <label class="form-check-label" for="cb_A">A</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input id="cb_B" name="cb[]" value="B" type="checkbox"
+                   class="form-check-input checkbox color-primary is-outline">
+            <label class="form-check-label" for="cb_B">B</label>
+          </div>
         </div>
         <label class="col-form-label col-md-2">复选框测试: </label>
-        <div class="col-md-4 form-inline">
-          <label class="checkbox-inline">
-            <input type='checkbox' name='cb1' value='C'>C
-          </label>
-          <label class="checkbox-inline">
-            <input name='cb1' type='checkbox' value='D'>D
-          </label>
+        <div class="col-md-4 col-form-label">
+          <div class="form-check form-check-inline">
+            <input id="cb1_C" name="cb1[]" value="C" type="checkbox"
+                   class="form-check-input checkbox color-primary is-outline">
+            <label class="form-check-label" for="cb1_C">C</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input id="cb1_D" name="cb1[]" value="D" type="checkbox"
+                   class="form-check-input checkbox color-primary is-outline">
+            <label class="form-check-label" for="cb1_D">D</label>
+          </div>
         </div>
       </div>
       <div class="form-group row">
         <label class="col-form-label col-md-2">单选框测试*：</label>
-        <div class="col-md-4 form-inline">
-          <label class="radio-inline">
-            <input type='radio' name='rb' data-required='单选框' value='A'>A
-          </label>
-          <label class="radio-inline">
-            <input name='rb' type='radio' value='B'>B
-          </label>
+        <div class="col-md-4 col-form-label">
+          <div class="form-check form-check-inline">
+            <input id="rb_A" name="rb" value="A" type="radio"
+                   class="form-check-input radio color-primary is-outline" checked>
+            <label class="form-check-label" for="rb_A">A</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input id="rb_B" name="rb" value="B" type="radio"
+                   class="form-check-input radio color-primary is-outline">
+            <label class="form-check-label" for="rb_B">B</label>
+          </div>
         </div>
         <label class="col-form-label col-md-2">单选框测试：</label>
-        <div class="col-md-4 form-inline">
-          <label class="radio-inline">
-            <input type='radio' name='rb1' value='C'>C
-          </label>
-          <label class="radio-inline">
-            <input name='rb1' type='radio' value='D'>D
-          </label>
+        <div class="col-md-4 col-form-label">
+          <div class="form-check form-check-inline">
+            <input id="rb1_C" name="rb1" value="C" type="radio"
+                   class="form-check-input radio color-primary is-outline">
+            <label class="form-check-label" for="rb1_C">A</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input id="rb1_D" name="rb1" value="D" type="radio"
+                   class="form-check-input radio color-primary is-outline" checked>
+            <label class="form-check-label" for="rb1_D">B</label>
+          </div>
         </div>
       </div>
       <div class="form-group row">
-        <label class="col-form-label col-md-2">文件测试*：</label>
-        <div class="col-md-4">
-          <input class="form-control" type='file' data-required='文件'>
+        <label class="col-form-label col-md-2">必选文件：</label>
+        <div class="col-md-4 input-group">
+          <input name="file0" data-required="必选文件" type="file" style="display: none">
+          <input name="file0_wrapper" class="form-control">
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-upload"></i>
+            </span>
+            <span class="input-group-text">
+              <i class="fas fa-asterisk icon-required"></i>
+            </span>
+          </div>
         </div>
-        <label class="col-form-label col-md-2">文件测试：</label>
-        <div class="col-md-4">
-          <input class="form-control" type='file'>
+        <label class="col-form-label col-md-2">可选文件：</label>
+        <div class="col-md-4 input-group">
+          <input name="file1" type="file" style="display: none">
+          <input name="file1_wrapper" class="form-control">
+          <div class="input-group-append">
+            <span class="input-group-text">
+              <i class="fas fa-upload"></i>
+            </span>
+          </div>
         </div>
       </div>
-      <div class="float-right">
-        <button data-role="save" class="btn btn-sm btn-save">保存</button>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
 <script>
 
-  $('#formRequired button[data-role=save]').on('click', function() {
-    let errors = $('#formRequired').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
-    }
-  });
+$('#formRequired button[data-role=save]').on('click', function() {
+  let errors = $('#formRequired').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
 
-  $('#formSpecial button[data-role=save]').on('click', function() {
-    let errors = $('#formSpecial').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
-    }
-  });
+$('#formSpecial button[data-role=save]').on('click', function() {
+  let errors = $('#formSpecial').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
 
-  $('#formNumber button[data-role=save]').on('click', function() {
-    let errors = $('#formNumber').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
-    }
-  });
+$('#formNumber button[data-role=save]').on('click', function() {
+  let errors = $('#formNumber').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
 
-  $('#formRange button[data-role=save]').on('click', function() {
-    let errors = $('#formRange').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
-    }
-  });
+$('#formRange button[data-role=save]').on('click', function() {
+  let errors = $('#formRange').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
 
-  $('#formString button[data-role=save]').on('click', function() {
-    let errors = $('#formString').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
-    }
-  });
+$('#formString button[data-role=save]').on('click', function() {
+  let errors = $('#formString').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
 
-  $('#formDate button[data-role=save]').on('click', function() {
-    let errors = $('#formDate').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
-    }
-  });
+$('#formDate input[name=startDate]').datetimepicker({
+  format: 'YYYY-MM-DD',
+  locale: 'zh_CN'
+});
 
-  $('#formOther button[data-role=save]').on('click', function() {
-    let errors = $('#formOther').validate();
-    if (errors.length > 0) {
-      dialog.error(utils.message(errors));
-      return;
+$('#formDate input[name=endDate]').datetimepicker({
+  format: 'YYYY-MM-DD',
+  locale: 'zh_CN'
+});
+
+$('#formDate input[name=startTime]').datetimepicker({
+  format: 'hh:mm',
+  locale: 'zh_CN'
+});
+
+$('#formDate input[name=endTime]').datetimepicker({
+  format: 'hh:mm',
+  locale: 'zh_CN'
+});
+
+$('#formDate button[data-role=save]').on('click', function() {
+  let errors = $('#formDate').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
+
+$('#formOther button[data-role=save]').on('click', function() {
+  let errors = $('#formOther').validate();
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+});
+
+$('#formOther select[name=select]').searchselect({
+  searchable: false,
+  placeholder: '请选择...',
+  fields: {value: '', text: ''}
+});
+
+$('#selectDistrict').cascadeselect({
+  fields: {
+    name: 'name'
+  },
+  levels: [{
+    name: 'provinceId',
+    fields: {
+      id: 'id',
+      name: 'name'
+    },
+    text: '省份',
+    width: 'calc(31% - 3px)',
+    url: 'data/component/form/province.json'
+  }, {
+    name: 'cityId',
+    fields: {
+      id: 'id',
+      name: 'name'
+    },
+    text: '城市',
+    width: 'calc(31% - 3px)',
+    url: 'data/component/form/city.json'
+  }, {
+    name: 'countyId',
+    fields: {
+      id: 'id',
+      name: 'name'
+    },
+    text: '区县',
+    width: 'calc(31% - 3px)',
+    url: 'data/component/form/county.json'
+  }]
+});
+
+$('#selectEmployee').cascadeselect({
+  fields: {
+    name: 'name'
+  },
+  levels: [{
+    name: 'departmentId',
+    fields: {
+      id: 'id',
+      name: 'name'
+    },
+    text: '部门',
+    width: 'calc(49% - 3px)',
+    url: 'data/component/form/department.json'
+  }, {
+    name: 'employeeId',
+    fields: {
+      id: 'id',
+      name: 'name'
+    },
+    text: '员工',
+    width: 'calc(49% - 3px)',
+    url: 'data/component/form/employee.json'
+  }]
+});
+
+new FormLayout({
+  fields: [{
+    title: '隐藏标识',
+    name: 'anyId',
+    input: 'hidden',
+  },{
+    title: '文本',
+    name: 'anyText',
+    input: 'text',
+    required: true,
+    tooltip: '这里测试一下这个文本，能不能正常显示。'
+  },{
+    title: '日期',
+    name: 'anyDate',
+    input: 'date',
+    required: true
+  },{
+    title: '任意整数',
+    name: 'anyNumber',
+    input: 'number',
+    required: true
+  },{
+    title: '允许两位小数',
+    name: 'anyFloat',
+    input: 'number(6,2)',
+    required: true
+  },{
+    title: '选择',
+    name: 'anySelect',
+    input: 'select',
+    required: true,
+    options: {
+      url: 'data/checklist.json',
+      placeholder: '请选择...',
+      searchable: false,
+      fields: {value: 'id', text: 'name'}
     }
-  });
+  },{
+    title: '级联选择',
+    name: 'anyCascade',
+    input: 'cascade',
+    required: true,
+    options: {
+      levels: [{
+        name: 'departmentId',
+        fields: {
+          value: 'id',
+          text: 'name'
+        },
+        text: '部门',
+        width: 'calc(49% - 3px)',
+        url: 'data/component/form/department.json',
+      }, {
+        name: 'employeeId',
+        fields: {
+          value: 'id',
+          text: 'name'
+        },
+        text: '员工',
+        width: 'calc(49% - 3px)',
+        url: 'data/component/form/employee.json'
+      }]
+    }
+  },{
+    title: '非必填数字',
+    name: 'optionalNumber',
+    input: 'number'
+  },{
+    title: '非必填日期',
+    name: 'optionalDate',
+    input: 'date',
+    tooltip: '随便选择一个日期'
+  },{
+    title: '文件',
+    name: 'anyFile',
+    input: 'file',
+    required: true,
+    tooltip: '需要上传的Excel文件'
+  }]
+}).render('#formDynamic1', null, {
+  anyDate: 1593937164685,
+  anySelect: '5',
+  departmentId: {id: '2', name: '市场部'},
+  employeeId: {id: '4', name: '热苏斯'}
+});
 </script>
+

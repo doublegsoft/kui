@@ -1,0 +1,125 @@
+<style>
+  .list-group-item:first-child {
+    border-radius: unset;
+    border-top: none;
+  }
+
+</style>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：列表视图</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-4">
+      <div id="listFilter"></div>
+    </div>
+    <div class="col-md-4">
+      <div id="listFilterAdd"></div>
+    </div>
+    <div class="col-md-4">
+      <div id="listFilterAddRequired"></div>
+    </div>
+    <div class="col-md-4">
+      <div class="title-bordered mt-4">可排序列表</div>
+      <div id="listReorderable" class="height-300"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+var data = [
+  {id: '1', name: "外星人"},
+  {id: '2', name: "MacBook Pro"},
+  {id: '3', name: "Sureface Book 2"},
+  {id: '4', name: "Thinkpad"},
+  {id: '5', name: "Dell Precision"}
+];
+
+var listFilter = new ListView({
+  containerId: '#listFilter',
+  local: data,
+  height: 200,
+  create: function(idx, row) {
+    let span = dom.create('div');
+    span.innerHTML = '<div>' + row.name + '</div>';
+    return span;
+  },
+  onRemove: function(li, model) {
+    console.log(li);
+  },
+  onCheck: function(checked, model) {
+    console.log(checked);
+  },
+  onFilter: function(keyword) {
+
+  }
+});
+listFilter.render();
+
+var listFilterAdd = new ListView({
+  containerId: '#listFilterAdd',
+  local: data,
+  height: 200,
+  create: function(idx, row) {
+    let span = dom.create('div');
+    span.innerHTML = '<div>' + row.name + '</div>';
+    return span;
+  },
+  onRemove: function(li, model) {
+    console.log(li);
+  },
+  onCheck: function(checked, model) {
+    console.log(checked);
+  },
+  onFilter: function(keyword) {
+
+  },
+  onAdd: function() {
+
+  }
+});
+listFilterAdd.render();
+
+var listFilterAddRequired = new ListView({
+  containerId: '#listFilterAddRequired',
+  local: data,
+  height: 200,
+  required: true,
+  create: function(idx, row) {
+    let span = dom.create('div');
+    span.innerHTML = '<div>' + row.name + '</div>';
+    return span;
+  },
+  onRemove: function(li, model) {
+    console.log(li);
+  },
+  onCheck: function(checked, model) {
+    console.log(checked);
+  },
+  onFilter: function(keyword) {
+
+  },
+  onAdd: function() {
+
+  }
+});
+listFilterAddRequired.render();
+
+var listReorderable = new ListView({
+  containerId: '#listReorderable',
+  local: data,
+  create: function(idx, row) {
+    let colors = ['#db2828', '#21ba45', '#a333c8'];
+    let li = dom.create('div');
+    li.style.borderLeft = "5px solid " + colors[idx % 3];
+    li.append(row.name);
+    dnd.setDraggable(li);
+    return li;
+  },
+  onReorder: function(oldIndex, newIndex, row) {
+    console.log(row);
+  }
+});
+listReorderable.render();
+</script>

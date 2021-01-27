@@ -1,0 +1,117 @@
+<div class="context-menu" style="display: none">
+  <ul class="context-menu-options">
+    <li class="context-menu-option">
+      <a class="pointer" onclick="deleteSelectable();">
+        <i class="fa fa-times text-danger mr-3"></i>删除
+      </a>
+    </li>
+  </ul>
+</div>
+<div id="widgetDesigner" class="row" style="overflow: hidden;">
+  <div class="col-md-2" style="padding: 0">
+    <ul id="widgetComponents" class="list-group">
+      <li data-type='panel' draggable="true" class="list-group-item grab">面板</li>
+      <li data-type='panel' draggable="true" class="list-group-item grab">图片</li>
+      <li data-type='card' draggable="true" class="list-group-item grab">卡片</li>
+      <li data-type='form' draggable="true" class="list-group-item grab">表单</li>
+      <li data-type='list' draggable="true" class="list-group-item grab">列表</li>
+      <li data-type='squares' draggable="true" class="list-group-item grab">九宫格</li>
+      <li data-type='chart' draggable="true" class="list-group-item grab">图表</li>
+      <li data-type='button' draggable="true" class="list-group-item grab">按钮</li>
+      <li data-type='carousel' draggable="true" class="list-group-item grab">传送带</li>
+    </ul>
+  </div>
+  <div class="col-md-8 m-0 p-0">
+    <div class="bg-white" id="widgetCanvas"
+         style="overflow: hidden; height: 700px; width: 375px; margin: auto;">
+      <iframe id="widgetCanvasInternal" frameborder="0"
+              src="html/application/kesigner/mobile_frame.html" width="100%" height="100%"
+              sandbox="allow-scripts
+                       allow-forms
+                       allow-modals
+                       allow-pointer-lock
+                       allow-orientation-lock
+                       allow-popups
+                       allow-presentation
+                       allow-top-navigation
+                       allow-same-origin"></iframe>
+    </div>
+  </div>
+  <div id="widgetProperties" class="col-md-2 properties-container">
+  </div>
+</div>
+
+<script>
+var widgetDesigner = document.getElementById('widgetDesigner');
+var widgetCanvas = document.getElementById('widgetCanvas');
+
+var offsetTop = dom.top(widgetCanvas);
+var width = widgetCanvas.getBoundingClientRect().width;
+
+var height = document.body.clientHeight - offsetTop - 56;
+widgetDesigner.style.height = height + 'px';
+
+
+$('#widgetComponents li').each(function(idx, elm) {
+  let payload = {};
+  payload.type = $(elm).attr('data-type');
+  dnd.setDraggable('#widgetComponents li[data-type=' + $(elm).attr('data-type') + ']', payload, function(x, y, target) {
+    // console.log(target);
+  });
+});
+
+var iframe = document.getElementById("widgetCanvasInternal");
+iframe.onload = function() {
+  let elementBody = iframe.contentWindow.document.getElementsByTagName("body")[0];
+  dnd.setDroppable(elementBody, function(x, y, data) {
+    console.log(data);
+    Kesigner.unselect(widgetCanvas);
+    let component = Kesigner.getComponent(data.type);
+    let offsetX = widgetCanvas.getBoundingClientRect().left;
+    let offsetY = widgetCanvas.getBoundingClientRect().top;
+    let container = document.elementFromPoint(offsetX + x, offsetY + y);
+
+    let fragment = Kesigner.getFragment(component);
+    let element = fragment.firstElementChild;
+    element.classList.add('kesigner-selected');
+
+    let values = JSON.parse(element.getAttribute('data-values'));
+    container.appendChild(fragment);
+    if (container.childNodes.length > 0) {
+      container.classList.remove("height200");
+      container.classList.remove("height300");
+    }
+    widgetProperties.render(component.properties(), values);
+  });
+};
+
+widgetCanvas.addEventListener('click', function(event) {
+  let x = event.clientX;
+  let y = event.clientY;
+  Kesigner.select(widgetCanvas, widgetProperties, x, y);
+
+  let contextMenu = document.querySelector('.context-menu');
+  contextMenu.style.display = 'none';
+});
+
+widgetCanvas.addEventListener('contextmenu', function(event) {
+  event.preventDefault();
+  let contextMenu = document.querySelector('.context-menu');
+  contextMenu.style.left = event.clientX + 'px';
+  contextMenu.style.top = event.clientY + 'px';
+  contextMenu.style.display = '';
+  return false;
+}, false);
+
+var widgetProperties = new Kesigner.PropertiesEditor('widgetProperties');
+
+function deleteSelectable() {
+  let element = widgetCanvas.querySelector('.kesigner-selected');
+  if (element != null) {
+    element.remove();
+    let contextMenu = document.querySelector('.context-menu');
+    contextMenu.style.display = 'none';
+  }
+}
+
+</script>

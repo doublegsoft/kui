@@ -1,0 +1,11 @@
+Hello, World!!!
+
+<script>
+EVENT_BUS('foo').observers = [];
+EVENT_BUS('foo').subscribe(o => {
+  console.log(o);
+});
+EVENT_BUS('foo').subscribe(o => {
+  console.log('next: ' + o);
+});
+</script>

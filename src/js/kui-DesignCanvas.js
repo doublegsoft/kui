@@ -4,9 +4,9 @@
  */
 function DesignCanvas() {
   // 在画布上选中的对象
-    this.selected = null;
+    this.selectedElement = null;
     this.objects = [];
-    this.alignmentLine = null;
+    this.alignmentLines = [];
     this.isMoving = false;
     this.isResizing = false;
     this.resizeType = 'none';
@@ -30,7 +30,6 @@ function DesignCanvas() {
    */
   DesignCanvas.prototype.bindDropEventListener = function (self, callback) {
     // 在canvas上面释放拖拽对象时的事件处理函数
-    var self = this;
     this.canvas.addEventListener('drop', function (ev) {
       ev.preventDefault();
       callback(self, ev);
@@ -44,11 +43,11 @@ function DesignCanvas() {
     // 在canvas上响应鼠标按钮按下的事件处理函数
     this.canvas.addEventListener('mousedown', function(ev) {
       // 重置已经选择的对象
-      self.selected = null;
+      self.selectedElement = null;
       
       // 绘制对齐辅助线
-      self.drawAlignmentLine();
-  
+      self.getAlignmentLines();
+
       // 利用坐标体系算法获取当前的选择对象
       callback(self, ev);
     });
@@ -69,25 +68,25 @@ function DesignCanvas() {
    */
   DesignCanvas.prototype.bindMouseMoveEventListener = function (self, callback) {
     this.canvas.addEventListener('mousemove', function(ev) {
-      var resizeType = 'none';
-      if (self.selected == null) {
+      let resizeType = 'none';
+      if (self.selectedElement == null) {
         return;
       }
       if (!self.isMoving && !self.isResizing)  return;
       
-      self.drawAlignmentLine();
+      self.getAlignmentLines();
       callback(self, ev);
-      if (self.selected != null) {
+      if (self.selectedElement != null) {
         self.isMoving = true;
       }
     });
   };
   
-  /**
+/**
    * 绑定鼠标按钮弹起事件的监听处理器，无需回调处理。
    */
   DesignCanvas.prototype.bindMouseUpEventListener = function () {
-    var self = this;
+    let self = this;
     this.canvas.addEventListener('mouseup', function(ev) {
       self.isMoving = false;
       self.isResizing = false;
@@ -101,31 +100,31 @@ function DesignCanvas() {
    * 画箭头的函数，基本功能的封装。
    */
   DesignCanvas.prototype.drawArrow = function(startX, startY, endX, endY, controlPoints) {
-    var ctx = this.canvas.getContext("2d");
+    let ctx = this.canvas.getContext("2d");
     ctx.beginPath();
   
-    var dx = endX - startX;
-    var dy = endY - startY;
-    var len = Math.sqrt(dx * dx + dy * dy);
-    var sin = dy / len;
-    var cos = dx / len;
-    var a = [];
+    let dx = endX - startX;
+    let dy = endY - startY;
+    let len = Math.sqrt(dx * dx + dy * dy);
+    let sin = dy / len;
+    let cos = dx / len;
+    let a = [];
     a.push(0, 0);
-    for (var i = 0; i < controlPoints.length; i += 2) {
-      var x = controlPoints[i];
-      var y = controlPoints[i + 1];
+    for (let i = 0; i < controlPoints.length; i += 2) {
+      let x = controlPoints[i];
+      let y = controlPoints[i + 1];
       a.push(x < 0 ? len + x : x, y);
     }
     a.push(len, 0);
-    for (var i = controlPoints.length; i > 0; i -= 2) {
-      var x = controlPoints[i - 2];
-      var y = controlPoints[i - 1];
+    for (let i = controlPoints.length; i > 0; i -= 2) {
+      let x = controlPoints[i - 2];
+      let y = controlPoints[i - 1];
       a.push(x < 0 ? len + x : x, -y);
     }
     a.push(0, 0);
-    for (var i = 0; i < a.length; i += 2) {
-      var x = a[i] * cos - a[i + 1] * sin + startX;
-      var y = a[i] * sin + a[i + 1] * cos + startY;
+    for (let i = 0; i < a.length; i += 2) {
+      let x = a[i] * cos - a[i + 1] * sin + startX;
+      let y = a[i] * sin + a[i + 1] * cos + startY;
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -137,44 +136,44 @@ function DesignCanvas() {
    * 利用点到线的直线距离来选取哪根线条。
    */
   DesignCanvas.prototype.showResizeCursor = function (ev) {
-    var self = this;
+    let self = this;
   
-    if (!self.selected) return;
+    if (!self.selectedElement) return;
   
-    var rect = self.canvas.getBoundingClientRect();
-    var x = ev.clientX - rect.left;
-    var y = ev.clientY - rect.top;
+    let rect = self.canvas.getBoundingClientRect();
+    let x = ev.clientX - rect.left;
+    let y = ev.clientY - rect.top;
   
-    var threshhold = 5;
+    let threshold = 10;
   
-    var sel = self.selected;
+    let sel = self.selectedElement.model;
   
-    var topX = sel.x;
-    var topY = sel.y;
-    var botX = sel.x + sel.width;
-    var botY = sel.y + sel.height;
+    let topX = sel.x;
+    let topY = sel.y;
+    let botX = sel.x + sel.width;
+    let botY = sel.y + sel.height;
   
     // 顶端线条
-    var distance = this.calculateVerticalDistance(x, y, topX, topY, botX, topY);
-    if (distance <= threshhold) {
+    let distance = this.calculateVerticalDistance(x, y, topX, topY, botX, topY);
+    if (distance <= threshold) {
       self.canvas.style.cursor = 'n-resize';
       return 'north';
     }
     // 底端线条
     distance = this.calculateVerticalDistance(x, y, topX, botY, botX, botY);
-    if (distance <= threshhold) {
+    if (distance <= threshold) {
       self.canvas.style.cursor = 's-resize';
       return 'south';
     }
     // 左侧线条
     distance = this.calculateVerticalDistance(x, y, topX, topY, topX, botY);
-    if (distance <= threshhold) {
+    if (distance <= threshold) {
       self.canvas.style.cursor = 'w-resize';
       return 'west';
     }
     // 右侧线条
     distance = this.calculateVerticalDistance(x, y, botX, topY, botX, topY);
-    if (distance <= threshhold) {
+    if (distance <= threshold) {
       self.canvas.style.cursor = 'e-resize';
       return 'east';
     }
@@ -185,40 +184,52 @@ function DesignCanvas() {
   /**
    * 画辅助对齐线。
    */
-  DesignCanvas.prototype.drawAlignmentLine = function() {
-    var threshhold = 10;
-    this.alignmentLine = null;
-    if (!this.selected) {
+  DesignCanvas.prototype.getAlignmentLines = function() {
+    let threshold = 10;
+    this.alignmentLines = [];
+    if (!this.selectedElement) {
       return;
     }
     
-    var topX = this.selected.x;
-    var topY = this.selected.y;
-    var botX = this.selected.x + this.selected.width;
-    var botY = this.selected.y + this.selected.height;
-  
-    for (var i = 0; i < this.objects.length; i++) {
-      var obj = this.objects[i];
-      if (obj.id == this.selected.id) {
+    let topX = this.selectedElement.model.x;
+    let topY = this.selectedElement.model.y;
+    let botX = this.selectedElement.model.x + this.selectedElement.model.width;
+    let botY = this.selectedElement.model.y + this.selectedElement.model.height;
+
+    let existings = {};
+    for (let i = 0; i < this.elements.length; i++) {
+      let obj = this.elements[i];
+      if (obj.model.id == this.selectedElement.model.id) {
         continue;
       }
-      var objTopX = obj.x;
-      var objTopY = obj.y;
-      var objBotX = obj.x + obj.width;
-      var objBotY = obj.y + obj.height;
+      let objTopX = obj.model.x;
+      let objTopY = obj.model.y;
+      let objBotX = obj.model.x + obj.model.width;
+      let objBotY = obj.model.y + obj.model.height;
       // left to left
-      if (Math.abs(topX - objTopX) <= threshhold) {
-        this.alignmentLine = {x: objTopX};
-        break;
-      } else if (Math.abs(botX - objBotX) <= threshhold) {
-        this.alignmentLine = {x: objBotX};
-        break;
-      } else if (Math.abs(topY - objTopY) <= threshhold) {
-        this.alignmentLine = {y: objTopY};
-        break;
-      } else if (Math.abs(botY - objBotY) <= threshhold) {
-        this.alignmentLine = {y: objBotY};
-        break;
+      if (Math.abs(topX - objTopX) <= threshold && !existings['x-' + objTopX]) {
+        this.alignmentLines.push({x: objTopX});
+      }
+      if (Math.abs(topX - objBotX) <= threshold && !existings['x-' + objBotX]) {
+        this.alignmentLines.push({x: objBotX});
+      }
+      if (Math.abs(botX - objTopX) <= threshold && !existings['x-' + objTopX]) {
+        this.alignmentLines.push({x: objTopX});
+      }
+      if (Math.abs(botX - objBotX) <= threshold && !existings['x-' + objBotX]) {
+        this.alignmentLines.push({x: objBotX});
+      }
+      if (Math.abs(topY - objTopY) <= threshold && !existings['y-' + objTopY]) {
+        this.alignmentLines.push({y: objTopY});
+      }
+      if (Math.abs(topY - objBotY) <= threshold && !existings['y-' + objBotY]) {
+        this.alignmentLines.push({y: objBotY});
+      }
+      if (Math.abs(botY - objTopY) <= threshold && !existings['y-' + objTopY]) {
+        this.alignmentLines.push({y: objTopY});
+      }
+      if (Math.abs(botY - objBotY) <= threshold && !existings['y-' + objBotY]) {
+        this.alignmentLines.push({y: objBotY});
       } 
     }
   };
@@ -254,8 +265,8 @@ function DesignCanvas() {
     // 计算直线方程，两点式：two-point form
     // (x - x1) / (x2 - x1) = (y - y1) / (y2 - y1)
     // y = kx + b
-    var xd = (linePointX1 - linePointX2);
-    var b = (linePointX1 * linePointY2 - linePointX2 * linePointY1 - linePointX2 * linePointY1 + linePointX2 * linePointY2);
-    var k = (linePointY1 - linePointY2);
+    let xd = (linePointX1 - linePointX2);
+    let b = (linePointX1 * linePointY2 - linePointX2 * linePointY1 - linePointX2 * linePointY1 + linePointX2 * linePointY2);
+    let k = (linePointY1 - linePointY2);
     // TODO
   };

@@ -28,7 +28,7 @@
 
     this.init = function () {
       var navOnLR = args.grid.getOptions().editorCellNavOnLRKeys;
-      $input = $("<INPUT type=text class='editor-text' />")
+      $input = $("<INPUT type=text class='editor-text b-a-0 full-width' />")
           .appendTo(args.container)
           .on("keydown.nav", navOnLR ? handleKeydownLRNav : handleKeydownLRNoNav)
           .focus()
@@ -94,7 +94,7 @@
 
     this.init = function () {
       var navOnLR = args.grid.getOptions().editorCellNavOnLRKeys;
-      $input = $("<INPUT type=text class='editor-text' />")
+      $input = $("<INPUT type=text class='editor-text b-a-0 full-width' />")
       .appendTo(args.container)
       .on("keydown.nav", navOnLR ? handleKeydownLRNav : handleKeydownLRNoNav)      
       .focus()
@@ -159,7 +159,7 @@
 
     this.init = function () {
       var navOnLR = args.grid.getOptions().editorCellNavOnLRKeys;
-      $input = $("<INPUT type=text class='editor-text' />")
+      $input = $("<INPUT type=text class='editor-text b-a-0 full-width' />")
       .appendTo(args.container)
       .on("keydown.nav", navOnLR ? handleKeydownLRNav : handleKeydownLRNoNav)      
       .focus()
@@ -258,10 +258,12 @@
     var calendarOpen = false;
 
     this.init = function () {
-      $input = $("<INPUT type=text class='editor-text' />");
+      $input = $("<INPUT type=text class='editor-text b-a-0 full-width' />");
       $input.appendTo(args.container);
       $input.focus().select();
       $input.datepicker({
+        // format: 'YYYY-MM-DD',
+        // locale: 'zh_CN'
         showOn: "button",
         buttonImageOnly: true,
          beforeShow: function () {
@@ -348,7 +350,7 @@
     var scope = this;
 
     this.init = function () {
-      $select = $("<SELECT tabIndex='0' class='editor-yesno'><OPTION value='yes'>Yes</OPTION><OPTION value='no'>No</OPTION></SELECT>");
+      $select = $("<SELECT tabIndex='0' class='editor-yesno'><OPTION value='yes'>是</OPTION><OPTION value='no'>否</OPTION></SELECT>");
       $select.appendTo(args.container);
       $select.focus();
     };
@@ -362,7 +364,7 @@
     };
 
     this.loadValue = function (item) {
-      $select.val((defaultValue = item[args.column.field]) ? "yes" : "no");
+      $select.val((defaultValue = item[args.column.field]) ? "是" : "否");
       $select.select();
     };
 

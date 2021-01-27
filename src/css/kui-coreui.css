@@ -36,7 +36,24 @@
   background-clip: border-box;
   border: 1px solid #c8ced3;
   border-radius: .25rem;
-  margin-bottom: 1.5rem;
+  /*margin-bottom: 1.5rem;*/
+  margin-bottom: 10px;
+}
+
+.card-inner {
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border-radius: .25rem;
+  margin-left: -10px;
+  margin-right: -10px;
+  margin-top: -25px;
 }
 
 .table-condensed > thead > tr > th,
@@ -57,4 +74,8 @@
   font-weight: 400;
   color: #20a8d8!important;
   background-color: transparent;
+}
+
+.form-check-input {
+  margin-bottom: 3px!important;
 }

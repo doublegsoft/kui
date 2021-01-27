@@ -17,433 +17,652 @@
  */
 if (typeof chart === 'undefined') chart = {};
 
-chart.pie = function (opts) {
-  let containerId = opts.containerId;
-  let title = opts.title;
-  let chartOpt = chart.convert(opts);
-  let option = {
-    title : {
-      text: title,
-      x:'center'
-    },
-    tooltip : {
-      trigger: 'item',
-      formatter: "{a} <br/>{b} : {c} ({d}%)"
-    },
-    label: {
-      color: 'white'
-    },
-    series : [{
-      name: opts.value.label,
-      type: 'pie',
-      radius : '55%',
-      center: ['50%', '60%'],
-      data:[],
-      itemStyle: {
-        emphasis: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
+chart.pie = function (selector, opt) {
+  function paint(selector, opt) {
+    let container = null;
+    if (typeof selector === 'string')
+      container = document.querySelector(selector);
+    else
+      container = selector;
+
+    if (container.getAttribute('_echarts_instance_') && opt.echartOption) {
+      opt.echartOption.series.data = opt.data;
+      return;
+    }
+
+    container.setAttribute('_echarts_instance_', '');
+
+    let echartOption = chart.convert(opt);
+    echartOption.tooltip = echartOption.tooltip || {};
+    let seriesData = [];
+    for (let category in echartOption.categories) {
+      seriesData.push({
+        name: echartOption.categories[category].name,
+        value: echartOption.categories[category].values[0][opt.values[0].operator]
+      });
+    }
+    // set colors
+    for (let i = 0; i < seriesData.length; i++) {
+      for (let key in opt.category.values) {
+        if (seriesData[i].name == opt.category.values[key].text) {
+          seriesData[i].color = opt.category.values[key].color;
+          break;
         }
       }
-    }]
-  };
-  for (let i = 0; i < chartOpt.legend.length; i++) {
-    option.series[0].data.push({
-      name: chartOpt.legend[i],
-      value: chartOpt.series[0].data[i]
-    });
-  }
-  if (opts.color) {
-    for (let i = 0; i < opts.color.length && i < option.series[0].data.length; i++) {
-      option.series[0].data[i].itemStyle = {
-        color: opts.color[i]
-      }
     }
-  }
+    echartOption.series = [{
+      type: 'pie',
+      data: seriesData
+    }];
 
-  let echart = echarts.init(document.getElementById(containerId));
-  echart.setOption(option);
-};
-
-/**
- * 绘制柱状图。
- *
- * @param opts
- */
-chart.bar = function (opts) {
-  let containerId = opts.containerId;
-  let tableContainerId = opts.tableContainerId;
-  let title = opts.title || '';
-
-  let chartOpt = chart.convert(opts);
-
-  let option = {
-    title: {
-      text: title,
-    },
-    tooltip : {
-      trigger: 'axis',
-      axisPointer : {
-        type : 'shadow'
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    color: opts.color,
-    textStyle: {
-      color: '#fff'
-    },
-    legend: {
-      data: chartOpt.legend,
-      textStyle: {
-        color: '#fff'
-      }
-    },
-    xAxis: chartOpt.xAxis,
-    yAxis: chartOpt.yAxis,
-    series: chartOpt.series
-  };
-
-  if (chartOpt.legend.length == 1)
-    option.legend = null;
-
-  // 如果颜色设置和图例数量不匹配，则
-  if (opts.color.length != chartOpt.legend.length && chartOpt.legend.length == 1) {
-    for (let i = 0; i < opts.color.length; i++) {
-      option.series[0].data[i] = {
-        name: option.series[0].name,
-        value: option.series[0].data[i],
-        itemStyle: {
-          color: opts.color[i]
+    if (opt.textColor) {
+      echartOption.textStyle = {
+        color: opt.textColor
+      };
+      echartOption.legend.textStyle = {
+        color: opt.textColor
+      };
+    }
+    if (opt.title) {
+      echartOption.title = {
+        text: opt.title,
+        left: 'center',
+        textStyle: {
+          color: opt.textColor
         }
       };
     }
-  }
-  let echart = echarts.init(document.getElementById(containerId));
-  echart.setOption(option);
+    echartOption.legend.show = false;
+    let echart = echarts.init(container);
+    echart.setOption(echartOption);
 
-  if (tableContainerId) {
-    chart.table(tableContainerId, chartOpt);
+    opt.echartOption = echartOption;
   }
+
+  chart.paint(selector, opt, paint);
 };
 
-/**
- * 绘制中国地图。
- *
- * @param opts
- */
-chart.china = function (opts) {
-  let containerId = opts.containerId;
-  let data = opts.data;
+chart.bar = function (selector, opt) {
+  function paint(selector, opt) {
+    let container = null;
+    if (typeof selector === 'string')
+      container = document.querySelector(selector);
+    else
+      container = selector;
 
-  let fields = opts.fields || {};
-
-  let name = fields.name;
-  let value = fields.value;
-
-  let districts = [
-    { name: '北京', value: 0 },
-    { name: '天津', value: 0 },
-    { name: '上海', value: 0 },
-    { name: '重庆', value: 0 },
-    { name: '河北', value: 0 },
-    { name: '河南', value: 0 },
-    { name: '云南', value: 0 },
-    { name: '辽宁', value: 0 },
-    { name: '黑龙江', value: 0 },
-    { name: '湖南', value: 0 },
-    { name: '安徽', value: 0 },
-    { name: '山东', value: 0 },
-    { name: '新疆', value: 0 },
-    { name: '江苏', value: 0 },
-    { name: '浙江', value: 0 },
-    { name: '江西', value: 0 },
-    { name: '湖北', value: 0 },
-    { name: '广西', value: 0 },
-    { name: '甘肃', value: 0 },
-    { name: '山西', value: 0 },
-    { name: '内蒙古', value: 0 },
-    { name: '陕西', value: 0 },
-    { name: '吉林', value: 0 },
-    { name: '福建', value: 0 },
-    { name: '贵州', value: 0 },
-    { name: '广东', value: 0 },
-    { name: '青海', value: 0 },
-    { name: '西藏', value: 0 },
-    { name: '四川', value: 0 },
-    { name: '宁夏', value: 0 },
-    { name: '海南', value: 0 },
-    { name: '台湾', value: 0 },
-    { name: '香港', value: 0 },
-    { name: '澳门', value: 0 },
-    { name: '北京', value: 0 },
-    { name: '天津', value: 0 },
-  ];
-
-  let max = 0;
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < districts.length; j++) {
-      if (data[i][name] == districts[j].name) {
-        districts[j].value = data[i][value];
-        max = Math.max(districts[j].value, max);
-        break;
-      }
+    if (container.getAttribute('_echarts_instance_') && opt.echartOption) {
+      opt.echartOption.series.data = opt.data;
+      return;
     }
+
+    container.setAttribute('_echarts_instance_', '');
+    let echartOption = chart.convert(opt);
+
+    let series = [];
+    let xAxis = {type: 'category', data: []};
+    for (let i = 0; i < opt.values.length; i++) {
+      let seriesItem = {
+        name: opt.values[i].text,
+        type: 'bar',
+        data: []
+      };
+      if (opt.values[i].color) {
+        seriesItem.itemStyle = {color: opt.values[i].color};
+      }
+      // 填充数值
+      for (let textCategory in echartOption.categories) {
+        if (i == 0) xAxis.data.push(textCategory);
+        let values = echartOption.categories[textCategory].values;
+        seriesItem.data.push(values[i][opt.values[i].operator]);
+      }
+      series.push(seriesItem);
+    }
+
+    echartOption.tooltip = echartOption.tooltip || {};
+    echartOption.xAxis = xAxis;
+    echartOption.series = series;
+    echartOption.yAxis = {
+
+    };
+    if (opt.textColor) {
+      echartOption.textStyle = {
+        color: opt.textColor
+      };
+      echartOption.legend.textStyle = {
+        color: opt.textColor
+      };
+    }
+
+    let echart = echarts.init(container);
+    echart.setOption(echartOption);
+
+    opt.echartOption = echartOption;
   }
 
-  let option = {
-    tooltip: {
-      trigger: 'item',
-      showDelay: 0,
-      transitionDuration: 0.2
+  chart.paint(selector, opt, paint);
+};
+
+chart.line = function (selector, opt) {
+  function paint(selector, opt) {
+    let container = null;
+    if (typeof selector === 'string')
+      container = document.querySelector(selector);
+    else
+      container = selector;
+
+    if (container.getAttribute('_echarts_instance_') && opt.echartOption) {
+      opt.echartOption.series.data = opt.data;
+      return;
+    }
+
+    container.setAttribute('_echarts_instance_', '');
+    let echartOption = chart.convert(opt);
+    let series = [];
+    let xAxis = {type: 'category', data: []};
+    for (let i = 0; i < opt.values.length; i++) {
+      let seriesItem = {
+        name: opt.values[i].text,
+        type: 'line',
+        data: [],
+      };
+      if (opt.values[i].color) {
+        seriesItem.itemStyle = {color: opt.values[i].color};
+      }
+      for (let textCategory in echartOption.categories) {
+        if (i == 0) xAxis.data.push(textCategory);
+        let values = echartOption.categories[textCategory].values;
+        seriesItem.data.push(values[i][opt.values[i].operator]);
+      }
+      series.push(seriesItem);
+    }
+    echartOption.tooltip = {};
+    echartOption.xAxis = xAxis;
+    echartOption.series = series;
+    echartOption.yAxis = {
+      splitLine: {
+        show: false
+      }
+    };
+    if (opt.textColor) {
+      echartOption.textStyle = {
+        color: opt.textColor
+      };
+      echartOption.legend.textStyle = {
+        color: opt.textColor
+      };
+    }
+    let echart = echarts.init(container);
+    echart.setOption(echartOption);
+
+    return {
+      chart: echart,
+      options: echartOption
+    };
+  }
+
+  return chart.paint(selector, opt, paint);
+};
+
+chart.scatter = function (selector, opt) {
+  function paint(selector, opt) {
+    let container = null;
+    if (typeof selector === 'string')
+      container = document.querySelector(selector);
+    else
+      container = selector;
+
+    if (container.getAttribute('_echarts_instance_') && opt.echartOption) {
+      opt.echartOption.series.data = opt.data;
+      return;
+    }
+
+    container.setAttribute('_echarts_instance_', '');
+    let echartOption = chart.convert(opt);
+    let series = [];
+    let xAxis = {type: 'category', data: []};
+    for (let i = 0; i < opt.values.length; i++) {
+      let seriesItem = {
+        name: opt.values[i].text,
+        type: 'scatter',
+        data: [],
+      };
+      if (opt.values[i].color) {
+        seriesItem.itemStyle = {color: opt.values[i].color};
+      }
+      for (let textCategory in echartOption.categories) {
+        if (i == 0) xAxis.data.push(textCategory);
+        let values = echartOption.categories[textCategory].values;
+        seriesItem.data.push(values[i][opt.values[i].operator]);
+      }
+      series.push(seriesItem);
+    }
+    echartOption.tooltip = echartOption.tooltip || {};
+    echartOption.xAxis = xAxis;
+    echartOption.series = series;
+    echartOption.yAxis = {
+      splitLine: {
+        show: false
+      }
+    };
+    if (opt.textColor) {
+      echartOption.textStyle = {
+        color: opt.textColor
+      };
+      echartOption.legend.textStyle = {
+        color: opt.textColor
+      };
+    }
+    let echart = echarts.init(container);
+    echart.setOption(echartOption);
+
+    if (opt.click) {
+      echart.on("click", "series.scatter", function (event) {
+        event.event.stop();
+        opt.click(event.dataIndex, event.data);
+      });
+    }
+    return {
+      chart: echart,
+      options: echartOption
+    };
+  }
+
+  return chart.paint(selector, opt, paint);
+};
+
+chart.stack = function (selector, opt) {
+  function paint(selector, opt) {
+    let container = null;
+    if (typeof selector === 'string')
+      container = document.querySelector(selector);
+    else
+      container = selector;
+
+    if (container.getAttribute('_echarts_instance_')) {
+      opt.echartOption.series.data = opt.data;
+      return;
+    }
+
+    let echartOption = chart.convert(opt);
+
+    let series = [];
+    let legendData = echartOption.legend.data;
+
+    let xAxis = {data: []};
+    for (let i = 0; i < opt.values.length; i++) {
+      for (let j = 0; j < legendData.length; j++) {
+        let seriesItem = {
+          name: legendData[j],
+          type: 'bar',
+          stack: i + '',
+          data: []
+        };
+        for (let textCategory in echartOption.categories) {
+          if (i == 0 && j == 0) xAxis.data.push(textCategory);
+          let values = echartOption.categories[textCategory].values;
+          seriesItem.data.push(values[i][legendData[j]]);
+        }
+        if (opt.values[i].values) {
+          let valuesInValues = opt.values[i].values;
+          for (let code in valuesInValues) {
+            if (legendData[j] == code || valuesInValues[code].text == legendData[j]) {
+              seriesItem.color = valuesInValues[code].color;
+            }
+          }
+        }
+        series.push(seriesItem);
+      }
+    }
+
+    echartOption.tooltip = echartOption.tooltip || {};
+    echartOption.xAxis = xAxis;
+    echartOption.series = series;
+    echartOption.yAxis = {};
+
+    let echart = echarts.init(container);
+    echart.setOption(echartOption);
+  }
+
+  chart.paint(selector, opt, paint);
+};
+
+chart.spark = function(selector, options) {
+
+};
+
+chart.thermometer = function(selector, options) {
+
+};
+
+chart.ratio = function(selector, options) {
+  let title = options.title;
+  let value = options.value || 0;
+  let container = null;
+  if (typeof selector === 'string')
+    container = document.querySelector(selector);
+  else
+    container = selector;
+
+  let echartOption = {
+    grid: {
+      bottom: 0,
+      top: 0
     },
-    geo: {
-      map: 'china',
-      label: {
-        normal: {
-          show: true,
-          textStyle: {
-            color: '#feffff',
-            fontSize: 10,
-          },
-        },
-        emphasis: {
-          show: true,
-          textStyle: {
-            color: '#feffff',
-            fontSize: 10,
-          },
-        },
-      },
-      roam: false,
-      zoom: 1.2,
-      itemStyle: {
-        normal: {
-          areaColor: '#eee',
-          borderColor: '#1a5cb5',
-          borderWidth: 2,
-        },
-        emphasis: {
-          areaColor: '#ed860d',
-          shadowOffsetX: 0,
-          shadowOffsetY: 0,
-          shadowBlur: 20,
-          borderWidth: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)',
-        },
-      },
-      zlevel: 1,
+    textStyle: {
+      color: 'white'
     },
-    visualMap: {
-      show: true,
-      type: 'continuous',
+    legend: {
+      textStyle: 'white'
+    },
+    xAxis: {
+      type: 'category',
+      data: [''],
+      show: false
+    },
+    yAxis: [{
+      type: 'value',
       min: 0,
-      max: max,
-      right: 32,
-      bottom: 20,
-      seriesIndex: [0],
-      color: ['#060e35', '#0d1648', '#101c65', '#083492', '#2560ff', '#4671ff'],
-      textStyle: {
-        color: '#feffff',
+      max: 100,
+      splitLine: {
+        show: false
       },
-      calculable: true,
-      zlevel: 2,
-    },
+      axisTick: {
+        show: false
+      },
+      axisLabel: {
+        show: false
+      }
+    },{
+      type: 'value',
+      min: 0,
+      max: 100,
+      splitLine: {
+        show: false
+      },
+      axisTick: {
+        show: false
+      },
+      axisLabel: {
+        show: false
+      }
+    }],
     series: [{
-      name: '',
-      type: 'map',
-      geoIndex: 0,
-      data: districts,
-      zlevel: 3,
+      data: [{
+        value: value
+      }],
+      barWidth: '100%',
+      type: 'bar',
+      label: {
+        show: true,
+        position: 'inside',
+        formatter: function (series) {
+          return title + '\n' + series.data.value + '%';
+        }
+      },
     }]
   };
 
-  $.get('data/map/china.json', function (chinaJson) {
-    echarts.registerMap('china', chinaJson);
+  let echart = echarts.init(container);
+  echart.setOption(echartOption);
 
-    let echart = echarts.init(document.getElementById(containerId));
-    echart.setOption(option);
-  });
+  return {
+    chart: echart,
+    options: echartOption
+  }
 };
 
-chart.table = function (tableContainerId, chartOpt) {
-  let table = $('#' + tableContainerId);
-
-  let legend = chartOpt.legend;
-  let series = chartOpt.series;
-  let xAxis = chartOpt.xAxis[0];
-
-  let rowHead = $('<tr></tr>');
-
-  rowHead.append('<td></td>');
-  for (let i = 0; i < xAxis.data.length; i++) {
-    rowHead.append('<td>' + xAxis.data[i] + '</td>');
-  }
-  table.append(rowHead);
-
-  for (let i = 0; i < legend.length; i++) {
-    let row = $('<tr></tr>');
-    row.append('<td style="width: 120px;">' + legend[i] + '</td>');
-    for (let j = 0; j < series[i].data.length; j++) {
-      row.append('<td>' + (series[i].data[j] || 0) + '</td>');
+chart.realtime = function(options, values, max, getColor) {
+  let echart = options.chart;
+  let echartOption = options.options;
+  let seriesData = echartOption.series[0].data;
+  for (let i = 0; i < values.length; i++) {
+    if (seriesData.length >= max) seriesData.shift();
+    let value = {
+      value: values[i]
+    };
+    if (getColor) {
+      value.itemStyle = {
+        color: getColor(values[i])
+      }
     }
-    table.append(row);
+    seriesData.push(value);
+    echart.setOption(echartOption);
   }
 };
 
 /**
+ * Converts custom options to echarts options.
  *
- * @param opts
- * @returns {{yAxis: [], xAxis: [], legend: [], series: []}}
+ * @param {object} opts
+ *        custom options
  */
-chart.convert = function(opts) {
-  let stack = opts.stack;
-  let orientation = opts.orientation;
-
-  let valueAxis = opts.value;
-  let legendConstant = opts.legend;
-
-  // 表示类别的字段
-  let category = opts.fields.category;
-
-  // 表示图例的字段
-  let legend = opts.fields.legend;
-
-  // 表示值的字段，可以为多个
-  let value = opts.fields.value;
-
+chart.convert = function (opts) {
+  // echarts option compatible data structure
+  let ret = {};
+  let color = [];
   let data = opts.data;
+  let category = opts.category;
+  let values = opts.values;
 
-  let valueAxes = [];
-  let values = [];
-  let legendConstants = [];
-  if (Array.isArray(value)) values = value;
-  else values.push(value);
-  if (Array.isArray(legendConstant)) legendConstants = legendConstant;
-  else legendConstants.push(legendConstant);
-  if (Array.isArray(valueAxis)) valueAxes = valueAxis;
-  else valueAxes.push(valueAxis);
+  // group field means chart legend
+  let dataLegend = [];
+  let hashLegend = {};
 
-  let ret = {
-    legend: [],
-    series: [],
-    xAxis: [],
-    yAxis: []
-  };
+  let hashCategory = {};
 
-  let categories = [];
-  let mapKey = {};
-  let mapLegend = {};
-
-  // 类别字段的排序依赖于数据库（服务器端）的排序
+  // 填充category数据
   for (let i = 0; i < data.length; i++) {
     let row = data[i];
-    let existing = false;
-    for (let j = 0; j < categories.length; j++) {
-      if (row[category] == categories[j]) {
-        existing = true;
-        break;
+
+    // 这一行所属的类别
+    let valueCategory = row[category.name];
+    let textCategory = valueCategory;
+
+    // 如果是图例，则要收集图例的数据
+    if (category.values && category.values[valueCategory]) {
+      textCategory = category.values[valueCategory].text;
+      textCategory = (typeof textCategory === 'undefined') ? valueCategory : textCategory;
+    }
+    if (typeof hashCategory[textCategory] === 'undefined') {
+      // 注意此处的数据结构
+      hashCategory[textCategory] = {name: textCategory, values: []};
+    }
+
+    // 收集category的数据
+    for (let j = 0; j < values.length; j++) {
+      let valueValue = row[values[j].name];
+      if (typeof hashCategory[textCategory].values[j] === 'undefined')
+        hashCategory[textCategory].values[j] = {};
+      if (values[j].operator === 'sum') {
+        if (typeof hashCategory[textCategory].values[j]['sum'] === 'undefined')
+          hashCategory[textCategory].values[j]['sum'] = [];
+        hashCategory[textCategory].values[j]['sum'].push(valueValue);
+      } else {
+        // operator为某个字段名，意味着以operator字段作为legend分别计算
+        let valueOperator = row[values[j].operator];
+        // 编码转文本
+        if (values[j].values && values[j].values[valueOperator]) {
+          valueOperator = values[j].values[valueOperator].text;
+        }
+        if (typeof hashCategory[textCategory].values[j][valueOperator] === 'undefined')
+          hashCategory[textCategory].values[j][valueOperator] = [];
+        hashCategory[textCategory].values[j][valueOperator].push(valueValue);
+        // 注意此处，从value的operator指定的字段中获取subcategory的值
+        hashLegend[valueOperator] = valueOperator;
       }
     }
-    // 有可能category没有设置
-    if (!existing && row[category]) {
-      categories.push(row[category]);
-    }
-    mapLegend[row[legend]] = {};
-    mapKey[row[legend] + '&' + row[category]] = {};
-  }
-  if (legend) {
-    // 初始化图例数据
-    for (let name in mapLegend) {
-      ret.legend.push(name);
-      ret.series.push({
-        name: name,
-        data: [],
-        label: {
-          normal: {
-            show: orientation == 'vertical' ? true : false,
-            position: 'top'
-          }
-        },
-      });
-    }
-  }
-  // 使用预定义的图例数据
-  if (ret.legend.length == 0) {
-    for (let i = 0; i < legendConstants.length; i++) {
-      ret.legend.push(legendConstants[i]);
-      ret.series.push({
-        name: legendConstants[i],
-        data: [],
-        label: {
-          normal: {
-            show: orientation == 'vertical' ? true : false,
-            position: 'top'
-          }
-        },
-      });
-    }
-  }
-  for (let i = 0; i < values.length; i++) {
-    ret.series[i].type = 'bar';
-    if (stack)
-      ret.series[i].stack = stack;
   }
 
-  // 开始准备系列数据
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < values.length; j++) {
-      ret.series[j].data.push(data[i][values[j]]);
-    }
-  }
-  if (valueAxes.length == 2) {
-    ret.series[ret.series.length - 1].yAxisIndex = 1;
-    ret.series[ret.series.length - 1].type = 'line';
-  }
-  if (orientation == 'vertical') {
-    ret.xAxis.push({
-      type: 'category',
-      color: 'white',
-      data: categories,
-      axisLabel : {
-        show:true,
-        interval: 0,
-        rotate: 45,
-        margin: 20
+  if (category.legend) {
+    // 图例的数据来源来自于分类的数据
+    for (let textCategory in hashCategory) {
+      dataLegend.push(textCategory);
+      for (let i = 0; i < values.length; i++) {
+        if (values[i].operator === 'sum') {
+          let sum = hashCategory[textCategory].values[i]['sum'].reduce(function (a, b) {
+            return a + b;
+          }, 0);
+          hashCategory[textCategory].values[i]['sum'] = sum;
+        }
       }
-    });
-    for (let i = 0; i < valueAxes.length; i++) {
-      ret.yAxis.push({
-        type: 'value',
-        color: valueAxes[i].color,
-        name: valueAxes[i].unit,
-        axisLabel: {
-          formatter: '{value}' + valueAxes[i].unit
-        }
-      });
     }
-  } else if (orientation == 'horizontal') {
-    ret.yAxis.push({
-      type: 'category',
-      color: 'white',
-      data: categories
-    });
-    for (let i = 0; i < valueAxes.length; i++) {
-      ret.xAxis.push({
-        type: 'value',
-        color: valueAxes[i].color,
-        name: valueAxes[i].unit,
-        axisLabel: {
-          formatter: '{value}' + valueAxes[i].unit
+  } else {
+    // 图例的数据来源于值的定义
+    for (let i = 0; i < values.length; i++) {
+      if (values[i].operator === 'sum') {
+        dataLegend.push(values[i].text);
+      } else {
+        if (i == 0) {
+          // 动态的图例数据，来源于值域中的operator值，相当于把subcategory作为图例
+          for (let key in hashLegend)
+            dataLegend.push(key);
         }
-      });
+      }
+      for (let textCategory in hashCategory) {
+        if (values[i].operator === 'sum') {
+          // 需要求和
+          let sum = hashCategory[textCategory].values[i]['sum'].reduce(function (a, b) {
+            return a + b;
+          }, 0);
+          // 把数组转换为数字
+          hashCategory[textCategory].values[i]['sum'] = sum;
+        } else {
+          for (let key in hashCategory[textCategory].values[i]) {
+            // 把数组转换为数字
+            hashCategory[textCategory].values[i][key] = hashCategory[textCategory].values[i][key][0];
+          }
+        }
+      }
+    }
+  } // if (category.legend)
+
+  // compatible echarts option
+  ret = {
+    legend: {
+      data: dataLegend
+    },
+    categories: hashCategory,
+    // grid: {
+    //   top: 30,
+    //   left: "10%",
+    //   right: 20,
+    //   bottom: 30
+    // }
+  };
+  if (opts.tooltip) {
+    ret.tooltip = {
+      formatter: opts.tooltip
+    }
+  }
+  if (color.length > 0) ret.color = color;
+  return ret;
+};
+
+/**
+ * Preprocess data to make datetime or number values to right format.
+ *
+ * @param data
+ *        the data from server
+ *
+ * @param opts
+ *        the conversion options
+ *
+ * @returns {Array}
+ *        the converted data
+ */
+chart.process = function(data, opts) {
+  function cacheKey(row, groups) {
+    let ret = '';
+    for (let i = 0; i < groups.length; i++) {
+      if (ret != '') {
+        ret += '-';
+      }
+      ret += row[groups[i]];
+    }
+    return ret;
+  }
+
+  if (opts.convert) {
+    for (let i = 0; i < data.length; i++) {
+      data[i] = opts.convert(data[i]);
+    }
+  }
+
+  let cache = {};
+  let ret = [];
+  let groups = opts.fields.groups;
+  let values = opts.fields.values;
+  for (let i = 0; i < data.length; i++) {
+    let row = data[i];
+    let key = cacheKey(row, groups);
+    if (!cache[key]) {
+      cache[key] = {};
+      for (let j = 0; j < values.length; j++) {
+        cache[key][values[j]] = 0;
+      }
+      ret.push(row);
+    }
+    for (let j = 0; j < values.length; j++) {
+      cache[key][values[j]] += row[values[j]];
+    }
+  }
+  for (let i = 0; i < ret.length; i++) {
+    let row = ret[i];
+    for (let j = 0; j < values.length; j++) {
+      data[i][values[j]] = cache[cacheKey(row, groups)][values[j]];
     }
   }
   return ret;
 };
 
+/**
+ * Fetches data from server side and applies them to paint function.
+ *
+ * @param {string} selector
+ *        the css selector
+ *
+ * @param {object} opt
+ *        the xhr options
+ *
+ * @param {function} paint
+ *        the paint function
+ *
+ * @private
+ */
+chart.paint = function(selector, opt, paint) {
+  function fetch() {
+    new Promise(function(resolve) {
+      xhr.post({
+        url: opt.url,
+        usecase: opt.usecase,
+        data: opt.params,
+        success: function(resp) {
+          if (resp.error) {
+            dialog.error('获取图表数据失败：' + resp.error.message);
+            return;
+          }
+          if (opt.convert) {
+            for (let i = 0; i < resp.data.length; i++)
+              resp.data[i] = opt.convert(resp.data[i]);
+          }
+          resolve(resp.data);
+        }
+      })
+    }).then(function(data) {
+      opt.data = data;
+      paint(selector, opt);
+    });
+  }
+  if (opt.url) {
+    // 变成周期任务
+    if (opt.interval) {
+      schedule.stop(opt.name);
+      schedule.start(opt.name, function() {
+        fetch(selector, opt, paint);
+      }, opt.interval);
+    }
+    fetch(selector, opt, paint);
+  } else {
+    return paint(selector, opt);
+  }
+};

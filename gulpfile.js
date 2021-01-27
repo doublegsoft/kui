@@ -48,4 +48,5 @@ gulp.task('default', function() {
     
 });
 
-gulp.task('default', ['compress', 'specs']);
+// gulp.task('default', ['compress', 'specs']);
+gulp.task('compress');

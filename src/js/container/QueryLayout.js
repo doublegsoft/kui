@@ -51,7 +51,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   for (let i = 0; i < rows.length; i++) {
     let row = rows[i];
-    let formGroup = dom.create('div', 'form-group', 'row');
+    let formGroup = dom.create('div', 'form-group', 'row', 'ml-0', 'mr-0');
     let group = this.createInput(row.first, columnCount);
 
     formGroup.appendChild(group.label);
@@ -108,11 +108,12 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   let buttonRow = dom.element('<div class="row"><div class="col-md-12"></div></div>');
   let buttons = dom.create('div', 'float-right');
+  buttons.style.paddingRight = '15px';
   let buttonQuery = dom.create('button', 'btn', 'btn-sm', 'btn-query');
   buttonQuery.textContent = '查询';
   dom.bind(buttonQuery, 'click', function() {
     if (self.queryOpt.callback) {
-      self.queryOpt.callback(dom.formdata(dom.find('.widget-query', this.container)));
+      self.queryOpt.callback(dom.formdata(self.container));
     }
   });
   buttons.appendChild(buttonQuery);
@@ -120,14 +121,14 @@ QueryLayout.prototype.render = function (containerId, read, data) {
   let buttonReset = dom.create('button', 'btn', 'btn-sm', 'btn-reset');
   buttonReset.textContent = '重置';
   dom.bind(buttonReset, 'click', function() {
-    $(dom.find('div.widget-query')).formdata({});
+    $(self.container).formdata({});
   });
   buttons.appendChild(buttonReset);
   buttons.append(' ');
   let buttonClose = dom.create('button', 'btn', 'btn-sm', 'btn-close');
   buttonClose.textContent = '关闭';
   dom.bind(buttonClose, 'click', function() {
-    $(dom.find('div.widget-query')).removeClass('show');
+    self.container.classList.remove('show');
   });
   buttons.appendChild(buttonClose);
   buttonRow.firstElementChild.appendChild(buttons);
@@ -135,7 +136,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 };
 
 QueryLayout.prototype.getQuery = function() {
-  return dom.formdata('.widget-query');
+  return dom.formdata(this.container);
 };
 
 /**

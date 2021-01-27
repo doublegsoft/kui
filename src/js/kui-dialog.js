@@ -4,10 +4,36 @@ dialog.alert = function (message) {
   layer.open({
     type: 0,
     icon: 0,
-    offset: '300px',
+    offset: '150px',
     shade: 0,
     shadeClose: true,
     title: '警告',
+    content: message,
+  });
+};
+
+
+dialog.info = function (message) {
+  layer.open({
+    type: 0,
+    offset: '150px',
+    shade: 0,
+    shadeClose: true,
+    title: '信息',
+    content: message,
+  });
+};
+
+/**
+ * 支持shadeClose
+ */
+dialog.info2 = function (message) {
+  layer.open({
+    type: 0,
+    offset: '100px',
+    shade: 0.3,
+    shadeClose: true,
+    title: '信息',
     content: message,
   });
 };
@@ -16,7 +42,7 @@ dialog.error = function (message) {
   layer.open({
     type: 0,
     icon: 2,
-    offset: '300px',
+    offset: '150px',
     shade: 0,
     shadeClose: true,
     title: '错误',
@@ -24,20 +50,41 @@ dialog.error = function (message) {
   });
 };
 
-dialog.success = function (message) {
-  layer.open({
-    type: 0,
-    icon: 1,
-    offset: '300px',
-    shade: 0,
-    shadeClose: true,
-    title: '成功',
-    content: message
-  });
+dialog.success = function (message, callback) {
+  if (callback) {
+    layer.open({
+      type: 0,
+      icon: 1,
+      offset: '150px',
+      shade: 0,
+      shadeClose: true,
+      title: '成功',
+      content: message,
+      btn: ['确定', '确定并返回'],
+      yes: function (index, layero) {
+        layer.close(index);
+      },
+      btn2: function (index, layero) {
+        layer.close(index);
+        callback();
+      }
+    });
+  } else {
+    layer.open({
+      type: 0,
+      icon: 1,
+      offset: '150px',
+      shade: 0,
+      shadeClose: true,
+      title: '成功',
+      content: message
+    });
+  }
 };
 
 dialog.confirm = function (message, callback) {
   layer.confirm(message, {
+    title: '确认',
     btn: ['确定', '取消'] //按钮
   }, function (index) {
     layer.close(index);
@@ -92,6 +139,23 @@ dialog.view = function (opts) {
       });
       $(document.body).append(html);
       $('#dialogApplication').modal('show');
+    }
+  });
+};
+
+dialog.select = function(opts) {
+  ajax.view({
+    url: opts.url,
+    success: function(resp) {
+      layer.open({
+        type: 0,
+        icon: 1,
+        offset: '150px',
+        shade: 0.5,
+        shadeClose: true,
+        title: opts.title,
+        content: resp
+      });
     }
   });
 };

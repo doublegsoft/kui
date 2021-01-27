@@ -9,15 +9,15 @@ const FILE_TYPE_IMAGE = '<i class="far fa-file-image"></i>';
 const FILE_TYPE_ARCHIVE = '<i class="far fa-file-archive"></i>';
 const FILE_TYPE_FILE = '<i class="far fa-file-alt"></i>';
 
-function FileList(opts) {
+function FileUpload(opts) {
   // upload url
   this.fetchUrl = opts.url.fetch;
   this.usecase = opts.usecase;
   this.uploadUrl = opts.url.upload
-  this.local = opts.local || [];
+  this.local = opts.local;
 }
 
-FileList.prototype.fetch = function (containerId) {
+FileUpload.prototype.fetch = function (containerId) {
   let self = this;
   xhr.post({
     url: this.fetchUrl,
@@ -29,16 +29,17 @@ FileList.prototype.fetch = function (containerId) {
   });
 };
 
-FileList.prototype.append = function (item) {
+FileUpload.prototype.append = function (item) {
   let ul = dom.find('ul', this.container);
   let li = dom.create('li', 'list-group-item', 'list-group-item-input');
-  let link = dom.create('link', 'btn', 'btn-link');
-  link.innerText = 'item.name';
+  let link = dom.create('a', 'btn', 'btn-link', 'text-info');
+  link.style.paddingBottom = '8px';
+  link.innerText = item.filename;
   let icon = null;
   if (item.extension === '.xls' || item.extension === '.xlsx') {
     icon = dom.element(FILE_TYPE_EXCEL);
   } else if (item.extension === '.doc' || item.extension === '.docx') {
-    icon = dom.element(FILE_TYPE_EXCEL);
+    icon = dom.element(FILE_TYPE_WORD);
   } else if (item.extension === '.ppt' || item.extension === '.pptx') {
     icon = dom.element(FILE_TYPE_POWERPOINT);
   } else if (item.extension === '.pdf') {
@@ -50,9 +51,10 @@ FileList.prototype.append = function (item) {
   }
   li.appendChild(icon);
   li.appendChild(link);
+  ul.appendChild(li);
 };
 
-FileList.prototype.render = function(containerId) {
+FileUpload.prototype.render = function(containerId) {
   if (typeof this.local === 'undefined') {
     this.fetch(containerId);
     return;
@@ -60,7 +62,7 @@ FileList.prototype.render = function(containerId) {
   if (typeof containerId === 'string')
     this.container = document.querySelector(containerId);
   else
-    this.container = container;
+    this.container = containerId;
   this.container.innerHTML = '';
   let ul = dom.create('ul', 'list-group');
   this.container.appendChild(ul);

@@ -5,29 +5,45 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link rel="shortcut icon" href="img/favicon.png">
-<title>KUI-BS4展示应用</title>
+<title>KUI展示应用</title>
+<link href="/3rd/googlefonts/roboto/roboto.css" rel="stylesheet">
+<link href="/3rd/material-icons/material-icons.css" rel="stylesheet">
 <link href="/3rd/font-awesome/css/all.css" rel="stylesheet">
 <link href="/3rd/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
 <link href="/3rd/jstree/themes/default/style.min.css" rel="stylesheet">
+<!--
 <link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+-->
 <link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker-standalone.css" rel="stylesheet">
 <link href="/3rd/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
 <link href="/3rd/bootstrap-lightbox/ekko-lightbox.css" rel="stylesheet">
 <link href="/3rd/trumbowyg/ui/trumbowyg.min.css" rel="stylesheet">
 <link href="/3rd/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet">
-<link href="/3rd/select2/css/select2.min.css" rel="stylesheet">
+<link href="/3rd/select2/dist/css/select2.css" rel="stylesheet">
 <link href="/3rd/ztree/css/zTreeStyle/zTreeStyle.css" rel="stylesheet">
+<link href="/3rd/clock/css/main.css" rel="stylesheet">
+
+<!-- SPREADSHEET -->
+<link rel="stylesheet" href="/3rd/slickgrid-2.4.24/slick.grid.css" type="text/css" media="screen" charset="utf-8"/>
+<link rel="stylesheet" href="/3rd/slickgrid-2.4.24/controls/slick.pager.css" type="text/css" media="screen" charset="utf-8"/>
+<link rel="stylesheet" href="/3rd/slickgrid-2.4.24/css/smoothness/jquery-ui.css" type="text/css"/>
+<link rel="stylesheet" href="/3rd/slickgrid-2.4.24/controls/slick.columnpicker.css" type="text/css" media="screen" charset="utf-8"/>
+<link rel="stylesheet" href="/3rd/x-spreadsheet/xspreadsheet.css" type="text/css">
 
 <!-- Main styles for this application -->
 <link href="/src/css/coreui.css" rel="stylesheet">
+<link href="/src/css/coreui3-c.css" rel="stylesheet">
 <link href="/src/css/kui-coreui.css" rel="stylesheet">
+<link href="/src/css/kui-semanticui.css" rel="stylesheet">
 <link href="/src/css/kui.css" rel="stylesheet">
 <link href="/src/css/kui-timeline.css" rel="stylesheet">
 <link href="/src/css/kui-toc.css" rel="stylesheet">
-<link href="/src/css/kui-districtpicker.css" rel="stylesheet">
 <link href="/src/css/kui-alarm.css" rel="stylesheet">
 <link href="/src/css/kui-checks.css" rel="stylesheet">
 <link href="/src/css/kui-thread.css" rel="stylesheet">
+<link href="/src/css/kui-report.css" rel="stylesheet">
+<link href="/src/css/kui-progress.css" rel="stylesheet">
+<link href="/src/css/kesigner.css" rel="stylesheet">
 </head>
 
 <body id="body" class="app header-fixed sidebar-fixed aside-menu-fixed sidebar-lg-show" style="overflow-y: hidden">
@@ -50,9 +66,9 @@
       </li>
       <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-list"></i></a> </li>
       <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-location-pin"></i></a> </li>
-      <li class="nav-item dropdown"> 
-        <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"> 
-          <img id="avatar" src="/desktop/img/avatars/drew_brees.jpg" class="img-avatar"> 
+      <li class="nav-item dropdown mr-3">
+        <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <img id="avatar" src="/desktop/img/avatars/2.jpg" class="img-avatar">所罗门
         </a>
         <div class="dropdown-menu dropdown-menu-right">
           <div class="dropdown-header text-center"> 
@@ -81,9 +97,6 @@
         </div>
       </li>
     </ul>
-    <button class="navbar-toggler aside-menu-toggler" onclick="toggleRightBar();"> 
-      <span class="navbar-toggler-icon"></span> 
-    </button>
   </header>
   
   <div class="app-body">
@@ -94,30 +107,19 @@
     </div>
   
     <!-- Main content -->
-    <main class="main header-fixed" style="overflow-y: hidden">
-      <div id="container" class="container-fluid" style="width: 100%; overflow-y: auto">
-      
-      </div>
+    <main class="main header-fixed" style="overflow: hidden">
+      <div id="container"></div>
     </main>
     <aside class="aside-menu"></aside>
   </div>
-  <footer class="app-footer">
-    <div>
-      <a href="#">Good Manager</a>
-      <span>© 2018 Christian Gann.</span>
-    </div>
-    <div class="ml-auto">
-      <span>Powered by</span>
-      <a href="https://github.com/doublegsoft/kui-bs4">KUI</a>
-    </div>
-  </footer>
-
 <!--
 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=8d6c8b8f3749aed6b1aff3aad6f40e37&services=true"></script> 
 -->
 <script src="/3rd/jquery/jquery-3.2.1.min.js"></script> 
-<script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script> 
-<script src="/3rd/echarts/echarts.min.js"></script> 
+<script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/3rd/rxjs/rxjs.umd.min.js"></script>
+<script src="/3rd/rxjs/rxjs-pubsub.js"></script>
+<script src="/3rd/echarts/echarts.min.js"></script>
 <script src="/3rd/d3/d3.min.js"></script> 
 <script src="/3rd/three/three.js"></script> 
 <script src="/3rd/three/loaders/OBJLoader.js"></script> 
@@ -125,6 +127,7 @@
 <script src="/3rd/layer/layer.js"></script> 
 <script src="/3rd/jstree/jstree.min.js"></script> 
 <script src="/3rd/moment/moment.min.js"></script>
+<script src="/3rd/accounting/accounting.min.js"></script>
 <script src="/3rd/handlebars/handlebars-v4.0.11.js"></script> 
 
 <script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
@@ -134,51 +137,99 @@
 <script src="/3rd/bootstrap-fileinput/themes/fa/theme.min.js"></script> 
 <script src="/3rd/bootstrap-lightbox/ekko-lightbox.min.js"></script> 
 
-<script src="/3rd/sparkline/jquery.sparkline.min.js"></script> 
+<script src="/3rd/sparkline/sparkline.js"></script>
 <script src="/3rd/trumbowyg/trumbowyg.min.js"></script> 
 <script src="/3rd/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
 <script src="/3rd/raphael/raphael.min.js"></script>
 <script src="/3rd/flowchart/flowchart.min.js"></script>
 <script src="/3rd/konva/konva.min.js"></script>
-<script src="/3rd/select2/js/select2.min.js"></script>
+<script src="/3rd/select2/dist/js/select2.full.js"></script>
+<script src="/3rd/select2/dist/js/i18n/zh-CN.js"></script>
 <script src="/3rd/ztree/js/jquery.ztree.all.js"></script>
+<script src="/3rd/splitjs/split.min.js"></script>
+
+<script src="/3rd/sigma/sigma.min.js"></script>
+<script src="/3rd/sigma/sigma.plugins.dragNodes.min.js"></script>
+<script src="/3rd/sigma/sigma.plugins.animate.min.js"></script>
+<script src="/3rd/sigma/sigma.layout.forceAtlas2.min.js"></script>
+
+<!-- SPREADSHEET -->
+<script src="/3rd/slickgrid-2.4.24/lib/firebugx.js" language="JavaScript"></script>
+
+<script src="/3rd/slickgrid-2.4.24/lib/jquery-ui-1.11.3.js"></script>
+<script src="/3rd/slickgrid-2.4.24/lib/jquery.event.drag-2.3.0.js"></script>
+<script src="/3rd/slickgrid-2.4.24/lib/jquery.mousewheel.js"></script>
+
+<script src="/3rd/slickgrid-2.4.24/slick.core.js"></script>
+<script src="/3rd/slickgrid-2.4.24/slick.editors.js"></script>
+<script src="/3rd/slickgrid-2.4.24/slick.formatters.js"></script>
+<script src="/3rd/slickgrid-2.4.24/plugins/slick.rowselectionmodel.js"></script>
+<script src="/3rd/slickgrid-2.4.24/slick.grid.js"></script>
+<script src="/3rd/slickgrid-2.4.24/slick.dataview.js"></script>
+<script src="/3rd/slickgrid-2.4.24/controls/slick.pager.js"></script>
+<script src="/3rd/slickgrid-2.4.24/controls/slick.columnpicker.js"></script>
+
+<script src="/3rd/x-spreadsheet/xspreadsheet.js"></script>
+<script src="/3rd/x-spreadsheet/zh-cn.js"></script>
 
 <script src="/src/js/kui-mainframe.js"></script> 
 <script src="/src/js/kui-bootstrap.js"></script> 
 <script src="/src/js/kui-ajax.js"></script> 
-<script src="/src/js/kui-alarm.js"></script> 
+<script src="/src/js/kui-Alarm.js"></script>
 <script src="/src/js/kui-dialog.js"></script> 
 <script src="/src/js/kui-formdata.js"></script> 
-<script src="/src/js/kui-validation.js"></script>  
-<script src="/src/js/kui-calendar.js"></script> 
-<script src="/src/js/kui-districtpicker.data.js"></script> 
-<script src="/src/js/kui-districtpicker.js"></script> 
-<script src="/src/js/kui-select.js"></script> 
+<script src="/src/js/kui-validation.js"></script>
+<script src="/src/js/kui-select.js"></script>
 
 <script src="/src/js/kui-svg.js"></script> 
 <script src="/src/js/kui-searchbox.js"></script>
-<script src="/src/js/kui-workflow.js"></script>
+<script src="/src/js/kui-Workflow.js"></script>
 <script src="/src/js/kui-utils.js"></script>
 <script src="/src/js/kui-xhr.js"></script>
- 
-<script src="/src/js/wiagram-utils.js"></script> 
-<script src="/src/js/wiagram-rsrwl.js"></script> 
-<script src="/src/js/wiagram-crsc.js"></script>
 
-<script src="/src/js/kui-DesignCanvas.js"></script>
-<script src="/src/js/kui-ReportDesigner.js"></script>
-<script src="/src/js/kui-SimpleChart.js"></script>
-<script src="/src/js/kui-FrozenColumnsTable.js"></script> 
-<script src="/src/js/kui-PaginationTable.js"></script> 
-<script src="/src/js/kui-PropertiesEditor.js"></script> 
+<!-- 集合显示容器 -->
+<script src="/src/js/container/PaginationTable.js"></script>
+<script src="/src/js/container/ListView.js"></script>
 
-<script src="/src/js/kui-statisticstable.js"></script> 
-<script src="/src/js/kui-calendartable.dev.js"></script>
-<script src="/src/js/kui-checktree.js"></script>
+<!-- 详情显示部件 -->
+<script src="/src/js/container/FormLayout.js"></script>
+<script src="/src/js/container/QueryLayout.js"></script>
 
 <script src="/src/js/kui-Checklist.js"></script>
-<script src="/src/js/kui-FileUpload.js"></script>
 <script src="/src/js/kui-TreelikeTable.js"></script>
+<script src="/src/js/kui-TreelikeList.js"></script>
+<script src="/src/js/kui-Checktree.js"></script>
+<script src="/src/js/kui-FileUpload.js"></script>
+
+<script src="/src/js/kui-GroupLayout.js"></script>
+<script src="/src/js/kui-chart.js"></script>
+
+<script src="/src/js/kui-PropertiesEditor.js"></script>
+<script src="/src/js/kui-DesignCanvas.js"></script>
+<script src="/src/js/kui-ReportDesigner.js"></script>
+<script src="/src/js/kui-ReportElements.js"></script>
+<script src="/src/js/kui-ReportElementRenderers.js"></script>
+<script src="/src/js/kui-Kesigner.js"></script>
+<script src="/src/js/kui-Rx-parser.js"></script>
+<script src="/src/js/kui-rx.js"></script>
+<script src="/src/js/kui-Couch.js"></script>
+<script src="/src/js/kui-dnd.js"></script>
+<script src="/src/js/kui-dom.js"></script>
+<script src="/src/js/kui-schedule.js"></script>
+<script src="/src/js/kui-toast.js"></script>
+<script src="/src/js/kui-format.js"></script>
+
+<script src="/src/js/container/Timeline.js"></script>
+<script src="/src/js/container/Wizard.js"></script>
+
+<script src="/src/js/widget/Members.js"></script>
+<script src="/src/js/widget/Progress.js"></script>
+<script src="/src/js/widget/Status.js"></script>
+<script src="/src/js/widget/Person.js"></script>
+<script src="/src/js/widget/TwoLine.js"></script>
+<script src="/src/js/widget/SparkLine.js"></script>
+
+<script src="/src/js/container/Topology.js"></script>
 </body>
 </html>
 
@@ -215,18 +266,19 @@
 </script>
 
 <script>
-  
+EVENT_BUS = RxJsPubSub.create();
+
 // alarm  
 var alarm = new Alarm({
   iconId: 'alarm_notification',
-  mp3url: '/demo/img/ring.mp3'
+  mp3url: '/desktop/img/ring.mp3'
 });
-setTimeout(function () {
-  // alarm.start();
-}, 5000);
-setTimeout(function () {
-  // alarm.stop();
-}, 1000 * 60 * 2);
+// setTimeout(function () {
+//   alarm.start();
+// }, 5000);
+// setTimeout(function () {
+//   alarm.stop();
+// }, 1000 * 60 * 2);
   
 // load menus
 xhr.post({
@@ -260,8 +312,30 @@ $('.navbar-toggler').on('click', function(evt) {
 });    
 
 // 重算容器高度
-document.getElementById('container').style.height = (document.body.clientHeight - 56 - 25) + 'px';
+document.getElementById('container').style.height = (document.body.clientHeight - 70) + 'px';
 
 new PerfectScrollbar('.sidebar-nav');
-new PerfectScrollbar('.container-fluid');
+// new PerfectScrollbar('.container-fluid');
+
+let click = rxjs.fromEvent(document, 'click');
+click.subscribe(event => {
+  let target = event.target;
+  if (target.tagName === 'A' ||
+    target.tagName === 'I' ||
+    target.tagName === 'IMG') return false;
+  let rightbar = dom.ancestor(target, 'div', 'rightbar');
+  if (rightbar != null) return false;
+  let query = dom.ancestor(target, 'div', 'widget-query');
+  if (query != null) return false;
+
+  rightbar = dom.find('.rightbar');
+  if (rightbar != null && !rightbar.classList.contains('out')) {
+    rightbar.classList.add('out');
+  }
+  query = dom.find('.widget-query');
+  if (query != null && query.classList.contains('show')) {
+    query.classList.remove('show');
+  }
+  return false;
+});
 </script>

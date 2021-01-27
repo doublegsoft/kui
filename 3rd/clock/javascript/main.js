@@ -1,14 +1,4 @@
 //invokes functions as soon as window loads
-window.onload = function(){
-	time();
-	ampm();
-	whatDay();
-	setInterval(function(){
-		time();
-		ampm();
-		whatDay();
-	}, 1000);
-};
 
 
 //gets current time and changes html to reflect it
@@ -64,3 +54,5 @@ function whatDay(){
 		(classArr !== undefined) && ((x == currentDay) ? classArr.add("light-on") : classArr.remove("light-on"));
 	}
 }
+
+schedule.start('time', time, 1000);

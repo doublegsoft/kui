@@ -13,10 +13,13 @@
  * @param {object} opts
  *        配置型
  */
-let PaginationTable = function (opts) {
+function PaginationTable(opts) {
   let self = this;
   // 远程数据源
   this.url = opts.url;
+  // 用例
+  this.usecase = opts.usecase;
+
   // 本地数据源，未封装的数据源
   this.local = opts.local;
   if (typeof opts.local !== "undefined") {
@@ -24,14 +27,34 @@ let PaginationTable = function (opts) {
     this.local.total = opts.local.length;
     this.local.data = opts.local;
   }
+
   this.limit = opts.limit || 15;
+
   this.cache = opts.cache || "server";
   this.style = opts.style || "full";
+
   this.headless = opts.headless || false;
-  this.filters = opts.params || opts.filters || {};
+  if (typeof opts.hoverable !== 'undefined') {
+    this.hoverable = opts.hoverable;
+  } else {
+    this.hoverable = true;
+  }
+
+  // 固定或者初始化查询条件
+  this.filters = {};
+  if (opts.filters) {
+    for (let k in opts.filters) {
+      this.filters[k] = opts.filters[k];
+    }
+  }
+  if (opts.params) {
+    for (let k in opts.params) {
+      this.filters[k] = opts.params[k];
+    }
+  }
+
   this.showLoading = opts.showLoading || false;
-  // modified by christian gann on apr 1, 2020
-  this.usecase = opts.usecase;
+
 
   // 高度和宽度，用来固定表头和列的参数
   this.width = opts.width;
@@ -96,7 +119,36 @@ let PaginationTable = function (opts) {
     };
     this.widgetFilter = new QueryLayout(opts.filter);
   }
-  this.sort = opts.sort;
+  if (opts.sort) {
+    opts.sort.local = opts.sort.fields;
+    opts.sort.create = function(idx, row) {
+      let ret = dom.element(`
+        <div class="full-width" style="margin-top: -8px; margin-bottom: -8px">
+          <span class="position-relative" style="top: 8px;">${row.title}</span>
+          <a data-role="desc" class="btn text-gray float-right" data-model-name="${row.name}">
+            <i class="fas fa-sort-amount-up"></i>
+          </a>
+          <a data-role="asc" class="btn text-gray float-right" data-model-name="${row.name}">
+            <i class="fas fa-sort-amount-down-alt"></i>
+          </a>
+        </div>
+      `);
+      dom.bind(dom.find('a[data-role=asc]', ret), 'click', function() {
+        let model = dom.model(this);
+        self.request({
+          _order_by: model.name + ' asc'
+        });
+      });
+      dom.bind(dom.find('a[data-role=desc]', ret), 'click', function() {
+        let model = dom.model(this);
+        self.request({
+          _order_by: model.name + ' desc'
+        });
+      });
+      return ret;
+    };
+    this.widgetSort = new ListView(opts.sort);
+  }
   this.group = opts.group;
 };
 
@@ -145,10 +197,12 @@ PaginationTable.prototype.render = function (containerId, params) {
     this.boundedQuery = $('#' + this.queryId);
   }
 
-  if (this.containerId.indexOf('#') == 0) {
-    this.container = document.querySelector(this.containerId);
-  } else if (typeof this.containerId === 'string') {
-    this.container = document.getElementById(this.containerId);
+  if (typeof this.containerId === 'string') {
+    if (this.containerId.indexOf('#') == 0) {
+      this.container = document.querySelector(this.containerId);
+    } else {
+      this.container = document.getElementById(this.containerId);
+    }
   } else {
     this.container = containerId;
   }
@@ -220,7 +274,10 @@ PaginationTable.prototype.root = function (initParams) {
   if (typeof this.height !== 'undefined') ret.css('height', this.height);
   // if (!this.frozenHeader) this.table.addClass('table');
   // this.table.addClass("table table-bordered table-striped");
-  this.table.addClass("table table-responsive-sm table-outline table-hover mb-0");
+  this.table.addClass("table table-responsive-sm table-outline mb-0");
+  if (this.hoverable) {
+    this.table.addClass('table-hover');
+  }
 
   let self = this;
   let thead = $('<thead class="thead-light" style="height: 43px;"></thead>');
@@ -330,7 +387,7 @@ PaginationTable.prototype.pagination = function () {
   let ul = $('<ul></ul>');
   ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
-  let a = $('<a class="page-link b-a-0" style="padding-bottom: 2px;"></a>');
+  let a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('首页');
   a.html('<i class="material-icons">first_page</i>');
@@ -344,7 +401,7 @@ PaginationTable.prototype.pagination = function () {
   }
 
   this.prevPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0" style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('上一页');
   a.html('<i class="material-icons">chevron_left</i>');
@@ -356,7 +413,7 @@ PaginationTable.prototype.pagination = function () {
 
   li = $('<li class="page-item disabled" style="padding-top: 4px;"></li>');
   li.addClass('disabled');
-  this.pagebar = $('<a class="page-link b-a-0" style="padding-bottom: 2px;"></a>');
+  this.pagebar = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
   this.pagebar.attr('style', 'cursor: default');
   this.pagebar.text("0/0");
@@ -364,7 +421,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(li);
 
   this.nextPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0" style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('下一页');
   a.html('<i class="material-icons">chevron_right</i>');
@@ -375,7 +432,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(this.nextPage);
 
   this.lastPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0"  style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0"  style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('末页');
   a.html('<i class="material-icons">last_page</i>');
@@ -388,10 +445,10 @@ PaginationTable.prototype.pagination = function () {
   }
 
   li = $('<li class="page-item disabled"></li>');
-  a = $('<a class="page-link b-a-0"></a>');
+  a = $('<a class="page-link b-a-0 pt-0"></a>');
   a.attr('style', 'cursor: default');
 
-  let actions = dom.create('div', 'card-header-actions', 'pt-2', 'pr-2');
+  let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
 
   if (this.group) {
     let action = dom.element('' +
@@ -401,16 +458,28 @@ PaginationTable.prototype.pagination = function () {
     actions.appendChild(action);
   }
 
-  if (this.sort) {
+  if (this.widgetSort) {
+    let containerSort = dom.create('div', 'card', 'widget-sort', 'fade', 'fadeIn');
+    containerSort.zIndex = 9999;
+    this.widgetSort.render(containerSort);
+    this.container.appendChild(containerSort);
+
     let action = dom.element('' +
-        '<a widget-id="toggleSort" class="card-header-action text-primary">\n' +
-        '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
-        '</a>');
+      '<a widget-id="toggleSort" class="card-header-action text-primary">\n' +
+      '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
+      '</a>');
+    dom.bind(action, 'click', function() {
+      if (containerSort.classList.contains('show')) {
+        containerSort.classList.remove('show');
+      } else {
+        containerSort.classList.add('show');
+      }
+    });
     actions.appendChild(action);
   }
 
   if (this.widgetFilter) {
-    let containerQuery = dom.create('div', 'widget-query', 'bg-white');
+    let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
     this.widgetFilter.render(containerQuery);
     this.container.appendChild(containerQuery);
 
@@ -428,6 +497,15 @@ PaginationTable.prototype.pagination = function () {
     });
     actions.appendChild(action);
   }
+
+  let action = dom.element('' +
+    '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
+    '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
+    '</a>');
+  dom.bind(action, 'click', function() {
+    self.request();
+  });
+  actions.appendChild(action);
 
   div.get(0).appendChild(actions);
 
@@ -604,15 +682,21 @@ PaginationTable.prototype.request = function (others) {
     }
   }
   params = params || {};
+
+  // the parameters from query for this table
   if (this.widgetFilter) {
     let queryParams = this.widgetFilter.getQuery();
     for (let k in queryParams) {
       params[k] = queryParams[k];
     }
   }
+
+  // the parameters defined in table options
   for (let k in this.filters) {
     params[k] = this.filters[k];
   }
+
+  // the parameters of method arguemnts
   if (typeof others !== "undefined") {
     for (let k in others) {
       if (k == "start") {
@@ -626,9 +710,7 @@ PaginationTable.prototype.request = function (others) {
   }
   params['start'] = this.start;
   params['limit'] = this.limit;
-  for (let k in this.filters) {
-    params[k] = this.filters[k];
-  }
+
   // params['criteria'] = JSON.stringify(this.filters);
   // this.setCookie();
   if (typeof this.url !== "undefined") {
@@ -839,21 +921,30 @@ PaginationTable.prototype.fill = function (result) {
  * @param {function} render
  *        用于渲染stack区域的回调函数
  */
-PaginationTable.prototype.stack = function(rowIndex, url, render) {
+PaginationTable.prototype.stack = function(rowIndex, url, params, render) {
+  params = params || {};
   let tbody = dom.find('tbody', this.container);
-  let rowStack = dom.find('tr[role=stack]', tbody);
-  if (rowStack != null) rowStack.remove();
+  let rowStack = tbody.children[rowIndex + 1];
+  if (rowStack != null && rowStack.getAttribute('role') == 'stack') {
+    return;
+  }
+  rowStack = dom.find('tr[role=stack]', tbody);
+
+  if (rowStack != null) {
+    if (rowStack.rowIndex <= rowIndex) rowIndex--;
+    rowStack.remove();
+  }
   let row = tbody.children[rowIndex];
-  rowStack = dom.create('tr');
+  rowStack = dom.create('tr', 'fade', 'fadeInDown');
   rowStack.setAttribute('role', 'stack');
-  rowStack.setAttribute('style', 'background-color: white;')
+  // rowStack.setAttribute('style', 'background-color: white;')
 
   let cellStack = dom.create('td');
   rowStack.style.backgoundColor = 'white';
   cellStack.setAttribute('colspan', this.columns.length);
   rowStack.appendChild(cellStack);
 
-  if (row.nextSibling == null) {
+  if (row == null || row.nextSibling == null) {
     tbody.appendChild(rowStack);
   } else {
     tbody.insertBefore(rowStack, row.nextSibling);
@@ -864,12 +955,206 @@ PaginationTable.prototype.stack = function(rowIndex, url, render) {
     success: function(resp) {
       utils.append(cellStack, resp);
       if (render)
-        render(cellStack);
+        render(cellStack, params);
       setTimeout(function () {
-        cellStack.classList.add('show');
-      }, 150);
+        rowStack.classList.add('show');
+      }, 300);
     }
   })
+};
 
+PaginationTable.prototype.unstack = function() {
+  let tbody = dom.find('tbody', this.container);
+  let rowStack = dom.find('tr[role=stack]', tbody);
+  if (rowStack != null) rowStack.remove();
+};
 
+/**
+ *
+ * @returns {Element}
+ */
+PaginationTable.skeleton = function() {
+  return dom.element(`
+    <table style="border-collapse: collapse; width: 100%;">
+      <thead>
+        <tr>
+          <th style="padding: 16px; /*position: sticky; top: 0px; z-index: 9999;*/">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
+          </th>
+          <th style="padding: 16px; /*position: sticky; top: 0px; z-index: 9999;*/">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
+          </th>
+          <th style="padding: 16px; /*position: sticky; top: 0px; z-index: 9999;*/">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-top: 1px solid rgba(0, 0, 0, 0.3);">
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr style="border-top: 1px solid rgba(0, 0, 0, 0.3);">
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr style="border-top: 1px solid rgba(0, 0, 0, 0.3);">
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr style="border-top: 1px solid rgba(0, 0, 0, 0.3);">
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+          <td style="padding: 16px;">
+            <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+              <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+                <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  `);
 };

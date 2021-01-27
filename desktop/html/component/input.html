@@ -1,0 +1,74 @@
+<div class="card">
+  <div class="card-header">
+    <strong>示例：添加标签</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-3">
+      <div class="tag-input">
+        <i class="fas fa-tags"></i>
+        <input class="form-control" type="text" placeholder="输入标签">
+        <a class="btn ui tag label">添加</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：搜索框</strong>
+  </div>
+  <div class="card-body row">
+    <div class="search">
+      <input class="search_input" type="text" name="" placeholder="搜索">
+      <a href="#" class="search_icon"><i class="fas fa-search"></i></a>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：评价</strong>
+  </div>
+  <div class="card-body row">
+    <div class="rating">
+      <button class="rating-star text-warning">☆</button>
+      <button class="rating-star text-warning">☆</button>
+      <button class="rating-star text-warning">☆</button>
+      <button class="rating-star text-warning">☆</button>
+      <button class="rating-star text-warning">★</button>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <strong>示例：选项切换</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-3">
+      <div class="text-switch">
+        <label class="mb-0 checked" data-switch=".checked">
+          <input name="text-switch" type="radio" style="display: none"/>年度
+        </label>
+        <label class="mb-0" data-switch=".checked">
+          <input name="text-switch" type="radio" style="display: none"/>月度
+        </label>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="text-multi-switch">
+        <label class="checked mb-0" style="width: 33.3%" data-switch=".checked">
+          <input type="radio" style="display: none;"/>年度
+        </label>
+        <label class="mb-0" style="width: 33.3%" data-switch=".checked">
+          <input type="radio" style="display: none;"/>季度
+        </label>
+        <label class="mb-0" style="width: 33.4%" data-switch=".checked">
+          <input type="radio" style="display: none;"/>月度
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+dom.switch('.text-switch label');
+dom.switch('.text-multi-switch label');
+</script>

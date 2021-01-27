@@ -1,14 +1,53 @@
-<div class="row">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">
-        <i class="fa fa-list"></i>
-        <strong>树形表</strong>
+<div class="card">
+  <div class="card-header">
+    <i class="fa fa-list"></i>
+    <strong>树型表</strong>
+  </div>
+  <div class="card-body">
+    <div id="treelikeTable" class="col-md-12 pl-0 pr-0"></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <i class="fa fa-list"></i>
+    <strong>可分页树型表（第一级节点分页）</strong>
+  </div>
+  <div class="card-body">
+    <div id="paginationTreelikeTable" class="col-md-12 pl-0 pr-0"></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
+    <i class="fa fa-list"></i>
+    <strong>分页表</strong>
+  </div>
+  <div class="card-body">
+    <div id="formSpecial" class="col-md-12 form-horizontal">
+      <div class="form-group row">
+        <label class="col-form-label col-md-2">电子邮箱：</label>
+        <div class="col-md-4 input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="far fa-envelope"></i>
+            </span>
+          </div>
+          <input value='hello.world' class="form-control" name="email" data-domain-type='email' data-required='电子邮箱'>
+        </div>
+        <label class="col-form-label col-md-2">正则式：</label>
+        <div class="col-md-4">
+          <input value="1898331977X" class="form-control" name="string3" data-domain-type="regexp(^\d$)" data-required='regexp(^\d$)'
+                 data-invalid-message="regexp(^\d$)表示只允许填写数字">
+        </div>
       </div>
-      <div class="card-body row">
-        <div id="treelikeTable" class="col-md-12"></div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="float-right form-buttons">
+            <button data-role="save" class="btn btn-sm btn-save">保存</button>
+          </div>
+        </div>
       </div>
     </div>
+    <div id="paginationTable" class="col-md-12 pl-0 pr-0"></div>
   </div>
 </div>
 
@@ -45,23 +84,88 @@ var treelikeTable = new TreelikeTable({
   }]
 });
 treelikeTable.render('treelikeTable', {});
-</script>
 
-<script>
-  function Parent() {
-    this.model = 'parent';
-  }
+var paginationTreelikeTable = new TreelikeTable({
+  url: 'data/treepage.json',
+  limit: 5,
+  levels: 2, /* 最多两级 */
+  fields: {
+    name: 'name',
+    id: 'id',
+    parentId: 'parentId'
+  },
+  columns: [{
+    title: '任务名称',
+  }, {
+    title: '开发进度',
+    display: function(row, td) {
+      let html = '<div class="clearfix">\n' +
+        '        <div class="float-left"><strong>' + row.progress +'%</strong></div>\n' +
+        '        <div class="float-right"><small class="text-muted">2020-01-01 至 2020-02-01</small></div>\n' +
+        '      </div>\n' +
+        '      <div class="progress progress-xs">\n' +
+        '        <div class="progress-bar bg-gradient-success" role="progressbar" style="width: ' + row.progress + '%" aria-valuenow="' + row.progress + '" aria-valuemin="0" aria-valuemax="100"></div> \n' +
+        '      </div>';
+      td.innerHTML = html;
+    }
+  }, {
+    title: '责任人',
+    display: function(row, td) {
+      let a = document.createElement('a');
+      a.classList.add('btn', 'text-success');
+      a.innerText = row.principalName;
+      td.append(a);
+    }
+  }]
+});
+paginationTreelikeTable.render('paginationTreelikeTable', {});
 
-  Parent.prototype.say = function() {
-    console.log('hello')
-  }
+var paginationTable = new PaginationTable({
+  url: 'data/paginationtable.json',
+  limit: 10,
+  columns: [{
+    title: '水库名称',
+    template: '{rsnm}',
+    order: 'rsnm'
+  }, {
+    title: '工程规模',
+    template: '{prscnm}',
+    order: 'prscnm'
+  }, {
+    title: '行政区划',
+    template: '{addvnm}',
+    order: 'addvnm'
+  }, {
+    title: '当前水位（m）',
+    template: '{rz}'
+  }, {
+    title: '当前累计雨量（mm）',
+    template: '{dyp}'
+  }, {
+    title: '最新水位上报时间',
+    template: '{dt}'
+  }, {
+    title: '报警',
+    display: function (obj, td) {
+      if (typeof obj.lvl === 'undefined') {
+        td.append('无');
+        return;
+      }
+      var alarm = '无';
+      switch (obj.lvl + '') {
+        case '1': alarm = '红色'; break;
+        case '2': alarm = '橙色'; break;
+        case '3': alarm = '黄色'; break;
+        case '4': alarm = '蓝色'; break;
+      }
+      var a = $('<a href="#">');
+      a.on('click', function () {
 
-  function Child() {
-
-  }
-
-  Child.prototype = new Parent();
-  let child = new Child();
-  console.log(child.model);
-  child.say();
+      });
+      a.text(alarm);
+      td.append(a);
+    }
+  }]
+});
+paginationTable.render('paginationTable');
 </script>

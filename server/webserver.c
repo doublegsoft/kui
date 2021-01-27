@@ -3,10 +3,14 @@
 
 #include "mongoose.h"
 
-static const char *s_http_port = "8000";
-static struct mg_serve_http_opts s_http_server_opts;
+static const struct mg_str        GM_HTTP_METHOD_POST     = MG_MK_STR("POST");
 
-static void ev_handler(struct mg_connection *nc, int ev, void *p) {
+static const char*                s_http_port             = "9000";
+
+static struct mg_serve_http_opts  s_http_server_opts;
+
+static void ev_handler(struct mg_connection *nc, int ev, void *p)
+{
   if (ev == MG_EV_HTTP_REQUEST) {
     mg_serve_http(nc, (struct http_message *) p, s_http_server_opts);
   }

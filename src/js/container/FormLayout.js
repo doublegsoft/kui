@@ -22,34 +22,66 @@ function FormLayout(opts) {
     </div>
   `);
 
-  dom.find('button', this.toast).addEventListener('click', function() {
+  dom.find('button', this.toast).addEventListener('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
     self.toast.classList.remove('show', 'in');
     self.toast.style.zIndex = -1;
   });
 }
 
-FormLayout.prototype.render = function (containerId, read, persisted) {
-  let self = this;
+/**
+ * Renders the form in page.
+ *
+ * @param containerId
+ *        the container selector or itself
+ *
+ * @param params
+ *        the request parameters
+ */
+FormLayout.prototype.render = function (containerId, params) {
   this.containerId = containerId;
-  if (read) {
-    this.fetch(read);
-    return;
+  if (typeof containerId === 'string') {
+    this.container = document.querySelector(containerId);
+  } else {
+    this.container = containerId;
   }
+  this.container.innerHTML = '';
 
+  this.fetch(params);
+};
+
+/**
+ * Builds the form.
+ *
+ * @param persisted
+ *        the persisted data which is fetching from remote data
+ *
+ * @private
+ */
+FormLayout.prototype.build = function(persisted) {
+  let self = this;
   persisted = persisted || {};
-
-  this.container = document.querySelector(this.containerId);
   let form = dom.create('div', 'col-md-12', 'form-horizontal');
-  form.style.marginBottom = '4rem';
   let columnCount = this.columnCount;
   let hiddenFields = [];
   let shownFields = [];
-
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
-    // default value should be working
-    if (!field.value)
-      field.value = (typeof persisted[field.name] === 'undefined') ? null : persisted[field.name];
+    // make default value working
+    if (!field.value) {
+      if (field.name.indexOf("[]") != -1) {
+        let name = field.name.substring(0, field.name.indexOf('[]'));
+        field.value = (typeof persisted[name] === 'undefined' || persisted[name] == 'null') ? null : persisted[name];
+      } else if (field.name.indexOf('.') != -1) {
+        let parentName = field.name.substring(0, field.name.indexOf('.'));
+        let childName = field.name.substring(field.name.indexOf('.') + 1);
+        field.value = (typeof persisted[parentName] === 'undefined' || persisted[parentName] == 'null') ? null :
+            (typeof persisted[parentName][childName] === 'undefined' || persisted[childName] == 'null') ? null : persisted[parentName][childName];
+      } else {
+        field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
+      }
+    }
     if (field.input == 'hidden') {
       hiddenFields.push(field);
     } else {
@@ -86,7 +118,9 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
     let formGroup = dom.create('div', 'form-group', 'row');
     let group = this.createInput(row.first, columnCount);
 
-    formGroup.appendChild(group.label);
+    if (group.label) {
+      formGroup.appendChild(group.label);
+    }
     formGroup.appendChild(group.input);
 
     if (columnCount == 2 && row.second) {
@@ -106,21 +140,27 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
     if (field.input == 'date') {
-      $(containerId + ' input[name=\'' + field.name + '\']').datetimepicker({
+      $(this.container).find('input[name=\'' + field.name + '\']').datetimepicker({
         format: 'YYYY-MM-DD',
-        locale: 'zh_CN'
+        locale: 'zh_CN',
+        useCurrent: false
       });
       // 加载值或者默认值
       if (field.value != null) {
-        $(containerId + ' input[name=\'' + field.name + '\']').val(
-          moment(field.value).format('YYYY-MM-DD'));
+        dom.find('input[name=\'' + field.name + '\']', this.container).value = moment(field.value).format('YYYY-MM-DD');
       }
     } else if (field.input == 'select') {
       let opts = field.options;
       opts.validate = FormLayout.validate;
       // 加载值或者默认值
-      opts.selection = field.value;
-      $(containerId + ' select[name=\'' + field.name + '\']').searchselect(opts);
+      // 允许数组值
+      if (Array.isArray(field.value)) {
+        opts.selection = field.value[0][opts.fields.value];
+      } else {
+        opts.selection = field.value;
+      }
+
+      $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
     } else if (field.input == 'cascade') {
       let opts = field.options;
       opts.validate = FormLayout.validate;
@@ -138,7 +178,7 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
       if (field.readonly == true) {
         opts.readonly = true;
       }
-      $(containerId + ' div[data-cascade-name=\'' + field.name + '\']').cascadeselect(opts);
+      $(this.container).find('div[data-cascade-name=\'' + field.name + '\']').cascadeselect(opts);
     } else if (field.input == 'checklist') {
       if (this.readonly == true) {
         field.options.readonly = true;
@@ -164,7 +204,9 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
         field.options.data[key] = this.params[key];
       }
       // new Checktree(field.options).render('#checktree_' + field.name);
-      new TreelikeList(field.options).render(dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container));
+      this[field.name] = new TreelikeList(field.options);
+      this[field.name].render(dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container), field.value);
+      // this[field.name].setValues(field.value);
     } else if (field.input == 'fileupload') {
       new FileUpload(field.options).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
@@ -177,20 +219,31 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
           background: '#565656'
         });
         cm.on('keyup', function(cm, what) {
-          dom.find(containerId + ' textarea[name=\'' + field.name + '\']').innerText = cm.getDoc().getValue();
+          dom.find(' textarea[name=\'' + field.name + '\']', this.container).innerText = cm.getDoc().getValue();
         });
       }
+    } else if (field.input == 'avatar') {
+      new Avatar({
+        readonly: this.readonly,
+        name: field.name
+      }).render(dom.find('div[data-avatar-name=\'' + field.name + '\']', this.container), field.value);
     }
   }
 
-  let buttons = dom.create('div', 'float-right', 'form-buttons');
+  let containerButtons = dom.create('div');
+  let buttons = dom.create('div', 'float-right');
+
   let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
   buttonSave.textContent = '保存';
-  dom.bind(buttonSave, 'click', function() {
+  dom.bind(buttonSave, 'click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
     self.save();
   });
-  buttons.appendChild(buttonSave);
-  buttons.append(' ');
+  if (!this.readonly) {
+    buttons.appendChild(buttonSave);
+    buttons.append(' ');
+  }
 
   // custom buttons
   for (let i = 0; i < this.actions.length; i++) {
@@ -201,34 +254,47 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
   let buttonClose = dom.create('button', 'btn', 'btn-sm', 'btn-close');
   buttonClose.textContent = '关闭';
   dom.bind(buttonClose, 'click', function() {
-    let rightbar = dom.find('.rightbar');
-    if (rightbar != null)
+    event.preventDefault();
+    event.stopPropagation();
+    let rightbar = dom.ancestor(self.container, 'div', 'rightbar');
+    if (rightbar != null) {
       rightbar.classList.add('out');
-    setTimeout(function() {
-      rightbar.remove();
-    }, 1000);
+      setTimeout(function () {
+        rightbar.remove();
+      }, 1000);
+    }
   });
   buttons.appendChild(buttonClose);
   // if (this.actions.length > 0) {
-  let row = dom.create('div', 'full-width');
-  row.style.backgroundColor = '#f0f3f5';
+  let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
+  // row.style.backgroundColor = '#f0f3f5';
   row.style.paddingTop = '5px';
+  row.style.paddingBottom = '5px';
   row.style.borderTop = '1px solid #c8ced3';
   row.style.borderBottom = '1px solid #c8ced3';
-  row.style.paddingRight = '20px';
-  row.style.marginLeft = '-20px';
+  row.style.paddingRight = '15px';
+  row.style.marginLeft = '-12px';
   row.style.position = 'fixed';
   row.style.zIndex = '2001';
   let rightbar = dom.find('.rightbar');
   if (rightbar != null) {
-    row.style.top = (rightbar.clientHeight - 56 - 14) + 'px';
-    row.appendChild(buttons);
+    //
+    // kui.css
+    // .rightbar
+    // top: -28px
+    //
+    // 只有在rightbar下，才允许
+    rightbar.style.height = (window.innerHeight + 28) + 'px';
+    form.style.marginBottom = '4rem';
+    row.style.top = (rightbar.clientHeight - buttons.clientHeight - 28 - 13) + 'px';
+
+    containerButtons.appendChild(buttons);
+    row.appendChild(containerButtons);
     this.container.appendChild(row);
   }
 
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
-
 };
 
 /**
@@ -240,23 +306,63 @@ FormLayout.prototype.render = function (containerId, read, persisted) {
  */
 FormLayout.prototype.fetch = function (params) {
   let self = this;
+  params = params || {};
   if (!this.readOpt) {
-    this.render(this.containerId);
+    this.build(params);
     return;
+  }
+  if (this.readOpt.params) {
+    for (let k in this.readOpt.params) {
+      params[k] = this.readOpt.params[k];
+    }
   }
   xhr.post({
     url: this.readOpt.url,
-    usecase: this.readOpt.usecase,
     data: params,
     success: function(resp) {
       if (resp.error) {
         dialog.error(resp.error.message);
         return;
       }
-      self.render(self.containerId, null, resp.data);
+      let data = resp.data;
+      if (self.readOpt.convert) {
+        data = self.readOpt.convert(data);
+      }
+      if (utils.isEmpty(data)) {
+        self.build(params);
+      } else {
+        for (let keyParam in params) {
+          if (typeof data[keyParam] === 'undefined') {
+            data[keyParam] = params[keyParam];
+          }
+        }
+        self.build(data);
+      }
     }
   });
   this.params = params;
+};
+
+FormLayout.prototype.read = function (params) {
+  let self = this;
+  params = params || {};
+
+  if (this.readOpt.params) {
+    for (let k in this.readOpt.params) {
+      params[k] = this.readOpt.params[k];
+    }
+  }
+  xhr.post({
+    url: this.readOpt.url,
+    data: params,
+    success: function(resp) {
+      if (resp.error) {
+        dialog.error(resp.error.message);
+        return;
+      }
+      dom.formdata(self.container, resp.data);
+    }
+  });
 };
 
 /**
@@ -270,10 +376,12 @@ FormLayout.prototype.save = function () {
     return;
   }
   // disable all buttons
-  dom.find(this.containerId + ' button.btn-save').innerHTML = "<i class='fa fa-spinner fa-spin'></i>数据保存中……";
-  dom.disable(this.containerId + ' button', 'disabled', true);
+  let buttonSave = dom.find('button.btn-save', this.container);
+  if (buttonSave != null)
+    buttonSave.innerHTML = "<i class='fa fa-spinner fa-spin'></i>数据保存中……";
+  dom.disable(dom.find('button', this.container), 'disabled', true);
   let formdata = dom.formdata(this.containerId);
-  let data = this.saveOpt.data || {};
+  let data = this.saveOpt.params || {};
   for (let key in formdata) {
     data[key] = formdata[key];
   }
@@ -283,14 +391,14 @@ FormLayout.prototype.save = function () {
     data: data,
     success: function(resp) {
       // enable all buttons
-      dom.find(self.containerId + ' button.btn-save').innerHTML = '保存';
-      dom.enable(self.containerId + ' button');
+      if (buttonSave != null)
+        buttonSave.innerHTML = '保存';
+      dom.enable( 'button', self.container);
       if (resp.error) {
         self.error(resp.error.message);
-        // dialog.error(resp.error.message);
         return;
       }
-      let identifiables = document.querySelectorAll(self.containerId + ' input[data-identifiable=true]');
+      let identifiables = document.querySelectorAll( ' input[data-identifiable=true]', self.container);
       for (let i = 0; i < identifiables.length; i++) {
         identifiables[i].value = resp.data[identifiables[i].name];
       }
@@ -372,11 +480,16 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     }
   } else if (field.input == 'longtext') {
     input = dom.create('textarea', 'form-control');
-    if (this.readonly)
-      input.style.backgroundColor = 'rgb(240, 243, 245)';
-    input.rows = 4;
+    field.style = field.style || '';
+    input.style = field.style;
+    // if (this.readonly)
+    //   input.style.backgroundColor = 'rgb(240, 243, 245)';
+    if (field.style === '')
+      input.rows = 4;
     input.setAttribute('name', field.name);
     input.innerHTML = field.value || '';
+    if (this.readonly)
+      input.setAttribute('disabled', true);
   } else if (field.input == 'cascade') {
     input = dom.create('div', 'form-control');
     if (this.readonly)
@@ -392,6 +505,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'fileupload') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-fileupload-name', field.name);
+  } else if (field.input == 'avatar') {
+    input = dom.create('div', 'full-width');
+    input.setAttribute('data-avatar-name', field.name);
+    group.classList.remove('col-md-4', 'col-md-9');
+    group.classList.add('col-md-12');
+    group.appendChild(input);
+    return {label: null, input: group};
   } else {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
@@ -417,6 +537,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       fileinput.click();
     });
     fileinput.addEventListener('change', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
       input.value = fileinput.files[0].name;
       FormLayout.validate(input);
     });
@@ -426,7 +548,21 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     }
   }
 
-  let tooltip = dom.element('<div class="input-group-append"><span class="input-group-text width-36 icon-error"></span></div>');
+  let unit = dom.element(`
+    <div class="input-group-append">
+      <span class="input-group-text"></span>
+    </div>
+  `);
+  if (field.unit) {
+    dom.find('span', unit).innerHTML = field.unit;
+    group.appendChild(unit);
+  }
+
+  let tooltip = dom.element(`
+    <div class="input-group-append">
+      <span class="input-group-text width-36 icon-error"></span>
+    </div>
+  `);
   if (field.required && input != null /* radio, check cause input is null*/) {
     input.setAttribute('data-required', field.title);
     dom.find('span', tooltip).innerHTML = ICON_REQUIRED;
@@ -554,6 +690,7 @@ FormLayout.prototype.createButton = function(action) {
 };
 
 FormLayout.prototype.error = function (message) {
+  message = message || '出现系统错误！';
   message = message.replaceAll('\n', '<br>');
   this.toast.style.zIndex = 11000;
   this.toast.classList.remove('bg-success', 'hidden');
@@ -650,4 +787,81 @@ FormLayout.validate = function(input) {
   } else {
     span.innerHTML = ICON_CORRECT;
   }
+};
+
+FormLayout.skeleton = function() {
+  return dom.element(`
+    <div style="border: 1px solid rgba(0, 0, 0, 0.3); border-radius: 4px; width: 100%;">
+      <div
+          style="align-items: center; border-bottom: 1px solid rgba(0, 0, 0, 0.3); display: flex; justify-content: space-between; padding: 16px;">
+        <div style="width: 60%;">
+          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
+        </div>
+        <div style="color: rgba(0, 0, 0, 0.7);">
+          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 16px; width: 16px;"></div>
+        </div>
+      </div>
+      <div style="padding: 16px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
+          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+          </div>
+          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+          </div>
+          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+          </div>
+          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+          </div>
+          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
+            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(0, 0, 0, 0.3); display: flex; justify-content: flex-end; padding: 16px;">
+        <div style="margin-right: 8px; width: 30%;">
+          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 32px; width: 100%;"></div>
+        </div>
+        <div style="width: 30%;">
+          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 32px; width: 100%;"></div>
+        </div>
+      </div>
+    </div>  
+  `);
 };

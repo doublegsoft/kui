@@ -7,7 +7,7 @@ click("//span[text()='9']")
 click("//span[@class='BMap_Marker BMap_noprint']")
 click("//button[text()='还原']")
 
-// 测试输入
+# 测试输入
 input("//input[@class='form-control']" = "hello")
 
 click("//a[text()='页面']")

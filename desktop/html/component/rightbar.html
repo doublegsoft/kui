@@ -4,12 +4,16 @@
 </div>
 
 <script>
-layout.form('#formTest div.card-body', {
+var form = new FormLayout({
   columnCount: 1,
+  save: {
+    url: 'data/chart.json',
+    usecase: 'test'
+  },
   fields: [{
     title: '隐藏标识',
     name: 'anyId',
-    input: 'hidden',
+    input: 'hidden'
   },{
     title: '文本',
     name: 'anyText',
@@ -47,14 +51,11 @@ layout.form('#formTest div.card-body', {
     input: 'cascade',
     required: true,
     options: {
-      fields: {
-        name: 'name'
-      },
       levels: [{
         name: 'departmentId',
         fields: {
-          id: 'id',
-          name: 'name'
+          value: 'id',
+          text: 'name'
         },
         text: '部门',
         width: 'calc(49% - 3px)',
@@ -62,8 +63,8 @@ layout.form('#formTest div.card-body', {
       }, {
         name: 'employeeId',
         fields: {
-          id: 'id',
-          name: 'name'
+          value: 'id',
+          text: 'name'
         },
         text: '员工',
         width: 'calc(49% - 3px)',
@@ -74,7 +75,8 @@ layout.form('#formTest div.card-body', {
     title: '文件',
     name: 'anyFile',
     input: 'file',
-    required: true
+    required: true,
+    tooltip: '需要上传的Excel文件'
   }],
   actions: [{
     text: '保存',
@@ -86,8 +88,18 @@ layout.form('#formTest div.card-body', {
     text: '关闭',
     role: 'close',
     click: function(event) {
-      dom.find('.sidebar-right').classList.add('out');
+      dom.find('.rightbar').classList.add('out');
     }
   }]
+});
+form.render('#formTest div.card-body', null, {
+  anyText: '文本文字',
+  anyDate: 1593937164685,
+  anySelect: '5',
+  anyFile: 'abc',
+  anyFloat: 12.23,
+  anyNumber: 123,
+  departmentId: {id: '2', name: '市场部'},
+  employeeId: {id: '4', name: '热苏斯'}
 });
 </script>

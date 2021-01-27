@@ -1,0 +1,71 @@
+<div id="pageNetworkDashboard" class="full-width" widget-type="Page">
+  <div class="card">
+    <div widget-id="topology" class="card-body height500" style="background: #455363;">
+
+    </div>
+  </div>
+<script>
+topology = new Topology({
+  images: ['img/network/atm.png', 'img/network/central.png', 'img/network/server.png', 'img/network/database.png']
+});
+
+topology.addVertex({
+  label: '监控服务器',
+  x: 50,
+  y: 0,
+  color: '#3a9d5d',
+  url: 'img/network/central.png',
+});
+topology.addVertex({
+  label: '门诊自助机',
+  x: -100,
+  y: -200,
+  color: '#3a9d5d',
+  url: 'img/network/atm.png',
+});
+topology.addVertex({
+  label: '住院部自助机',
+  x: -300,
+  y: -200,
+  color: '#3a9d5d',
+  url: 'img/network/atm.png',
+});
+topology.addVertex({
+  label: '急诊部自助机',
+  x: -500,
+  y: -200,
+  color: '#3a9d5d',
+  url: 'img/network/atm.png',
+});
+topology.addVertex({
+  label: 'HIS数据库',
+  x: -50,
+  y: 0,
+  color: '#3a9d5d',
+  url: 'img/network/database.png',
+});
+
+topology.connect('门诊自助机', '监控服务器');
+topology.connect('住院部自助机', '监控服务器');
+topology.connect('急诊部自助机', '监控服务器');
+topology.connect('门诊自助机', 'HIS数据库');
+topology.connect('住院部自助机', 'HIS数据库');
+topology.connect('急诊部自助机', 'HIS数据库');
+topology.connect('监控服务器', 'HIS数据库');
+
+topology.renderTo('div[widget-id=topology]');
+
+setInterval(function() {
+  if (topology.sigma) {
+    if (topology.sigma.graph.nodes()[0].color != '#ffc107') {
+      topology.sigma.graph.nodes()[0].color = '#ffc107';
+    } else {
+      topology.sigma.graph.nodes()[0].color = '#3a9d5d';
+    }
+    topology.sigma.refresh();
+  }
+}, 500);
+
+
+</script>
+</div>

@@ -1,0 +1,13 @@
+.kesigner-selected {
+  border: 1px dashed cornflowerblue!important;
+}
+
+.kesigner-row {
+  border: 1px dashed #cdcdcd;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.kesigner-column {
+  border: 1px dashed #cdcdcd;
+}

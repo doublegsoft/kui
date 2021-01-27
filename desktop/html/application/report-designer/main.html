@@ -1,108 +1,44 @@
-<style>
-  label {
-    margin-bottom: 0;
-  }
-  </style>
-  
+
+<div class="row">
+  <div class="btn-group" role="group" aria-label="Basic example">
+    <button class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
+    <button class="btn btn-primary" type="button"><i class="fa fa-file-export"></i></button>
+    <button class="btn btn-primary" type="button"><i class="fa fa-trash-alt"></i></button>
+  </div>
+</div>
 <div id="designer_container" class="row">
-  <div class="col-md-2">
+  <div class="col-md-2" style="padding: 0">
     <ul class="list-group">
       <li id="text-part" data-type='text' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">文本</li>
+      <li id="longtext-part" data-type='longtext' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">长文本</li>
       <li id="image-part" data-type='image' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图片</li>
       <li id="chart-part" data-type='chart' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图表</li>
       <li id="table-part" data-type='table' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">表格</li>
     </ul>
   </div>
-  <div class="col-md-8" id="canvas_container" style="background-color: #fff"></div>
-  <div class="col-md-2" id="properties_container"></div>
-  <div id="imager_container" style="display: none">
-    <img id="test_image" src="./img/hp.jpg">
-    <img id="chart_line" src="./img/chart/line.png">
-    <img id="chart_bar" src="./img/chart/bar.png">
-    <img id="chart_gauge" src="./img/chart/gauge.png">
-    <img id="chart_pie" src="./img/chart/pie.png">
-    <img id="chart_stack" src="./img/chart/stack.png">
+  <div class="col-md-8" id="canvas_container" style="background-color: #fff; padding: 0;"></div>
+  <div id="properties_container" class="col-md-2 properties-container">
+  </div>
+
+  <div id="image_container" style="display: none">
+    <img id="image_sample" src="./img/report-designer/placeholder.jpg">
   </div>
 </div>
-  
+
 <script>
 
 var designerContainer = document.getElementById('designer_container');
 var canvasContainer = document.getElementById('canvas_container');
 var height = 900;// document.body.clientHeight - 100;
 designerContainer.style.height = height + 'px';
-canvasContainer.style.height= height + 'px';
+canvasContainer.style.height = height + 'px';
 
 var propertiesEditor = new PropertiesEditor({
   containerId: 'properties_container',
-  properties: [{
-    id: 'id',
-    label: '标识',
-    input: 'text',
-    readonly: true,
-    display: function(obj) {
-      return obj.id;
-    }
-  }, {
-    id: 'text',
-    label: '文本',
-    input: 'text',
-    display: function(obj) {
-      return obj.text;
-    }
-  }, {
-    id: 'font',
-    label: '字体',
-    input: 'dialog',
-    readonly: true,
-    display: function(obj) {
-      if (obj.fontSize)
-        return obj.fontSize + 'px ' + obj.fontFamily;
-      return '';
-    },
-    properties: [{
-      id: 'fontSize',
-      input: 'text',
-      label: '字体大小',
-      unit: 'px'
-    }]
-  }, {
-    id: 'position',
-    label: '位置（顶边，左边，长，宽）',
-    input: 'dialog',
-    readonly: true,
-    display: function(obj) {
-      return '(' + parseInt(obj.x) + ", " + parseInt(obj.y) + ", " 
-               + parseInt(obj.width) + ', ' +  parseInt(obj.height) + ')';
-    },
-    properties: [{
-      id: 'x',
-      input: 'text',
-      label: 'X坐标',
-      unit: 'px'
-    }, {
-      id: 'y',
-      input: 'text',
-      label: 'Y坐标',
-      unit: 'px'
-    }, {
-      id: 'width',
-      input: 'text',
-      label: '宽度',
-      unit: 'px'
-    }, {
-      id: 'height',
-      input: 'text',
-      label: '高度',
-      unit: 'px'
-    }]
-  }],
   confirm: function () {
     designer.render();
   }
 });
-
-propertiesEditor.render();
 
 window.designer = new ReportDesigner({
   containerId: 'canvas_container',
@@ -110,39 +46,8 @@ window.designer = new ReportDesigner({
   propertiesEditor: propertiesEditor
 });
 
-function setPosition() {
-  if (!designer.selected) return;
-  ajax.dialog('设置位置', 'app/report-designer/dialog-position.html', {}, 400, 330, function() {
-    var selected = designer.selected;
-    var container = document.getElementById('position_editor');
-    var input = container.querySelector('input[name="x"]');
-    input.value = parseInt(selected.x);
-    input = container.querySelector('input[name="y"]');
-    input.value = parseInt(selected.y);
-    input = container.querySelector('input[name="width"]');
-    input.value = selected.width;
-    input = container.querySelector('input[name="height"]');
-    input.value = selected.height;
-
-    var layerContent = document.querySelector('.layui-layer-content');
-    layerContent.style += '; overflow: hidden;'
-  });
-}
-
-function setFont() {
-  if (!designer.selected) return;
-  ajax.dialog('设置位置', 'app/report-designer/dialog-font.html', {}, 400, 200, function() {
-    var selected = designer.selected;
-    var container = document.getElementById('font_editor');
-    var input = container.querySelector('input[name="size"]');
-    input.value = selected.height;
-
-    var layerContent = document.querySelector('.layui-layer-content');
-    layerContent.style += '; overflow: hidden;'
-  });
-}
-
 function drag(ev) {
   designer.drag(ev);
 }
+
 </script>

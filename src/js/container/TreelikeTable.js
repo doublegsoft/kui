@@ -374,7 +374,7 @@ TreelikeTable.prototype.pagination = function () {
 
   let ul = dom.create('ul', 'pagination', 'mb-0');
   this.firstPage = dom.create('li', 'page-item');
-  let a = dom.create('a', 'page-link', 'b-a-0');
+  let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '首页';
@@ -387,7 +387,7 @@ TreelikeTable.prototype.pagination = function () {
   ul.appendChild(this.firstPage);
 
   this.prevPage = dom.create('li', 'page-item');
-  a = dom.create('a', 'page-link', 'b-a-0');
+  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '上一页';
@@ -399,17 +399,18 @@ TreelikeTable.prototype.pagination = function () {
   ul.appendChild(this.prevPage);
 
   li = dom.create('li', 'page-item', 'disabled');
-  this.pagebar = dom.create('a', 'page-link', 'b-a-0');
+  li.style.paddingTop = '4px';
+  this.pagebar = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   this.pagebar.setAttribute('href', 'javascript:void(0)');
   this.pagebar.style.cursor = 'default';
-  this.pagebar.style.paddingTop = '12px';
+
   this.pagebar.style.paddingBottom = '0px';
   this.pagebar.innerText = "0/0";
   li.appendChild(this.pagebar);
   ul.appendChild(li);
 
   this.nextPage = dom.create('li', 'page-item');
-  a = dom.create('a', 'page-link', 'b-a-0');
+  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '下一页';
@@ -421,7 +422,7 @@ TreelikeTable.prototype.pagination = function () {
   ul.appendChild(this.nextPage);
 
   this.lastPage = dom.create('li', 'page-item');
-  a = dom.create('a', 'page-link', 'b-a-0');
+  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '末页';
@@ -432,7 +433,7 @@ TreelikeTable.prototype.pagination = function () {
   this.lastPage.appendChild(a);
   ul.append(this.lastPage);
 
-  let actions = dom.create('div', 'card-header-actions', 'pt-2', 'pr-2');
+  let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
   if (this.widgetFilter) {
     let containerQuery = dom.create('div', 'widget-query', 'bg-white');
     this.widgetFilter.render(containerQuery);

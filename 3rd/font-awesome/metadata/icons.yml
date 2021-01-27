@@ -2072,7 +2072,7 @@ calendar-day:
   search:
     terms:
       - date
-      - detail
+      - result
       - event
       - focus
       - schedule
@@ -2138,7 +2138,7 @@ calendar-week:
   search:
     terms:
       - date
-      - detail
+      - result
       - event
       - focus
       - schedule

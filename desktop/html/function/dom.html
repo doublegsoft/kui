@@ -1,0 +1,299 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <h6>示例：HTML DATA 属性采集</h6>
+        </div>
+        <div class="card-body">
+          <pre>
+dom.data('#formDomData input[name=hello]', {
+  groupId: '123',
+  groupName: '测试'
+});
+          </pre>
+          <div id="formDomData" class="form form-horizontal">
+            <div class="row form-group">
+              <label class="col-md-2 col-form-label">测试元素：</label>
+              <div class="col-md-4">
+                <input name="hello" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <button type="button" data-role="test" class="btn btn-sm btn-success">测试</button>
+              </div>
+            </div>
+          </div>
+          <div id="outputDomData" class="row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <h6>示例：集合元素数据采集</h6>
+        </div>
+        <div class="card-body">
+          <pre>
+dom.collect('#listDomCollect li.selected', ['projectId', 'projectName']);
+          </pre>
+          <ul id="listDomCollect" class="list-group">
+            <li class="list-group-item" data-model-project-id="A" data-model-project-name="A项目">
+              <i class="fa fa-check text-white pr-1"></i>A项目
+            </li>
+            <li class="list-group-item" data-model-project-id="B" data-model-project-name="B项目">
+              <i class="fa fa-check text-white pr-1"></i>B项目
+            </li>
+            <li class="list-group-item selected" data-model-project-id="C" data-model-project-name="C项目">
+              <i class="fa fa-check text-success pr-1"></i>C项目
+            </li>
+            <li class="list-group-item selected" data-model-project-id="D" data-model-project-name="D项目">
+              <i class="fa fa-check text-success pr-1"></i>D项目
+            </li>
+            <button type="button" data-role="test" class="btn btn-sm btn-success mt-1">测试</button>
+          </ul>
+          <div id="outputDomCollect" class="row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <h6>示例：子元素繁殖</h6>
+        </div>
+        <div class="card-body">
+          <pre>
+for (let i = 1; i <= 5; i++) {
+  dom.propagate(document.getElementById('listDomPropagate'), {
+    projectId: i,
+    projectName: i + '项目'
+  }, 'projectId', function(data) {
+    let li = document.createElement('li');
+    li.classList.add('list-group-item');
+    li.innerText = data.projectName;
+    return li
+  });
+}
+          </pre>
+          <ul id="listDomPropagate" class="list-group">
+            <button type="button" data-role="test" class="btn btn-sm btn-success mt-1">测试</button>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-body">
+      <div class="card-title title-bordered">
+        <h6>示例：Toggle</h6>
+      </div>
+      <div class="card-body">
+        <pre>
+for (let i = 1; i <= 5; i++) {
+  dom.propagate(document.getElementById('listDomToggle'), {
+    projectId: i,
+    projectName: i + '项目'
+  }, 'projectId', function(data) {
+    let li = document.createElement('li');
+    li.setAttribute('data-toggle', '.checked + i:first-child.text-success >> i:first-child.text-white');
+    li.classList.add('list-group-item', 'pointer');
+    let link = document.createElement('a');
+    let icon = document.createElement('i');
+    icon.classList.add('fa', 'fa-check', 'pr-2', 'text-white');
+    link.appendChild(icon);
+
+    li.appendChild(link);
+    li.append(data.projectName);
+
+    return li;
+  });
+}
+dom.toggle('#listDomToggle li', function(li) {
+
+});
+        </pre>
+        <ul id="listDomToggle" class="list-group">
+          <button type="button" data-role="test" class="btn btn-sm btn-success mt-1">测试</button>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-body">
+      <div class="card-title title-bordered">
+        <h6>示例：Switch 1</h6>
+      </div>
+      <div class="card-body">
+        <pre>
+$('#listDomSwitch button[data-role=test]').on('click', function() {
+  document.querySelectorAll('#listDomSwitch li').forEach(function (li, idx) { li.remove(); });
+  for (let i = 1; i <= 5; i++) {
+    dom.propagate(document.getElementById('listDomSwitch'), {
+      projectId: i,
+      projectName: i + '项目'
+    }, 'projectId', function(data) {
+      let li = document.createElement('li');
+      li.setAttribute('data-toggle', '.checked + i:first-child.text-success');
+      li.classList.add('list-group-item', 'pointer');
+      let link = document.createElement('a');
+      let icon = document.createElement('i');
+      icon.classList.add('fa', 'fa-check', 'pr-2', 'text-white');
+      link.appendChild(icon);
+
+      li.appendChild(link);
+      li.append(data.projectName);
+
+      return li;
+    });
+  }
+  dom.switch('#listDomSwitch li', function(li) {
+
+  });
+});
+        </pre>
+        <ul id="listDomSwitch1" class="list-group">
+          <button type="button" data-role="test" class="btn btn-sm btn-success mt-1">测试</button>
+        </ul>
+      </div>
+      <div class="card-title title-bordered">
+        <h6>示例：switch 2</h6>
+      </div>
+      <div class="card-body">
+        <div id="listDomSwitch2" class="accordion" role="tablist">
+          <div class="card mb-0" data-switch="div:last-child.show">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <a class="btn btn-link">点击展开#1</a>
+              </h5>
+            </div>
+            <div class="collapse">
+              <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
+            </div>
+          </div>
+          <div class="card mb-0" data-switch="div:last-child.show">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <a class="btn btn-link">点击展开#2</a>
+              </h5>
+            </div>
+            <div class="collapse">
+              <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
+            </div>
+          </div>
+          <div class="card mb-0" data-switch="div:last-child.show">
+            <div class="card-header">
+              <h5 class="mb-0">
+                <a class="btn btn-link">点击展开#3</a>
+              </h5>
+            </div>
+            <div class="collapse show">
+              <div class="card-body">Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$('#formDomData button[data-role=test]').on('click', function() {
+  dom.model('#formDomData input[name=hello]', {
+    groupId: '123',
+    groupName: '测试'
+  });
+  let data = dom.model('#formDomData input[name=hello]');
+  $('#outputDomData').text(JSON.stringify(data));
+});
+
+$('#listDomCollect button[data-role=test]').on('click', function() {
+  let data = dom.collect('#listDomCollect li.selected', ['projectId', 'projectName']);
+  $('#outputDomCollect').text(JSON.stringify(data));
+});
+
+$('#listDomPropagate button[data-role=test]').on('click', function() {
+  document.querySelectorAll('#listDomPropagate li').forEach(function (li, idx) { li.remove(); });
+  for (let i = 1; i <= 5; i++) {
+    dom.propagate(document.getElementById('listDomPropagate'), {
+      projectId: i,
+      projectName: i + '项目'
+    }, 'projectId', function(data) {
+      let li = document.createElement('li');
+      li.classList.add('list-group-item');
+      li.innerText = data.projectName;
+      return li
+    });
+  }
+});
+
+$('#listDomToggle button[data-role=test]').on('click', function() {
+  document.querySelectorAll('#listDomToggle li').forEach(function (li, idx) { li.remove(); });
+  for (let i = 1; i <= 5; i++) {
+    dom.propagate(document.getElementById('listDomToggle'), {
+      projectId: i,
+      projectName: i + '项目'
+    }, 'projectId', function(data) {
+      let li = document.createElement('li');
+      li.setAttribute('data-toggle', '.checked + i:first-child.text-success >> i:first-child.text-white');
+      li.classList.add('list-group-item', 'pointer');
+      let link = document.createElement('a');
+      let icon = document.createElement('i');
+      icon.classList.add('fa', 'fa-check', 'pr-2', 'text-white');
+      link.appendChild(icon);
+
+      li.appendChild(link);
+      li.append(data.projectName);
+
+      return li;
+    });
+  }
+  dom.toggle('#listDomToggle li', function(li) {
+
+  });
+});
+
+$('#listDomSwitch1 button[data-role=test]').on('click', function() {
+  document.querySelectorAll('#listDomSwitch1 li').forEach(function (li, idx) { li.remove(); });
+  for (let i = 1; i <= 5; i++) {
+    dom.propagate(document.getElementById('listDomSwitch1'), {
+      projectId: i,
+      projectName: i + '项目'
+    }, 'projectId', function(data) {
+      let li = document.createElement('li');
+      li.setAttribute('data-switch', '.checked + i:first-child.text-success');
+      li.classList.add('list-group-item', 'pointer');
+      let link = document.createElement('a');
+      let icon = document.createElement('i');
+      icon.classList.add('fa', 'fa-check', 'pr-2', 'text-white');
+      link.appendChild(icon);
+
+      li.appendChild(link);
+      li.append(data.projectName);
+
+      return li;
+    });
+  }
+  dom.switch('#listDomSwitch1 li', function(li) {
+
+  });
+});
+
+dom.switch('#listDomSwitch2 div.card', function(div) {
+
+});
+</script>

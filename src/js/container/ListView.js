@@ -12,32 +12,73 @@
  * 7. CHECK an item in a list
  * 8. SELECT an item in a list
  */
-let ListView = function (opts) {
-  this.container = document.querySelector(opts.containerId);
-
+ListView = function (opt) {
   // the remote data source
-  this.url = opts.url;
-  this.usecase = opts.usecase;
-  // the remote data source parameters
-  this.data = opts.data || {};
-  this.local = opts.local || [];
-  this.containerId = opts.containerId;
-  this.create = opts.create || function(idx, row) {};
+  this.url = opt.url;
+  this.usecase = opt.usecase;
+  this.params = opt.params || {};
 
-  this.start = opts.start || 0;
-  this.limit = opts.limit || -1;
+  /*!
+  ** 用于比较用的标识字段。
+  */
+  this.compare = opt.compare || function(selection, row) {return false;};
+  this.selections = opt.selections || [];
+  this.local = opt.local || [];
+  this.create = opt.create || function(idx, row) {};
+  this.complete = opt.complete;
 
-  this.height = opts.height;
-  this.tooltip = opts.tooltip;
-  this.required = opts.required || false;
+  this.start = opt.start || 0;
+  this.limit = opt.limit || -1;
+
+  this.borderless = opt.borderless || false;
+  this.height = opt.height;
+  this.tooltip = opt.tooltip;
+  this.required = opt.required || false;
   // event callback
-  this.onRemove = opts.onRemove;
-  this.onReorder = opts.onReorder;
-  this.onCheck = opts.onCheck;
-  this.onSelect = opts.onSelect;
-  this.onFilter = opts.onFilter;
-  this.onAdd = opts.onAdd;
-  this.onSearch = opts.onSearch;
+  this.onRemove = opt.onRemove;
+  this.onReorder = opt.onReorder;
+  this.onCheck = opt.onCheck;
+  this.onSelect = opt.onSelect;
+  this.onFilter = opt.onFilter;
+  this.onAdd = opt.onAdd;
+  this.onSearch = opt.onSearch;
+  this.onClick = opt.onClick;
+};
+
+/**
+ * Fetch data from remote data source.
+ */
+ListView.prototype.fetch = function () {
+  let self = this;
+  if (this.url) {
+    this.data = this.data || {};
+    this.data.start = this.start;
+    this.data.limit = this.limit;
+    xhr.post({
+      url: this.url,
+      usecase: this.usecase,
+      params: this.params,
+      success: function (resp) {
+        Array.prototype.push.apply(self.local, resp.data);
+        self.append(resp.data);
+        if (self.complete) {
+          self.complete();
+        }
+      }
+    });
+  } else {
+    self.append(this.local);
+  }
+};
+
+/**
+ * Renders a list view under its container.
+ */
+ListView.prototype.render = function(containerId) {
+  if (typeof containerId === 'string')
+    this.container = document.querySelector(containerId);
+  else
+    this.container = containerId;
 
   let ulHeight = this.height - 37;
   // style="height: 120px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.125); border-top: none;"
@@ -79,6 +120,9 @@ let ListView = function (opts) {
   }
 
   let ul = dom.create('ul', 'list-group');
+  if (this.borderless) {
+    ul.classList.add('b-a-0');
+  }
   if (this.onFilter) {
     let ulContainer = dom.create('div');
     ulContainer.style.height = ulHeight + 'px';
@@ -91,34 +135,7 @@ let ListView = function (opts) {
   } else {
     this.container.appendChild(ul);
   }
-};
 
-/**
- * Fetch data from remote data source.
- */
-ListView.prototype.fetch = function () {
-  let self = this;
-  if (this.url) {
-    this.data.start = this.start;
-    this.data.limit = this.limit;
-    xhr.post({
-      url: this.url,
-      usecase: this.usecase,
-      data: this.data,
-      success: function (resp) {
-        Array.prototype.push.apply(self.local, resp.data);
-        self.append(resp.data);
-      }
-    });
-  } else {
-    self.append(this.local);
-  }
-};
-
-/**
- * Renders a list view under its container.
- */
-ListView.prototype.render = function() {
   this.reload();
 };
 
@@ -200,9 +217,18 @@ ListView.prototype.append = function(data) {
     for (let i = 0; i < rows.length; i++) {
       this.append(rows[i]);
     }
+    if (self.complete) {
+      self.complete();
+    }
   } else {
     let row = data;
     let li = dom.create('li', 'list-group-item', 'list-group-item-action');
+    if (this.borderless) {
+      li.classList.add('b-a-0');
+    }
+    if (this.onClick) {
+      dom.bind(li, 'click', this.onClick);
+    }
     li.style.paddingLeft = '16px';
     li.style.paddingRight = '16px';
     li.style.paddingTop = '8px';
@@ -222,8 +248,14 @@ ListView.prototype.append = function(data) {
       let input = dom.element(`
         <input class="pointer checkbox color-info is-outline mr-2" type="checkbox">
       `);
+      for (let i = 0; i < this.selections.length; i++) {
+        if (this.compare(this.selections[i], row)) {
+          input.setAttribute('checked', true);
+          break;
+        }
+      }
       dom.bind(input, 'change', function() {
-        self.onCheck(this.checked, dom.model(this));
+        self.onCheck(this.checked, dom.model(this), this);
       });
       dom.model(input, row);
       li.appendChild(input);

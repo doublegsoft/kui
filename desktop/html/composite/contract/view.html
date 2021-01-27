@@ -1,0 +1,64 @@
+<div id="pageContractView" class="card b-a-0">
+  <div id="formContractView" class="card-body mb-3">
+  </div>
+</div>
+
+<script>
+
+function PageContractView() {
+  this.formContractView = new FormLayout({
+    columnCount: 1,
+    readonly: true,
+    allowClose: true,
+    save: {
+      url: 'data/chart.json',
+      usecase: 'test'
+    },
+    fields: [{
+      title: '隐藏标识',
+      name: 'anyId',
+      input: 'hidden'
+    },{
+      title: '合同名称',
+      name: 'contractName',
+      input: 'text',
+      required: true
+    },{
+      title: '签订日期',
+      name: 'signedDate',
+      input: 'date',
+      required: true
+    },{
+      title: '合同金额',
+      name: 'amount',
+      input: 'number',
+      required: true
+    },{
+      title: '合同文书',
+      name: 'attachmentId',
+      input: 'fileupload',
+      options: {
+        url: {
+          fetch: 'data/file/filelist.json'
+        }
+      }
+    }]
+  });
+}
+
+PageContractView.prototype.show = function (projectId) {
+  this.setup(projectId);
+};
+
+PageContractView.prototype.setup = function (projectId) {
+  this.formContractView.render('#formContractView', null, {
+    contractName: '自动驾驶项目',
+    signedDate: 1593937164685,
+    amount: '5000000',
+    attachmentId: [{id: '1'},{id: '2'},{id: '3'}]
+  });
+};
+
+pageContractView = new PageContractView();
+
+</script>

@@ -1,0 +1,168 @@
+<div id="pageProjectList" class="card mb-0">
+  <div class="card-header">
+    <i class="fa fa-list"></i>
+    <strong>项目列表</strong>
+    <div class="card-header-actions" style="margin-top: 1px;">
+      <a widget-id="toggleGroup" class="card-header-action"
+         data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+        <i class="fas fa-ellipsis-v"></i>
+      </a>
+      <div class="dropdown-menu dropdown-menu-right">
+        <a class="dropdown-item" href="#">新建</a>
+        <a class="dropdown-item" href="#">刷新</a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div id="tableProject" class="col-md-12 pl-0 pr-0"></div>
+  </div>
+</div>
+
+<script>
+function PageProjectList() {
+  let self = this;
+  this.tableProject = new TreelikeTable({
+    url: 'data/treepage.json',
+    limit: 5,
+    levels: 2, /* 最多两级 */
+    fields: {
+      name: 'name',
+      id: 'id',
+      parentId: 'parentId'
+    },
+    filter: {
+      fields: [{
+        title: '开始时间',
+        input: 'date',
+        name: 'startDate'
+      },{
+        title: '结束时间',
+        input: 'date',
+        name: 'completionDate'
+      },{
+        title: '项目名称',
+        input: 'text',
+        name: 'projectName',
+      },{
+        title: '项目经理',
+        input: 'text',
+        name: 'principalId'
+      }]
+    },
+    columns: [{
+      title: '任务名称',
+    }, {
+      title: '开发进度',
+      display: function(row, td) {
+        new Progress({
+          value: row,
+          model: {
+            max: 100,
+            value: 25,
+            startDate: 1577808000000,
+            finishDate: 1609344000000
+          }
+        }).renderTo(td);
+      }
+    }, {
+      title: '任务状态',
+      display: function(row, td) {
+        new Status({
+          value: row,
+          model: {
+            status: Status.COMPLETED
+          },
+          onStatusClicked: function(model) {
+            self.status();
+          }
+        }).renderTo(td);
+      }
+    },{
+      title: '责任人',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        new Person({
+          value: row,
+          model: {
+            avatar: 'img/avatars/christian.jpg',
+            name: row.principalName,
+            detail: '项目经理'
+          },
+          onPersonClicked: function(model) {
+            console.log(model);
+          }
+        }).renderTo(td);
+      }
+    },{
+      title: '操作',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        let link = dom.create('a', 'btn', 'btn-link');
+        link.setAttribute('data-model-project-id', 1);
+        link.innerHTML = '编辑';
+        dom.bind(link, 'click', function() {
+          let projectId = this.getAttribute('data-model-project-id');
+          self.edit(projectId, 'HTTPDB数据库项目');
+        });
+        td.appendChild(link);
+
+        link = dom.create('a', 'btn', 'btn-link');
+        link.setAttribute('data-model-project-id', 1);
+        link.innerHTML = '查看';
+        dom.bind(link, 'click', function() {
+          let projectId = this.getAttribute('data-model-project-id');
+          self.view(projectId, 'HTTPDB数据库项目');
+        });
+        td.appendChild(link);
+      }
+    }]
+  });
+}
+
+PageProjectList.prototype.show = function () {
+  this.setup();
+};
+
+PageProjectList.prototype.setup = function () {
+  this.tableProject.render('#tableProject', {});
+};
+
+PageProjectList.prototype.edit = function (projectId, projectName) {
+  ajax.sidebar({
+    containerId: '#pageProjectList',
+    title: projectName,
+    url: 'html/composite/project/edit.html',
+    success: function() {
+      pageProjectEdit.show(projectId);
+    }
+  });
+};
+
+PageProjectList.prototype.view = function (projectId, projectName) {
+  ajax.sidebar({
+    containerId: '#pageProjectList',
+    title: projectName,
+    allowClose: true,
+    url: 'html/composite/project/view.html',
+    success: function() {
+      pageProjectView.show(projectId);
+    }
+  });
+};
+
+PageProjectList.prototype.status = function (projectId, projectName) {
+  ajax.sidebar({
+    containerId: '#pageProjectList',
+    title: projectName,
+    allowClose: true,
+    url: 'html/composite/project/status.html',
+    success: function() {
+      //  pageProjectView.show(projectId);
+    }
+  });
+};
+
+pageProjectList = new PageProjectList();
+pageProjectList.show();
+
+</script>

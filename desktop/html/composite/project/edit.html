@@ -1,0 +1,159 @@
+<div id="pageProjectEdit" class="card b-a-0">
+  <div id="formProject" class="card-body mb-3">
+  </div>
+</div>
+
+<script>
+
+function PageProjectEdit () {
+  this.formProject = new FormLayout({
+    columnCount: 1,
+    save: {
+      url: 'data/chart.json',
+      usecase: 'test'
+    },
+    fields: [{
+      title: '隐藏标识',
+      name: 'anyId',
+      input: 'hidden'
+    },{
+      title: '文本',
+      name: 'anyText',
+      input: 'text',
+      required: true
+    },{
+      title: '编码',
+      name: 'anyCode',
+      fixed: ['DYSL', '2020', '08', '01'],
+      domain: 'regexp(^\\d{4}$)',
+      input: 'code',
+      required: true
+    },{
+      title: '日期',
+      name: 'anyDate',
+      input: 'date',
+      required: true
+    },{
+      title: '任意整数',
+      name: 'anyNumber',
+      input: 'number',
+      required: true
+    },{
+      title: '允许两位小数',
+      name: 'anyFloat',
+      input: 'number(6,2)',
+      required: true
+    },{
+      title: '选择',
+      name: 'anySelect',
+      input: 'select',
+      required: true,
+      options: {
+        url: 'data/checklist.json',
+        placeholder: '请选择...',
+        searchable: false,
+        fields: {value: 'id', text: 'name'}
+      }
+    },{
+      title: '级联选择',
+      name: 'anyCascade',
+      input: 'cascade',
+      required: true,
+      options: {
+        levels: [{
+          name: 'departmentId',
+          fields: {
+            value: 'id',
+            text: 'name'
+          },
+          text: '部门',
+          width: 'calc(49% - 3px)',
+          url: 'data/component/form/department.json'
+        }, {
+          name: 'employeeId',
+          fields: {
+            value: 'id',
+            text: 'name'
+          },
+          text: '员工',
+          width: 'calc(49% - 3px)',
+          url: 'data/component/form/employee.json'
+        }]
+      }
+    },{
+      title: '文件',
+      name: 'anyFile',
+      input: 'file',
+      required: true,
+      tooltip: '需要上传的Excel文件'
+    },{
+      title: '重要',
+      name: 'vital',
+      input: 'bool',
+    },{
+      title: '规模',
+      name: 'size',
+      input: 'radio',
+      value: '1',
+      values: [
+        {value: '1', text: '千万级'},
+        {value: '2', text: '百万级'},
+        {value: '3', text: '十万级'}
+      ]
+    },{
+      title: '项目成员',
+      name: 'projectMemberId',
+      input: 'checklist',
+      options: {
+        url: 'data/checklist.json',
+        fields: {text: 'name', value: 'id'}
+      }
+    },{
+      title: '项目任务',
+      name: 'taskId',
+      input: 'checktree',
+      options: {
+        url: {
+          root: 'data/tree.json',
+          child: 'data/tree.json'
+        },
+        data: {},
+        fields: {
+          name: 'name',
+          id: 'id',
+          parentId: 'parentId'
+        },
+        filters: {
+
+        },
+        callback: {
+          onCheck: function(event, treeId, node) {
+            console.log(node)
+          }
+        }
+      }
+    }]
+  });
+}
+
+PageProjectEdit.prototype.show = function (projectId) {
+  this.setup(projectId);
+};
+
+PageProjectEdit.prototype.setup = function (projectId) {
+  this.formProject.render('#formProject', null, {
+    anyText: '',
+    anyDate: 1593937164685,
+    anySelect: '5',
+    anyFile: 'abc',
+    anyFloat: 12.23,
+    anyNumber: 123,
+    departmentId: {id: '2', name: '市场部'},
+    employeeId: {id: '4', name: '热苏斯'},
+    projectMemberId: [{id: 1},{id: 2},{id: 3}]
+  });
+};
+
+pageProjectEdit = new PageProjectEdit();
+
+</script>

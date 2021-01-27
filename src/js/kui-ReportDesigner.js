@@ -9,8 +9,9 @@
  * @param {object} options 
  */
 function ReportDesigner(options) {
-  var self = this;
+  let self = this;
 
+  this.elements = [];
   // 页面元素
   this.containerId = options.containerId;
   this.container = document.getElementById(this.containerId);
@@ -18,6 +19,7 @@ function ReportDesigner(options) {
 
   // 属性编辑器
   this.propertiesEditor = options.propertiesEditor;
+  this.propertiesEditor.addPropertyChangedListener(this);
 
   this.bindDragOverEventListener();
   this.bindDropEventListener(this, this.drop);
@@ -28,20 +30,22 @@ function ReportDesigner(options) {
   this.canvas.setAttribute('width', this.containerWidth);
   this.canvas.setAttribute('height', options.canvasHeight);
 
+  //
+  // 鼠标点击，只支持删除对象
+  //
   document.addEventListener('keyup', function(ev) {
     if (ev.keyCode == 46 /*DEL*/) {
-      if (!self.selected) return;
-      for (var i = 0; i < self.objects.length; i++) {
-        if (self.objects[i].id == self.selected.id) {
-          self.objects.splice(i, 1);
+      if (!self.selectedElement) return;
+      for (let i = 0; i < self.elements.length; i++) {
+        if (self.elements[i].model.id == self.selectedElement.model.id) {
+          self.elements.splice(i, 1);
           break;
         }
       }
-      self.selected = null;
-      self.propertiesEditor.setSelected(null);
+      self.selectedElement = null;
+      self.propertiesEditor.clear();
       self.render();
-      
-      self.drawArrow(20, 20, 200, 100, [0, 1, -10, 1, -10, 5]);
+      // self.drawArrow(20, 20, 200, 100, [0, 1, -10, 1, -10, 5]);
     }
   });
 
@@ -59,28 +63,42 @@ function ReportDesigner(options) {
 
 ReportDesigner.prototype = new DesignCanvas();
 
-ReportDesigner.TEXT_FONT_SIZE = '18';
+ReportDesigner.TEXT_FONT_SIZE = 18;
 ReportDesigner.TEXT_FONT_FAMILY = '宋体';
-ReportDesigner.STROKE_STYLE_SELECTED = 'red';
-ReportDesigner.STROKE_STYLE_ALIGNMENT = 'blue';
+ReportDesigner.STROKE_STYLE_SELECTED = '#20a8d8';
+ReportDesigner.STROKE_STYLE_ALIGNMENT = '#ffc107';
 ReportDesigner.STROKE_STYLE_DEFAULT = 'black';
+
+ReportDesigner.prototype.unselectAll = function (element) {
+  for (let i = 0; i < this.elements.length; i++)
+    this.elements[i].unselect();
+  this.selectedElement = null;
+};
+
+ReportDesigner.prototype.onPropertyChanged = function (prop) {
+  if (this.selectedElement == null) return;
+  this.selectedElement.notifyModelChangedListeners(prop);
+  this.render();
+};
 
 /**
  * 添加设计器上的对象到设计器对象对对象的管理容器。
- * 
+ *
  * @param {object} obj
  *        设计器新增加的对象
  */
-ReportDesigner.prototype.addObject = function (obj) {
-  obj.position = function() {
-    return '(' + parseInt(this.x) + ", " + parseInt(this.y) + ", " 
-               + parseInt(this.width) + ', ' +  parseInt(this.height) + ')';
-  }
-  obj.font = function() {
-    return obj.fontSize + 'px ' + obj.fontFamily; 
-  }
-  this.objects.push(obj);
-}
+ReportDesigner.prototype.addAndRenderElement = function (element) {
+  element.addModelChangedListener(this.propertiesEditor);
+  this.elements.push(element);
+
+  // 显示元素的属性编辑器
+  this.propertiesEditor.render(element);
+  // 取消所有原有的元素
+  this.unselectAll();
+  this.selectedElement = element;
+  // 渲染
+  this.render();
+};
 
 /**
  * 添加默认的文本到画布对象中。
@@ -95,256 +113,106 @@ ReportDesigner.prototype.addObject = function (obj) {
  *        the coordinate y in canvas
  */
 ReportDesigner.prototype.addText = function (text, x, y) {
-  var textObj = {
-    id: 'text-' + moment().valueOf(),
-    text: text,
-    type: 'text',
-    fontSize: ReportDesigner.TEXT_FONT_SIZE,
-    fontFamily: ReportDesigner.TEXT_FONT_FAMILY,
+  let elementText = new TextElement({
     x: x,
     y: y,
-    height: parseInt(ReportDesigner.TEXT_FONT_SIZE),
-    isSelected: false
-  };
-  
-  this.addObject(textObj);
-
-  this.renderText(textObj);
+    text: text,
+    selected: true
+  });
+  // 添加文本元素
+  this.addAndRenderElement(elementText);
 };
 
-/**
- * 在画布对象中渲染一个文本对象。
- * 
- * @param {object} textObj
- *        文本对象
- */
-ReportDesigner.prototype.renderText = function (textObj) {
-  var ctx = this.canvas.getContext('2d');
-  ctx.fillStyle = textObj.color || ReportDesigner.STROKE_STYLE_DEFAULT;
-  ctx.font = textObj.font();
- 
-  textObj.width = ctx.measureText(textObj.text).width;
-  // 文本的高度设置特殊性
-  textObj.height = parseInt(textObj.fontSize);
+ReportDesigner.prototype.addLongtext = function (text, x, y) {
+  let elementText = new LongtextElement({
+    x: x,
+    y: y,
+    text: text,
+    selected: true
+  });
+  // 添加文本元素
+  this.addAndRenderElement(elementText);
+};
 
-  ctx.fillText(textObj.text, textObj.x, textObj.y + textObj.height);
-  
-  if (textObj.isSelected) {
-    var offsetX = 5;
-    var offsetY = 2;
-    
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
-    ctx.beginPath();
-    // left-top
-    ctx.moveTo(textObj.x - offsetX, textObj.y - offsetY);
-    // left-bottom
-    ctx.lineTo(textObj.x - offsetX, textObj.y + textObj.height + offsetY + 3);
-    // right-bottom
-    ctx.lineTo(textObj.x + textObj.width + offsetX, textObj.y + textObj.height + offsetY + 3);
-    // right-top
-    ctx.lineTo(textObj.x + textObj.width + offsetX, textObj.y - offsetY);
-    // left-top
-    ctx.lineTo(textObj.x - offsetX, textObj.y - offsetY);
-    ctx.stroke();
-  }
-}
+ReportDesigner.prototype.addImage = function (x, y) {
+  let elementImage = new ImageElement({
+    x: x,
+    y: y,
+    selected: true
+  });
+  this.addAndRenderElement(elementImage);
+};
 
 ReportDesigner.prototype.addTable = function (x, y) {
-  var now = moment();
-  var tableObj = {
-    id: 'table-' + now.valueOf(),
-    type: 'table',
-    fontSize: ReportDesigner.TEXT_FONT_SIZE,
-    fontFamily: ReportDesigner.TEXT_FONT_FAMILY,
-    columns: [{
-      title: '列标题1'
-    }, {
-      title: '列标题2'
-    }, {
-      title: '列标题3'
-    }],
+  let elementTable = new TableElement({
     x: x,
     y: y,
-    width: 500,
-    height: 300,
-    isSelected: false
-  };
-
-  this.addObject(tableObj);
-
-  this.renderTable(tableObj);
-};
-
-ReportDesigner.prototype.renderTable = function (tableObj) {
-  var ctx = this.canvas.getContext('2d');
-  ctx.font = tableObj.font();
-
-  if (tableObj.isSelected) {
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
-  } else {
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_DEFAULT;
-  }
-  ctx.beginPath();
-
-  // left-top
-  ctx.moveTo(tableObj.x, tableObj.y);
-  // left-bottom
-  ctx.lineTo(tableObj.x, tableObj.y + tableObj.height);
-  // right-bottom
-  ctx.lineTo(tableObj.x + tableObj.width, tableObj.y + tableObj.height);
-  // right-top
-  ctx.lineTo(tableObj.x + tableObj.width, tableObj.y);
-  // left-top
-  ctx.lineTo(tableObj.x, tableObj.y);
-  ctx.stroke();
-  
-  ctx.strokeStyle = 'black';
-  ctx.font = tableObj.font();
-
-  for (var i = 0; i < tableObj.columns.length; i++) {
-    ctx.fillText(tableObj.columns[i].title, tableObj.x + 30 + (150 * i), tableObj.y + 30);
-  }
-  
+    selected: true
+  });
+  this.addAndRenderElement(elementTable);
 };
 
 ReportDesigner.prototype.addChart = function (x, y) {
-  var now = moment();
-  var chartObj = {
-    id: 'chart-' + now.valueOf(),
-    type: 'chart',
-    subtype: 'bar',
+  let elementChart = new ChartElement({
+    subtype: '柱状图',
     x: x,
     y: y,
-    width: 500,
-    height: 300,
-    isSelected: false
-  };
-
-  this.addObject(chartObj);
-
-  this.renderChart(chartObj);
-};
-
-ReportDesigner.prototype.renderChart = function (chartObj) {
-  var ctx = this.canvas.getContext('2d');
-
-  var img = document.getElementById('chart_' + chartObj.subtype);
-  var sWidth = img.naturalWidth;
-  var sHeight = img.naturalHeight;
-
-  ctx.drawImage(img, 0, 0, sWidth, sHeight, chartObj.x, chartObj.y, chartObj.width, chartObj.height);
-  
-  if (chartObj.isSelected) {
-    var offsetX = 2;
-    var offsetY = 2;
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
-    ctx.beginPath();
-    // left-top
-    ctx.moveTo(chartObj.x - offsetX, chartObj.y - offsetY);
-    // left-bottom
-    ctx.lineTo(chartObj.x - offsetX, chartObj.y + chartObj.height + offsetY);
-    // right-bottom
-    ctx.lineTo(chartObj.x + chartObj.width + offsetX, chartObj.y + chartObj.height + offsetY);
-    // right-top
-    ctx.lineTo(chartObj.x + chartObj.width + offsetX, chartObj.y - offsetY);
-    // left-top
-    ctx.lineTo(chartObj.x - offsetX, chartObj.y - offsetY);
-    ctx.stroke();
-  }
-}
-
-ReportDesigner.prototype.addImage = function (x, y) {
-  var now = moment();
-  var imageObj = {
-    id: 'image-' + now.valueOf(),
-    type: 'image',
-    x: x,
-    y: y,
-    width: 100,
-    height: 100
-  };
-  
-  this.addObject(imageObj);
-
-  this.renderImage(imageObj);
-};
-
-ReportDesigner.prototype.renderImage = function (imageObj) {
-  var ctx = this.canvas.getContext('2d');
-  var img = document.getElementById('test_image');
-  var sWidth = img.naturalWidth;
-  var sHeight = img.naturalHeight;
-  ctx.drawImage(img, 0, 0, sWidth, sHeight, imageObj.x, imageObj.y, imageObj.width, imageObj.height);
-
-  if (imageObj.isSelected) {
-    var offsetX = 2;
-    var offsetY = 2;
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
-    ctx.beginPath();
-    // left-top
-    ctx.moveTo(imageObj.x - offsetX, imageObj.y - offsetY);
-    // left-bottom
-    ctx.lineTo(imageObj.x - offsetX, imageObj.y + imageObj.height + offsetY);
-    // right-bottom
-    ctx.lineTo(imageObj.x + imageObj.width + offsetX, imageObj.y + imageObj.height + offsetY);
-    // right-top
-    ctx.lineTo(imageObj.x + imageObj.width + offsetX, imageObj.y - offsetY);
-    // left-top
-    ctx.lineTo(imageObj.x - offsetX, imageObj.y - offsetY);
-    ctx.stroke();
-  }
+    selected: true
+  });
+  this.addAndRenderElement(elementChart);
 };
 
 ReportDesigner.prototype.drawGrid = function (w, h, strokeStyle, step) {
-  var ctx = this.canvas.getContext('2d');
-  for (var x = 0.5; x < w; x += step){
+  let ctx = this.canvas.getContext('2d');
+  for (let x = 0.5; x < w; x += step){
     ctx.moveTo(x, 0);
     ctx.lineTo(x, h);
   }
   
-  for (var y = 0.5; y < h; y += step) {
+  for (let y = 0.5; y < h; y += step) {
     ctx.moveTo(0, y);
     ctx.lineTo(w, y);
   }
   
   ctx.strokeStyle = strokeStyle;
   ctx.stroke();
-}
+};
+
 
 ReportDesigner.prototype.render = function () {
-  // 画网格线
-  // this.drawDotLines();
-  var ctx = this.canvas.getContext('2d');
+  let ctx = this.canvas.getContext('2d');
+
+  // 清除画布
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+  // 网格线
   this.drawGrid(this.canvas.width, this.canvas.height, '#eee', 10);
 
-  for (var i = 0; i < this.objects.length; i++) {
-    var obj = this.objects[i];
-    if (obj.type == 'text') {
-      this.renderText(obj);
-    } else if (obj.type == 'table') {
-      this.renderTable(obj);
-    } else if (obj.type == 'image') {
-      this.renderImage(obj);
-    } else if (obj.type == 'chart') {
-      this.renderChart(obj);
-    }
+  // 逐个画元素（根据元素的模型数据）
+  for (let i = 0; i < this.elements.length; i++) {
+    let element = this.elements[i];
+    element.render(ctx);
   }
 
-  if (this.alignmentLine) {
-    var ctx = this.canvas.getContext('2d');
-    ctx.strokeStyle = ReportDesigner.STROKE_STYLE_ALIGNMENT;
-    ctx.lineWidth = '1px';
-    var line = this.alignmentLine;
-    if (line.x) {
-      ctx.moveTo(line.x, 0);
-      ctx.lineTo(line.x, this.canvas.height);
-      ctx.stroke();
-    } else {
-      ctx.moveTo(0, line.y);
-      ctx.lineTo(this.canvas.width, line.y);
-      ctx.stroke();
+  if (this.alignmentLines && this.alignmentLines.length > 0) {
+    for (let i = 0; i < this.alignmentLines.length; i++) {
+      let alignmentLine = this.alignmentLines[i];
+      ctx.beginPath();
+      ctx.setLineDash([3, 5]);
+      ctx.strokeStyle = ReportDesigner.STROKE_STYLE_ALIGNMENT;
+      ctx.lineWidth = 1;
+      let line = alignmentLine;
+      if (line.x) {
+        ctx.moveTo(line.x, 0);
+        ctx.lineTo(line.x, this.canvas.height);
+        ctx.stroke();
+      } else {
+        ctx.moveTo(0, line.y);
+        ctx.lineTo(this.canvas.width, line.y);
+        ctx.stroke();
+      }
+      ctx.closePath();
+      ctx.setLineDash([]);
     }
   }
 };
@@ -353,7 +221,7 @@ ReportDesigner.prototype.render = function () {
  * 
  */
 ReportDesigner.prototype.drag = function (ev) {
-  var target = ev.target;
+  let target = ev.target;
   self.dragging = target;
 
   self.dragX = ev.layerX;
@@ -363,13 +231,15 @@ ReportDesigner.prototype.drag = function (ev) {
 };
 
 ReportDesigner.prototype.drop = function (self, ev) {
-  var rect = self.canvas.getBoundingClientRect();
-  var x = ev.clientX - rect.left;
-  var y = ev.clientY - rect.top;
+  let rect = self.canvas.getBoundingClientRect();
+  let x = ev.clientX - rect.left;
+  let y = ev.clientY - rect.top;
 
-  var dragType = ev.dataTransfer.getData('drag-type');
+  let dragType = ev.dataTransfer.getData('drag-type');
   if (dragType == 'text') {
     self.addText('这里是标题', x, y);
+  } else if (dragType == 'longtext') {
+    self.addLongtext('这是长文本的示例，长文本允许折行显示，适合显示描述性的文本内容。', x, y);
   } else if (dragType == 'table') {
     self.addTable(x, y);
   } else if (dragType == 'image') {
@@ -384,46 +254,39 @@ ReportDesigner.prototype.drop = function (self, ev) {
  */
 ReportDesigner.prototype.select = function (self, ev) {
   if (ev.button != 0) return;
-  var rect = self.canvas.getBoundingClientRect();
-  var clickX = ev.clientX - rect.left;
-  var clickY = ev.clientY - rect.top;
+  let rect = self.canvas.getBoundingClientRect();
+  let clickX = ev.clientX - rect.left;
+  let clickY = ev.clientY - rect.top;
 
   // reset selected object in designer
-  self.selected = null;
+  self.unselectAll();
 
-  // reset each object selected property to false
-  for (var i = 0; i < self.objects.length; i++) {
-    var obj = self.objects[i];
-    obj.isSelected = false;
-  }
-
-  for (var i = 0; i < self.objects.length; i++) {
-    var obj = self.objects[i];
+  for (let i = 0; i < self.elements.length; i++) {
+    let elm = self.elements[i];
     // check the mouse position is or not in the object shape.
-    if ((clickX >= obj.x && clickX <= (obj.x + obj.width)) &&
-        (clickY >= obj.y && clickY <= (obj.y + obj.height))) {
-      obj.isSelected = true;
-      self.selected = obj;
+    if (elm.select(clickX, clickY)) {
       // allow to move
       self.isMoving = true;
-      self.offsetMoveX = clickX - self.selected.x;
-      self.offsetMoveY = clickY - self.selected.y;
+      self.offsetMoveX = clickX - elm.model.x;
+      self.offsetMoveY = clickY - elm.model.y;
+      self.selectedElement = elm;
       break;
     }
   }
 
-  self.propertiesEditor.setSelected(self.selected);
-
   // 光标改变
-  if (self.selected) {
-    var resizeType = self.showResizeCursor(ev);
-    if (resizeType == 'none' || self.selected.type == 'text') {
+  if (self.selectedElement) {
+    let resizeType = self.showResizeCursor(ev);
+    if (resizeType == 'none' || self.selectedElement.model.type == 'text') {
       self.isMoving = true;
       self.canvas.style.cursor = 'move';
     } else {
       self.resizeType = resizeType;
       self.isResizing = true;
     }
+    self.propertiesEditor.render(self.selectedElement);
+  } else {
+    self.propertiesEditor.clear();
   }
 
   // 重新渲染，如果选择了则显示选择的边框；如果没有，则消除选择的边框
@@ -435,37 +298,40 @@ ReportDesigner.prototype.select = function (self, ev) {
  */
 ReportDesigner.prototype.move = function (self, ev) {
   // 没有选择
-  if (self.selected == null) return;
+  if (self.selectedElement == null) return;
   if (!self.isMoving && !self.isResizing) return;
 
-  var resizeType = self.resizeType;
+  let resizeType = self.resizeType;
   
-  var rect = self.canvas.getBoundingClientRect();
-  var moveX = ev.clientX - rect.left;
-  var moveY = ev.clientY - rect.top;
+  let rect = self.canvas.getBoundingClientRect();
+  let moveX = ev.clientX - rect.left;
+  let moveY = ev.clientY - rect.top;
 
   if (resizeType == 'east') {
-    var offsetX = moveX - self.selected.x - self.selected.width;
-    self.selected.width = self.selected.width + offsetX;
+    let offsetX = moveX - self.selectedElement.model.x - self.selectedElement.model.width;
+    self.selectedElement.model.width = self.selectedElement.model.width + offsetX;
   } else if (resizeType == 'west') {
-    var offsetX = self.selected.x - moveX;
-    self.selected.x = moveX;
-    self.selected.width = self.selected.width + offsetX;
+    let offsetX = self.selectedElement.model.x - moveX;
+    self.selectedElement.model.x = moveX;
+    self.selectedElement.model.width = self.selectedElement.model.width + offsetX;
   } else if (resizeType == 'north') {
-    var offsetY = self.selected.y - moveY;
-    self.selected.y = moveY;
-    self.selected.height = self.selected.height + offsetY;
+    let offsetY = self.selectedElement.model.y - moveY;
+    self.selectedElement.model.y = moveY;
+    self.selectedElement.model.height = self.selectedElement.model.height + offsetY;
   } else if (resizeType == 'south') {
-    var offsetY = moveY - self.selected.y - self.selected.height;
-    self.selected.height = self.selected.height + offsetY;
+    let offsetY = moveY - self.selectedElement.model.y - self.selectedElement.model.height;
+    self.selectedElement.model.height = self.selectedElement.model.height + offsetY;
   } else {
     self.canvas.style.cursor = 'move';
-    self.selected.x = moveX - self.offsetMoveX;
-    self.selected.y = moveY - self.offsetMoveY;
+    self.selectedElement.model.x = moveX - self.offsetMoveX;
+    self.selectedElement.model.y = moveY - self.offsetMoveY;
   }
-
-  // 实时更新位置属性
-  self.propertiesEditor.setSelected(self.selected);
+  self.selectedElement.notifyModelChangedListeners({
+    x: self.selectedElement.model.x,
+    y: self.selectedElement.model.y,
+    width: self.selectedElement.model.width,
+    height: self.selectedElement.model.height
+  });
 
   // 渲染
   self.render();

@@ -2,14 +2,14 @@
  *
  */
 Model
-  = model:(Trigger / Observer) {
+  = model:(trigger:Trigger / observer:Observer) {
     return model;
   }
 
 Trigger
   = event:Event _ '=>' _ variable:Id {
     return {
-      event: name,
+      event: event,
       variable: variable
     };
   }
@@ -24,6 +24,11 @@ Observer
 
 Event
   = '(' id:Id ')' {
+    return id;
+  }
+
+Action
+  = '<' id:Id '>' {
     return id;
   }
 

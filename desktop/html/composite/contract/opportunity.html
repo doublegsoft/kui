@@ -1,0 +1,25 @@
+<div id="pageEmployeeProfile" class="full-width">
+
+</div>
+
+<script>
+var wizard = new Wizard({
+  topic: 'opportunity',
+  steps: [{
+    title: '商机建立',
+    description: '通过各种渠道获取的市场信息'
+  },{
+    title: '客户跟进',
+    description: '记录围绕客户当前商机的活动',
+    active: true,
+    url: 'html/composite/contract/opportunity_update.html'
+  },{
+    title: '项目投标',
+    description: '客户项目招标结果。'
+  },{
+    title: '合同签订',
+    description: '合同详细信息及相关资料'
+  }]
+});
+wizard.render('#pageEmployeeProfile', {});
+</script>

@@ -35,20 +35,23 @@ Validation = {
     if (typeof container === 'undefined') {
       container = $(document);
     }
+    if (typeof container === 'string') {
+      container = $('#' + container);
+    }
     // 输入框
     container.find('input[type!=checkbox][type!=radio][type!=button]').each(function (idx, el) {
       var val = $(el).val().trim();
       var label = Validation.getLabel(el);
       // 必填项校验
-      var msg = $(el).attr('required-message') ? $(el).attr('required-message') : label + '必须填写！';
-      if (($(el).prop('required') || $(el).attr("required") == "required") && val === '') {
+      var msg = $(el).attr('data-required-message') ? $(el).attr('data-required-message') : label + '必须填写！';
+      if (Validation.isRequired(el) && val === '') {
         ret.push({
           element: el,
           message: msg
         });
       }
       // 专用类型校验
-      var expr = $(el).attr('domain-type');
+      var expr = $(el).attr('data-domain-type');
       if (!expr) {
         return;
       }
@@ -60,10 +63,10 @@ Validation = {
           case REQUIRED_ERROR:
             break;
           case FORMAT_ERROR:
-            msg = $(el).attr('format-message') ? $(el).attr('format-message') : msg;
+            msg = $(el).attr('data-format-message') ? $(el).attr('data-format-message') : msg;
             break;
           case INVALID_ERROR:
-            msg = $(el).attr('invalid-message') ? $(el).attr('invalid-message') : msg;
+            msg = $(el).attr('data-invalid-message') ? $(el).attr('data-invalid-message') : msg;
             break;
           default:
             break;
@@ -80,15 +83,15 @@ Validation = {
       var val = $(el).val().trim();
       var label = Validation.getLabel(el);
       // 必填项校验
-      var msg = $(el).attr('required-message') ? $(el).attr('required-message') : label + '必须填写！';
-      if ($(el).prop('required') && val === '') {
+      var msg = $(el).attr('data-required-message') ? $(el).attr('data-required-message') : label + '必须填写！';
+      if (Validation.isRequired(el) && val === '') {
         ret.push({
           element: el,
           message: msg
         });
       }
       // 专用类型校验
-      var expr = $(el).attr('domain-type');
+      var expr = $(el).attr('data-domain-type');
       if (!expr) {
         return;
       }
@@ -100,10 +103,10 @@ Validation = {
           case REQUIRED_ERROR:
             break;
           case FORMAT_ERROR:
-            msg = $(el).attr('format-message') ? $(el).attr('format-message') : msg;
+            msg = $(el).attr('data-format-message') ? $(el).attr('data-format-message') : msg;
             break;
           case INVALID_ERROR:
-            msg = $(el).attr('invalid-message') ? $(el).attr('invalid-message') : msg;
+            msg = $(el).attr('data-invalid-message') ? $(el).attr('data-invalid-message') : msg;
             break;
           default:
             break;
@@ -118,10 +121,10 @@ Validation = {
     });
     // 下拉框
     container.find('select').each(function (idx, el) {
-      if ($(el).prop('required') && $(el).val() == '-1') {
+      if (Validation.isRequired(el) && ($(el).val() == '-1' || $(el).val() == '' || $(el).val() == null)) {
         var label = Validation.getLabel(el);
         var msg = label + '必须选择！';
-        msg = $(el).attr('required-message') ? $(el).attr('required-message') : msg;
+        msg = $(el).attr('data-required-message') ? $(el).attr('data-required-message') : msg;
         ret.push({
           element: $(el),
           message: msg
@@ -148,9 +151,9 @@ Validation = {
           checked = true;
         }
       });
-      if (!checked && $(elm).prop('required')) {
+      if (!checked && Validation.isRequired(elm)) {
         var msg = label + '必须选择！';
-        msg = $(elm).attr('required-message') ? $(elm).attr('required-message') : msg;
+        msg = $(elm).attr('data-required-message') ? $(elm).attr('data-required-message') : msg;
         ret.push({
           element: $(elm),
           message: msg
@@ -179,7 +182,7 @@ Validation = {
       });
       if (!checked && $(elm).prop('required')) {
         var msg = label + '必须选择！';
-        msg = $(elm).attr('required-message') ? $(elm).attr('required-message') : msg;
+        msg = $(elm).attr('data-required-message') ? $(elm).attr('data-required-message') : msg;
         ret.push({
           element: $(elm),
           message: msg
@@ -216,7 +219,15 @@ Validation = {
 
   getLabel: function (_el) {
     var el = $(_el);
-    return el.attr('label') || (el.attr("name") || el.attr("id"));
+    return el.attr('label') || $(el).attr("data-required") || (el.attr("name") || el.attr("id"));
+  },
+
+  isRequired: function(_el) {
+    let el = $(_el);
+    if (el.prop('required')) return true;
+    if (el.attr('required') == 'required') return true;
+    if (typeof el.attr('data-required') === 'undefined') return false;
+    return el.attr('data-required') != '';
   },
 
   getDomainValidator: function (model) {

@@ -1,13 +1,91 @@
-<div class="row">
+<div id="widgetRx" class="row">
   <div class="col-md-3">
     <div class="card">
       <div class="card-body">
         <div class="card-title title-bordered">
-          <h6>ReactiveX表单</h6>
+          <h6>示例：表单</h6>
         </div>
-        <div id="formSimple" class="height300 full-width card-body">
-          <input name="input" class="form-control" data-rx-model="(input)=>input" placeholder="这里输入文本">
+        <div id="formSimple" class="height300 full-width">
+          <input name="input" class="form-control mb-2" data-rx-model="(input)=>input" placeholder="这里输入文本">
           <input name="output" class="form-control" data-rx-model="[input]=>page.accept()" placeholder="这里输出文本" readonly>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <h6>示例：列表过滤</h6>
+        </div>
+        <div id="formListFilter" class="height300 full-width" style="overflow-y: hidden">
+          <input name="filter" class="form-control mb-1" data-rx-model="(input)=>filter" placeholder="搜索...">
+          <ul id="listCountry" class="list-group" data-rx-model="[filter]=>page.filter()">
+            <li class="list-group-item" data-pinyin="MeiGuo">美国</li>
+            <li class="list-group-item" data-pinyin="ZhongGuo">中国</li>
+            <li class="list-group-item" data-pinyin="DeGuo">德国</li>
+            <li class="list-group-item" data-pinyin="YingGuo">英国</li>
+            <li class="list-group-item" data-pinyin="FaGuo">法国</li>
+            <li class="list-group-item" data-pinyin="YiDaLi">意大利</li>
+            <li class="list-group-item" data-pinyin="BaXi">巴西</li>
+            <li class="list-group-item" data-pinyin="RiBen">日本</li>
+            <li class="list-group-item" data-pinyin="YinDu">印度</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <h6>示例：列表选择联动1</h6>
+        </div>
+        <div class="height300 full-width row ml-0 mr-0">
+          <div id="listPerson" class="list-group col-md-4"></div>
+          <div id="formPersonDetail" class="form form-horizontal col-md-8" data-rx-model="[person] => page.readPerson()">
+            <div class="form-group row">
+              <label class="col-form-label col-md-3">标识：</label>
+              <div class="col-md-9 input-group">
+                <input class="form-control" name="personId">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-form-label col-md-3">姓名：</label>
+              <div class="col-md-9 input-group">
+                <input class="form-control" name="personName">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title title-bordered">
+          <h6>示例：列表选择联动2</h6>
+        </div>
+        <div class="height300 full-width row ml-0 mr-0">
+          <div id="listProject" class="list-group col-md-2"></div>
+          <div id="formProjectDetail" class="form form-horizontal col-md-8" data-rx-model="[project] => page.readProject()">
+            <div class="form-group row">
+              <label class="col-form-label col-md-3">标识：</label>
+              <div class="col-md-9 input-group">
+                <input class="form-control" name="projectId">
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-form-label col-md-3">项目名称：</label>
+              <div class="col-md-9 input-group">
+                <input class="form-control" name="projectName">
+              </div>
+            </div>
+          </div>
+          <ul id="listProjectMember" class="list-group col-md-2 pr-0" data-rx-model="[project] => page.readProjectMembers()">
+
+          </ul>
         </div>
       </div>
     </div>
@@ -17,18 +95,116 @@
 <script>
 var form = document.getElementById('formSimple');
 var observable = new ObservableObject({
-  input: ''
+  input: '',
+  filter: '',
+  person: {}
 });
 
 var page = {
-  accept: function(evt) {
-    $('#formSimple input[name=output]').val(evt.newValue);
+  accept: function(newVal) {
+    $('#formSimple input[name=output]').val(newVal);
+  },
+  readPerson: function(newVal) {
+    $('#formPersonDetail').formdata(newVal);
+  },
+  readProject: function(newVal) {
+    $('#formProjectDetail').formdata(newVal);
+  },
+  readProjectMembers: function(newVal) {
+    document.querySelectorAll('#listProjectMember li').forEach(function(elm, idx) {
+      elm.remove();
+    });
+    for (let i = 1; i <= 3; i++) {
+      let no = Math.floor(Math.random() * 10);
+      dom.propagate(document.getElementById('listProjectMember'), {
+        personId: no,
+        personName: no + '同学'
+      }, ['personId', 'personName'], function(data) {
+        let li = document.createElement('li');
+        li.classList.add('list-group-item', 'pointer');
+        li.append(data.personName);
+        return li;
+      });
+    }
+  },
+  filter: function(keyword) {
+    console.log(keyword);
+    dom.find('#listCountry li').forEach(function(elm, idx) {
+      elm.classList.remove('hide');
+      elm.classList.add('show');
+    });
+    dom.find('#listCountry li').forEach(function(elm, idx) {
+      let pinyin = elm.getAttribute('data-pinyin');
+      if (pinyin.toLowerCase().indexOf(keyword) == -1 && elm.innerText.indexOf(keyword) == -1)
+        elm.classList.add('hide');
+    });
   }
 };
 
-observable.install('formSimple');
+observable.install('widgetRx');
 
-// document.querySelector('input[name=input]').addEventListener('input', function() {
-//   observable.proxy.input = this.value;
-// })
+//
+// 随机产生【人员】信息
+//
+for (let i = 1; i <= 5; i++) {
+  dom.propagate(document.getElementById('listPerson'), {
+    personId: i,
+    personName: i + '同学'
+  }, ['personId', 'personName'], function(data) {
+    let li = document.createElement('li');
+    li.setAttribute('data-switch', '.checked + i:first-child.text-success');
+    li.classList.add('list-group-item', 'pointer');
+    let link = document.createElement('a');
+    let icon = document.createElement('i');
+    icon.classList.add('fa', 'fa-check', 'pr-2', 'text-white');
+    link.appendChild(icon);
+
+    li.appendChild(link);
+    li.append(data.personName);
+
+    return li;
+  });
+}
+
+dom.switch('#listPerson li', function(li) {
+  observable.setValue('person', dom.model(li));
+});
+
+//
+// 随机产生【项目】名称
+//
+for (let i = 1; i <= 5; i++) {
+  dom.propagate(document.getElementById('listProject'), {
+    projectId: i,
+    projectName: i + '项目'
+  }, ['projectId', 'projectName'], function(data) {
+    let li = dom.create('li', 'list-group-item', 'list-group-item-action', 'pointer')
+    li.setAttribute('data-switch', '.checked + i:first-child.text-success');
+    let link = document.createElement('a');
+    let icon = document.createElement('i');
+    icon.classList.add('fa', 'fa-check', 'pr-2', 'text-white');
+    link.appendChild(icon);
+
+    li.appendChild(link);
+    li.append(data.projectName);
+
+    return li;
+  });
+}
+
+dom.switch('#listProject li', function(li) {
+  observable.setValue('project', dom.model(li));
+});
+
+//
+// 固定过滤框
+//
+var position = dom.fix('#formListFilter input[name=filter]');
+document.querySelector('#listCountry').style.marginTop = position.height + 'px';
+
+//
+// 重设列表的高度
+//
+dom.find('#listCountry').style.height = (300 - position.height) + 'px';
+dom.find('#listCountry').style.overflowY = 'auto';
 </script>

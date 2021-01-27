@@ -60,7 +60,7 @@ if (typeof Slick === "undefined") {
       alwaysShowVerticalScroll: false,
       alwaysAllowHorizontalScroll: false,
       explicitInitialization: false,
-      rowHeight: 25,
+      rowHeight: 32,
       defaultColumnWidth: 80,
       enableAddRow: false,
       leaveSpaceForNewRows: false,

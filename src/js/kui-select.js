@@ -20,6 +20,9 @@
  * SOFTWARE.
  */
 
+/**
+ * 浏览器默认的简单下拉单选框。
+ */
 $.fn.simpleselect = function (opts) {
   let value = opts.fields.value;
   let text = opts.fields.text;
@@ -28,37 +31,6 @@ $.fn.simpleselect = function (opts) {
   let dotIndex = value.indexOf('.');
   let objname = value.substr(0, dotIndex);
   let attrname = value.substr(dotIndex + 1);
-  xhr.post({
-    url: opts.url,
-    data: opts.data || {},
-    success: function (resp) {
-      if (!resp.data) return;
-      for (let i = 0; i < resp.data.length; i++) {
-        let item = resp.data[i];
-        let option = $('<option></option>');
-        if (dotIndex == -1) {
-          option.prop('selected', selection == item[value]);
-          option.attr('value', item[value]);
-        } else {
-          option.prop('selected', selection == item[objname][attrname]);
-          option.attr('value', item[objname][attrname]);
-        }
-        option.text(item[text]);
-        self.append(option);
-      }
-    }
-  });
-};
-
-$.fn.searchselect = function (opts) {
-  let value = opts.fields.value;
-  let text = opts.fields.text;
-  let selection = opts.selection || '-1';
-  let self = $(this);
-  let dotIndex = value.indexOf('.');
-  let objname = value.substr(0, dotIndex);
-  let attrname = value.substr(dotIndex + 1);
-
   xhr.post({
     url: opts.url,
     data: opts.data || {},
@@ -79,11 +51,127 @@ $.fn.searchselect = function (opts) {
         option.text(item[text]);
         self.append(option);
       }
-      self.select2({
-        liveSearch: true
-      });
     }
   });
+};
+
+/**
+ * 可搜索的下拉单选框。
+ */
+$.fn.searchselect = function (opts) {
+  let selection = opts.selection || null;
+  let searchable = true;
+  let complete = opts.complete || function (data) {};
+  if (typeof opts.searchable !== 'undefined')
+    searchable = opts.searchable;
+  let select = opts.select;
+  let onchange = opts.onchange;
+  let validate = opts.validate || function(val) {};
+
+  let value;
+  let text;
+  if (opts.values) {
+    value = 'value';
+    text = 'text';
+  } else {
+    value = opts.fields.value;
+    text = opts.fields.text;
+  }
+
+
+  if (opts.url) {
+
+    let self = $(this);
+    let dotIndex = value.indexOf('.');
+    let objname = value.substr(0, dotIndex);
+    let attrname = value.substr(dotIndex + 1);
+
+    xhr.post({
+      url: opts.url,
+      usecase: opts.usecase,
+      data: opts.data || {},
+      success: function (resp) {
+        if (!resp.data) {
+          resp.data = [];
+        }
+        let hasSelected = false;
+        self.empty();
+        for (let i = 0; i < resp.data.length; i++) {
+          let item = resp.data[i];
+          let option = $('<option></option>');
+
+          if (dotIndex == -1) {
+            option.prop('selected', selection == item[value]);
+            option.attr('value', item[value]);
+            hasSelected = hasSelected ? hasSelected : selection == item[value];
+          } else {
+            option.prop('selected', selection == item[objname][attrname]);
+            option.attr('value', item[objname][attrname]);
+            hasSelected = hasSelected ? hasSelected : selection == item[objname][attrname];
+          }
+          option.text(item[text]);
+          self.append(option);
+        }
+        self.select2({
+          placeholder: opts.placeholder,
+          minimumResultsForSearch: searchable ? 0 : Infinity,
+          liveSearch: true,
+          allowClear: true,
+        });
+        self.on('change', function(evt) {
+          validate(self.get(0));
+          if (onchange) onchange(evt);
+        });
+        if (select) {
+          if (!hasSelected) {
+            self.val(resp.data[0][value]);
+          }
+          select(self.val());
+        } else {
+          self.val(selection).trigger('change');
+        }
+        complete(resp.data);
+      }
+    });
+  } else if (opts.local || opts.values) {
+    let values = opts.local || opts.values;
+    for (let i = 0; i < values.length; i++) {
+      $(this).append('<option value="' + values[i][value] + '">' + values[i][text] + '</option>');
+    }
+    $(this).val(selection);
+    $(this).select2({
+      liveSearch: false,
+      allowClear: true,
+      minimumResultsForSearch: searchable ? 0 : Infinity,
+      placeholder: opts.placeholder,
+    });
+    if (selection && select) {
+      select(selection);
+    }
+    $(this).on('change', function(evt) {
+      validate($(this).get(0));
+      if (onchange) onchange(evt);
+    });
+    validate($(this).get(0));
+    complete(values);
+  } else {
+    $(this).val(selection);
+    $(this).select2({
+      liveSearch: false,
+      allowClear: true,
+      minimumResultsForSearch: searchable ? 0 : Infinity,
+      placeholder: opts.placeholder,
+    });
+    if (selection && select) {
+      select(selection);
+    }
+    $(this).on('change', function(evt) {
+      validate($(this).get(0));
+      if (onchange) onchange(evt);
+    });
+    validate($(this).get(0));
+    complete([]);
+  }
 };
 
 $.fn.multiselect = function (opts) {
@@ -107,6 +195,89 @@ $.fn.multiselect = function (opts) {
   });
 };
 
+$.fn.dialogselect = function (opts) {
+  let templateId = opts.templateId;
+  let fieldId = opts.fields.id;
+  let fieldParentId = opts.fields.parentId;
+  let url = opts.url;
+  let data = opts.data;
+  let title = opts.title;
+  let confirm = opts.confirm;
+  let self = $(this);
+  let htmlNormal = self.html();
+  let htmlLoading = '<i class="fa fa-spin fa-spinner"></i>';
+  let htmlChecked = '<i class="fas fa-check float-right"></i>';
+  data.fieldId = fieldId;
+  data.fieldParentId = fieldParentId;
+  $(this).on('click', function() {
+    $('button[type=setting]').prop('disabled', true);
+    self.html(htmlLoading);
+    xhr.post({
+      url: url,
+      data: data,
+      success: function (resp) {
+        let buttons =
+          '<div class="form-buttons float-right" style="padding-top: 12px; padding-right: 15px;">' +
+          '  <button class="btn btn-sm btn-confirm">确定</button>' +
+          '  <button class="btn btn-sm btn-close" onclick="layer.close(layer.index);">关闭</button>' +
+          '</div>';
+        if (!resp.data) return;
+        let source = document.getElementById(templateId).innerHTML;
+        let template = Handlebars.compile(source);
+        let html = template(resp) + buttons;
+        layer.open({
+          type : 1,
+          offset: '120px',
+          title : title,
+          closeBtn: 0,
+          shadeClose : false,
+          area : [opts.width, ''],
+          content : html,
+          success: function (layero, index) {
+            let layerContent = document.querySelector('.layui-layer-content');
+            layerContent.style += '; overflow: hidden;';
+            $('.kui-dialog').css('padding', '15px 25px 25px 25px');
+            self.html(htmlNormal);
+            $('button[type=setting]').prop('disabled', false);
+
+            // bind event listener
+            let listItems = layerContent.querySelectorAll('li');
+            for (let i = 0; i < listItems.length; i++) {
+              let li = listItems[i];
+              li.attributes['data-checked'] = false;
+              li.addEventListener('click', function() {
+                let divs = li.querySelectorAll('.col-md-2');
+                let div = divs[divs.length - 1];
+                let checked = li.attributes['data-checked'];
+                li.attributes['data-checked'] = !checked;
+                if (!checked) {
+                  div.innerHTML = htmlChecked;
+                } else {
+                  div.innerHTML = '';
+                }
+              });
+            }
+            let buttonConfirm = layerContent.querySelector('.btn-confirm');
+            buttonConfirm.addEventListener('click', function() {
+              let selections = [];
+              for (let i = 0; i < listItems.length; i++) {
+                let li = listItems[i];
+                if (li.attributes['data-checked']) {
+                  selections.push({
+                    id: li.attributes['data-id']
+                  });
+                }
+              }
+              confirm(selections);
+              layer.close(layer.index);
+            });
+          }
+        });
+      }
+    });
+  });
+};
+
 $.fn.autocomplete = function (opts) {
   var value = opts.value;
   var text = opts.text;
@@ -126,4 +297,226 @@ $.fn.autocomplete = function (opts) {
       self.select2({});
     }
   });
+};
+
+/**
+ * 瓦片式布局多项选择器。
+ */
+$.fn.tiledmultiselect = function(opts) {
+  let container = document.getElementById($(this).attr('id'));
+  let data = opts.data || [];
+  let fields = opts.fields;
+  let usecase = opts.usecase;
+  let url = opts.url;
+  let check = opts.check || function (value, text) {};
+  let uncheck = opts.uncheck || function (vlaue, text) {};
+
+  function renderItem(data) {
+    for (let i = 0; i < data.length; i++) {
+      let div = document.createElement('div');
+      div.classList.add('tag-checkable', 'mh-10');
+      let icon = document.createElement('i');
+      icon.classList.add('fa', 'fa-check', 'pr-2');
+      if (!data[i].checked) {
+        div.setAttribute('data-checked', "false");
+        icon.classList.add('text-white');
+      } else {
+        div.setAttribute('data-checked', "true");
+      }
+      div.setAttribute('data-id', data[i][fields.value]);
+      div.append(icon);
+      div.append(data[i][fields.text]);
+      div.addEventListener('click', function(event) {
+        let icon = this.querySelector('i');
+        if (this.getAttribute('data-checked') == 'false') {
+          this.setAttribute('data-checked', 'true');
+          icon.classList.remove('text-white');
+          check(this.getAttribute('data-id'), this.innerText);
+        } else {
+          this.setAttribute('data-checked', 'false');
+          icon.classList.add('text-white');
+          uncheck(this.getAttribute('data-id'), this.innerText);
+        }
+        event.preventDefault();
+        event.stopPropagation();
+      });
+      container.append(div);
+    }
+  }
+
+  if (opts.local) {
+    renderItem(opts.local);
+    return;
+  }
+
+  xhr.post({
+    url: url,
+    usecase: usecase,
+    data: data,
+    success: function(resp) {
+      if (resp.error) {
+        dialog.error(resp.error.message);
+        return;
+      }
+      renderItem(resp.data);
+    }
+  });
+};
+
+/**
+ * 层叠式的选择器。
+ */
+$.fn.cascadeselect = function(opts) {
+  let levels = opts.levels;
+  let readonly = opts.readonly;
+  let container = $(this).get(0);
+  let rectContainer = container.getBoundingClientRect();
+  let widthContainer = rectContainer.width;
+  let levelCount = opts.levels.length;
+  let validate = opts.validate;
+
+  function displayPopup(link, data) {
+    // 【选中下划线】渲染
+    document.querySelectorAll('.cascadeselect-link').forEach(function(elm, idx) {
+      elm.style.borderBottom = 'none';
+    });
+    link.style.borderBottom = '2px solid #1976D2';
+
+    let url = link.getAttribute('data-url');
+    let usecase = link.getAttribute('data-usecase');
+    // let data = dom.model(link);
+    data = data || {};
+    data.cascadeIndex = link.getAttribute('data-cascade-index');
+    let container = link.parentElement.parentElement;
+    let popup = dom.find('.cascadeselect-popup');
+    if (popup == null) {
+      popup = dom.create('div', 'row', 'b-a-1', 'mt-0', 'cascadeselect-popup');
+      popup.style.overflowY = 'auto';
+      popup.style.width = widthContainer + 'px';
+      popup.style.maxHeight = '200px';
+      popup.style.position = 'relative';
+      popup.style.zIndex = 99999;
+      popup.style.backgroundColor = 'white';
+    }
+    popup.style.display = '';
+    popup.innerHTML = '';
+    xhr.post({
+      url: url,
+      usecase: usecase,
+      data: data,
+      success: function(resp) {
+        let data = resp.data;
+        for (let i = 0; i < data.length; i++) {
+          let dataItem = data[i];
+          let linkPopup = dom.create('a', 'btn', 'btn-link');
+          linkPopup.innerText = dataItem[link.getAttribute('data-cascade-field-text')];
+          // set data-model-*
+          dom.model(linkPopup, dataItem);
+          // 选中点击事件
+          linkPopup.addEventListener('click', function(event) {
+            let cascadeIndex = parseInt(link.getAttribute('data-cascade-index'));
+            let cascadeName = link.getAttribute('data-cascade-name');
+            let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
+            let cascadeFieldText = link.getAttribute('data-cascade-field-text');
+            let model = dom.model(this);
+            link.setAttribute('data-cascade-value', model[cascadeFieldValue]);
+            link.innerText = model[cascadeFieldText];
+            dom.find('input', link.parentElement).value = model[cascadeFieldValue];
+            dom.model(link, model);
+            if (cascadeIndex < levelCount - 1) {
+              let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
+              let data = {};
+              data[cascadeName] = model[cascadeFieldValue];
+              displayPopup(next, data);
+              // 阻止繁殖的click事件
+              event.stopImmediatePropagation();
+              event.stopPropagation();
+              event.preventDefault();
+            }
+            if (validate)
+              validate(link.parentElement.parentElement);
+          });
+          popup.appendChild(linkPopup);
+        }
+      }
+    });
+
+    container.appendChild(popup);
+  }
+
+  for (let i = 0; i < levels.length; i++) {
+    let level = levels[i];
+    let div = dom.create('div');
+    div.style.width = level.width;
+    div.style.display = 'inline-block';
+    div.style.textAlign = 'center';
+    div.style.textOverflow = 'ellipsis';
+    div.style.overflow = 'hidden';
+    div.style.whiteSpace = 'nowrap';
+
+    let link = dom.create('a', 'btn', 'pb-1', 'cascadeselect-link');
+    link.style.paddingTop = '1px';
+    link.setAttribute('data-url', level.url);
+    link.setAttribute('data-usecase', level.usecase);
+    link.setAttribute('data-cascade-index', i);
+    link.setAttribute('data-cascade-name', level.name);
+    link.setAttribute('data-cascade-field-value', level.fields.value);
+    link.setAttribute('data-cascade-field-text', level.fields.text);
+    link.style.borderRadius = 'unset';
+
+    if (level.value) {
+      link.innerText = level.value[level.fields.text];
+      link.setAttribute('data-cascade-value', level.value[level.fields.value]);
+    } else {
+      link.innerText = level.text;
+    }
+
+    link.addEventListener('click', function() {
+      if (opts.readonly) return;
+      displayPopup(this);
+    });
+
+    if (i != levels.length - 1) {
+      div.style.marginRight = '5px';
+    }
+    if (i > 0) {
+      div.style.marginLeft = '3px';
+    }
+
+    let hidden = dom.create('input');
+    hidden.setAttribute('type', 'hidden');
+    if (opts.required)
+      hidden.setAttribute('data-required', level.text);
+    hidden.setAttribute('name', level.name);
+    div.appendChild(link);
+    div.appendChild(hidden);
+    container.appendChild(div);
+    if (i != levels.length - 1) {
+      let separator = dom.create('span');
+      separator.textContent = '/';
+      separator.style.position = 'absolute';
+      separator.style.top = '8px';
+      container.append(separator);
+    }
+
+    // validate them if having default value
+    if (validate)
+      validate(link.parentElement.parentElement);
+  }
+
+  function hidePopup(event) {
+    let clickedElement = document.elementFromPoint(event.clientX, event.clientY);
+    if (clickedElement.className.indexOf('cascadeselect') == -1) {
+      let popup = dom.find('.cascadeselect-popup');
+      if (popup != null) {
+        document.querySelectorAll('.cascadeselect-link').forEach(function(elm, idx) {
+          elm.style.borderBottom = 'none';
+        });
+        popup.remove();
+      }
+    }
+  }
+
+  document.removeEventListener('click', hidePopup);
+  document.addEventListener('click', hidePopup);
 };

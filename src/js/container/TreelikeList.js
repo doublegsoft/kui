@@ -4,9 +4,11 @@ function TreelikeList(opts) {
   this.filterRoot = opts.filters.root;
   this.filterChild = opts.filters.child;
 
+  this.name = opts.name;
   this.params = opts.params || {};
 
   this.checkable = opts.checkable || false;
+  this.filterable = opts.filterable || false;
 
   this.fieldId = opts.fields.id;
   this.fieldName = opts.fields.name;
@@ -14,8 +16,10 @@ function TreelikeList(opts) {
 
   this.urlRoot = opts.url.root;
   this.urlChild = opts.url.child;
-  this.usecaseRoot = opts.usecase.root || '';
-  this.usecaseChild = opts.usecase.child;
+  if (opts.usecase) {
+    this.usecaseRoot = opts.usecase.root || '';
+    this.usecaseChild = opts.usecase.child;
+  }
 
   this.observableChecked = new rxjs.Subject();
   this.observableSelected = new rxjs.Subject();
@@ -85,7 +89,9 @@ TreelikeList.prototype.top = function() {
 TreelikeList.prototype.root = function(data) {
   let self = this;
   let ret = dom.create('div');
-  ret.appendChild(this.top());
+  if (this.filterable) {
+    ret.appendChild(this.top());
+  }
 
   if (typeof data === 'undefined') data = [];
   let ul = document.createElement('ul');
@@ -213,7 +219,6 @@ TreelikeList.prototype.changeParentItem = function (li) {
         check.checked = true;
         check.setAttribute('style', 'background: #ababab!important;')
       }
-      console.log(liChild.innerText + ':' + state);
       check.setAttribute('data-tree-item-state', state);
       this.changeParentItem(liChild);
       break;
@@ -307,7 +312,7 @@ TreelikeList.prototype.checkItem = function(li, state) {
   }
 };
 
-TreelikeList.prototype.render = function(selector, selections) {
+TreelikeList.prototype.render = function(selector, values) {
   if (typeof selector === 'string') {
     this.container = document.querySelector(selector);
   } else {
@@ -325,6 +330,7 @@ TreelikeList.prototype.render = function(selector, selections) {
     data: params,
     success: function(resp) {
       self.container.appendChild(self.root(resp.data));
+      self.setValues(values);
     }
   });
 };
@@ -337,5 +343,21 @@ TreelikeList.prototype.publishObservableChecked = function() {
     }
   });
   this.observableChecked.next(checked);
+};
+
+TreelikeList.prototype.setValues = function(values) {
+  if (!values) return;
+  let lis = this.container.querySelectorAll('li');
+  for (let i = 0; i < values.length; i++) {
+    let val = values[i];
+    for (let j = 0; j < lis.length; j++) {
+      let li = lis[j];
+      let input = dom.find('input', li);
+      if (val[this.fieldId] === input.value) {
+        input.checked = true;
+        break;
+      }
+    }
+  }
 };
 

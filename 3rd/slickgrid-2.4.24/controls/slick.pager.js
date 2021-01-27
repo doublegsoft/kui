@@ -69,13 +69,18 @@
     function constructPagerUI() {
       $container.empty();
 
-      var $nav = $("<span class='slick-pager-nav' />").appendTo($container);
+      var $nav = $("<span class='slick-pager-nav pull-right btn-group' />").appendTo($container);
       var $settings = $("<span class='slick-pager-settings' />").appendTo($container);
       $status = $("<span class='slick-pager-status' />").appendTo($container);
 
-      $settings
-          .append("<span class='slick-pager-settings-expanded' style='display:none'>Show: <a data=0>All</a><a data='-1'>Auto</a><a data=25>25</a><a data=50>50</a><a data=100>100</a></span>");
+      $settings.append('<span class="slick-pager-settings-expanded btn-group">' +
+        '<!--a class="text-info pointer font-16 mr-3 pt-2" data=0>所有</a-->' +
+        '<a class="btn btn-sm btn-info text-white width-36 pointer font-16 pl-1 pr-1 " data=25>25</a>' +
+        '<a class="btn btn-sm btn-info text-white width-36 pointer font-16 pl-1 pr-1" data=50>50</a>' +
+        '<a class="btn btn-sm btn-info text-white width-36 toggled pointer font-16 pl-1 pr-1" data=100>100</a></span>');
 
+      let defaultPageSize = 25;
+      setPageSize(defaultPageSize);
       $settings.find("a[data]").click(function (e) {
         var pagesize = $(e.target).attr("data");
         if (pagesize !== undefined) {
@@ -89,29 +94,35 @@
       });
 
       var icon_prefix = "<span class='ui-state-default ui-corner-all ui-icon-container'><span class='ui-icon ";
-      var icon_suffix = "' /></span>";
+      var icon_suffix = "'/></span>";
 
-      $(icon_prefix + "ui-icon-lightbulb" + icon_suffix)
-          .click(function () {
-            $(".slick-pager-settings-expanded").toggle();
-          })
-          .appendTo($settings);
+      // $(icon_prefix + "ui-icon-lightbulb" + icon_suffix).click(function () {
+      //   $(".slick-pager-settings-expanded").toggle();
+      // }).appendTo($settings);
 
-      $(icon_prefix + "ui-icon-seek-first" + icon_suffix)
-          .click(gotoFirst)
-          .appendTo($nav);
+      let linkFirst = $('<a class="btn btn-sm btn-info text-white width-36 pointer font-16 pl-1 pr-1 ">');
+      let iconFirst = $('<i class="fas fa-angle-double-left"></i>');
 
-      $(icon_prefix + "ui-icon-seek-prev" + icon_suffix)
-          .click(gotoPrev)
-          .appendTo($nav);
+      linkFirst.append(iconFirst);
+      linkFirst.click(gotoFirst).appendTo($nav);
 
-      $(icon_prefix + "ui-icon-seek-next" + icon_suffix)
-          .click(gotoNext)
-          .appendTo($nav);
+      let linkPrev = $('<a class="btn btn-sm btn-info text-white width-36 pointer font-16 pl-1 pr-1 ">');
+      let iconPrev = $('<i class="fas fa-angle-left"></i>');
 
-      $(icon_prefix + "ui-icon-seek-end" + icon_suffix)
-          .click(gotoLast)
-          .appendTo($nav);
+      linkPrev.append(iconPrev);
+      linkPrev.click(gotoPrev).appendTo($nav);
+
+      let linkNext = $('<a class="btn btn-sm btn-info text-white width-36 pointer font-16 pl-1 pr-1 ">');
+      let iconNext = $('<i class="fas fa-angle-right"></i>');
+
+      linkNext.append(iconNext);
+      linkNext.click(gotoNext).appendTo($nav);
+
+      let linkLast = $('<a class="btn btn-sm btn-info text-white width-36 pointer font-16 pl-1 pr-1 ">');
+      let iconLast = $('<i class="fas fa-angle-double-right"></i>');
+
+      linkLast.append(iconLast);
+      linkLast.click(gotoLast).appendTo($nav);
 
       $container.find(".ui-icon-container")
           .hover(function () {
@@ -140,9 +151,9 @@
       }
 
       if (pagingInfo.pageSize === 0) {
-        $status.text(_options.showAllText.replace('{rowCount}', pagingInfo.totalRows + "").replace('{pageCount}', pagingInfo.totalPages + ""));
+        // $status.text(_options.showAllText.replace('{rowCount}', pagingInfo.totalRows + "").replace('{pageCount}', pagingInfo.totalPages + ""));
       } else {
-        $status.text(_options.showPageText.replace('{pageNum}', pagingInfo.pageNum + 1 + "").replace('{pageCount}', pagingInfo.totalPages + ""));
+        // $status.text(_options.showPageText.replace('{pageNum}', pagingInfo.pageNum + 1 + "").replace('{pageCount}', pagingInfo.totalPages + ""));
       }
     }
 

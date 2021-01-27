@@ -27,7 +27,7 @@
     if (value == null || value === "") {
       return "-";
     } else if (value < 50) {
-      return "<span style='color:red;font-weight:bold;'>" + value + "%</span>";
+      return "<span style='color:red;font-weight:normal;'>" + value + "%</span>";
     } else {
       return "<span style='color:green'>" + value + "%</span>";
     }
@@ -52,7 +52,7 @@
   }
 
   function YesNoFormatter(row, cell, value, columnDef, dataContext) {
-    return value ? "Yes" : "No";
+    return value ? "是" : "否";
   }
 
   function CheckboxFormatter(row, cell, value, columnDef, dataContext) {

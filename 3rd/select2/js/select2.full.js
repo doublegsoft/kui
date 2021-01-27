@@ -4623,10 +4623,10 @@ S2.define('select2/i18n/en',[],function () {
       return message;
     },
     noResults: function () {
-      return 'No results found';
+      return '没有任何数据';
     },
     searching: function () {
-      return 'Searching…';
+      return '搜索中...';
     },
     removeAllItems: function () {
       return 'Remove all items';

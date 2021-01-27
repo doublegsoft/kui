@@ -19,199 +19,280 @@
  */
 function PropertiesEditor(options) {
   this.containerId = options.containerId;
-  this.properties = options.properties || [];
   this.confirm = options.confirm || function () {};
-  this.selected = null;
+  this.propertyChangedListeners = [];
 }
+
+PropertiesEditor.prototype.addPropertyChangedListener = function (listener) {
+  this.propertyChangedListeners.push(listener);
+};
+
+PropertiesEditor.prototype.notifyPropertyChangedListeners = function (prop) {
+  for (let i = 0; i < this.propertyChangedListeners.length; i++) {
+    this.propertyChangedListeners[i].onPropertyChanged(prop);
+  }
+};
+
+PropertiesEditor.prototype.onModelChanged = function (model) {
+  this.setData(model);
+};
+
+PropertiesEditor.prototype.clear = function (prop) {
+  let container = document.getElementById(this.containerId);
+  container.innerHTML = '';
+};
 
 /**
  * 在父容器下渲染属性编辑器。
  * 
  * @since 1.0
  */
-PropertiesEditor.prototype.render = function() {
-  var self = this;
-  var form = $('<div class="form"></div>');
-  for (var i = 0; i < this.properties.length; i++) {
-    var prop = this.properties[i];
-    var formItem = $('<div class="form-group"></div>');
-    
-    var label = $('<label></label>');
-    label.text(prop.label);
-    formItem.append(label);
+PropertiesEditor.prototype.render = function(element) {
+  let self = this;
+  let elementProperties = element.getProperties();
+  let container = document.getElementById(this.containerId);
+  container.innerHTML = '';
+  for (let i = 0; i < elementProperties.length; i++) {
+    let group = elementProperties[i];
+    let divGroup = document.createElement('div');
+    divGroup.classList.add('group');
 
-    var input = $('<input>');
-    input.attr('name', prop.id);
-    input.addClass('form-control');
-    input.attr('pe-prop-id', prop.id);
-    if (prop.readonly) {
-      input.prop('readonly', true);
-    } else {
-      input.on('keyup', function(ev) {
-        var input = $(ev.target);
-        var propId = input.attr('pe-prop-id')
-        if (self.selected && self.selected[propId]) {
-          self.selected[propId] = input.val();
-        }
-      });
-    }
-    
-    if (prop.input == 'dialog') {
-      var inputGroup = $('<div class="input-group"></div>');
-      var link = $(
-          '<span class="input-group-append">' + 
-          '  <span class="input-group-text" style="padding: 0;">' +
-          '    <a class="btn btn-sm btn-link" href="javascript:void(0);">设置</a>' + 
-          '  </span>' + 
-          '</span>');
-      link.find('a.btn-link').attr('pe-prop-id', prop.id);
-      link.find('a.btn-link').on('click', function(ev) {
-        var link = $(ev.target);
-        var propId = link.attr('pe-prop-id')
-        if (self.selected && self.selected[propId]) {
-          for (var i = 0; i < self.properties.length; i++) {
-            var prop = self.properties[i];
-            if (prop.id == propId) {
-              self.openDialog(prop);
-            }
+    let h3Group = document.createElement('h3');
+    h3Group.classList.add('group-title');
+
+    let linkGroup = document.createElement('a');
+    let iconGroup = document.createElement('i');
+
+    linkGroup.classList.add('btn', 'btn-link');
+    iconGroup.classList.add('icon-minus');
+
+    linkGroup.append(iconGroup);
+    h3Group.append(linkGroup);
+    h3Group.append(group.title);
+    divGroup.append(h3Group);
+
+    container.append(divGroup);
+
+    let props = group.properties || [];
+    let divProps = document.createElement('div');
+    divProps.classList.add('group-body');
+
+    divProps.style.display = '';
+    for (let j = 0; j < props.length; j++) {
+      let prop = props[j];
+      let divProp = document.createElement('div');
+      divProp.classList.add('group-item');
+      let labelProp = document.createElement('label');
+      labelProp.classList.add('group-item-label');
+      labelProp.textContent = prop.label + '：';
+      divProp.append(labelProp);
+
+      let divInput = document.createElement('div');
+      if (prop.input == 'textarea') {
+        //
+        // 【文本】
+        //
+        let textarea = document.createElement('textarea');
+        textarea.setAttribute('data-id', prop.id);
+        textarea.classList.add('group-item-input');
+        textarea.textContent = prop.value || '';
+
+        textarea.addEventListener('keyup', function (evt) {
+          let changed = {};
+          changed[prop.id] = textarea.value;
+          self.notifyPropertyChangedListeners(changed);
+        });
+
+        divProp.append(textarea);
+      } else if (prop.input == 'range') {
+        //
+        // 【区域值】
+        //
+        let input = document.createElement('input');
+        input.setAttribute('data-id', prop.id);
+        input.setAttribute('type', 'range');
+        input.setAttribute('step', '1');
+        input.setAttribute('min', prop.min);
+        input.setAttribute('max', prop.max);
+        input.setAttribute('data-unit', prop.unit);
+        input.valueAsNumber = prop.value;
+        input.classList.add('group-item-input');
+        labelProp.textContent = prop.label + '：' + prop.value + prop.unit;
+        divProp.append(input);
+
+        // 事件绑定，随时变化显示值
+        input.addEventListener('change', function(evt) {
+          labelProp.textContent = prop.label + '：' + input.valueAsNumber + prop.unit;
+          let changed = {};
+          changed[prop.id] = input.valueAsNumber;
+          self.notifyPropertyChangedListeners(changed);
+        });
+        input.addEventListener('input', function(evt) {
+          labelProp.textContent = prop.label + '：' + input.valueAsNumber + prop.unit;
+          let changed = {};
+          changed[prop.id] = input.valueAsNumber;
+          self.notifyPropertyChangedListeners(changed);
+        });
+
+      } else if (prop.input == 'select') {
+        //
+        // 【下拉框】
+        //
+        let select = document.createElement('select');
+        select.setAttribute('data-id', prop.id);
+        select.style.display = 'block';
+        select.classList.add('group-item-input');
+        for (let i = 0; i < prop.values.length; i++) {
+          let option = document.createElement('option');
+          option.value = prop.values[i];
+          option.textContent = prop.values[i];
+          if (prop.values[i] == prop.value) {
+            option.selected = true;
           }
+          select.append(option);
         }
-      });
-      inputGroup.append(input);
-      inputGroup.append(link);
-      formItem.append(inputGroup);
-    } else {
-      formItem.append(input);
-    }
-    form.append(formItem);
-  }
+        divProp.append(select);
 
-  $('#' + this.containerId).empty();
-  $('#' + this.containerId).append(form);
+        select.addEventListener('change', function(evt) {
+          let changed = {};
+          changed[prop.id] = select.value;
+          self.notifyPropertyChangedListeners(changed);
+        });
+
+      } else if (prop.input == 'number') {
+        //
+        // 【数字】
+        //
+        let input = document.createElement('input');
+        input.setAttribute('data-id', prop.id);
+        input.value = parseInt(prop.value);
+        input.classList.add('group-item-input');
+        divProp.append(input);
+
+        input.addEventListener('input', function(evt) {
+          if (isNaN(parseFloat(this.value))) return;
+          let changed = {};
+          changed[prop.id] = parseFloat(this.value);
+          console.log(changed);
+          self.notifyPropertyChangedListeners(changed);
+        });
+      } else if (prop.input == 'color') {
+        //
+        // 【颜色】
+        //
+        let input = document.createElement('input');
+        input.setAttribute('type', 'color');
+        input.setAttribute('data-id', prop.id);
+        input.value = prop.value;
+        input.classList.add('group-item-input');
+        divProp.append(input);
+
+        input.addEventListener('input', function(evt) {
+          let changed = {};
+          changed[prop.id] = input.value;
+          self.notifyPropertyChangedListeners(changed);
+        });
+      } else if (prop.input == 'file') {
+        //
+        // 【文件】
+        //
+        let input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('data-id', prop.id);
+        input.value = prop.value;
+        input.classList.add('group-item-input');
+        divProp.append(input);
+
+        input.addEventListener('input', function(evt) {
+          let reader = new FileReader();
+          reader.onloadend = function () {
+            let changed = {};
+            changed[prop.id] = reader.result;
+            self.notifyPropertyChangedListeners(changed);
+          };
+          reader.readAsDataURL(this.files[0]);
+
+        });
+      } else if (prop.display) {
+        //
+        // 【自定义】
+        //
+        divProp.append(prop.display(prop.value));
+      }
+      divProp.append(divInput);
+
+      divProps.append(divProp);
+    }
+    divGroup.append(divProps);
+
+    linkGroup.addEventListener('click', function() {
+      let icon = this.querySelector('i');
+      if (icon.classList.contains('icon-plus')) {
+        divProps.style.display = '';
+        icon.classList.remove('icon-plus');
+        icon.classList.add('icon-minus');
+      } else {
+        divProps.style.display = 'none';
+        icon.classList.remove('icon-minus');
+        icon.classList.add('icon-plus');
+      }
+    });
+  }
 };
 
-/**
- * 设置当前编辑的对象实例。
- * 
- * @param {object} obj
- *        当前编辑的对象实例，实例的定义由设计器来决定
- */
-PropertiesEditor.prototype.setSelected = function (obj) {
-  this.selected = obj;
-  for (var i = 0; i < this.properties.length; i++) {
-    var prop = this.properties[i];
-    // 通过判断对象是否含有
-    if (obj && obj[prop.id]) {
-      $('#' + this.containerId + ' input[name=' + prop.id + ']').val(prop.display(obj));
-    } else {
-      $('#' + this.containerId + ' input[name=' + prop.id + ']').val('');
-    }
+PropertiesEditor.prototype.getData = function () {
+  let container = document.getElementById(this.containerId);
+  let inputs = container.querySelectorAll('input');
+  let selects = container.querySelectorAll('select');
+  let textareas = container.querySelectorAll('textarea');
+  let ret = {};
+  for (let i = 0; i < inputs.length; i++) {
+    let input = inputs[i];
+    let dataId = input.getAttribute('data-id');
+    let dataValue = input.value;
+    ret[dataId] = dataValue;
   }
+  for (let i = 0; i < selects.length; i++) {
+    let select = selects[i];
+    let dataId = select.getAttribute('data-id');
+    let dataValue = select.value;
+    ret[dataId] = dataValue;
+  }
+  for (let i = 0; i < inputs.length; i++) {
+    let textarea = textareas[i];
+    let dataId = textarea.getAttribute('data-id');
+    let dataValue = textarea.textContent;
+    ret[dataId] = dataValue;
+  }
+  return ret;
 };
 
-/**
- * 打开设置对话框。
- * 
- * @param {object} parentProp
- *        含有子属性的属性
- */
-PropertiesEditor.prototype.openDialog = function (parentProp) {
-  if (!this.selected) return;
-  var self = this;
+PropertiesEditor.prototype.setData = function (data) {
+  let container = document.getElementById(this.containerId);
+  let inputs = container.querySelectorAll('input');
+  let selects = container.querySelectorAll('select');
+  let textareas = container.querySelectorAll('textarea');
 
-  var dialog = $('<div class="row" style="margin-top: 15px; padding: 0 15px 0 15px"></div>');
-  var col12 = $('<div class="col-md-12"></div>');
-  var form = $('<div class="form form-horizontal"></div>');
-
-  dialog.append(col12);
-  col12.append(form);
-
-  var buttons = $(
-    '<div class="button-group float-right">' + 
-    '  <button class="btn btn-sm btn-confirm">确认</button>' + 
-    '  <button class="btn btn-sm btn-close" onclick="layer.close(layer.index);">关闭</button>' + 
-    '</div>'
-  );
-  buttons.find('.btn-confirm').on('click', function () {
-    self.confirmDialog();
-  });
-  var height = 110;
-  for (var i = 0; i < parentProp.properties.length; i++) {
-    var prop = parentProp.properties[i];
-    var formItem = $('<div class="form-group row"></div>');
-    var col9 = $('<div class="col-md-9"></div>');
-
-    var group = $('<div class="input-group"></div>');
-    var unit = $(
-      '<div class="input-group-append">' + 
-      '  <span class="input-group-text">' + prop.unit + '</span>' + 
-      '</div>'
-    );
-
-    var label = $('<label class="col-form-label col-md-3"></label>');
-    label.text(prop.label + '：');
-
-    var input = $('<input>');
-    input.attr('name', prop.id);
-    input.addClass('form-control');
-    input.attr('pe-prop-id', prop.id);
-    // input.on('keyup', function(ev) {
-    //   var input = $(ev.target);
-    //   var propId = input.attr('pe-prop-id')
-    //   if (self.selected && self.selected[propId]) {
-    //     self.selected[propId] = input.val();
-    //   }
-    // });
-    input.val(this.selected[prop.id]);
-    if (prop.unit) {
-      col9.append(group);
-      group.append(input);
-      group.append(unit);
-    } else {
-      col9.append(input);
+  for (let i = 0; i < inputs.length; i++) {
+    let input = inputs[i];
+    let dataId = input.getAttribute('data-id');
+    if (data[dataId]) {
+      // 特殊处理BUG
+      if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
+      if (dataId != 'image')
+        input.value = data[dataId];
     }
-
-    formItem.append(label);
-    formItem.append(col9);
-
-    form.append(formItem);
-    // 行高，包括margin
-    height += 52.5;
   }
-  form.append(buttons);
-
-  layer.open({
-    type : 1,
-    title : parentProp.label + '属性编辑',
-    shadeClose : false,
-    skin : 'layui-layer-rim', //加上边框
-    area : [ 480 + 'px', height + 'px' ], //宽高
-    content : '<div id="dialog"></div>',
-    success: function () {
-      // 重新设置样式
-      var layerContent = document.querySelector('.layui-layer-content');
-      layerContent.style += '; overflow: hidden;';
-      
-      // 加载对话框的JQuery对象
-      $('#dialog').append(dialog);
-    },
-    end: function () {}
-  });
-
+  for (let i = 0; i < selects.length; i++) {
+    let select = selects[i];
+    let dataId = select.getAttribute('data-id');
+    if (data[dataId])
+      select.value = data[dataId];
+  }
+  for (let i = 0; i < textareas.length; i++) {
+    let textarea = textareas[i];
+    let dataId = textarea.getAttribute('data-id');
+    if (data[dataId])
+      textarea.textContent = data[dataId];
+  }
 };
-
-/**
- * 设置对话框确认修改。
- */
-PropertiesEditor.prototype.confirmDialog = function () {
-  var self = this;
-  $('#dialog input').each(function(idx, el) {
-    var input = $(el);
-    var propId = input.attr('pe-prop-id');
-    if (self.selected && self.selected[propId]) {
-      self.selected[propId] = parseInt(input.val());
-    }
-  }); 
-  layer.close(layer.index);
-  self.confirm();
-}

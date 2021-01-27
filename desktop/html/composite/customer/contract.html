@@ -1,4 +1,4 @@
-<div id="pageContractList" class="card b-a-0">
+<div id="pageContractList" class="card b-a-0 mb-0">
   <div class="card-body p-0">
     <div id="tableContractList" class="col-md-12 pl-0 pr-0"></div>
   </div>
@@ -7,37 +7,80 @@
 <script>
 function PageContractList() {
   let self = this;
-  this.tableProject = new TreelikeTable({
-    url: 'data/treepage.json',
-    limit: 5,
-    levels: 2, /* 最多两级 */
-    fields: {
-      name: 'name',
-      id: 'id',
-      parentId: 'parentId'
+  this.tableContractList = new PaginationTable({
+    url: 'data/contract/paginate.json',
+    filter: {
+      fields: [{
+        title: '开始时间',
+        input: 'date',
+        name: 'startDate'
+      },{
+        title: '结束时间',
+        input: 'date',
+        name: 'completionDate'
+      },{
+        title: '项目名称',
+        input: 'text',
+        name: 'projectName',
+      },{
+        title: '项目经理',
+        input: 'text',
+        name: 'principalId'
+      }],
+      actions: [{
+        role: 'query',
+        text: '查询',
+        click: function() {
+
+        }
+      }, {
+        role: 'reset',
+        text: '重置',
+        click: function() {
+
+        }
+      }]
     },
     columns: [{
-      title: '任务名称',
+      title: '合同名称',
+      style: 'text-align: left;',
+      display: function(row, td)  {
+        new TwoLine({
+          value: row,
+          model: {
+            primary: row.contractName,
+            secondary: '优质客户'
+          }
+        }).renderTo(td);
+      }
     }, {
-      title: '开发进度',
+      title: '合同金额',
+      style: 'text-align: right;',
       display: function(row, td) {
-        let html = '<div class="clearfix">\n' +
-          '        <div class="float-left"><strong>50%</strong></div>\n' +
-          '        <div class="float-right"><small class="text-muted">Jun 11, 2015 - Jul 10, 2015</small></div>\n' +
-          '      </div>\n' +
-          '      <div class="progress progress-xs">\n' +
-          '        <div class="progress-bar bg-gradient-success" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div> \n' +
-          '      </div>';
-        td.innerHTML = html;
+        td.innerText = format.money(row.amount);
       }
     },{
-      title: '责任人',
+      title: '市场人员',
       style: 'text-align: center;',
       display: function(row, td) {
-        let a = document.createElement('a');
-        a.classList.add('btn', 'text-success');
-        a.innerText = row.principalName;
-        td.append(a);
+        new Members({
+          members: row.sales,
+          model: {
+          },
+          onMemberClicked: function(model) {
+            self.viewEmployee(model);
+          }
+        }).renderTo(td);
+      }
+    },{
+      title: '市场趋势',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        new SparkLine({
+          model: {
+            numbers: [1, 5, 2, 4, 8, 3, 7]
+          }
+        }).renderTo(td);
       }
     },{
       title: '操作',
@@ -45,19 +88,10 @@ function PageContractList() {
       display: function(row, td) {
         let link = dom.create('a', 'btn', 'btn-link');
         link.setAttribute('data-model-project-id', 1);
-        link.innerHTML = '编辑';
-        dom.bind(link, 'click', function() {
-          let projectId = this.getAttribute('data-model-project-id');
-          self.edit(projectId, 'HTTPDB数据库项目');
-        });
-        td.appendChild(link);
-
-        link = dom.create('a', 'btn', 'btn-link');
-        link.setAttribute('data-model-project-id', 1);
         link.innerHTML = '查看';
         dom.bind(link, 'click', function() {
           let projectId = this.getAttribute('data-model-project-id');
-          self.view(projectId, 'HTTPDB数据库项目');
+          self.viewContract(projectId, '自动驾驶项目合同');
         });
         td.appendChild(link);
       }
@@ -65,38 +99,40 @@ function PageContractList() {
   });
 }
 
-PageContactList.prototype.show = function () {
+PageContractList.prototype.show = function () {
   this.setup();
 };
 
-PageContactList.prototype.setup = function () {
-  this.tableProject.render('tableProject', {});
+PageContractList.prototype.setup = function () {
+  this.tableContractList.render('tableContractList', {});
 };
 
-PageContactList.prototype.edit = function (projectId, projectName) {
+PageContractList.prototype.viewEmployee = function (projectId, projectName) {
   ajax.sidebar({
-    containerId: '#pageProjectList',
-    title: projectName,
-    url: 'html/composite/project/edit.html',
-    success: function() {
-      pageProjectEdit.show(projectId);
-    }
-  });
-};
-
-PageContactList.prototype.view = function (projectId, projectName) {
-  ajax.sidebar({
-    containerId: '#pageProjectList',
+    containerId: '#pageContractList',
     title: projectName,
     allowClose: true,
-    url: 'html/composite/project/view.html',
+    url: 'html/composite/employee/profile.html',
     success: function() {
-      pageProjectView.show(projectId);
+      // pageProjectView.show(projectId);
+      pageEmployeeProfile.show({employeeId: 123});
     }
   });
 };
 
-pageContactList = new PageContactList();
-pageContactList.show();
+PageContractList.prototype.viewContract = function (projectId, projectName) {
+  ajax.sidebar({
+    containerId: '#pageContractList',
+    title: projectName,
+    allowClose: true,
+    url: 'html/composite/contract/view.html',
+    success: function() {
+      pageContractView.show({employeeId: 123});
+    }
+  });
+};
+
+pageContractList = new PageContractList();
+pageContractList.show();
 
 </script>

@@ -1,4 +1,4 @@
-let ObservableObject = require('../../src/js/kui-Rx.js')
+let ObservableObject = require('../../src/js/kui-rx.js')
 
 let pageData = {
   id: '',

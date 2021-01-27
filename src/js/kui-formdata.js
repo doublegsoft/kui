@@ -7,7 +7,7 @@
  */
 $.fn.formdata = function(initial) {
   if (typeof initial !== "undefined") {
-    var obj;
+    let obj;
     if (typeof initial === "string") {
       obj = $.parseJSON(initial);
     } else {
@@ -20,17 +20,17 @@ $.fn.formdata = function(initial) {
       $(this).prop('checked', false);
     });
     $(this).find('textarea').each(function(idx, elm) {
-      $(this).text('');
+      $(this).val('');
     });
-    var params = obj;
-    for (var key in params) {
-      var elementNodeName;
-      this.find('[name=' + key + ']').each(function() {
+    let params = obj;
+    for (let key in params) {
+      let elementNodeName;
+      this.find('[name=' + key + ']').each(function(idx, elm) {
         elementNodeName = $(this)[0].nodeName;
         if (elementNodeName == "INPUT" && ($(this).attr("type") == "radio" || $(this).attr("type") == "checkbox")) {
           if (params[key].constructor == Array) {
-            var arr = params[key];
-            for (var i = 0; i < arr.length; i++) {
+            let arr = params[key];
+            for (let i = 0; i < arr.length; i++) {
               if ($(this).val() == arr[i]) {
                 $(this).prop("checked", true);
               }
@@ -43,9 +43,9 @@ $.fn.formdata = function(initial) {
         } else if (elementNodeName == "INPUT" && ($(this).attr("type") == "file" || $(this).attr("type") == "button")) {
           // 无需回显
         } else if (elementNodeName == "SELECT") {
-          var found = false;
+          let found = false;
           $(this).find('option').each(function() {
-            var option = $(this);
+            let option = $(this);
             if (option.attr('value') == params[key]) {
               option.prop('selected', true);
               found = true;
@@ -54,44 +54,82 @@ $.fn.formdata = function(initial) {
           if (!found) {
             $(this).val($($(this).find("option:first")).val());
           }
+          // select2
+          // FIXME: NOT WORKING
+          $(this).val(null).trigger('change');
         } else {
-          $(this).val(params[key]);
+          if ($(this).attr('data-domain-type') == 'date') {
+            $(this).val(moment(params[key]).format('YYYY-MM-DD'));
+            // $(elm).data('DateTimePicker').date(new Date(params[key]));
+          } else {
+            $(this).val(params[key]);
+          }
         }
       });
     }
-    return;
+    return {};
   }
-  var ret = {};
+  let ret = {};
   this.find('input[type!=checkbox][type!=radio][type!=button]').each(function(idx, el) {
-    var name = $(el).attr('name');
+    let name = $(el).attr('name');
     if (!name) return;
-    var value = $(el).val();
-    if (name.indexOf('[]') != -1) {
-      if (typeof ret[name] === 'undefined') ret[name] = []; 
-      ret[name].push(value);
+    let objname = name;
+    let attrname = '';
+    let isArray = name.indexOf('[]') != -1;
+    let dotIndex = name.indexOf('.');
+    let value = $(el).val();
+    if (dotIndex != -1) {
+      objname = name.substr(0, dotIndex);
+      attrname = name.substr(dotIndex + 1,
+          isArray ? name.indexOf('[]') - objname.length - 1 : name.length - objname.length - 1);
+    }
+
+    if (isArray) {
+      ret[objname] = ret[objname] || [];
+      if (attrname != '') {
+        let item = {};
+        item[attrname] = value;
+        ret[objname].push(item);
+      } else {
+        ret[name].push(value);
+      }
     } else {
-      ret[name] = value;
+      if (attrname != '') {
+        let item = {};
+        item[attrname] = value;
+        ret[objname] = name;
+      } else {
+        ret[name] = value;
+      }
     }
   });
 
   this.find('input[type=checkbox]').each(function(idx, el) {
     if ($(el).prop('checked')) {
-      var existingVals = ret[$(el).attr('name')];
-      if (typeof existingVals != 'undefined') {
-        if (typeof ret[$(el).attr('name')] === "string") {
-          var val = ret[$(el).attr('name')];
-          ret[$(el).attr('name')] = [];
-          ret[$(el).attr('name')].push(val);
+      let name = $(el).attr('name');
+      if (name.indexOf('[]') != -1) {
+        let objname = name;
+        let attrname = '';
+        let dotIndex = objname.indexOf('.');
+        if (dotIndex == -1) {
+          ret[objname] = ret[objname] || [];
+          ret[objname].push($(el).val());
+        } else {
+          objname = name.substr(0, dotIndex);
+          attrname = name.substr(dotIndex + 1, name.indexOf('[]') - objname.length - 1);
+          ret[objname] = ret[objname] || [];
+          let item = {};
+          item[attrname] = $(el).val();
+          ret[objname].push(item);
         }
-        ret[$(el).attr('name')].push($(el).val());
       } else {
-        ret[$(el).attr('name')] = $(el).val();
+        ret[name] = $(el).val();
       }
     }
   });
   this.find('input[type=checkbox]').each(function(idx, el) {
-    var name = $(el).attr('name');
-    if (typeof ret[name] === "undefined") {
+    let name = $(el).attr('name');
+    if (typeof ret[name] === "undefined" && name.indexOf('[]') == -1) {
       ret[name] = '';
     }
   });
@@ -108,14 +146,32 @@ $.fn.formdata = function(initial) {
   });
   this.find('select').each(function(idx, el) {
     if ($(el).val() != '' && $(el).val() != '-1' && $(el).val() != null) {//&& $(el).val() != '0'
+      let name = $(el).attr('name');
+      let value = $(el).val();
+      let objname = name;
+      let attrname = '';
+      if (typeof name === 'undefined') return;
+      let dotIndex = name.indexOf('.');
+      if (dotIndex != -1) {
+        objname = name.substr(0, dotIndex);
+        attrname = name.substr(dotIndex + 1,
+            name.length - objname.length - 1);
+      }
       if (typeof $(el).val() === 'object') {
         ret[$(el).attr('name')] = $(el).val().join(',');
       } else {
-        ret[$(el).attr('name')] = $(el).val();
+        if (attrname != '') {
+          let item = {};
+          item[attrname] = value;
+          ret[objname] = item;
+        } else
+          ret[name] = value;
       }
     } else if ($(el).val() == '-1') {
+      // NOT ALLOW EMPTY STRING
       ret[$(el).attr('name')] = '';
     } else {
+      // NOT ALLOW EMPTY STRING
       ret[$(el).attr('name')] = '';
     }
   });
@@ -128,27 +184,3 @@ $.fn.formdata = function(initial) {
   });
   return ret;
 };
-
-/**
- * @description 回显html元素数据，标准html元素，数据字段与页面元素一一对应，radio，checkbox除外。
- * @param  json json数据
- * @buffer  目前只考虑到input textArea  select.
- * */
-$.fn.reviewFormdata = function(data) {
-  var _this = this;
-  $.each(data, function(key, value) {
-    var ctrl = $(_this).find('[name=' + key.toLowerCase() + ']').first();
-    switch (ctrl.prop("type")) {
-    case "radio":
-    case "checkbox":
-      ctrl.each(function() {
-        if ($(this).attr('value') == value)
-          $(this).attr("checked", value);
-      });
-      break;
-
-    default:
-      ctrl.val(value);
-    }
-  });
-}

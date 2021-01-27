@@ -717,6 +717,7 @@ S2.define('select2/utils',[
     // and was designed to be used with the Sizzle selector engine.
 
     var $el = $(el);
+    if (typeof el.style === 'undefined') return;
     var overflowX = el.style.overflowX;
     var overflowY = el.style.overflowY;
 
@@ -1418,7 +1419,7 @@ S2.define('select2/selection/base',[
   BaseSelection.prototype.render = function () {
     var $selection = $(
       '<span class="select2-selection" role="combobox" ' +
-      ' aria-haspopup="true" aria-expanded="false" style="height: 35px; padding-top: 4px;">' +
+      ' aria-haspopup="true" aria-expanded="false" style="height: 37px; padding-top: 4px;">' +
       '</span>'
     );
 
@@ -4724,13 +4725,13 @@ S2.define('select2/i18n/en',[],function () {
       return message;
     },
     noResults: function () {
-      return 'No results found';
+      return '没有任何选项';
     },
     searching: function () {
-      return 'Searching…';
+      return '搜索中...';
     },
     removeAllItems: function () {
-      return 'Remove all items';
+      return '清除';
     }
   };
 });

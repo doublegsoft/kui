@@ -13,8 +13,15 @@
       <li data-type='row' draggable="true" class="list-group-item grab">行布局</li>
       <li data-type='panel' draggable="true" class="list-group-item grab">面板</li>
       <li data-type='form' draggable="true" class="list-group-item grab">表单</li>
-      <li data-type='table' draggable="true" class="list-group-item grab">表格</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">广义分页表</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">树型分页表</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">块状分页表</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">列式分页表</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">列表</li>
       <li data-type='chart' draggable="true" class="list-group-item grab">图表</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">时间线</li>
+      <li data-type='table' draggable="true" class="list-group-item grab">向导表单</li>
+
     </ul>
   </div>
   <div class="col-md-8 m-0 p-0">
@@ -30,7 +37,7 @@
 var widgetDesigner = document.getElementById('widgetDesigner');
 var widgetCanvas = document.getElementById('widgetCanvas');
 
-var offsetTop = resize.top(widgetCanvas);
+var offsetTop = dom.top(widgetCanvas);
 var width = widgetCanvas.getBoundingClientRect().width;
 
 var height = document.body.clientHeight - offsetTop - 56;

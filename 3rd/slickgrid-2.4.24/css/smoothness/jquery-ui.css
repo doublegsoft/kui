@@ -929,9 +929,11 @@ works properly when clicked or hovered */
 html .ui-button.ui-state-disabled:hover,
 html .ui-button.ui-state-disabled:active {
 	border: 1px solid #d3d3d3;
-	background: #e6e6e6 url("images/ui-bg_glass_75_e6e6e6_1x400.png") 50% 50% repeat-x;
-	font-weight: normal;
-	color: #555555;
+	/* background: #e6e6e6 url("images/ui-bg_glass_75_e6e6e6_1x400.png") 50% 50% repeat-x; */
+	background-color: #e4e7ea;
+	color: #5c6873;
+	font-weight: bold;
+	/*color: #555555;*/
 }
 .ui-state-default a,
 .ui-state-default a:link,
@@ -953,8 +955,8 @@ a:visited.ui-button,
 .ui-button:focus {
 	border: 1px solid #999999;
 	background: #dadada url("images/ui-bg_glass_75_dadada_1x400.png") 50% 50% repeat-x;
-	font-weight: normal;
-	color: #212121;
+	font-weight: bold;
+	color: #5c6873;
 }
 .ui-state-hover a,
 .ui-state-hover a:hover,

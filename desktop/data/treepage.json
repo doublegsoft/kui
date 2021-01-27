@@ -1,0 +1,35 @@
+{
+  "total": 20,
+  "data": [{
+    "id": "01",
+    "name": "开发基于Chromium的自定义网页应用桌面程序",
+    "startDate": "2017-06-05",
+    "principalName": "袁璐山",
+    "status": "进行中",
+    "progress": 85
+  },{
+    "id": "02",
+    "name": "3D地图建模",
+    "startDate": "2017-09-09",
+    "progress": 50,
+    "principalName": "杜玲浪"
+  },{
+    "id": "03",
+    "name": "ERP系统后端开发",
+    "startDate": "2017-09-09",
+    "progress": 50,
+    "principalName": "张新全"
+  },{
+    "id": "04",
+    "name": "3D地球建模",
+    "startDate": "2017-09-09",
+    "progress": 50,
+    "principalName": "杜玲浪"
+  },{
+    "id": "05",
+    "name": "3D银河系建模",
+    "startDate": "2017-09-09",
+    "progress": 50,
+    "principalName": "杜玲浪"
+  }]
+}

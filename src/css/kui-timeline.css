@@ -1,0 +1,189 @@
+.timeline {
+  width: 100%;
+  margin: 30px auto;
+  position: relative;
+  padding: 0 10px;
+  -webkit-transition: all 0.4s ease;
+  -moz-transition: all 0.4s ease;
+  -ms-transition: all 0.4s ease;
+  transition: all 0.4s ease;
+}
+
+.timeline:before {
+  content: "";
+  width: 3px;
+  height: 100%;
+  background: #20a8d8;
+  /*left: 50%;*/
+  top: 0;
+  position: absolute;
+}
+
+.timeline.completed:before {
+  background-color: #4dbd74!important;
+}
+
+.timeline.done:before {
+  background-color: #20a8d8!important;
+}
+
+.timeline.rejected:before {
+  background-color: #f86c6b!important;
+}
+
+.timeline:after {
+  content: "";
+  clear: both;
+  display: table;
+  width: 100%;
+}
+
+.timeline .timeline-item {
+  margin-bottom: 50px;
+  position: relative;
+}
+
+.timeline .timeline-item .timeline-icon {
+  background: #20a8d8;
+  width: 36px;
+  height: 36px;
+  position: absolute;
+  top: 0;
+  /*left: 50%;*/
+  overflow: hidden;
+  margin-left: -16px;
+  -webkit-border-radius: 50%;
+  -moz-border-radius: 50%;
+  -ms-border-radius: 50%;
+  border-radius: 50%;
+}
+
+.timeline .timeline-item .timeline-icon.completed {
+  background-color: #4dbd74!important;
+}
+
+.timeline .timeline-item .timeline-icon.done {
+  background-color: #20a8d8!important;
+}
+
+.timeline .timeline-item .timeline-icon.rejected {
+  background-color: #f86c6b!important;
+}
+
+.timeline .timeline-item .timeline-icon svg {
+  position: relative;
+  top: 7px;
+  left: 7px;
+}
+
+.timeline .timeline-item .timeline-content {
+  width: 90%;
+  background: #fff;
+  padding: 20px;
+  margin-left: auto;
+  /*
+  -webkit-box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+  -ms-box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.1);
+  */
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.timeline .timeline-item .timeline-content.completed {
+  border: 1px solid #4dbd74!important;
+}
+
+.timeline .timeline-item .timeline-content.done {
+  border: 1px solid #20a8d8!important;
+}
+
+.timeline .timeline-item .timeline-content.rejected {
+  border: 1px solid #f86c6b!important;
+}
+
+.timeline .timeline-item .timeline-content .timeline-title {
+  font-size: 18px;
+  background: #20a8d8;
+  color: #fff;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 12px;
+  margin: -20px -20px 0 -20px;
+  /*font-weight: 300;*/
+  -webkit-border-radius: 3px 3px 0 0;
+  -moz-border-radius: 3px 3px 0 0;
+  -ms-border-radius: 3px 3px 0 0;
+  border-radius: 3px 3px 0 0;
+}
+
+
+.timeline .timeline-item .timeline-content .timeline-title.completed {
+  background-color: #4dbd74!important;
+}
+
+.timeline .timeline-item .timeline-content .timeline-title.done {
+  background-color: #20a8d8!important;
+}
+
+.timeline .timeline-item .timeline-content .timeline-title.rejected {
+  background-color: #f86c6b!important;
+}
+
+.timeline .timeline-item .timeline-content:before {
+  content: '';
+  position: absolute;
+  left: calc(9% - 1px);
+  top: 11px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 0;
+  border-right: 7px solid #20a8d8;
+}
+
+.timeline .timeline-item .timeline-content.completed:before {
+  border-right: 7px solid #4dbd74!important;
+}
+
+.timeline .timeline-item .timeline-content.done:before {
+  border-right: 7px solid #20a8d8!important;
+}
+
+.timeline .timeline-item .timeline-content.rejected:before {
+  border-right: 7px solid #f86c6b!important;
+}
+
+.timeline .timeline-item .timeline-content.right {
+  float: right;
+}
+
+.timeline .timeline-item .timeline-content.right:before {
+  content: '';
+  right: 45%;
+  left: inherit;
+  border-left: 0;
+  border-right: 7px solid #20a8d8;
+}
+
+.timeline .timeline-item .timeline-content.right:before .completed {
+  border-right: 7px solid #4dbd74;
+}
+
+.timeline .timeline-item .timeline-content.right:before .done {
+  border-right: 7px solid #20a8d8;
+}
+
+.timeline .timeline-item .timeline-content.right:before .rejected {
+  border-right: 7px solid #f86c6b;
+}
+ 

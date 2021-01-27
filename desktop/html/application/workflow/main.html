@@ -1,53 +1,102 @@
-
-<div class="row">
-  <div class="btn-group" role="group" aria-label="Basic example">
-    <button class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
-    <button class="btn btn-primary" type="button"><i class="fa fa-file-export"></i></button>
-    <button class="btn btn-primary" type="button"><i class="fa fa-trash-alt"></i></button>
+<div class="context-menu" style="display: none">
+  <ul class="context-menu-options">
+    <li class="context-menu-option">
+      <a class="pointer"><i class="far fa-edit text-info"></i>编辑</a>
+    </li>
+    <div class="b-b-2"></div>
+    <li class="context-menu-option">
+      <a class="pointer" onclick="removeObject(event);"><i class="fas fa-times text-danger"></i>删除</a>
+    </li>
+  </ul>
+</div>
+<div id="widgetEditorElement" class="row">
+  <div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-primary active">
+      <input type="radio" name="mode" autocomplete="off" checked value="move">
+      <i class="far fa-hand-paper"></i>
+    </label>
+    <label class="btn btn-primary">
+      <input type="radio" name="mode" autocomplete="off" value="connect">
+      <i class="fas fa-retweet"></i>
+    </label>
+    <label class="btn btn-primary">
+      <input type="radio" name="mode" autocomplete="off" value="group">
+      <i class="far fa-object-group"></i>
+    </label>
   </div>
 </div>
 <div id="designer_container" class="row">
   <div class="col-md-2" style="padding: 0">
     <ul class="list-group">
-      <li id="text-part" data-type='text' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">文本</li>
-      <li id="longtext-part" data-type='longtext' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">长文本</li>
-      <li id="image-part" data-type='image' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图片</li>
-      <li id="chart-part" data-type='chart' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图表</li>
-      <li id="table-part" data-type='table' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">表格</li>
+      <li id="nodeRole" data-transfer-type='role' class="list-group-item list-group-item-action" style="cursor: grab">角色</li>
+      <!--
+      <li id="nodeStart" data-transfer-type='start' class="list-group-item" style="cursor: grab">起点</li>
+      -->
+      <li id="nodeProcess" data-transfer-type='process' class="list-group-item list-group-item-action" style="cursor: grab">工单</li>
+      <li id="nodeCondition" data-transfer-type='condition' class="list-group-item list-group-item-action" style="cursor: grab">审批</li>
+      <li id="nodeFinish" data-transfer-type='finish' class="list-group-item list-group-item-action" style="cursor: grab">结束</li>
     </ul>
   </div>
-  <div class="col-md-8" id="canvas_container" style="background-color: #fff; padding: 0;"></div>
-  <div id="properties_container" class="col-md-2 properties-container">
-  </div>
+  <div class="col-md-8" id="widgetDesigner"
+       style="background-image: url(/desktop/img/kui/grid.gif); background-color: white; padding: 0;">
 
-  <div id="image_container" style="display: none">
-    <img id="image_sample" src="./img/report-designer/placeholder.jpg">
+  </div>
+  <div id="properties_container" class="col-md-2 properties-container">
   </div>
 </div>
 
 <script>
 
+$('#widgetEditorElement input[name=mode]').on('change', function() {
+  designer.setMode($('#widgetEditorElement input[name=mode]:checked').val());
+});
+
 var designerContainer = document.getElementById('designer_container');
-var canvasContainer = document.getElementById('canvas_container');
-var height = 900;// document.body.clientHeight - 100;
+var canvasContainer = document.getElementById('widgetDesigner');
+var height = (dom.find('#container').clientHeight - dom.find('#widgetEditorElement').clientHeight);
 designerContainer.style.height = height + 'px';
 canvasContainer.style.height = height + 'px';
 
-var propertiesEditor = new PropertiesEditor({
-  containerId: 'properties_container',
-  confirm: function () {
-    designer.render();
+dnd.setDraggable('#nodeRole', {type: 'role'}, function(x, y, elm) {
+
+});
+
+dnd.setDraggable('#nodeProcess', {type: 'process'}, function(x, y, elm) {
+
+});
+
+dnd.setDraggable('#nodeCondition', {type: 'condition'}, function(x, y, elm) {
+
+});
+
+dnd.setDraggable('#nodeFinish', {type: 'finish'}, function(x, y, elm) {
+
+});
+
+dnd.setDroppable('#widgetDesigner', function(x, y, dataTransfer) {
+  designer.addNode(x, y, dataTransfer);
+});
+
+var designer = new WorkflowDesigner({
+  svgContainerId: 'widgetDesigner'
+});
+
+document.removeEventListener('click', function() {});
+document.addEventListener('click', function(event) {
+  let contextMenu = dom.find('.context-menu');
+  if (contextMenu != null) {
+    contextMenu.style.display = 'none';
   }
 });
 
-window.designer = new ReportDesigner({
-  containerId: 'canvas_container',
-  canvasHeight: height,
-  propertiesEditor: propertiesEditor
+document.addEventListener('contextmenu', function(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  event.cancelBubble = true;
 });
 
-function drag(ev) {
-  designer.drag(ev);
+function removeObject(event) {
+  designer.removeNode(event.layerX, event.layerY);
 }
 
 </script>

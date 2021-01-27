@@ -1,24 +1,14 @@
-<div class="card">
+<div id="widgetSidebar" class="card">
   <div class="card-header">
-    <strong>示例：进度</strong>
+    <strong>示例：弹出框</strong>
   </div>
   <div class="card-body row">
-    <div class="col-md-3">
-      <div class="progress-circle p10">
-        <span>10%</span>
-        <div class="left-half-clipper">
-          <div class="first50-bar"></div>
-          <div class="value-bar"></div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="progress-circle over50 p55">
-        <span>55%</span>
-        <div class="left-half-clipper">
-          <div class="first50-bar"></div>
-          <div class="value-bar"></div>
-        </div>
+    <div>
+      <button id="buttonSidebarRight" class="btn btn-info text-white">显示右侧编辑栏</button>
+      <button id="buttonPopupRightCenter" class="btn btn-info text-white">显示提示框</button>
+      <div class="popup hidden">
+        <div class="popup-right-center"></div>
+        <div class="popup-body">这里可以放任意提示！多加几个字测试一下！</div>
       </div>
     </div>
   </div>
@@ -52,6 +42,31 @@
 </div>
 <div class="card">
   <div class="card-header">
+    <strong>示例：进度</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-3">
+      <div class="progress-circle p10">
+        <span>10%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="progress-circle over50 p55">
+        <span>55%</span>
+        <div class="left-half-clipper">
+          <div class="first50-bar"></div>
+          <div class="value-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header">
     <strong>示例：标签</strong>
   </div>
   <div class="card-body row">
@@ -73,28 +88,38 @@
     </div>
   </div>
 </div>
-<div class="card">
-  <div class="card-header">
-    <strong>示例：两个文本化选项切换</strong>
-  </div>
-  <div class="card-body row">
-    <div class="text-switch">
-      <label class="mb-0 checked">
-        <input name="text-switch" type="radio" style="display: none"/>年度
-      </label>
-      <label class="mb-0">
-        <input name="text-switch" type="radio" style="display: none"/>月度
-      </label>
-    </div>
-  </div>
-</div>
-
 
 <script src="/3rd/clock/javascript/main.js"></script>
 
 <script>
-  setTimeout(function() {
-    schedule.stop();
-  }, 5000);
+setTimeout(function() {
+  schedule.stop();
+}, 5000);
+
+dom.bind('#buttonSidebarRight', 'click', function() {
+  ajax.sidebar({
+    containerId: '#widgetSidebar',
+    title: '表单编辑',
+    url: 'html/component/rightbar.html'
+  });
+});
+
+dom.bind('#buttonPopupRightCenter', 'click', function() {
+  let ox = this.offsetLeft;
+  let oy = this.offsetTop;
+  let width = parseInt(this.clientWidth);
+  let height = parseInt(this.clientHeight);
+  let popup = dom.find('.popup');
+  popup.style.left = ox + width + 'px';
+  popup.style.top = oy + (height / 2) + 'px';
+
+  popup.classList.remove('hidden');
+  popup.classList.add('show');
+
+  setTimeout(function(event) {
+    popup.classList.remove('show');
+    popup.classList.add('hidden');
+  }, 2000)
+});
 </script>
 

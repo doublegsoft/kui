@@ -717,6 +717,7 @@ S2.define('select2/utils',[
     // and was designed to be used with the Sizzle selector engine.
 
     var $el = $(el);
+    if (typeof el.style === 'undefined') return;
     var overflowX = el.style.overflowX;
     var overflowY = el.style.overflowY;
 
@@ -4623,10 +4624,10 @@ S2.define('select2/i18n/en',[],function () {
       return message;
     },
     noResults: function () {
-      return 'No results found';
+      return '没有任何数据';
     },
     searching: function () {
-      return 'Searching…';
+      return '搜索中...';
     },
     removeAllItems: function () {
       return 'Remove all items';
