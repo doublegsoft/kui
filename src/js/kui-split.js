@@ -1,0 +1,106 @@
+if (typeof split === 'undefined') split = {};
+
+split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
+  const splitterId = "__split_splitterId";
+  leftDefaultSize = (leftDefaultSize || 300)
+  let container = document.getElementById(containerId);
+  let splitter = document.createElement('a');
+  splitter.setAttribute('id', splitterId);
+  container.appendChild(splitter);
+  splitter.style.backgroundColor = '#cdcdcd';
+  splitter.style.position = 'absolute';
+  splitter.style.width = '3px';
+  splitter.style.cursor = 'col-resize';
+  splitter.style.padding = '2px';
+  splitter.style.zIndex = '3';
+
+  let offsetTop = dom.top(container);
+  let heightContainer = document.body.clientHeight - offsetTop;
+  container.style.height = heightContainer + 'px';
+
+  let left = document.getElementById(leftId);
+  let right = document.getElementById(rightId);
+
+  left.style.width = leftDefaultSize + 'px';
+  right.style.width = container.clientWidth - leftDefaultSize + 'px';
+
+  splitter.style.top = 0 + 'px';
+  splitter.style.left = leftDefaultSize + 'px';
+  splitter.style.height = heightContainer + 'px';
+
+  left.style.height = heightContainer + 'px';
+  left.style.overflowY = 'auto';
+  right.style.height = heightContainer + 'px';
+  right.style.overflowY = 'auto';
+
+  let dragging = false;
+  splitter.addEventListener('mousedown', function(event) {
+    event.preventDefault();
+    dragging = true;
+  });
+
+  document.addEventListener('mouseup', function(event) {
+    dragging = false;
+  });
+
+  function isUnderContainer(element, container) {
+    if (element == null) {
+      return false;
+    }
+    if (element == container) return true;
+    return isUnderContainer(element.parentElement, container);
+  }
+
+  let offsetLeftPrevious = -1;
+  container.addEventListener('mousemove', function(event) {
+    if (dragging) {
+      if (event.offsetX <= 0) return;
+      if (event.offsetX >= this.clientWidth) return;
+      let target = event.target;
+
+      if (target.getAttribute('id') == splitterId) {
+        let offsetLeft = parseInt(splitter.style.left);
+        splitter.style.left = (offsetLeft + event.layerX) + 'px';
+        left.style.width = (offsetLeft + event.layerX) + 'px';
+        right.style.width = (container.clientWidth - (offsetLeft + event.layerX) - 10) + 'px';
+        return;
+      }
+      let offset = 0;
+      if (isUnderContainer(target, left)) {
+        offset = parseInt(splitter.style.left) - 5;
+        splitter.style.left = offset + 'px';
+        left.style.width = offset + 'px';
+        right.style.width = (container.clientWidth - offset) + 'px';
+        return;
+      }
+      if (isUnderContainer(target, right)) {
+        offset = parseInt(splitter.style.left) + 5;
+        splitter.style.left = offset + 'px';
+        left.style.width = offset + 'px';
+        right.style.width = (container.clientWidth - offset) + 'px';
+        return
+      }
+      // if (target.getAttribute('id') == containerId) {
+      //   splitter.style.left = event.layerX + 'px';
+      //   left.style.width = event.layerX + 'px';
+      //   right.style.width = (container.clientWidth - event.layerX) + 'px';
+      // } else if (target.getAttribute('id') == splitterId ||
+      //     target.getAttribute('id') == rightId ||
+      //     target.getAttribute('id') == leftId) {
+      //   let offsetLeft = parseInt(splitter.style.left);
+      //   splitter.style.left = (offsetLeft + event.layerX) + 'px';
+      //   left.style.width = (offsetLeft + event.layerX) + 'px';
+      //   right.style.width = (container.clientWidth - (offsetLeft + event.layerX) - 10) + 'px';
+      // } else {
+      //   offsetLeftPrevious = event.layerX;
+      //   splitter.style.left = event.layerX + 'px';
+      //   left.style.width = event.layerX + 'px';
+      //   right.style.width = (container.clientWidth - event.layerX) + 'px';
+      // }
+      // splitter.style.left = event.layerX + 'px';
+      // left.style.width = event.layerX + 'px';
+      // right.style.width = (container.clientWidth - event.layerX) + 'px';
+    }
+  });
+
+};

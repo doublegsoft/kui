@@ -1,0 +1,56 @@
+.editor {
+  display: block;
+  border: 1px solid #d1d1d1;
+  padding: 0;
+}
+
+.editor-toolbar {
+  border-bottom: 1px solid #d1d1d1;
+  background: #f8f8f8;
+  padding: 2px 8px 6px 3px;
+  white-space: normal;
+}
+
+.editor-toolbar .button-group {
+  border: 0;
+  margin: 1px 2px 6px 0;
+  padding-right: 3px;
+}
+
+.editor-toolbar .button-group .button {
+  display: inline-block;
+  height: 18px;
+  text-decoration: none;
+  width: auto;
+  box-sizing: content-box;
+  padding: 4px 6px;
+  outline: 0;
+  float: left;
+  border: 0;
+  position: relative;
+  cursor: default;
+}
+
+.c-dark-theme .button {
+  color: rgba(0,0,0,.8)!important;
+}
+
+/*
+.editor-toolbar .button-group .button i {
+  position: relative;
+  top: -3px;
+}
+*/
+
+.editor-toolbar .button-group .button:hover {
+  background-color: #e2e2e2;
+  /*border: 1px solid #ababab;*/
+}
+
+.editor-toolbar .separator {
+  float: left;
+  background-color: #bcbcbc;
+  margin: 4px 2px 0 2px;
+  height: 18px;
+  width: 1px;
+}
