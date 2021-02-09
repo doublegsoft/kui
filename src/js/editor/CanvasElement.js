@@ -1,8 +1,15 @@
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// CANVAS
+//
+////////////////////////////////////////////////////////////////////////////////
+
 /**
  * 【报表基本元素】
  * @constructor
  */
-function ReportElement() {
+function CanvasElement() {
   this.model = {};
   this.modelChangedListeners = [];
   this.model.font = function () {
@@ -10,29 +17,29 @@ function ReportElement() {
   };
 }
 
-ReportElement.prototype.isSelected = function () {
+CanvasElement.prototype.isSelected = function () {
   return this.model.selected;
 };
 
-ReportElement.prototype.select = function (x, y) {
+CanvasElement.prototype.select = function (x, y) {
   let model = this.model;
   this.model.selected =  (x >= model.x && x <= (model.x + model.width) && y >= model.y && y <= (model.y + model.height));
   return this.model.selected;
 };
 
-ReportElement.prototype.unselect = function () {
+CanvasElement.prototype.unselect = function () {
   this.model.selected = false;
 };
 
-ReportElement.prototype.render = function (context) {
+CanvasElement.prototype.render = function (context) {
   this.renderer.render(context, this);
 };
 
-ReportElement.prototype.addModelChangedListener = function(listener) {
+CanvasElement.prototype.addModelChangedListener = function(listener) {
   this.modelChangedListeners.push(listener);
 };
 
-ReportElement.prototype.notifyModelChangedListeners = function(model) {
+CanvasElement.prototype.notifyModelChangedListeners = function(model) {
   for (let key in model) {
     this.model[key] = model[key];
   }
@@ -41,10 +48,18 @@ ReportElement.prototype.notifyModelChangedListeners = function(model) {
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// TEXT
+//
+////////////////////////////////////////////////////////////////////////////////
+
 /**
- * 【文本元素】
+ * The text element on canvas.
  *
  * @param opts
+ *        the options for text element
+ *
  * @constructor
  */
 function TextElement(opts) {
@@ -64,6 +79,31 @@ function TextElement(opts) {
   }
   this.renderer = new TextElementRenderer();
 }
+
+TextElement.typename = 'text';
+
+TextElement.prototype.render = function(context, element) {
+  let model = element.model;
+  context.fillStyle = model.fontColor;
+  context.font = model.font();
+
+  model.width = context.measureText(model.text).width;
+
+  // 文本的高度设置特殊性
+  model.height = parseInt(model.fontSize);
+
+  if (element.model.selected) {
+    // 只有选择了的才能触发此逻辑，主要显示字体的调整，宽度随之调整
+    element.notifyModelChangedListeners({
+      width: model.width,
+      height: model.height
+    });
+  }
+
+  context.fillText(model.text, model.x, model.y + model.height * 0.85);
+
+  this.renderSelected(context, model);
+};
 
 TextElement.prototype.getProperties = function () {
   return [{
@@ -119,10 +159,16 @@ TextElement.prototype.getProperties = function () {
   }];
 };
 
-Object.assign(TextElement.prototype, ReportElement.prototype);
+Object.assign(TextElement.prototype, CanvasElement.prototype);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// LONG TEXT
+//
+////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 【文本元素】
+ * long text element type.
  *
  * @param opts
  * @constructor
@@ -147,6 +193,8 @@ function LongtextElement(opts) {
   }
   this.renderer = new LongtextElementRenderer();
 }
+
+LongtextElement.typename = 'longtext';
 
 LongtextElement.prototype.getProperties = function () {
   return [{
@@ -270,10 +318,16 @@ LongtextElement.prototype.getProperties = function () {
   }];
 };
 
-Object.assign(LongtextElement.prototype, ReportElement.prototype);
+Object.assign(LongtextElement.prototype, CanvasElement.prototype);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// IMAGE
+//
+////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 【图片元素】对象。
+ * the image element type.
  */
 function ImageElement(opts) {
   this.model = {};
@@ -287,6 +341,8 @@ function ImageElement(opts) {
   }
   this.renderer = new ImageElementRenderer();
 }
+
+ImageElement.typename = 'image';
 
 ImageElement.prototype.getProperties = function () {
   return [{
@@ -323,10 +379,16 @@ ImageElement.prototype.getProperties = function () {
   }];
 };
 
-Object.assign(ImageElement.prototype, ReportElement.prototype);
+Object.assign(ImageElement.prototype, CanvasElement.prototype);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// TABLE
+//
+////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 【表格】元素。
+ * the table element type.
  */
 function TableElement(opts) {
   this.model = {};
@@ -340,13 +402,15 @@ function TableElement(opts) {
   this.model.height = 240;
   this.model.fontColor = 'black';
   this.model.fontSize = 12;
-  this.model.fontFamily = ReportDesigner.TEXT_FONT_FAMILY;
+  this.model.fontFamily = Canvas.TEXT_FONT_FAMILY;
   this.model.columns =  '商品;单价;数量;总价';
   for (let key in opts) {
     this.model[key] = opts[key];
   }
   this.renderer = new TableElementRenderer();
 }
+
+TableElement.typename = 'table';
 
 TableElement.prototype.getProperties = function () {
   return [{
@@ -402,11 +466,16 @@ TableElement.prototype.getProperties = function () {
   }];
 };
 
-Object.assign(TableElement.prototype, ReportElement.prototype);
+Object.assign(TableElement.prototype, CanvasElement.prototype);
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// CHART
+//
+////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 【图表】元素。
+ * the chart element type.
  */
 function ChartElement(opts) {
   this.model = {};
@@ -419,12 +488,14 @@ function ChartElement(opts) {
   this.model.width = 500;
   this.model.height = 360;
   this.model.fontSize = 12;
-  this.model.fontFamily = ReportDesigner.TEXT_FONT_FAMILY;
+  this.model.fontFamily = Canvas.TEXT_FONT_FAMILY;
   for (let key in opts) {
     this.model[key] = opts[key];
   }
   this.renderer = new ChartElementRenderer();
 }
+
+ChartElement.typename = 'chart';
 
 ChartElement.prototype.getProperties = function () {
   return [{
@@ -462,4 +533,147 @@ ChartElement.prototype.getProperties = function () {
   }];
 };
 
-Object.assign(ChartElement.prototype, ReportElement.prototype);
+Object.assign(ChartElement.prototype, CanvasElement.prototype);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// VIDEO
+//
+////////////////////////////////////////////////////////////////////////////////
+
+function VideoElement(opts) {
+  this.model = {};
+  this.model.font = function () {
+    return this.fontSize + 'px ' + this.fontFamily;
+  };
+  this.modelChangedListeners = [];
+  this.model.type = 'video';
+  this.model.id = this.model.type + '-' + moment().valueOf();
+  this.model.width = 427;
+  this.model.height = 240;
+  this.model.fontSize = 12;
+  this.model.fontFamily = Canvas.TEXT_FONT_FAMILY;
+  for (let key in opts) {
+    this.model[key] = opts[key];
+  }
+  this.model.sample = 'img/av/ad_health.mp4';
+  this.renderer = new VideoElementRenderer();
+}
+
+VideoElement.typename = 'video';
+
+VideoElement.prototype.getProperties = function () {
+  return [{
+    title: '位置',
+    properties: [{
+      id: 'x',
+      label: '左',
+      input: 'number',
+      value: this.model.x || 0
+    }, {
+      id: 'y',
+      label: '顶',
+      input: 'number',
+      value: this.model.y || 0
+    }, {
+      id: 'width',
+      label: '宽度',
+      input: 'number',
+      value: this.model.width || 600
+    }, {
+      id: 'height',
+      label: '高度',
+      input: 'number',
+      value: this.model.height || 400
+    }]
+  }];
+};
+
+Object.assign(VideoElement.prototype, CanvasElement.prototype);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// QUEUE
+//
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * the table element type.
+ */
+function QueueElement(opts) {
+  this.model = {};
+  this.model.font = function () {
+    return this.fontSize + 'px ' + this.fontFamily;
+  };
+  this.modelChangedListeners = [];
+  this.model.type = 'table';
+  this.model.id = this.model.type + '-' + moment().valueOf();
+  this.model.width = 360;
+  this.model.height = 240;
+  this.model.fontColor = 'black';
+  this.model.fontSize = 12;
+  this.model.fontFamily = Canvas.TEXT_FONT_FAMILY;
+  this.model.columns =  '序号;姓名';
+  for (let key in opts) {
+    this.model[key] = opts[key];
+  }
+  this.renderer = new QueueElementRenderer();
+}
+
+QueueElement.typename = 'queue';
+
+QueueElement.prototype.getProperties = function () {
+  return [{
+    title: '位置',
+    properties: [{
+      id: 'x',
+      label: '左',
+      input: 'number',
+      value: this.model.x || 0
+    }, {
+      id: 'y',
+      label: '顶',
+      input: 'number',
+      value: this.model.y || 0
+    }, {
+      id: 'width',
+      label: '宽度',
+      input: 'number',
+      value: this.model.width || 600
+    }, {
+      id: 'height',
+      label: '高度',
+      input: 'number',
+      value: this.model.height || 400
+    }]
+  }, {
+    title: '表格',
+    properties: [{
+      id: 'columns',
+      label: '列',
+      input: 'textarea',
+      value: this.model.columns || ''
+    },{
+      id: 'fontFamily',
+      label: '字体名称',
+      input: 'select',
+      value: this.model.fontFamily || '宋体',
+      values: ['宋体','黑体','楷体','仿宋体']
+    },{
+      id: 'fontSize',
+      label: '字体大小',
+      input: 'range',
+      unit: 'px',
+      value: this.model.fontSize || 16,
+      min: '10',
+      max: '60'
+    },{
+      id: 'fontColor',
+      label: '字体颜色',
+      input: 'color',
+      value: this.model.color || 'black',
+    }]
+  }];
+};
+
+Object.assign(QueueElement.prototype, CanvasElement.prototype);

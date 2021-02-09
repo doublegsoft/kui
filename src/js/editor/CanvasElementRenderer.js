@@ -33,6 +33,11 @@ CanvasElementRenderer.prototype.renderSelected = function(context, model) {
   }
 };
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// TEXT
+//
+////////////////////////////////////////////////////////////////////////////////
 /**
  * the renderer for text element.
  *
@@ -65,8 +70,13 @@ TextElementRenderer.prototype.render = function(context, element) {
   this.renderSelected(context, model);
 };
 
-Object.assign(TextElementRenderer.prototype, ReportElementRenderer.prototype);
+Object.assign(TextElementRenderer.prototype, CanvasElementRenderer.prototype);
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// LONG TEXT
+//
+////////////////////////////////////////////////////////////////////////////////
 /**
  * the renderer for long text element.
  *
@@ -108,8 +118,13 @@ LongtextElementRenderer.prototype.render = function(context, element) {
   this.renderSelected(context, model);
 };
 
-Object.assign(LongtextElementRenderer.prototype, ReportElementRenderer.prototype);
+Object.assign(LongtextElementRenderer.prototype, CanvasElementRenderer.prototype);
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// IMAGE
+//
+////////////////////////////////////////////////////////////////////////////////
 /**
  * the renderer for image element.
  *
@@ -132,7 +147,7 @@ ImageElementRenderer.prototype.render = function (context, element) {
         let sWidth = img.naturalWidth;
         let sHeight = img.naturalHeight;
         context.drawImage(img, 0, 0, sWidth, sHeight, model.x, model.y, model.width, model.height);
-      }
+      };
       containerImage.append(img);
     } else {
       let sWidth = img.naturalWidth;
@@ -153,8 +168,13 @@ ImageElementRenderer.prototype.render = function (context, element) {
   this.renderSelected(context, model);
 };
 
-Object.assign(ImageElementRenderer.prototype, ReportElementRenderer.prototype);
+Object.assign(ImageElementRenderer.prototype, CanvasElementRenderer.prototype);
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// TABLE
+//
+////////////////////////////////////////////////////////////////////////////////
 /**
  * the renderer for table element.
  *
@@ -223,8 +243,13 @@ TableElementRenderer.prototype.render = function (context, element) {
   this.renderSelected(context, model);
 };
 
-Object.assign(TableElementRenderer.prototype, ReportElementRenderer.prototype);
+Object.assign(TableElementRenderer.prototype, CanvasElementRenderer.prototype);
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// CHART
+//
+////////////////////////////////////////////////////////////////////////////////
 /**
  * the renderer for chart element.
  */
@@ -369,6 +394,155 @@ ChartElementRenderer.prototype.render = function (context, element) {
   this.renderSelected(context, model);
 };
 
-Object.assign(ChartElementRenderer.prototype, ReportElementRenderer.prototype);
+Object.assign(ChartElementRenderer.prototype, CanvasElementRenderer.prototype);
+
+////////////////////////////////////////////////////////////////////////////////
+//
+// VIDEO
+//
+////////////////////////////////////////////////////////////////////////////////
+
+function VideoElementRenderer() {
+
+}
+
+VideoElementRenderer.prototype.render = function (context, element) {
+  let model = element.model;
+  let containerVideo = document.getElementById('video_container');
+  // let video = dom.element('<video id="videoSample" autoplay loop></video>');
+  // video.src = model.sample;
+  // containerVideo.appendChild(video);
+
+  function renderFrame() {
+    // context.globalCompositeOperation = "source-over";
+    // context.clearRect(0, 0, c.width, c.height);     // makes sure we have an alpha channel
+
+    // context.beginPath();                            // draw diagonal half
+    // context.moveTo(model.x, model.y);
+    // context.lineTo(pos - 50, 0);
+    // context.lineTo(pos + 50, c.height);
+    // context.lineTo(0, c.height);
+    // context.fill();
+
+    // // video source 2
+    // ctx.globalCompositeOperation = "source-in";        // comp in source 2
+    // ctx.drawImage(video2, 0, 0, c.width, c.height);
+
+    // video source 1
+    // context.globalCompositeOperation = "destination-atop"; // comp in source 1
+    context.drawImage(video, model.x, model.y, model.width, model.height);
+
+    requestAnimationFrame(renderFrame);
+  }
+
+  // video.oncanplay = function() { renderFrame() };
+
+  if (model.image) {
+    let containerImage = document.getElementById('image_container');
+    let img = document.getElementById(model.id);
+    if (img == null) {
+      let img = document.createElement('img');
+      img.setAttribute('id', model.id);
+      img.setAttribute('src', model.image);
+      img.onload = function () {
+        let sWidth = img.naturalWidth;
+        let sHeight = img.naturalHeight;
+        context.drawImage(img, 0, 0, sWidth, sHeight, model.x, model.y, model.width, model.height);
+      };
+      containerImage.append(img);
+    } else {
+      let sWidth = img.naturalWidth;
+      let sHeight = img.naturalHeight;
+      img.setAttribute('src', model.image);
+      context.drawImage(img, 0, 0, sWidth, sHeight, model.x, model.y, model.width, model.height);
+    }
+  } else {
+    let img = document.getElementById(model.id);
+    if (img == null) {
+      img = document.getElementById('image_poster')
+    }
+    let sWidth = img.naturalWidth;
+    let sHeight = img.naturalHeight;
+    context.drawImage(img, 0, 0, sWidth, sHeight, model.x, model.y, model.width, model.height);
+  }
+
+  this.renderSelected(context, model);
+};
+
+Object.assign(VideoElementRenderer.prototype, CanvasElementRenderer.prototype);
 
 
+////////////////////////////////////////////////////////////////////////////////
+//
+// TABLE
+//
+////////////////////////////////////////////////////////////////////////////////
+/**
+ * the renderer for table element.
+ *
+ * @constructor
+ */
+function QueueElementRenderer() {
+
+}
+
+QueueElementRenderer.prototype.render = function (context, element) {
+  let model = element.model;
+  // context.font = model.font();
+  context.fillStyle = model.fontColor;
+
+  if (model.selected) {
+    context.strokeStyle = ReportDesigner.STROKE_STYLE_SELECTED;
+  } else {
+    context.strokeStyle = ReportDesigner.STROKE_STYLE_DEFAULT;
+  }
+  context.setLineDash([]);
+  context.strokeStyle = ReportDesigner.STROKE_STYLE_DEFAULT;
+
+  // 画边框
+  context.beginPath();
+  // left-top
+  context.moveTo(model.x, model.y);
+  // left-bottom
+  context.lineTo(model.x, model.y + model.height);
+  // right-bottom
+  context.lineTo(model.x + model.width, model.y + model.height);
+  // right-top
+  context.lineTo(model.x + model.width, model.y);
+  // left-top
+  context.lineTo(model.x, model.y);
+  context.stroke();
+  context.closePath();
+
+  let columnTitles = model.columns.split(';');
+  let columnCount = columnTitles.length;
+  let columnWidth = parseInt(model.width / (columnCount == 0 ? 1 : columnCount));
+  let headerHeight = model.fontSize * 1.25;
+
+  // 画【列】的竖线
+  // for (let i = 1; i < columnCount; i++) {
+  //   context.beginPath();
+  //   context.moveTo(model.x + columnWidth * i, model.y);
+  //   context.lineTo(model.x + columnWidth * i, model.y + model.height);
+  //   context.stroke();
+  //   context.closePath();
+  // }
+  // 画【表头】的横线
+  context.beginPath();
+  context.moveTo(model.x, model.y + headerHeight);
+  context.lineTo(model.x + model.width, model.y + headerHeight);
+  context.stroke();
+  context.closePath();
+  // 画【表头】的标题
+  context.font = model.font();
+  for (let i = 0; i < columnCount; i++) {
+    let title = columnTitles[i];
+    let titleWidth = context.measureText(title).width;
+    let titleX = model.x + (columnWidth - titleWidth) / 2 + columnWidth * i;
+    context.fillText(title, titleX, model.y + model.fontSize * 1.0);
+  }
+
+  this.renderSelected(context, model);
+};
+
+Object.assign(QueueElementRenderer.prototype, CanvasElementRenderer.prototype);

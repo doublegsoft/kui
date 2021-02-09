@@ -7,7 +7,7 @@
   "groups": [{
     "title": "应用示例",
     "menus": [{
-      "text": "工具应用",
+      "text": "应用程序",
       "icon": "nav-icon fa fa-cubes",
       "items": [{
         "text": "报表设计",
@@ -25,6 +25,10 @@
         "text": "手机应用设计",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/application/kesigner/mobile.html', containerId: 'container'});"
+      },{
+        "text": "叫号屏幕",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/application/loudtalk/screen.html', containerId: 'container'});"
       }]
     }]
   }, {

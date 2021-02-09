@@ -1,0 +1,139 @@
+<style>
+  .container {
+    margin: 0!important;
+  }
+  .toolbar {
+    border-bottom: 1px solid #e0e2e4;
+    height: 40px;
+    padding: 0 30px;
+    text-align: left;
+    background: #f5f6f7;
+    display: flex;
+  }
+</style>
+<div id="pageLoudTalk" style="margin: 0 -12px; overflow-y: hidden;">
+  <div class="x-spreadsheet-toolbar">
+    <div class="x-spreadsheet-toolbar-btn" data-tooltip="保存">
+      <div class="x-spreadsheet-icon">
+        <i class="fas fa-save position-relative" style="top: -3px;"></i>
+      </div>
+    </div>
+    <div class="x-spreadsheet-toolbar-btn" data-tooltip="预览">
+      <div class="x-spreadsheet-icon">
+        <i class="far fa-eye position-relative" style="top: -3px;"></i>
+      </div>
+    </div>
+    <div class="position-relative" data-tooltip="屏幕尺寸"
+         style="top: 5px; padding: 0 10px;">
+      <label>宽</label>
+      <input style="width: 50px" type="number" value="1920">
+      <span style="margin-right: 5px;">像素</span>
+      <label>高</label>
+      <input style="width: 50px" type="number" value="1280">
+      <span>像素</span>
+    </div>
+    <div class="x-spreadsheet-toolbar-btn" data-tooltip="屏幕尺寸">
+      <div class="x-spreadsheet-dropdown bottom-left">
+        <div class="x-spreadsheet-dropdown-header">
+          <div class="x-spreadsheet-dropdown-title">正常</div>
+          <div class="x-spreadsheet-icon arrow-right">
+            <div class="x-spreadsheet-icon-img arrow-down"></div>
+          </div>
+        </div>
+        <div class="x-spreadsheet-dropdown-content" style="width: 220px; display: none;">
+          <div class="x-spreadsheet-item">正常</div>
+          <div class="x-spreadsheet-item">文本</div>
+          <div class="x-spreadsheet-item divider"></div>
+          <div class="x-spreadsheet-item">数值
+            <div class="label">1,000.12</div>
+          </div>
+          <div class="x-spreadsheet-item">百分比
+            <div class="label">10.12%</div>
+          </div>
+          <div class="x-spreadsheet-item">人民币
+            <div class="label">￥10.00</div>
+          </div>
+          <div class="x-spreadsheet-item">美元
+            <div class="label">$10.00</div>
+          </div>
+          <div class="x-spreadsheet-item">欧元
+            <div class="label">€10.00</div>
+          </div>
+          <div class="x-spreadsheet-item divider"></div>
+          <div class="x-spreadsheet-item">短日期
+            <div class="label">26/09/2008</div>
+          </div>
+          <div class="x-spreadsheet-item">时间
+            <div class="label">15:59:00</div>
+          </div>
+          <div class="x-spreadsheet-item">长日期
+            <div class="label">26/09/2008 15:59:00</div>
+          </div>
+          <div class="x-spreadsheet-item">持续时间
+            <div class="label">24:01:00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="designer_container" class="row p-0 m-0">
+    <div class="col-md-2" style="padding: 0">
+      <ul class="list-group">
+        <li data-type='text' draggable="true" ondragstart="drag(event);" class="list-group-item grab">
+          <i class="fas fa-heading mr-1"></i>文本
+        </li>
+        <li data-type='longtext' draggable="true" ondragstart="drag(event);" class="list-group-item grab">
+          <i class="fas fa-paragraph mr-1"></i>长文本
+        </li>
+        <li data-type='image' draggable="true" ondragstart="drag(event);" class="list-group-item grab">
+          <i class="far fa-image mr-1"></i>图片
+        </li>
+        <li id="text-part" data-type='video' draggable="true" ondragstart="drag(event);" class="list-group-item grab">
+          <i class="fas fa-film mr-1"></i>广告
+        </li>
+        <li id="image-part" data-type='queue' draggable="true" ondragstart="drag(event);" class="list-group-item grab">
+          <i class="far fa-address-book mr-1"></i>患者队列
+        </li>
+      </ul>
+    </div>
+    <div class="col-md-8" id="canvas_container" style="background-color: #fff; padding: 0;"></div>
+    <div id="properties_container" class="col-md-2 properties-container">
+    </div>
+
+    <div id="image_container" style="display: none">
+      <img id="image_sample" src="./img/report-designer/placeholder.jpg">
+      <img id="image_poster" src="img/canvas/poster.png">
+    </div>
+    <div id="video_container" style="display: none;"></div>
+  </div>
+</div>
+
+<script>
+
+var pageLoudTalk = document.getElementById('pageLoudTalk');
+var designerContainer = document.getElementById('designer_container');
+var canvasContainer = document.getElementById('canvas_container');
+
+dom.height(canvasContainer, 12);
+dom.height(designerContainer, 12);
+
+var height = canvasContainer.clientHeight;
+
+var propertiesEditor = new PropertiesEditor({
+  containerId: 'properties_container',
+  confirm: function () {
+    designer.render();
+  }
+});
+
+window.designer = new Canvas({
+  containerId: 'canvas_container',
+  canvasHeight: height,
+  propertiesEditor: propertiesEditor
+});
+
+function drag(ev) {
+  designer.drag(ev);
+}
+
+</script>
