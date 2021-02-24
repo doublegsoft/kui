@@ -351,6 +351,13 @@ topo = new NetworkTopology({
         containerId: self.container,
         allowClose: true
       });
+    } else {
+      ajax.bottombar({
+        url: 'html/application/network/server/outline.html',
+        title: '数据平台应用服务',
+        containerId: self.container,
+        allowClose: true
+      });
     }
   }
 });

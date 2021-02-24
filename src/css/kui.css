@@ -1658,7 +1658,7 @@ div.search:hover > a {
   right: 6px;
 }
 
-right-bar {
+.right-bar {
   position: fixed;
   margin: auto;
   right: -600px;
@@ -1672,11 +1672,11 @@ right-bar {
   transform: translate3d(0%, 0, 0);
 }
 
-right-bar.in {
+.right-bar.in {
   right: 0px;
 }
 
-right-bar.out {
+.right-bar.out {
   visibility:hidden;
   right:-600px;
   overflow:hidden;
@@ -1685,7 +1685,7 @@ right-bar.out {
 }
 
 
-right-bar.fade .modal-dialog {
+.right-bar.fade .modal-dialog {
   right: -600px;
   height: 100%;
   max-width: 600px;
@@ -1695,36 +1695,36 @@ right-bar.fade .modal-dialog {
   transition: opacity 0.3s linear, right 0.3s ease-out;
 }
 
-right-bar.fade.in .modal-dialog {
+.right-bar.fade.in .modal-dialog {
   right: 0;
 }
 
-right-bar .modal-header {
+.right-bar .modal-header {
   padding-top: 5px;
   padding-bottom: 5px;
   border-radius: unset;
   border-top: none;
 }
 
-right-bar .modal-content {
+.right-bar .modal-content {
   height: 100%;
   overflow-y: auto;
   border-radius: unset;
   border-top: none;
 }
 
-right-bar .modal-body {
+.right-bar .modal-body {
   padding: 0px 0px;
 }
 
 .bottom-bar {
   position: fixed;
-  margin: auto;
-  right: -600px;
-  top: -28px;
+  /*margin: auto;*/
+  bottom: -400px;
   z-index: 9999;
-  width: 600px;
-  height: calc(100% + 28px);
+  width: calc(100% - 200px);
+  max-width: 100% !important;
+  height: 400px;
   -webkit-transform: translate3d(0%, 0, 0);
   -ms-transform: translate3d(0%, 0, 0);
   -o-transform: translate3d(0%, 0, 0);
@@ -1732,44 +1732,43 @@ right-bar .modal-body {
 }
 
 .bottom-bar.in {
-  right: 0px;
+  bottom: 0px;
 }
 
 .bottom-bar.out {
   visibility:hidden;
-  right:-600px;
+  bottom: -400px;
   overflow:hidden;
   transition:0.3s;
   -webkit-transition:0.3s;
 }
 
-
 .bottom-bar.fade .modal-dialog {
-  right: -600px;
-  height: 100%;
-  max-width: 600px;
-  -webkit-transition: opacity 0.3s linear, right 0.3s ease-out;
-  -moz-transition: opacity 0.3s linear, right 0.3s ease-out;
-  -o-transition: opacity 0.3s linear, right 0.3s ease-out;
-  transition: opacity 0.3s linear, right 0.3s ease-out;
+  bottom: -400px;
+  width: 100%;
+  max-width: 100% !important;
+  max-height: 400px;
+  margin: 0!important;
+  -webkit-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  -moz-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  -o-transition: opacity 0.3s linear, bottom 0.3s ease-out;
+  transition: opacity 0.3s linear, bottom 0.3s ease-out;
 }
 
 .bottom-bar.fade.in .modal-dialog {
-  right: 0;
+  bottom: 0;
 }
 
 .bottom-bar .modal-header {
   padding-top: 5px;
   padding-bottom: 5px;
   border-radius: unset;
-  border-top: none;
 }
 
 .bottom-bar .modal-content {
-  height: 100%;
+  height: 400px;
   overflow-y: auto;
   border-radius: unset;
-  border-top: none;
 }
 
 .bottom-bar .modal-body {

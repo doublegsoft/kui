@@ -797,11 +797,11 @@ ajax.upload = function(opts) {
 ajax.sidebar = function(opt) {
   let container = dom.find(opt.containerId);
   let success = opt.success || function() {};
-  let sidebar = dom.find('right-bar', container);
+  let sidebar = dom.find('.right-bar', container);
   let allowClose = opt.allowClose || false;
   if (sidebar != null) sidebar.remove();
   sidebar = dom.element(`
-    <div class="rightbar fade show">
+    <div class="right-bar fade show">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="card-header pt-2 pb-2">
@@ -825,7 +825,7 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('right-bar').classList.add('out');
+          dom.find('.right-bar').classList.add('out');
           // 关闭回调
           if (opt.close)
             opt.close();
@@ -852,7 +852,80 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('right-bar').classList.add('out');
+          dom.find('.right-bar').classList.add('out');
+          // 关闭回调
+          if (opt.close)
+            opt.close();
+        });
+        if (success) success(resp);
+        setTimeout(function () {
+          sidebar.classList.remove('out');
+          sidebar.classList.add('in');
+        }, 200);
+      }
+    });
+  }
+};
+
+ajax.bottombar = function(opt) {
+  let container = dom.find(opt.containerId);
+  let success = opt.success || function() {};
+  let sidebar = dom.find('.bottom-bar', container);
+  let allowClose = opt.allowClose || false;
+  if (sidebar != null) sidebar.remove();
+  sidebar = dom.element(`
+    <div class="bottom-bar fade show">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="card-header pt-2 pb-2">
+            <button type="button" class="close text-danger">
+              <i class="fas fa-times"></i>
+            </button>
+            <h5 class="modal-title"></h5>
+          </div>
+          <div class="modal-body" style="overflow-y: auto"></div>
+        </div>
+      </div>
+    </div>
+  `);
+  container.appendChild(sidebar);
+  if (opt.url) {
+    xhr.get({
+      url: opt.url,
+      success: function (resp) {
+        dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
+        if (!allowClose && !opt.close) {
+          dom.find('button.close', sidebar).classList.add('hidden');
+        }
+        dom.find('button.close', sidebar).addEventListener('click', function () {
+          dom.find('.bottom-bar').classList.add('out');
+          // 关闭回调
+          if (opt.close)
+            opt.close();
+        });
+        utils.append(dom.find('.modal-body', sidebar), resp);
+        if (success) success(resp);
+        setTimeout(function () {
+          sidebar.classList.remove('out');
+          sidebar.classList.add('in');
+        }, 200);
+      }
+    });
+  } else {
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: opt.page
+      },
+      success: function (resp) {
+        let script = resp.data.script;
+        utils.append(dom.find('.modal-body', sidebar), script);
+        dom.find('.modal-title', sidebar).innerHTML = opt.title;
+        if (!allowClose && !opt.close) {
+          dom.find('button.close', sidebar).classList.add('hidden');
+        }
+        dom.find('button.close', sidebar).addEventListener('click', function () {
+          dom.find('.bottom-bar').classList.add('out');
           // 关闭回调
           if (opt.close)
             opt.close();

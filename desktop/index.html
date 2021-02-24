@@ -342,12 +342,12 @@ click.subscribe(event => {
   if (target.tagName === 'A' ||
     target.tagName === 'I' ||
     target.tagName === 'IMG') return false;
-  let rightbar = dom.ancestor(target, 'div', 'rightbar');
+  let rightbar = dom.ancestor(target, 'div', '.right-bar');
   if (rightbar != null) return false;
   let query = dom.ancestor(target, 'div', 'widget-query');
   if (query != null) return false;
 
-  rightbar = dom.find('right-bar');
+  rightbar = dom.find('.right-bar');
   if (rightbar != null && !rightbar.classList.contains('out')) {
     rightbar.classList.add('out');
   }

@@ -276,7 +276,7 @@ FormLayout.prototype.build = function(persisted) {
   row.style.marginLeft = '-12px';
   row.style.position = 'fixed';
   row.style.zIndex = '2001';
-  let rightbar = dom.find('right-bar');
+  let rightbar = dom.find('.right-bar');
   if (rightbar != null) {
     //
     // kui.css
