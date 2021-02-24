@@ -11,9 +11,7 @@
 <link href="/3rd/font-awesome/css/all.css" rel="stylesheet">
 <link href="/3rd/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
 <link href="/3rd/jstree/themes/default/style.min.css" rel="stylesheet">
-<!--
-<link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
--->
+<link href="/3rd/codemirror/codemirror.css" rel="stylesheet">
 <link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker-standalone.css" rel="stylesheet">
 <link href="/3rd/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
 <link href="/3rd/bootstrap-lightbox/ekko-lightbox.css" rel="stylesheet">
@@ -29,6 +27,7 @@
 <link rel="stylesheet" href="/3rd/slickgrid-2.4.24/css/smoothness/jquery-ui.css" type="text/css"/>
 <link rel="stylesheet" href="/3rd/slickgrid-2.4.24/controls/slick.columnpicker.css" type="text/css" media="screen" charset="utf-8"/>
 <link rel="stylesheet" href="/3rd/x-spreadsheet/xspreadsheet.css" type="text/css">
+<link href="/3rd/mxgraph/common.css" rel="stylesheet">
 
 <!-- Main styles for this application -->
 <link href="/src/css/coreui.css" rel="stylesheet">
@@ -128,9 +127,11 @@
 <script src="/3rd/jstree/jstree.min.js"></script> 
 <script src="/3rd/moment/moment.min.js"></script>
 <script src="/3rd/accounting/accounting.min.js"></script>
-<script src="/3rd/handlebars/handlebars-v4.0.11.js"></script> 
+<script src="/3rd/handlebars/handlebars-v4.0.11.js"></script>
+<script src="/3rd/codemirror/codemirror.js"></script>
+<script src="/3rd/codemirror/mode/xml/xml.js"></script>
 
-<script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+  <script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/3rd/bootstrap-datetimepicker/js/zh-cn.js"></script>  
 <script src="/3rd/bootstrap-fileinput/js/fileinput.min.js"></script> 
 <script src="/3rd/bootstrap-fileinput/js/locales/zh.js"></script> 
@@ -171,6 +172,7 @@
 
 <script src="/3rd/x-spreadsheet/xspreadsheet.js"></script>
 <script src="/3rd/x-spreadsheet/zh-cn.js"></script>
+<script src="/3rd/mxgraph/mxClient.js"></script>
 
 <script src="/src/js/kui-mainframe.js"></script> 
 <script src="/src/js/kui-bootstrap.js"></script> 
@@ -180,12 +182,14 @@
 <script src="/src/js/kui-formdata.js"></script> 
 <script src="/src/js/kui-validation.js"></script>
 <script src="/src/js/kui-select.js"></script>
+<script src="/src/js/kui-split.js"></script>
 
 <script src="/src/js/kui-svg.js"></script> 
 <script src="/src/js/kui-searchbox.js"></script>
 <script src="/src/js/kui-Workflow.js"></script>
 <script src="/src/js/kui-utils.js"></script>
 <script src="/src/js/kui-xhr.js"></script>
+
 
 <!-- 集合显示容器 -->
 <script src="/src/js/container/PaginationTable.js"></script>
@@ -194,10 +198,10 @@
 <!-- 详情显示部件 -->
 <script src="/src/js/container/FormLayout.js"></script>
 <script src="/src/js/container/QueryLayout.js"></script>
+<script src="/src/js/container/TreelikeList.js"></script>
 
 <script src="/src/js/kui-Checklist.js"></script>
 <script src="/src/js/kui-TreelikeTable.js"></script>
-<script src="/src/js/kui-TreelikeList.js"></script>
 <script src="/src/js/kui-Checktree.js"></script>
 <script src="/src/js/kui-FileUpload.js"></script>
 
@@ -235,6 +239,7 @@
 <script src="/src/js/editor/CanvasElement.js"></script>
 <script src="/src/js/editor/CanvasElementRenderer.js"></script>
 <script src="/src/js/editor/PropertiesEditor.js"></script>
+<script src="/src/js/editor/NetworkTopology.js"></script>
 </body>
 </html>
 
@@ -250,21 +255,30 @@
   {{#each groups}}
   <li class="nav-title">{{title}}</li>
     {{#each menus}}
+      {{#if url}}
+  <li class="nav-item">
+    <a class="nav-link" href="{{url}}">
+      <span style="padding-left: 16px"></span>
+      <i class="{{icon}}"></i>{{text}}
+    </a>
+  </li>
+    {{else}}
   <li class="nav-item nav-dropdown"> 
     <a class="nav-link nav-dropdown-toggle" href="#">
       <i class="{{icon}}"></i>{{text}}
     </a>
     <ul class="nav-dropdown-items">
-      {{#each items}}
+        {{#each items}}
       <li class="nav-item"> 
         <a class="nav-link" href="{{url}}">
           <span style="padding-left: 16px"></span>
           <i class="{{icon}}"></i>{{text}}
         </a> 
       </li>
-      {{/each}}
+        {{/each}}
     </ul>
   </li>
+      {{/if}}
     {{/each}}
   {{/each}}
 </ul>
@@ -333,7 +347,7 @@ click.subscribe(event => {
   let query = dom.ancestor(target, 'div', 'widget-query');
   if (query != null) return false;
 
-  rightbar = dom.find('.rightbar');
+  rightbar = dom.find('right-bar');
   if (rightbar != null && !rightbar.classList.contains('out')) {
     rightbar.classList.add('out');
   }

@@ -16,7 +16,10 @@ Status.prototype.renderTo = function(container) {
   container.innerHTML = '';
 
   let el = dom.element(`
-    <div class="font-13 m-auto tag-success">${model.status.text}</div>
+    <div class="font-13 m-auto tag-success">
+      <span>${model.status.text}</span>
+      <div class="tag-success-after"></div>
+    </div>
   `);
   if (this.onStatusClicked) {
     el.classList.add('pointer');

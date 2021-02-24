@@ -276,11 +276,11 @@ FormLayout.prototype.build = function(persisted) {
   row.style.marginLeft = '-12px';
   row.style.position = 'fixed';
   row.style.zIndex = '2001';
-  let rightbar = dom.find('.rightbar');
+  let rightbar = dom.find('right-bar');
   if (rightbar != null) {
     //
     // kui.css
-    // .rightbar
+    // right-bar
     // top: -28px
     //
     // 只有在rightbar下，才允许

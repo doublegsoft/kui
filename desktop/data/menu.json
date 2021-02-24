@@ -29,6 +29,10 @@
         "text": "叫号屏幕",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/application/loudtalk/screen.html', containerId: 'container'});"
+      },{
+        "text": "网络拓扑",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/application/network/dashboard.html', containerId: 'container'});"
       }]
     }]
   }, {
@@ -72,6 +76,10 @@
         "text": "特殊显示",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/component/display.html', containerId: 'container'});"
+      }, {
+        "text": "分栏显示",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/component/splitter.html', containerId: 'container'});"
       }]
     },{
       "text": "组合示例",
@@ -109,6 +117,17 @@
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/function/couch.html', containerId: 'container'});"
       }]
+    }]
+  }, {
+    "title": "布局示例",
+    "menus": [{
+      "text": "列表布局",
+      "icon": "nav-icon fa fa-list",
+      "url": "javascript:ajax.view({url: 'html/layout/list.html', containerId: 'container'});"
+    }, {
+      "text": "网格布局",
+      "icon": "nav-icon fa fa-th",
+      "url": "javascript:ajax.view({url: 'html/layout/grid.html', containerId: 'container'});"
     }]
   }, {
     "title": "页面示例",

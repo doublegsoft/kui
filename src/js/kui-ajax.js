@@ -795,9 +795,9 @@ ajax.upload = function(opts) {
 };
 
 ajax.sidebar = function(opt) {
-  let container = document.querySelector(opt.containerId);
+  let container = dom.find(opt.containerId);
   let success = opt.success || function() {};
-  let sidebar = dom.find('.rightbar', container);
+  let sidebar = dom.find('right-bar', container);
   let allowClose = opt.allowClose || false;
   if (sidebar != null) sidebar.remove();
   sidebar = dom.element(`
@@ -825,7 +825,7 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('.rightbar').classList.add('out');
+          dom.find('right-bar').classList.add('out');
           // 关闭回调
           if (opt.close)
             opt.close();
@@ -852,7 +852,7 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('.rightbar').classList.add('out');
+          dom.find('right-bar').classList.add('out');
           // 关闭回调
           if (opt.close)
             opt.close();

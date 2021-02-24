@@ -1,0 +1,358 @@
+<div id="pageNetworkDashboard" class="d-flex bg-white"></div>
+
+<script>
+var data = [
+  {
+    "id": "2",
+    "vertex": true,
+    "x": 424.5,
+    "y": 155,
+    "width": 63,
+    "height": 63,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/switch-l3.svg",
+    "type": "switch-l3"
+  },
+  {
+    "id": "3",
+    "vertex": true,
+    "x": 270.05,
+    "y": 170,
+    "width": 69.95,
+    "height": 37,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/switch-l2.svg",
+    "type": "switch-l2"
+  },
+  {
+    "id": "4",
+    "vertex": true,
+    "x": 160.0000030517578,
+    "y": 51,
+    "width": 28,
+    "height": 40,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/server.svg",
+    "type": "server"
+  },
+  {
+    "id": "5",
+    "vertex": true,
+    "x": 159.0500030517578,
+    "y": 110,
+    "width": 28,
+    "height": 40,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/server.svg",
+    "type": "server"
+  },
+  {
+    "id": "6",
+    "vertex": true,
+    "x": 159.0500030517578,
+    "y": 170,
+    "width": 28,
+    "height": 40,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/server.svg",
+    "type": "server"
+  },
+  {
+    "id": "7",
+    "vertex": true,
+    "x": 160.0000030517578,
+    "y": 230,
+    "width": 28,
+    "height": 40,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/server.svg",
+    "type": "server"
+  },
+  {
+    "id": "8",
+    "vertex": true,
+    "x": 78,
+    "y": 90,
+    "width": 42,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/database.svg",
+    "type": "database"
+  },
+  {
+    "id": "9",
+    "vertex": true,
+    "x": 78,
+    "y": 200,
+    "width": 42,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/database.svg",
+    "type": "database"
+  },
+  {
+    "id": "10",
+    "edge": true,
+    "source": "8",
+    "target": "3"
+  },
+  {
+    "id": "11",
+    "edge": true,
+    "source": "9",
+    "target": "3"
+  },
+  {
+    "id": "12",
+    "edge": true,
+    "source": "5",
+    "target": "3"
+  },
+  {
+    "id": "13",
+    "edge": true,
+    "source": "6",
+    "target": "3"
+  },
+  {
+    "id": "14",
+    "edge": true,
+    "source": "7",
+    "target": "3"
+  },
+  {
+    "id": "15",
+    "edge": true,
+    "source": "4",
+    "target": "3"
+  },
+  {
+    "id": "16",
+    "edge": true,
+    "source": "3",
+    "target": "2"
+  },
+  {
+    "id": "17",
+    "vertex": true,
+    "x": 290,
+    "y": 310,
+    "width": 65,
+    "height": 32,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/switch-l2.svg",
+    "type": "switch-l2"
+  },
+  {
+    "id": "18",
+    "vertex": true,
+    "x": 550,
+    "y": 310,
+    "width": 65,
+    "height": 32,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/switch-l2.svg",
+    "type": "switch-l2"
+  },
+  {
+    "id": "19",
+    "edge": true,
+    "source": "17",
+    "target": "2"
+  },
+  {
+    "id": "20",
+    "edge": true,
+    "source": "18",
+    "target": "2"
+  },
+  {
+    "id": "21",
+    "vertex": true,
+    "x": 228,
+    "y": 370,
+    "width": 32,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "22",
+    "vertex": true,
+    "x": 300,
+    "y": 370,
+    "width": 33,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "23",
+    "vertex": true,
+    "x": 370,
+    "y": 370,
+    "width": 33,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "24",
+    "vertex": true,
+    "x": 220,
+    "y": 430,
+    "width": 33,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "25",
+    "vertex": true,
+    "x": 300,
+    "y": 430,
+    "width": 33,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "26",
+    "vertex": true,
+    "x": 368,
+    "y": 430,
+    "width": 33,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "27",
+    "vertex": true,
+    "x": 490,
+    "y": 370,
+    "width": 36,
+    "height": 43,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "28",
+    "vertex": true,
+    "x": 650,
+    "y": 350,
+    "width": 30,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "29",
+    "vertex": true,
+    "x": 500,
+    "y": 440,
+    "width": 29,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "30",
+    "vertex": true,
+    "x": 620,
+    "y": 440,
+    "width": 33,
+    "height": 33,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/pc.svg",
+    "type": "pc"
+  },
+  {
+    "id": "31",
+    "vertex": true,
+    "x": 640,
+    "y": 40,
+    "width": 109,
+    "height": 63,
+    "style": "verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=img/network/symbol/cloud.svg",
+    "type": "cloud"
+  },
+  {
+    "id": "32",
+    "edge": true,
+    "source": "2",
+    "target": "31"
+  },
+  {
+    "id": "33",
+    "edge": true,
+    "source": "27",
+    "target": "18"
+  },
+  {
+    "id": "35",
+    "edge": true,
+    "source": "29",
+    "target": "18"
+  },
+  {
+    "id": "37",
+    "edge": true,
+    "source": "23",
+    "target": "17"
+  },
+  {
+    "id": "38",
+    "edge": true,
+    "source": "22",
+    "target": "17"
+  },
+  {
+    "id": "39",
+    "edge": true,
+    "source": "25",
+    "target": "17"
+  },
+  {
+    "id": "40",
+    "edge": true,
+    "source": "21",
+    "target": "17"
+  },
+  {
+    "id": "41",
+    "edge": true,
+    "source": "24",
+    "target": "17"
+  },
+  {
+    "id": "43",
+    "edge": true,
+    "source": "30",
+    "target": "18"
+  },
+  {
+    "id": "44",
+    "edge": true,
+    "source": "28",
+    "target": "18"
+  },
+  {
+    "id": "45",
+    "edge": true,
+    "source": "26",
+    "target": "17"
+  }
+];
+dom.height('#pageNetworkDashboard', 14);
+
+topo = new NetworkTopology({
+  onCellDoubleClicked: function(cell) {
+    if (cell.value.type === 'database') {
+      ajax.sidebar({
+        url: 'html/application/network/database/outline.html',
+        title: 'HIS数据库服务器',
+        containerId: self.container,
+        allowClose: true
+      });
+    } else if (cell.value.type === 'server') {
+      ajax.sidebar({
+        url: 'html/application/network/server/outline.html',
+        title: '数据平台应用服务',
+        containerId: self.container,
+        allowClose: true
+      });
+    }
+  }
+});
+topo.render('#pageNetworkDashboard', data);
+</script>

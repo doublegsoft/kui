@@ -14,7 +14,7 @@
   width: 3px;
   height: 100%;
   background: #20a8d8;
-  /*left: 50%;*/
+  left: 5px!important;
   top: 0;
   position: absolute;
 }
@@ -39,14 +39,14 @@
 }
 
 .timeline .timeline-item {
-  margin-bottom: 50px;
+  margin-bottom: 24px;
   position: relative;
 }
 
 .timeline .timeline-item .timeline-icon {
   background: #20a8d8;
-  width: 36px;
-  height: 36px;
+  width: 24px;
+  height: 24px;
   position: absolute;
   top: 0;
   /*left: 50%;*/
@@ -77,6 +77,8 @@
 }
 
 .timeline .timeline-item .timeline-content {
+  position: relative;
+  top: -8px;
   width: 90%;
   background: #fff;
   padding: 20px;
@@ -141,8 +143,9 @@
 .timeline .timeline-item .timeline-content:before {
   content: '';
   position: absolute;
-  left: calc(9% - 1px);
+  /*left: calc(9% - 1px);*/
   top: 11px;
+  left: -8px;
   width: 0;
   height: 0;
   border-top: 7px solid transparent;

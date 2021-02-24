@@ -10,20 +10,24 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   splitter.style.backgroundColor = '#cdcdcd';
   splitter.style.position = 'absolute';
   splitter.style.width = '3px';
-  splitter.style.cursor = 'col-resize';
+  splitter.style.cursor = 'ew-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
 
-  let offsetTop = dom.top(container);
-  let heightContainer = document.body.clientHeight - offsetTop;
-  container.style.height = heightContainer + 'px';
+  // disable scroll-y for container
+  container.style.overflowY = 'hidden';
+
+  let heightContainer = container.clientHeight;
 
   let left = document.getElementById(leftId);
   let right = document.getElementById(rightId);
 
   left.style.width = leftDefaultSize + 'px';
+  left.style.flex = leftDefaultSize + 'px';
   right.style.width = container.clientWidth - leftDefaultSize + 'px';
+  right.style.flex = container.clientWidth - leftDefaultSize + 'px';
 
+  splitter.style.height = heightContainer + 'px';
   splitter.style.top = 0 + 'px';
   splitter.style.left = leftDefaultSize + 'px';
   splitter.style.height = heightContainer + 'px';
@@ -37,10 +41,12 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   splitter.addEventListener('mousedown', function(event) {
     event.preventDefault();
     dragging = true;
+    document.body.style.cursor = 'ew-resize';
   });
 
   document.addEventListener('mouseup', function(event) {
     dragging = false;
+    document.body.style.cursor = 'default';
   });
 
   function isUnderContainer(element, container) {
@@ -59,10 +65,13 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
       let target = event.target;
 
       if (target.getAttribute('id') == splitterId) {
+        console.log('hello');
         let offsetLeft = parseInt(splitter.style.left);
-        splitter.style.left = (offsetLeft + event.layerX) + 'px';
-        left.style.width = (offsetLeft + event.layerX) + 'px';
-        right.style.width = (container.clientWidth - (offsetLeft + event.layerX) - 10) + 'px';
+        splitter.style.left = (offsetLeft/* + event.layerX*/) + 'px';
+        left.style.width = (offsetLeft/* + event.layerX*/) + 'px';
+        left.style.flex = (offsetLeft/* + event.layerX*/) + 'px';
+        right.style.width = (container.clientWidth - (offsetLeft/* + event.layerX*/)) + 'px';
+        right.style.flex = (container.clientWidth - (offsetLeft/* + event.layerX*/)) + 'px';
         return;
       }
       let offset = 0;
@@ -71,6 +80,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
         right.style.width = (container.clientWidth - offset) + 'px';
+        left.style.flex = offset + 'px';
+        right.style.flex = (container.clientWidth - offset) + 'px';
         return;
       }
       if (isUnderContainer(target, right)) {
@@ -78,6 +89,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
         right.style.width = (container.clientWidth - offset) + 'px';
+        left.style.flex = offset + 'px';
+        right.style.flex = (container.clientWidth - offset) + 'px';
         return
       }
       // if (target.getAttribute('id') == containerId) {

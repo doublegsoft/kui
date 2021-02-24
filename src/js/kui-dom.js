@@ -741,3 +741,9 @@ dom.height = function(selector, offset, parent) {
   if (parent != document.body) offsetTop = 0;
   element.style.height = (parent.clientHeight - offsetTop - offset) + 'px';
 };
+
+dom.templatize = function(template, model) {
+  let tpl = Handlebars.compile(template);
+  let html = tpl(model);
+  return dom.element(html);
+};

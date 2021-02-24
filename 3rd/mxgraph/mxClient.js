@@ -43008,6 +43008,9 @@ mxCell.prototype.insertEdge = function(edge, isOutgoing)
  * 
  * Parameters:
  * 
+ * 
+ * 
+ * 
  * edge - <mxCell> to be removed from the edge array.
  * isOutgoing - Boolean that specifies if the edge is outgoing.
  */

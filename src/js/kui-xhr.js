@@ -20,10 +20,7 @@ xhr.request = function (opts, method) {
   let usecase = opts.usecase || '';
 
   let req  = new XMLHttpRequest();
-  req.open(method, url, true);
-  req.timeout = 15 * 1000;
-  req.setRequestHeader("Content-Type", "application/json");
-  req.setRequestHeader("usecase", usecase);
+  req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -45,9 +42,12 @@ xhr.request = function (opts, method) {
   req.ontimeout = function () {
     if (error) error({error: {code: -501, message: '网络请求超时！'}});
   };
+  req.open(method, url, true);
+  req.setRequestHeader("Content-Type", "application/json");
+  req.setRequestHeader("usecase", usecase);
   if (data)
     req.send(JSON.stringify(data));
-  else 
+  else
     req.send(null);
 };
 

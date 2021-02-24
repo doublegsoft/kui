@@ -34,7 +34,7 @@ int main(void) {
   s_http_server_opts.enable_directory_listing = "yes";
 
   for (;;) {
-    mg_mgr_poll(&mgr, 1000);
+    mg_mgr_poll(&mgr, 100);
   }
   mg_mgr_free(&mgr);
 

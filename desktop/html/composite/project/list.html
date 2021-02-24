@@ -132,6 +132,7 @@ PageProjectList.prototype.edit = function (projectId, projectName) {
     containerId: '#pageProjectList',
     title: projectName,
     url: 'html/composite/project/edit.html',
+    usecase: 'test',
     success: function() {
       pageProjectEdit.show(projectId);
     }
