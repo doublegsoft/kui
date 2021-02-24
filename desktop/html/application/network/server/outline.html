@@ -1,0 +1,182 @@
+<div id="pageAssetDetail" widget-type="Page" class="card b-a-0" style="overflow-x: hidden;">
+  <div class="card-body mb-3">
+    <div>
+      <div class="title-bordered mb-2">
+        <strong>基本情况</strong>
+      </div>
+      <div class="mb-3">
+        <div class="form form-horizontal">
+          <div class="form-group row m-auto">
+            <label class="col-md-2 col-form-label">IP地址</label>
+            <label class="col-md-10 col-form-label"><strong>10.6.2.20</strong></label>
+          </div>
+          <div class="form-group row m-auto">
+            <label class="col-md-2 col-form-label">型号</label>
+            <label class="col-md-10 col-form-label"><strong>CISCO 3型</strong></label>
+          </div>
+          <div class="form-group row m-auto">
+            <label class="col-md-2 col-form-label">地址</label>
+            <label class="col-md-10 col-form-label"><strong>计算中心三号机房</strong></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="title-bordered mb-2">
+        <strong>CPU使用情况</strong>
+      </div>
+      <div class="mb-3">
+        <div widget-id="chartCPU" class="height-200"></div>
+      </div>
+    </div>
+    <div>
+      <div class="title-bordered mb-2">
+        <strong>内存使用情况</strong>
+      </div>
+      <div class="mb-3">
+        <div widget-id="chartMemory" class="height-200"></div>
+      </div>
+    </div>
+    <div>
+      <div class="title-bordered mb-2">
+        <strong>硬盘使用情况</strong>
+      </div>
+      <div widget-id="chartVolume" class="mb-3">
+
+      </div>
+    </div>
+  </div>
+<script>
+function PageAssetDetail() {
+
+}
+
+PageAssetDetail.prototype.show = function(params) {
+  let self = this;
+};
+
+PageAssetDetail.prototype.chartVolume = function(host, port) {
+  xhr.post({
+    url: 'http://' + host + ':' + port + '/api/agent/os/volume',
+    success: function(resp) {
+      let widget = dom.find('#pageAssetDetail div[widget-id=chartVolume]');
+      widget.innerHTML = '';
+      let widgetRow = dom.create('div', 'row');
+      widget.appendChild(widgetRow);
+      for (let i = 0; i < resp.data.length; i++) {
+        let row = resp.data[i];
+        row.used = row.total - row.free;
+        let div = dom.create('div', 'col-md-6', 'height-200');
+        widgetRow.appendChild(div);
+        let data = [];
+        data.push({name: '剩余（GB）', value: (row.free / 1024).toFixed(0)});
+        data.push({name: '使用（GB)', value: (row.used / 1024).toFixed(0)});
+        chart.pie(div, {
+          title: row.volume,
+          textColor: '#fff',
+          values: [{
+            name: 'value'
+          }],
+          category: {
+            name: 'name',
+            legend: {
+              show: false
+            }
+          },
+          data: data
+        });
+      }
+    }
+  })
+};
+
+PageAssetDetail.prototype.chartCPU = function(host, port) {
+  let self = this;
+  xhr.post({
+    url: 'http://' + host + ':' + port + '/api/agent/os/cpu',
+    success: function(resp) {
+      let widget = dom.find('#pageAssetDetail div[widget-id=chartCPU]');
+      let values = [];
+      let row = {};
+      for (let i = 0; i < resp.data.length; i++) {
+        row.date = moment().format('hh:mm:ss');
+        row['core_' + i] = parseInt(resp.data[i].processed * 100 / resp.data[i].total);
+        values.push({
+          name: 'core_' + i,
+          text: 'Core-' + (i + 1)
+        });
+      }
+      if (widget.children.length > 0) {
+        let series = self.cpuChart.options.series;
+        let xAxis = self.cpuChart.options.xAxis;
+        for (let i = 0; i < series.length; i++) {
+          series[i].data.push(row['core_' + i]);
+          if (series[i].data.length == 31) {
+            series[i].data.shift();
+          }
+        }
+        xAxis.data.push(row.date);
+        if (xAxis.data.length == 31) xAxis.data.shift();
+        self.cpuChart.chart.setOption({
+          series: series,
+          xAxis: xAxis
+        });
+        return;
+      }
+
+      self.cpuChart = chart.line(widget, {
+        textColor: 'white',
+        values: values,
+        category: {
+          name: 'date'
+        },
+        data: [row]
+      });
+    }
+  })
+};
+
+PageAssetDetail.prototype.chartMemory = function(host, port) {
+  let self = this;
+  xhr.post({
+    url: 'http://' + host + ':' + port + '/api/agent/os/memory',
+    success: function(resp) {
+      let widget = dom.find('#pageAssetDetail div[widget-id=chartMemory]');
+      let row = resp.data;
+      row.date = moment().format('hh:mm:ss');
+      row['used'] = row.total - row.free;
+
+      if (widget.children.length > 0) {
+        let series = self.cpuMemory.options.series;
+        let xAxis = self.cpuMemory.options.xAxis;
+        xAxis.data.push(row.date);
+        series[0].data.push(row.used);
+        if (series[0].data.length == 31) {
+          series[0].data.shift();
+          xAxis.data.shift();
+        }
+        self.cpuMemory.chart.setOption({
+          series: series,
+          xAxis: xAxis
+        });
+        return;
+      }
+
+      self.cpuMemory = chart.line(widget, {
+        textColor: 'white',
+        values: [{
+          name: 'used',
+          text: '使用（MB）'
+        }],
+        category: {
+          name: 'date'
+        },
+        data: [row]
+      });
+    }
+  })
+};
+
+pageAssetDetail = new PageAssetDetail();
+</script>
+</div>

@@ -1,0 +1,86 @@
+<div>
+  <div class="card">
+    <div class="card-header">
+      <i class="fa fa-list"></i>
+      <strong>左边、两行布局</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6 d-flex">
+          <div>
+            <img src="img/avatars/1.jpg" class="width-84">
+
+          </div>
+
+        </div>
+        <div class="col-md-6">
+          <textarea name="longtextBorderTwoLine" class="full-width" readonly>
+<li class="list-group-item list-group-item-action"
+    style="padding: 8px 16px; display: flex; align-items: center;">
+  <div class="pl-2" style="border-color: rgb(229, 83, 83); border-left: 4px solid rgb(229, 83, 83);">
+    <div>服务未运行</div>
+    <div class="small text-muted">23:00:00</div>
+  </div>
+</li>
+          </textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+codeview = CodeMirror.fromTextArea(dom.find('textarea[name=longtextBorderTwoLine]'), {
+  mode: 'xml',
+  lineNumbers: true,
+  editable: false,
+  height: '100%',
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 173);
+codeview = CodeMirror.fromTextArea(dom.find('textarea[name=longtextImageTwoLine]'), {
+  mode: 'xml',
+  lineNumbers: true,
+  editable: false,
+  height: '100%',
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 196);
+codeview = CodeMirror.fromTextArea(dom.find('textarea[name=longtextImageTwoLineFloat]'), {
+  mode: 'xml',
+  lineNumbers: true,
+  editable: false,
+  height: '100%',
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 196);
+codeview = CodeMirror.fromTextArea(dom.find('textarea[name=longtextImageThreeLineFloat]'), {
+  mode: 'xml',
+  lineNumbers: true,
+  editable: false,
+  height: '218px',
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 218);
+codeview = CodeMirror.fromTextArea(dom.find('textarea[name=longtextImageSummary]'), {
+  mode: 'xml',
+  lineNumbers: true,
+  editable: false,
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 349);
+codeview = CodeMirror.fromTextArea(dom.find('textarea[name=longtextImageSummaryFooter]'), {
+  mode: 'xml',
+  lineNumbers: true,
+  editable: false,
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 349);
+</script>
