@@ -231,6 +231,7 @@ FormLayout.prototype.build = function(persisted) {
   }
 
   let containerButtons = dom.create('div');
+  containerButtons.classList.add('buttons');
   let buttons = dom.create('div', 'float-right');
 
   let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
@@ -256,7 +257,7 @@ FormLayout.prototype.build = function(persisted) {
   dom.bind(buttonClose, 'click', function() {
     event.preventDefault();
     event.stopPropagation();
-    let rightbar = dom.ancestor(self.container, 'div', 'rightbar');
+    let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
     if (rightbar != null) {
       rightbar.classList.add('out');
       setTimeout(function () {
@@ -273,7 +274,7 @@ FormLayout.prototype.build = function(persisted) {
   row.style.borderTop = '1px solid #c8ced3';
   row.style.borderBottom = '1px solid #c8ced3';
   row.style.paddingRight = '15px';
-  row.style.marginLeft = '-12px';
+  row.style.marginLeft = '-10px';
   row.style.position = 'fixed';
   row.style.zIndex = '2001';
   let rightbar = dom.find('.right-bar');
@@ -315,6 +316,11 @@ FormLayout.prototype.fetch = function (params) {
     for (let k in this.readOpt.params) {
       params[k] = this.readOpt.params[k];
     }
+  }
+  // if not need to fetch data
+  if (!this.readOpt.url && this.readOpt.url == '') {
+    this.build({});
+    return;
   }
   xhr.post({
     url: this.readOpt.url,

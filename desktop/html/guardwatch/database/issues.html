@@ -1,0 +1,109 @@
+<div id="pageDatabaseIssues" class="page">
+  <div class="card">
+    <div class="card-header">
+      <strong>
+        <i class="fas fa-list pr-2"></i>问题列表
+      </strong>
+      <div class="card-header-actions">
+        <a class="card-header-action" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a widget-id="buttonNew" class="dropdown-item bg-success text-light pointer pt-2 pb-2" data-toggle="dropdown">
+            <i class="fas fa-plus-square text-white ml-0"></i>新  建
+          </a>
+        </div>
+      </div>
+    </div>
+    <div widget-id="widgetIssues" class="card-body"></div>
+  </div>
+</div>
+<script>
+function PageDatabaseIssues() {
+  // 页面
+  this.page = dom.find('#pageDatabaseIssues');
+  this.widgetIssues = dom.find('[widget-id=widgetIssues]', this.page);
+  this.buttonNew = dom.find('a[widget-id=buttonNew]', this.page);
+  // 集合显示的表格
+  
+  this.tableDatabaseIssues = new PaginationTable({
+    url: '/api/v3/common/script/guardwatch/database/issues',
+    columns: [{
+      title: '告警级别',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let data = {};
+        data.primary = row.severity;
+        let el = dom.templatize(`
+          <div class="font-13 m-auto tag-success pt-02">
+            <strong>{{{primary}}}</strong>
+            <div class="tag-success-after"></div>
+          </div>
+        `, data);
+        td.appendChild(el);
+      }
+    },{
+      title: '数据库',
+      style: 'text-align: left;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let data = {};
+        row.options = row.options || {};
+        data.secondary = row.options.address;
+        data.align = 'left';
+        data.primary = row.databaseName;
+        let el = dom.templatize(`
+          <div class="pl-2">
+            <div>{{{primary}}}</div>
+            <div class="small text-muted">{{{secondary}}}</div>
+          </div>
+        `, data);
+        td.appendChild(el);
+      }
+    },{
+      title: '操作',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let linkDetail = dom.element(`
+          <a class="btn btn-link">详情</a>
+        `);
+        dom.model(linkDetail, row);
+        dom.bind(linkDetail, 'click', function() {
+          let model = dom.model(this);
+          ajax.shade({
+            url: 'html/guardwatch/database/issue.html',
+            success: function() {
+              // TODO
+            }
+          });
+        });
+        td.appendChild(linkDetail);
+      }
+    }]
+  });
+};
+
+PageDatabaseIssues.prototype.setup = function(params) {
+  this.tableDatabaseIssues.render(this.widgetIssues);
+  // 点击【新建】
+  dom.bind(this.buttonNew, 'click', function(event) {
+    ajax.shade({
+      url: 'html/guardwatch/database/issue.html',
+      success: function() {
+        // TODO
+      }
+    });
+    event.preventDefault();
+    event.stopPropagation();
+  });
+};
+
+PageDatabaseIssues.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseIssues = new PageDatabaseIssues();
+pageDatabaseIssues.show();
+</script>

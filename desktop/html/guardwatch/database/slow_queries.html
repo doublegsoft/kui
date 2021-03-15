@@ -1,0 +1,141 @@
+<div id="pageDatabaseSlowQueries" class="page">
+  <div class="card">
+    <div class="card-header">
+      <strong>
+        <i class="fas fa-list pr-2"></i>慢查询分析
+      </strong>
+      <div class="card-header-actions">
+        <a class="card-header-action" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right">
+          <a widget-id="buttonNew" class="dropdown-item bg-success text-light pointer pt-2 pb-2" data-toggle="dropdown">
+            <i class="fas fa-plus-square text-white ml-0"></i>新  建
+          </a>
+        </div>
+      </div>
+    </div>
+    <div widget-id="widgetSlowQueries" class="card-body"></div>
+  </div>
+</div>
+<script>
+function PageDatabaseSlowQueries() {
+  // 页面
+  this.page = dom.find('#pageDatabaseSlowQueries');
+  this.widgetSlowQueries = dom.find('[widget-id=widgetSlowQueries]', this.page);
+  this.buttonNew = dom.find('a[widget-id=buttonNew]', this.page);
+  // 集合显示的表格
+  
+  this.tableDatabaseSlowQueries = new PaginationTable({
+    url: '/api/v3/common/script/guardwatch/database/slow_queries',
+    columns: [{
+      title: '客户端',
+      style: 'text-align: left;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let data = {};
+        data.secondary = row.hostName;
+        data.align = 'left';
+        data.primary = row.applicationName;
+        let el = dom.templatize(`
+          <div class="pl-2">
+            <div>{{{primary}}}</div>
+            <div class="small text-muted">{{{secondary}}}</div>
+          </div>
+        `, data);
+        td.appendChild(el);
+      }
+    },{
+      title: '数据库',
+      style: 'text-align: left;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let data = {};
+        data.secondary = row.loginName;
+        data.align = 'left';
+        data.primary = row.databaseName;
+        let el = dom.templatize(`
+          <div class="pl-2">
+            <div>{{{primary}}}</div>
+            <div class="small text-muted">{{{secondary}}}</div>
+          </div>
+        `, data);
+        td.appendChild(el);
+      }
+    },{
+      title: '耗时(秒)',
+      style: 'text-align: right;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let data = {};
+        data.align = 'right';
+        data.primary = row.duration;
+        let el = dom.templatize(`
+          <strong>{{{primary}}}</strong>
+        `, data);
+        td.appendChild(el);
+      }
+    },{
+      title: 'SQL',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let data = {};
+        data.page = 'slow_query';
+        data.align = 'center';
+        data.primary = row.sql;
+        let el = dom.templatize(`
+          <a class="btn btn-link">
+            <i class="far fa-file"></i>
+          </a>
+        `, data);
+        dom.bind(el, 'click', function() {
+          ajax.shade({
+            url: 'html/guardwatch/database/slow_query.html',
+            success: function() {
+              // TODO
+            }
+          });
+        });
+        td.appendChild(el);
+      }
+    },{
+      title: '操作',
+      style: 'text-align: center;',
+      display: function(row, td) {
+        td.innerHTML = '';
+        let linkDetail = dom.element(`
+          <a class="btn btn-link">详情</a>
+        `);
+        dom.model(linkDetail, row);
+        dom.bind(linkDetail, 'click', function() {
+          let model = dom.model(this);
+          ajax.shade({
+            url: 'html/guardwatch/database/slow_query.html',
+            success: function() {
+              // TODO
+            }
+          });
+        });
+        td.appendChild(linkDetail);
+      }
+    }]
+  });
+};
+
+PageDatabaseSlowQueries.prototype.setup = function(params) {
+  this.tableDatabaseSlowQueries.render(this.widgetSlowQueries);
+  // 点击【新建】
+  dom.bind(this.buttonNew, 'click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  });
+};
+
+PageDatabaseSlowQueries.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseSlowQueries = new PageDatabaseSlowQueries();
+pageDatabaseSlowQueries.show();
+</script>

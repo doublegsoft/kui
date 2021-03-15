@@ -353,10 +353,13 @@ topo = new NetworkTopology({
       });
     } else {
       ajax.bottombar({
-        url: 'html/application/network/server/outline.html',
-        title: '数据平台应用服务',
+        url: 'html/application/network/alarm/latest.html',
+        title: '告警',
         containerId: self.container,
-        allowClose: true
+        allowClose: true,
+        success: function() {
+          pageNetworkAlarmLatest.show({});
+        }
       });
     }
   }

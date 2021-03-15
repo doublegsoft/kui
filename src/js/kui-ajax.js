@@ -480,6 +480,8 @@ ajax.shade = function(opts) {
   let url = opts.url;
   let callback = opts.success;
 
+  let shade = document.querySelector('.page.full');
+  if (shade != null) shade.remove();
   xhr.get({
     url : url,
     success : function(resp) {
@@ -671,7 +673,7 @@ ajax.dialog = function(opts) {
 /**
  * 支持shade close。
  */
-ajax.dialog2 = function(opts) {
+ajax.dialog = function(opts) {
   var title = opts.title || '';
   var url = opts.url || '';
   var data = opts.params || {};
@@ -797,7 +799,8 @@ ajax.upload = function(opts) {
 ajax.sidebar = function(opt) {
   let container = dom.find(opt.containerId);
   let success = opt.success || function() {};
-  let sidebar = dom.find('.right-bar', container);
+  // only one instance
+  let sidebar = dom.find('.right-bar'/*, container */);
   let allowClose = opt.allowClose || false;
   if (sidebar != null) sidebar.remove();
   sidebar = dom.element(`
@@ -889,6 +892,11 @@ ajax.bottombar = function(opt) {
     </div>
   `);
   container.appendChild(sidebar);
+  // adjust the width of bottom bar
+  let width = sidebar.parentElement.clientWidth;
+  let paddingLeft = parseInt(window.getComputedStyle(sidebar.parentElement, null).getPropertyValue('padding-left'));
+  let paddingRight = parseInt(window.getComputedStyle(sidebar.parentElement, null).getPropertyValue('padding-right'));
+  sidebar.style.width = (width - paddingRight - paddingLeft) + 'px';
   if (opt.url) {
     xhr.get({
       url: opt.url,

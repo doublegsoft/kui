@@ -193,6 +193,7 @@
 
 <!-- 集合显示容器 -->
 <script src="/src/js/container/PaginationTable.js"></script>
+<script src="/src/js/container/PaginationGrid.js"></script>
 <script src="/src/js/container/ListView.js"></script>
 
 <!-- 详情显示部件 -->
@@ -331,7 +332,8 @@ $('.navbar-toggler').on('click', function(evt) {
 });    
 
 // 重算容器高度
-document.getElementById('container').style.height = (document.body.clientHeight - 70) + 'px';
+// document.getElementById('container').style.height = (document.body.clientHeight - 60) + 'px';
+dom.height(document.getElementById('container'), 0);
 
 new PerfectScrollbar('.sidebar-nav');
 // new PerfectScrollbar('.container-fluid');

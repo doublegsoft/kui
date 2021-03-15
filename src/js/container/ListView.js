@@ -12,7 +12,7 @@
  * 7. CHECK an item in a list
  * 8. SELECT an item in a list
  */
-ListView = function (opt) {
+function ListView(opt) {
   // the remote data source
   this.url = opt.url;
   this.usecase = opt.usecase;

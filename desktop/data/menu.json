@@ -202,5 +202,32 @@
         "url": "javascript:ajax.view({url: 'html/guidbase/thread.html', containerId: 'container'});"
       }]  
     }]
+  }, {
+    "title": "其他",
+    "menus": [{
+      "text": "GUARDWATCH",
+      "icon": "nav-icon fa fa-industry",
+      "items": [{
+        "text": "驾驶舱",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view({url: 'html/guardwatch/database/dashboard.html', containerId: 'container'});"
+      }, {
+        "text": "问题列表",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view({url: 'html/guardwatch/database/issues.html', containerId: 'container'});"
+      }, {
+        "text": "慢查询分析",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view({url: 'html/guardwatch/database/slow_queries.html', containerId: 'container'});"
+      }, {
+        "text": "阻塞分析",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view({url: 'html/guardwatch/database/blocks.html', containerId: 'container'});"
+      }, {
+        "text": "性能分析",
+        "icon": "nav-icon fa fa-user",
+        "url": "javascript:ajax.view({url: 'html/guardwatch/database/performances.html', containerId: 'container'});"
+      }]
+    }]
   }]
 }

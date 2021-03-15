@@ -421,6 +421,14 @@ dom.top = function (selector) {
   } else {
     element = selector;
   }
+  // let ret = 0;
+  // do {
+  //   if ( !isNaN( element.offsetTop ) )
+  //   {
+  //     ret += element.offsetTop;
+  //   }
+  // } while (element = element.offsetParent);
+  // return ret;
   if (element == null) return 0;
   let ret = element.offsetTop;
   if (typeof element.offsetParent !== 'undefined') {
@@ -738,8 +746,22 @@ dom.height = function(selector, offset, parent) {
     element = selector;
   }
   let offsetTop = dom.top(element);
-  if (parent != document.body) offsetTop = 0;
-  element.style.height = (parent.clientHeight - offsetTop - offset) + 'px';
+  let computedStyle = getComputedStyle(dom.find('#container'),null);
+
+  let paddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
+  let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
+
+  computedStyle = getComputedStyle(element,null);
+  let borderTopWidth = parseInt(computedStyle.getPropertyValue('border-top-width'));
+  let borderBottomWidth = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
+
+  element.style.marginBottom = '0px';
+
+  let ancestor = dom.ancestor(element, 'div', 'full');
+  if (ancestor == null) {
+    paddingBottom = 0;
+  }
+  element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
 };
 
 dom.templatize = function(template, model) {

@@ -1,0 +1,51 @@
+<div id="pageDatabaseSlowQuery" class="page full">
+  <div class="card height-300">
+    <div widget-id="widgetPerformance" class="card-body">
+    </div>
+  </div>
+  <div class="card height-300">
+    <div widget-id="widgetGraph" class="card-body">
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabaseSlowQuery() {
+  this.page = dom.find('#pageDatabaseSlowQuery');
+  this.widgetPerformance = dom.find('[widget-id=widgetPerformance]', this.page);
+  this.widgetGraph = dom.find('[widget-id=widgetGraph]', this.page);
+  dom.height(this.widgetGraph.parentElement);
+};
+
+PageDatabaseSlowQuery.prototype.setup = function(params) {
+  let self = this;
+
+  this.formPerformance = new FormLayout({
+    columnCount: 1,
+    allowClose: true,
+    save: {
+      url: ''
+    },
+    read: {
+      url: ''
+    },
+    fields: [{
+    }]
+  });
+  this.formPerformance.render(this.widgetPerformance);
+
+  this.graphGraph = new PaginationGrid({
+    
+  });
+
+  dom.bind(this.page, 'click', function() {
+    self.page.remove();
+  });
+};
+
+PageDatabaseSlowQuery.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseSlowQuery = new PageDatabaseSlowQuery();
+pageDatabaseSlowQuery.show();
+</script>

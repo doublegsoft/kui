@@ -75,8 +75,8 @@ xhr.get = function (opts) {
 
 xhr.post = function (opts) {
   let url = opts.url;
-  if (typeof window.HOST !== 'undefined' && url.indexOf('http') == -1) {
-    url = window.HOST + url;
+  if (typeof HOST !== 'undefined' && url.indexOf('http') == -1) {
+    url = HOST + url;
     opts.url = url;
   }
   xhr.request(opts, 'POST');

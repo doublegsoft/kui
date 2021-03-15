@@ -383,7 +383,6 @@ $.fn.cascadeselect = function(opts) {
     link.style.borderBottom = '2px solid #1976D2';
 
     let url = link.getAttribute('data-url');
-    let usecase = link.getAttribute('data-usecase');
     // let data = dom.model(link);
     data = data || {};
     data.cascadeIndex = link.getAttribute('data-cascade-index');
@@ -402,7 +401,6 @@ $.fn.cascadeselect = function(opts) {
     popup.innerHTML = '';
     xhr.post({
       url: url,
-      usecase: usecase,
       data: data,
       success: function(resp) {
         let data = resp.data;
@@ -427,7 +425,12 @@ $.fn.cascadeselect = function(opts) {
               let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
               let data = {};
               data[cascadeName] = model[cascadeFieldValue];
-              displayPopup(next, data);
+              let params = {};
+              for (let key in levels[cascadeIndex + 1].params) {
+                let tpl = Handlebars.compile(levels[cascadeIndex + 1].params[key]);
+                params[key] = tpl(data);
+              }
+              displayPopup(next, params);
               // 阻止繁殖的click事件
               event.stopImmediatePropagation();
               event.stopPropagation();
@@ -457,7 +460,7 @@ $.fn.cascadeselect = function(opts) {
     let link = dom.create('a', 'btn', 'pb-1', 'cascadeselect-link');
     link.style.paddingTop = '1px';
     link.setAttribute('data-url', level.url);
-    link.setAttribute('data-usecase', level.usecase);
+    // link.setAttribute('data-usecase', level.usecase);
     link.setAttribute('data-cascade-index', i);
     link.setAttribute('data-cascade-name', level.name);
     link.setAttribute('data-cascade-field-value', level.fields.value);
@@ -473,7 +476,7 @@ $.fn.cascadeselect = function(opts) {
 
     link.addEventListener('click', function() {
       if (opts.readonly) return;
-      displayPopup(this);
+      displayPopup(this, levels[i].params);
     });
 
     if (i != levels.length - 1) {
@@ -488,6 +491,9 @@ $.fn.cascadeselect = function(opts) {
     if (opts.required)
       hidden.setAttribute('data-required', level.text);
     hidden.setAttribute('name', level.name);
+    if (level.value) {
+      hidden.value = level.value[level.fields.value];
+    }
     div.appendChild(link);
     div.appendChild(hidden);
     container.appendChild(div);

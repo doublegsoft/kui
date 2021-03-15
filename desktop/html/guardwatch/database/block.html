@@ -1,0 +1,50 @@
+<div id="pageDatabaseBlock" class="page side">
+  <div class="card height-300">
+    <div widget-id="widgetBlock" class="card-body">
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabaseBlock() {
+  this.page = dom.find('#pageDatabaseBlock');
+  this.widgetBlock = dom.find('[widget-id=widgetBlock]', this.page);
+  dom.height(this.widgetBlock.parentElement);
+};
+
+PageDatabaseBlock.prototype.setup = function(params) {
+  let self = this;
+
+  this.formBlock = new FormLayout({
+    columnCount: 1,
+    allowClose: true,
+    save: {
+      url: ''
+    },
+    read: {
+      url: ''
+    },
+    fields: [{
+      name: 'sessionId',
+      title: '会话标识',
+      input: 'text'                          
+    },{                        
+      name: 'blockingSessionId',
+      title: '阻塞会话标识',
+      input: 'number'                          
+    },{                        
+      name: 'checklist1',
+      title: '多选',
+      input: 'checklist'                          
+    }]
+  });
+  this.formBlock.render(this.widgetBlock);
+
+};
+
+PageDatabaseBlock.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseBlock = new PageDatabaseBlock();
+pageDatabaseBlock.show();
+</script>

@@ -1,0 +1,28 @@
+<div id="pageDatabaseExecutionPlan" class="page bottom">
+  <div widget-id="" class="card">
+    <div widget-id="widgetGraph" class="card-body height-400">
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabaseExecutionPlan() {
+  this.page = dom.find('#pageDatabaseExecutionPlan');
+  this.widgetGraph = dom.find('[widget-id=widgetGraph]', this.page);
+};
+
+PageDatabaseExecutionPlan.prototype.setup = function(params) {
+  let self = this;
+
+  this.graphGraph = new PaginationGrid({
+    
+  });
+
+};
+
+PageDatabaseExecutionPlan.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseExecutionPlan = new PageDatabaseExecutionPlan();
+pageDatabaseExecutionPlan.show();
+</script>

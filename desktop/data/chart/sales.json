@@ -1,0 +1,25 @@
+{
+  "data": [
+  {"date": "2020-01-01", "group": "1", "groupName": "药品", "value0": 100, "value1": 200},
+  {"date": "2020-01-02", "group": "1", "groupName": "药品", "value0": 110, "value1": 220},
+  {"date": "2020-01-03", "group": "1", "groupName": "药品", "value0": 120, "value1": 240},
+  {"date": "2020-01-04", "group": "1", "groupName": "药品", "value0": 130, "value1": 260},
+  {"date": "2020-01-05", "group": "1", "groupName": "药品", "value0": 140, "value1": 280},
+  {"date": "2020-01-06", "group": "1", "groupName": "药品", "value0": 150, "value1": 300},
+  {"date": "2020-01-07", "group": "1", "groupName": "药品", "value0": 150, "value1": 300},
+  {"date": "2020-01-01", "group": "2", "groupName": "耗材", "value0": 100, "value1": 200},
+  {"date": "2020-01-02", "group": "2", "groupName": "耗材", "value0": 110, "value1": 220},
+  {"date": "2020-01-03", "group": "2", "groupName": "耗材", "value0": 120, "value1": 240},
+  {"date": "2020-01-04", "group": "2", "groupName": "耗材", "value0": 130, "value1": 260},
+  {"date": "2020-01-05", "group": "2", "groupName": "耗材", "value0": 140, "value1": 280},
+  {"date": "2020-01-06", "group": "2", "groupName": "耗材", "value0": 150, "value1": 300},
+  {"date": "2020-01-07", "group": "2", "groupName": "耗材", "value0": 150, "value1": 300},
+  {"date": "2020-01-01", "group": "3", "groupName": "服务", "value0": 100, "value1": 200},
+  {"date": "2020-01-02", "group": "3", "groupName": "服务", "value0": 110, "value1": 220},
+  {"date": "2020-01-03", "group": "3", "groupName": "服务", "value0": 120, "value1": 240},
+  {"date": "2020-01-04", "group": "3", "groupName": "服务", "value0": 130, "value1": 260},
+  {"date": "2020-01-05", "group": "3", "groupName": "服务", "value0": 140, "value1": 280},
+  {"date": "2020-01-06", "group": "3", "groupName": "服务", "value0": 150, "value1": 300},
+  {"date": "2020-01-07", "group": "3", "groupName": "服务", "value0": 150, "value1": 300}
+  ]
+}

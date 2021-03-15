@@ -1,0 +1,39 @@
+<div id="pageNetworkAlarmLatest" widget-type="Page" class="card b-a-0" style="overflow-x: hidden;">
+  <div class="card-body">
+
+  </div>
+<script>
+function PageNetworkAlarmLatest() {
+  this.tableAlarm = new PaginationTable({
+    local: [{}],
+    columns: [{
+      title: '告警级别',
+      display: function(row, td) {
+        let elm = dom.element(`
+        <div class="font-13 m-auto tag-danger">
+          <span>关键</span>
+          <div class="tag-danger-after"></div>
+        </div>
+        `);
+        td.appendChild(elm);
+      }
+    },{
+      title: '告警时间'
+    },{
+      title: '告警对象'
+    },{
+      title: '描述'
+    },{
+      title: '操作'
+    }]
+  })
+}
+
+PageNetworkAlarmLatest.prototype.show = function(params) {
+  let self = this;
+  this.tableAlarm.render('#pageNetworkAlarmLatest div.card-body');
+};
+
+pageNetworkAlarmLatest = new PageNetworkAlarmLatest();
+</script>
+</div>

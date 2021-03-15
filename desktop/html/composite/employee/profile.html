@@ -99,7 +99,15 @@ PageEmployeeProfile.prototype.show = function(data) {
 };
 
 PageEmployeeProfile.prototype.setup = function() {
-  chart.bar('#pageEmployeeProfile div[widget-id=chartHistoricPerformance]', {
+  let self = this;
+  this.chartSales = new ChartWrapper({
+    url: 'data/chart/sales.json',
+    interval: 2000,
+    refresh: function(chartWrapper, data) {
+      chartWrapper.options.data = data;
+      chartWrapper.paint();
+    },
+    chartType: 'bar',
     values: [{
       name: 'value0',
       text: '毛利润',
@@ -119,10 +127,11 @@ PageEmployeeProfile.prototype.setup = function() {
         '3': {text: '服务', color: 'yellow'}
       }
     },
-    data: data
-  });
+  }).render('#pageEmployeeProfile div[widget-id=chartHistoricPerformance]');
 
-  chart.stack('#pageEmployeeProfile div[widget-id=chartKPI]', {
+  new ChartWrapper({
+    url: 'data/chart/sales.json',
+    chartType: 'stack',
     values: [{
       name: 'value0',
       text: '毛利润',
@@ -134,9 +143,8 @@ PageEmployeeProfile.prototype.setup = function() {
     }],
     category: {
       name: 'date'
-    },
-    data: data
-  });
+    }
+  }).render('#pageEmployeeProfile div[widget-id=chartKPI]');
 
   this.listCustomer.render('#pageEmployeeProfile [widget-id=listCustomer]');
 };

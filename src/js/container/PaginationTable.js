@@ -754,7 +754,7 @@ PaginationTable.prototype.loadLocal = function () {
   let result = {};
   result.total = this.local.total;
   result.data = [];
-  for (let i = this.start; i < (this.start + this.limit); i++) {
+  for (let i = this.start; i < (this.start + this.limit) && i < this.local.total; i++) {
     result.data.push(this.local.data[i] == null ? "&nbsp;" : this.local.data[i]);
   }
   this.fill(result);

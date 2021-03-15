@@ -1,0 +1,41 @@
+<div id="pageDatabasePerformance" class="page full">
+  <div class="card height-300">
+    <div widget-id="widgetPerformance" class="card-body">
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabasePerformance() {
+  this.page = dom.find('#pageDatabasePerformance');
+  this.widgetPerformance = dom.find('[widget-id=widgetPerformance]', this.page);
+};
+
+PageDatabasePerformance.prototype.setup = function(params) {
+  let self = this;
+
+  this.formPerformance = new FormLayout({
+    columnCount: 1,
+    allowClose: true,
+    save: {
+      url: ''
+    },
+    read: {
+      url: ''
+    },
+    fields: [{
+    }]
+  });
+  this.formPerformance.render(this.widgetPerformance);
+
+  dom.bind(this.page, 'click', function() {
+    self.page.remove();
+  });
+};
+
+PageDatabasePerformance.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabasePerformance = new PageDatabasePerformance();
+pageDatabasePerformance.show();
+</script>

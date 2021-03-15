@@ -1,0 +1,154 @@
+<div id="pageDatabaseIssue" class="page full">
+  <div class="row ml-0 mr-0">
+    <div class="col-md-6 col-left">
+      <div class="card height-300">
+        <div widget-id="widgetChart1" class="card-body">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-right">
+      <div class="card height-300">
+        <div widget-id="widgetChart2" class="card-body">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row ml-0 mr-0">
+    <div class="col-md-6 col-left">
+      <div class="card height-300">
+        <div widget-id="widgetDetails" class="card-body">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-right">
+      <div class="card height-300">
+        <div widget-id="widgetSessions" class="card-body">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabaseIssue() {
+  this.page = dom.find('#pageDatabaseIssue');
+  this.widgetChart1 = dom.find('[widget-id=widgetChart1]', this.page);
+  this.widgetChart2 = dom.find('[widget-id=widgetChart2]', this.page);
+  this.widgetDetails = dom.find('[widget-id=widgetDetails]', this.page);
+  dom.height(this.widgetDetails.parentElement);
+  this.widgetSessions = dom.find('[widget-id=widgetSessions]', this.page);
+  dom.height(this.widgetSessions.parentElement);
+};
+
+PageDatabaseIssue.prototype.setup = function(params) {
+  let self = this;
+
+  this.chartChart1 = new ChartWrapper({
+    url: 'data/chart/sales.json',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartChart1.render(this.widgetChart1);
+
+  this.chartChart2 = new ChartWrapper({
+    url: 'data/chart/sales.json',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartChart2.render(this.widgetChart2);
+
+  this.listDetails = new ListView({
+    url: '/api/v3/common/script/guardwatch/database/blocked_sessions',
+    create: function(len, row) {
+      let data = {};
+      data.secondary = row.hostName;
+      data.primary = row.loginName;
+      let ret = dom.templatize(`
+        <div class="d-flex justify-content-between pl-2 full-width">
+          <div>
+            <div>{{{primary}}}</div>
+            <div class="small text-muted">
+              <span class="text-success">{{{secondary}}}</span>
+            </div>
+          </div>
+          <div class="float-right position-relative" style="top: 8px; height: 26px;">
+            <i class="far fa-check-circle"></i>
+          </div>
+        </div>
+      `, data);
+      return ret;
+    }
+  });
+  this.listDetails.render(this.widgetDetails);
+
+  this.listSessions = new ListView({
+    url: '/api/v3/common/script/guardwatch/database/blocked_sessions',
+    create: function(len, row) {
+      let data = {};
+      data.secondary = row.hostName;
+      data.primary = row.loginName;
+      let ret = dom.templatize(`
+        <div class="d-flex justify-content-between pl-2 full-width">
+          <div>
+            <div>{{{primary}}}</div>
+            <div class="small text-muted">
+              <span class="text-success">{{{secondary}}}</span>
+            </div>
+          </div>
+          <div class="float-right position-relative" style="top: 8px; height: 26px;">
+            <i class="far fa-check-circle"></i>
+          </div>
+        </div>
+      `, data);
+      return ret;
+    }
+  });
+  this.listSessions.render(this.widgetSessions);
+
+  dom.bind(this.page, 'click', function() {
+    self.page.remove();
+  });
+};
+
+PageDatabaseIssue.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseIssue = new PageDatabaseIssue();
+pageDatabaseIssue.show();
+</script>

@@ -15762,7 +15762,7 @@ gis.Baidu.Toolbar.prototype.initialize = function (map) {
 /**
  * 
  */
-var ListView = function (opts) {
+function ListView(opts) {
   // 远程数据源
   this.url = opts.url;
 

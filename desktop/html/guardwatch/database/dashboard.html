@@ -1,0 +1,95 @@
+<div id="pageDatabaseDashboard" class="page ">
+  <div class="card height-300">
+    <div widget-id="widgetTopology" class="card-body">
+    </div>
+  </div>
+  <div class="row ml-0 mr-0">
+    <div class="col-md-6 col-left">
+      <div class="card height-300">
+        <div widget-id="widgetOverview" class="card-body">
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-right">
+      <div class="card height-300">
+        <div widget-id="widgetDetails" class="card-body">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabaseDashboard() {
+  this.page = dom.find('#pageDatabaseDashboard');
+  this.widgetTopology = dom.find('[widget-id=widgetTopology]', this.page);
+  this.widgetOverview = dom.find('[widget-id=widgetOverview]', this.page);
+  dom.height(this.widgetOverview.parentElement);
+  this.widgetDetails = dom.find('[widget-id=widgetDetails]', this.page);
+  dom.height(this.widgetDetails.parentElement);
+};
+
+PageDatabaseDashboard.prototype.setup = function(params) {
+  let self = this;
+
+  this.graphTopology = new PaginationGrid({
+    
+  });
+
+  this.chartOverview = new ChartWrapper({
+    url: 'data/chart/sales.json',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartOverview.render(this.widgetOverview);
+
+  this.listDetails = new ListView({
+    url: '/api/v3/common/script/guardwatch/database/issues2',
+    create: function(len, row) {
+      let data = {};
+      data.secondary = row.databaseName;
+      data.primary = row.severity;
+      let ret = dom.templatize(`
+        <div class="d-flex justify-content-between pl-2 full-width">
+          <div>
+            <div>{{{primary}}}</div>
+            <div class="small text-muted">
+              <span class="text-success">{{{secondary}}}</span>
+            </div>
+          </div>
+          <div class="float-right position-relative" style="top: 8px; height: 26px;">
+            <i class="far fa-check-circle"></i>
+          </div>
+        </div>
+      `, data);
+      return ret;
+    }
+  });
+  this.listDetails.render(this.widgetDetails);
+
+};
+
+PageDatabaseDashboard.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabaseDashboard = new PageDatabaseDashboard();
+pageDatabaseDashboard.show();
+</script>

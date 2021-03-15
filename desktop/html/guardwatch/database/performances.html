@@ -1,0 +1,169 @@
+<div id="pageDatabasePerformances" class="page ">
+  <div class="card height-300">
+    <div widget-id="widgetSessions" class="card-body">
+    </div>
+  </div>
+  <div class="card height-300">
+    <div widget-id="widgetNetworkIo" class="card-body">
+    </div>
+  </div>
+  <div class="card height-300">
+    <div widget-id="widgetDiskIo" class="card-body">
+    </div>
+  </div>
+  <div class="card height-300">
+    <div widget-id="widgetCpuUsage" class="card-body">
+    </div>
+  </div>
+  <div class="card height-300">
+    <div widget-id="widgetMemoryUsage" class="card-body">
+    </div>
+  </div>
+</div>
+<script>
+function PageDatabasePerformances() {
+  this.page = dom.find('#pageDatabasePerformances');
+  this.widgetSessions = dom.find('[widget-id=widgetSessions]', this.page);
+  this.widgetNetworkIo = dom.find('[widget-id=widgetNetworkIo]', this.page);
+  this.widgetDiskIo = dom.find('[widget-id=widgetDiskIo]', this.page);
+  this.widgetCpuUsage = dom.find('[widget-id=widgetCpuUsage]', this.page);
+  this.widgetMemoryUsage = dom.find('[widget-id=widgetMemoryUsage]', this.page);
+};
+
+PageDatabasePerformances.prototype.setup = function(params) {
+  let self = this;
+
+  this.chartSessions = new ChartWrapper({
+    url: 'TODO',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartSessions.render(this.widgetSessions);
+
+  this.chartNetworkIo = new ChartWrapper({
+    url: 'TODO',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartNetworkIo.render(this.widgetNetworkIo);
+
+  this.chartDiskIo = new ChartWrapper({
+    url: 'TODO',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartDiskIo.render(this.widgetDiskIo);
+
+  this.chartCpuUsage = new ChartWrapper({
+    url: 'TODO',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartCpuUsage.render(this.widgetCpuUsage);
+
+  this.chartMemoryUsage = new ChartWrapper({
+    url: 'TODO',
+    chartType: 'bar',
+values: [{
+      name: 'value0',
+      text: '毛利润',
+      operator: 'sum',
+      color: '#283593'
+    }, {
+      name: 'value1',
+      text: '销售额',
+      operator: 'sum',
+      color: '#2E7D32'
+    }],
+    category: {
+      name: 'group',
+      values: {
+        '1': {text: '药品', color: 'blue'},
+        '2': {text: '耗材', color: 'green'},
+        '3': {text: '服务', color: 'yellow'}
+      }
+    },
+  });
+  this.chartMemoryUsage.render(this.widgetMemoryUsage);
+
+};
+
+PageDatabasePerformances.prototype.show = function(params) {
+  this.setup(params);
+};
+
+pageDatabasePerformances = new PageDatabasePerformances();
+pageDatabasePerformances.show();
+</script>
