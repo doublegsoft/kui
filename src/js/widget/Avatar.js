@@ -34,10 +34,9 @@ function Avatar(opt) {
     dom.bind(this.fileinput, 'change', function(ev) {
       if (!('files' in this)) return;
       if (this.files.length == 0) return;
+      let reader = new FileReader();
 
-      const reader = new FileReader();
-
-      reader.addEventListener("load", function () {
+      reader.addEventListener("loadend", function () {
         // convert image file to base64 string
         self.image.src = reader.result;
         self.input.value = reader.result;

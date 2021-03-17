@@ -1416,15 +1416,31 @@ a {
 }
 
 .avatar {
-  align-items: center;
+
   background-color: rgb(187, 187, 187);
   border-radius: 9999px;
   box-shadow: rgb(255, 255, 255) 0px 0px 0px 4px;
   color: rgb(255, 255, 255);
-  display: flex;
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
   height: 48px;
-  justify-content: center;
   width: 48px;
+}
+
+.avatar-24 {
+  height: 24px!important;
+  width: 24px!important;
+}
+
+.avatar-28 {
+  height: 28px!important;
+  width: 28px!important;
+}
+
+.avatar-32 {
+  height: 32px!important;
+  width: 32px!important;
 }
 
 .avatar-36 {

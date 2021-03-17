@@ -407,7 +407,9 @@ $.fn.cascadeselect = function(opts) {
         for (let i = 0; i < data.length; i++) {
           let dataItem = data[i];
           let linkPopup = dom.create('a', 'btn', 'btn-link');
-          linkPopup.innerText = dataItem[link.getAttribute('data-cascade-field-text')];
+          if (dataItem[link.getAttribute('data-cascade-field-text')]) {
+            linkPopup.innerText = dataItem[link.getAttribute('data-cascade-field-text')];
+          }
           // set data-model-*
           dom.model(linkPopup, dataItem);
           // 选中点击事件
@@ -418,7 +420,9 @@ $.fn.cascadeselect = function(opts) {
             let cascadeFieldText = link.getAttribute('data-cascade-field-text');
             let model = dom.model(this);
             link.setAttribute('data-cascade-value', model[cascadeFieldValue]);
-            link.innerText = model[cascadeFieldText];
+            if (model[cascadeFieldText]) {
+              link.innerText = model[cascadeFieldText];
+            }
             dom.find('input', link.parentElement).value = model[cascadeFieldValue];
             dom.model(link, model);
             if (cascadeIndex < levelCount - 1) {
@@ -467,7 +471,7 @@ $.fn.cascadeselect = function(opts) {
     link.setAttribute('data-cascade-field-text', level.fields.text);
     link.style.borderRadius = 'unset';
 
-    if (level.value) {
+    if (level.value && level.value[level.fields.text]) {
       link.innerText = level.value[level.fields.text];
       link.setAttribute('data-cascade-value', level.value[level.fields.value]);
     } else {
@@ -491,7 +495,7 @@ $.fn.cascadeselect = function(opts) {
     if (opts.required)
       hidden.setAttribute('data-required', level.text);
     hidden.setAttribute('name', level.name);
-    if (level.value) {
+    if (level.value && level.value[level.fields.value]) {
       hidden.value = level.value[level.fields.value];
     }
     div.appendChild(link);

@@ -227,6 +227,11 @@ FormLayout.prototype.build = function(persisted) {
         readonly: this.readonly,
         name: field.name
       }).render(dom.find('div[data-avatar-name=\'' + field.name + '\']', this.container), field.value);
+    } else if (field.input == 'logo') {
+      new Logo({
+        readonly: this.readonly,
+        name: field.name
+      }).render(dom.find('div[data-logo-name=\'' + field.name + '\']', this.container), field.value);
     }
   }
 
@@ -477,7 +482,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       `);
       dom.find('input', radio).id = 'radio_' + val.value;
       dom.find('input', radio).name = field.name;
-      dom.find('input', radio).checked = field.value == val.value;
+      if (field.value == val.value) {
+        dom.find('input', radio).checked = true;
+      }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
       dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
@@ -514,6 +521,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-avatar-name', field.name);
+    group.classList.remove('col-md-4', 'col-md-9');
+    group.classList.add('col-md-12');
+    group.appendChild(input);
+    return {label: null, input: group};
+  } else if (field.input == 'logo') {
+    input = dom.create('div', 'full-width');
+    input.setAttribute('data-logo-name', field.name);
     group.classList.remove('col-md-4', 'col-md-9');
     group.classList.add('col-md-12');
     group.appendChild(input);
