@@ -6,8 +6,9 @@ function ChartWrapper(opts) {
   this.chartType = opts.chartType;
   this.interval = opts.interval || 0;
   this.scheduleName = opts.scheduleName;
-  this.refresh = opts.refresh || function(data) {
-
+  this.refresh = opts.refresh;
+  this.convertRow = opts.convert || function(data) {
+    return data;
   };
 }
 
@@ -18,7 +19,7 @@ function ChartWrapper(opts) {
  */
 ChartWrapper.prototype.convert = function() {
   let color = [];
-  let data = this.options.data;
+  let data = this.options.data || [];
   let category = this.options.category;
   let values = this.options.values;
 
@@ -256,7 +257,7 @@ ChartWrapper.prototype.line = function() {
   for (let i = 0; i < this.options.values.length; i++) {
     let seriesItem = {
       name: this.options.values[i].text,
-      type: 'line',
+      type: this.options.values[i].type || 'line',
       data: [],
     };
     if (this.options.values[i].color) {
@@ -265,11 +266,18 @@ ChartWrapper.prototype.line = function() {
     for (let textCategory in this.echartOptions.categories) {
       if (i == 0) xAxis.data.push(textCategory);
       let values = this.echartOptions.categories[textCategory].values;
-      seriesItem.data.push(values[i][this.options.values[i].operator]);
+      if (seriesItem.type === 'scatter') {
+        seriesItem.symbolSize = 6;
+        if (values[i][this.options.values[i].operator] > 0) {
+          seriesItem.data.push([textCategory, values[i][this.options.values[i].operator]]);
+        }
+      } else {
+        seriesItem.data.push(values[i][this.options.values[i].operator]);
+      }
     }
     series.push(seriesItem);
   }
-  this.echartOptions.tooltip = {};
+  this.echartOptions.tooltip = this.echartOptions.tooltip || {};
   this.echartOptions.xAxis = xAxis;
   this.echartOptions.series = series;
   this.echartOptions.yAxis = {
@@ -331,6 +339,7 @@ ChartWrapper.prototype.scatter = function() {
     let seriesItem = {
       name: this.options.values[i].text,
       type: 'scatter',
+      symbolSize: 6,
       data: [],
     };
     if (this.options.values[i].color) {
@@ -420,7 +429,7 @@ ChartWrapper.prototype.ratio = function() {
   };
 };
 
-ChartWrapper.prototype.fetch = function(resolve) {
+ChartWrapper.prototype.fetch = function(refresh) {
   let self = this;
   new Promise(function(resolve) {
     xhr.post({
@@ -428,16 +437,21 @@ ChartWrapper.prototype.fetch = function(resolve) {
       data: self.params,
       success: function(resp) {
         if (resp.error) {
-          dialog.error('获取图表数据失败：' + resp.error.message);
+          // dialog.error('获取图表数据失败：' + resp.error.message);
           return;
+        }
+        // let series = self.echartOptions.series[0];
+        // series.shift()
+        for (let i = 0; i < resp.data.length; i++) {
+          resp.data[i] = self.convertRow(resp.data[i]);
         }
         resolve(resp.data);
       }
     });
   }).then(function(data) {
-    if (resolve) {
+    if (refresh) {
       // custom
-      resolve(self, data);
+      refresh(data);
     } else {
       // default
       self.options.data = data;
@@ -462,7 +476,11 @@ ChartWrapper.prototype.render = function(containerId) {
   }
   if (this.interval > 0) {
     schedule.start(this.scheduleName, function() {
-      self.fetch(self.refresh);
+      if (self.refresh) {
+        self.fetch(self.refresh);
+      } else {
+        self.fetch();
+      }
     }, this.interval);
   }
 };
