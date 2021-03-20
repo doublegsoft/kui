@@ -31,6 +31,7 @@
   --color-light: #ebedef;
   --color-dark: #636f83;
   --color-border: #d8dbe0;
+  --color-white: #fff;
 }
 
 :root .c-dark-theme {
@@ -450,6 +451,24 @@ body {
   color: var(--color-light);
   background-color: var(--color-info);
   border-color: var(--color-info);
+}
+
+.btn-default-reverted {
+  color: var(--color-dark)!important;
+  background-color: var(--color-white)!important;
+  border-color: var(--color-dark)!important;
+}
+
+.btn-primary-reverted {
+  color: var(--color-primary)!important;
+  background-color: var(--color-white)!important;
+  border-color: var(--color-primary)!important;
+}
+
+.btn-success-reverted {
+  color: var(--color-success)!important;
+  background-color: var(--color-white)!important;
+  border-color: var(--color-success)!important;
 }
 
 .btn-upload:before {

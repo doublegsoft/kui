@@ -203,13 +203,18 @@ var dragula = require('dragula');
           nodeItem.classList.add(cl)
         })
       }
-      nodeItem.innerHTML = __buildItemTitle(element.title)
-      //add function
-      nodeItem.clickfn = element.click
-      nodeItem.dragfn = element.drag
-      nodeItem.dragendfn = element.dragend
-      nodeItem.dropfn = element.drop
-      __appendCustomProperties(nodeItem, element)
+      if (typeof element.title !== 'undefined' && element.title != '') {
+        nodeItem.innerHTML = __buildItemTitle(element.title);
+        //add function
+        nodeItem.clickfn = element.click;
+        nodeItem.dragfn = element.drag;
+        nodeItem.dragendfn = element.dragend;
+        nodeItem.dropfn = element.drop;
+        __appendCustomProperties(nodeItem, element);
+      } else {
+        nodeItem.appendChild(element);
+      }
+
       __onclickHandler(nodeItem)
       if (self.options.itemHandleOptions.enabled) {
         nodeItem.style.cursor = 'default'
@@ -289,9 +294,15 @@ var dragula = require('dragula');
           // Remove empty spaces
           value = value.replace(/^[ ]+/g, '')
           headerBoard.classList.add(value)
-        })
-        headerBoard.innerHTML =
-          '<div class="kanban-title-board">' + board.title + '</div>'
+        });
+        if (typeof board.title === 'string') {
+          headerBoard.innerHTML = '<div class="kanban-title-board">' + board.title + '</div>';
+        } else {
+          let div = document.createElement('div');
+          div.classList.add('kanban-title-board');
+          div.appendChild(board.title);
+          headerBoard.appendChild(div);
+        }
         //content board
         var contentBoard = document.createElement('main')
         contentBoard.classList.add('kanban-drag')
@@ -463,15 +474,19 @@ var dragula = require('dragula');
     }
 
     function __setBoard () {
-      self.element = document.querySelector(self.options.element)
+      if (typeof self.options.element === 'string') {
+        self.element = document.querySelector(self.options.element);
+      } else {
+        self.element = self.options.element;
+      }
       //create container
       var boardContainer = document.createElement('div')
       boardContainer.classList.add('kanban-container')
       self.container = boardContainer
       //add boards
 
-      if (document.querySelector(self.options.element).dataset.hasOwnProperty('board')) {
-        url = document.querySelector(self.options.element).dataset.board
+      if (self.element.dataset.hasOwnProperty('board')) {
+        url = self.element.dataset.board
         window.fetch(url, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }

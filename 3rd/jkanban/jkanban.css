@@ -53,6 +53,7 @@
 }
 
 .kanban-board .kanban-drag {
+  height: calc(100% - 1px) !important;
   padding: 20px;
   overflow-y: auto;
 }
