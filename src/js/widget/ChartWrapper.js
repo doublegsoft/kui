@@ -152,8 +152,8 @@ ChartWrapper.prototype.paint = function() {
     this.stack();
   } else if (this.chartType == 'scatter') {
     this.scatter();
-  } else if (this.chartType == 'organization') {
-    this.organization();
+  } else if (this.chartType == 'orgchart') {
+    this.orgchart();
   }
 
   // text color
