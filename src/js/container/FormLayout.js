@@ -21,6 +21,7 @@ function FormLayout(opts) {
       <div class="toast-body p-2"></div>
     </div>
   `);
+  this.controls = {};
 
   dom.find('button', this.toast).addEventListener('click', function(event) {
     event.preventDefault();
@@ -149,6 +150,36 @@ FormLayout.prototype.build = function(persisted) {
       if (field.value != null) {
         dom.find('input[name=\'' + field.name + '\']', this.container).value = moment(field.value).format('YYYY-MM-DD');
       }
+    } else if (field.input == 'datetime') {
+      $(this.container).find('input[name=\'' + field.name + '_date\']').datetimepicker({
+        format: 'YYYY-MM-DD',
+        locale: 'zh_CN',
+        useCurrent: false
+      });
+      // 加载值或者默认值
+      if (field.value != null) {
+        dom.find('input[name=\'' + field.name + '_date\']', this.container).value = moment(field.value).format('YYYY-MM-DD');
+      }
+
+      $(this.container).find('input[name=\'' + field.name + '_time\']').datetimepicker({
+        format: 'HH:mm:00',
+        locale: 'zh_CN',
+        useCurrent: false
+      });
+      // 加载值或者默认值
+      if (field.value != null) {
+        dom.find('input[name=\'' + field.name + '_time\']', this.container).value = moment(field.value).format('HH:mm:00');
+      }
+    } else if (field.input == 'time') {
+      $(this.container).find('input[name=\'' + field.name + '\']').datetimepicker({
+        format: 'hh:mm:00',
+        locale: 'zh_CN',
+        useCurrent: false
+      });
+      // 加载值或者默认值
+      if (field.value != null) {
+        dom.find('input[name=\'' + field.name + '\']', this.container).value = moment(field.value).format('hh:mm:00');
+      }
     } else if (field.input == 'select') {
       let opts = field.options;
       opts.validate = FormLayout.validate;
@@ -159,8 +190,7 @@ FormLayout.prototype.build = function(persisted) {
       } else {
         opts.selection = field.value;
       }
-
-      $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
+      this.controls[field.name] = $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
     } else if (field.input == 'cascade') {
       let opts = field.options;
       opts.validate = FormLayout.validate;
@@ -396,6 +426,9 @@ FormLayout.prototype.save = function () {
   for (let key in formdata) {
     data[key] = formdata[key];
   }
+  if (this.saveOpt.convert) {
+    data = this.saveOpt.convert(data);
+  }
   xhr.post({
     url: this.saveOpt.url,
     usecase: this.saveOpt.usecase,
@@ -457,6 +490,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('name', field.name);
   } else if (field.input == 'select') {
     input = dom.create('select', 'form-control');
+    input.style = '-moz-appearance:none';
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
   } else if (field.input == 'bool') {
@@ -532,6 +566,34 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.classList.add('col-md-12');
     group.appendChild(input);
     return {label: null, input: group};
+  } else if (field.input == 'datetime') {
+    let dateIcon = dom.element(`
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="far fa-calendar-alt"></i>
+        </span>
+      </div>
+    `);
+    let dateInput = dom.create('input', 'form-control');
+    dateInput.disabled = this.readonly || field.readonly || false;
+    dateInput.setAttribute('name', field.name + '_date');
+
+    let timeIcon = dom.element(`
+      <div class="input-group-prepend">
+        <span class="input-group-text">
+          <i class="far fa-clock"></i>
+        </span>
+      </div>
+    `);
+    let timeInput = dom.create('input', 'form-control');
+    timeInput.disabled = this.readonly || field.readonly || false;
+    timeInput.setAttribute('name', field.name + '_time');
+
+    group.appendChild(dateIcon);
+    group.appendChild(dateInput);
+    group.appendChild(timeIcon);
+    group.appendChild(timeInput);
+    return {label: label, input: group};
   } else {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
@@ -566,6 +628,17 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     if (!this.readonly) {
       group.appendChild(upload);
     }
+  }
+
+  if (field.create) {
+    let addnew = dom.element(`
+      <div class="input-group-append">
+        <span class="input-group-text">
+          <i class="fas fa-plus-square pointer text-success"></i>
+        </span>
+      </div>
+    `);
+    group.appendChild(addnew);
   }
 
   let unit = dom.element(`
@@ -807,6 +880,16 @@ FormLayout.validate = function(input) {
   } else {
     span.innerHTML = ICON_CORRECT;
   }
+};
+
+FormLayout.prototype.input = function(nameAndValue) {
+  let name = nameAndValue.name;
+  let value = nameAndValue.value;
+  let text = nameAndValue.text;
+  let control = this.controls[name];
+  if (!control) return;
+  let newOption = new Option(text, value, false, true);
+  control.append(newOption).trigger('change');
 };
 
 FormLayout.skeleton = function() {

@@ -152,6 +152,8 @@ ChartWrapper.prototype.paint = function() {
     this.stack();
   } else if (this.chartType == 'scatter') {
     this.scatter();
+  } else if (this.chartType == 'organization') {
+    this.organization();
   }
 
   // text color
@@ -425,6 +427,56 @@ ChartWrapper.prototype.ratio = function() {
           return title + '\n' + series.data.value + '%';
         }
       },
+    }]
+  };
+};
+
+/**
+ * 组织结构图。
+ */
+ChartWrapper.prototype.orgchart = function() {
+  this.echartOptions = {
+    tooltip: {
+      trigger: 'item',
+      triggerOn: 'mousemove'
+    },
+    series:[{
+      type: 'tree',
+      data: this.options.data,
+      left: '2%',
+      right: '2%',
+      top: '8%',
+      bottom: '20%',
+      symbol: 'emptyCircle',
+      orient: 'vertical',
+      expandAndCollapse: false,
+      lineStyle: {
+        curveness: 0
+      },
+      label: {
+        position: 'top',
+        rotate: 0,
+        verticalAlign: 'middle',
+        align: 'center',
+        fontSize: 15,
+        padding: [12, 12, 12, 12],
+        borderWidth: 2,
+        borderColor: '#39f',
+        symbolSize: 0,
+        color: 'white',
+        backgroundColor: '#39f',
+        formatter: this.options.formatter
+      },
+      leaves: {
+        label: {
+          position: 'top',
+          rotate: 0,
+          verticalAlign: 'middle',
+          padding: [12, 12, 12, 12],
+          align: 'center'
+        }
+      },
+      animationDurationUpdate: 750
     }]
   };
 };

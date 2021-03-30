@@ -467,6 +467,7 @@ dom.formdata = function(selector, data) {
       let type = input.type;
       let value = input.value;
       if (type == 'text' || type == 'number' || type == 'password' || type == 'hidden') {
+        values[name] = null;
         if (value != '') {
           if (name.indexOf('[]') != -1) {
             values[name] = [value];
@@ -475,10 +476,12 @@ dom.formdata = function(selector, data) {
           }
         }
       } else if (type == 'radio') {
+        // values[name] = null;
         if (input.checked) {
           values[name] = value;
         }
       } else if (type == 'checkbox') {
+        // values[name] = [];
         if (typeof checkboxCount[name] === 'undefined') {
           checkboxCount[name] = 0;
         }
@@ -487,7 +490,6 @@ dom.formdata = function(selector, data) {
             checkboxCount[name] = 0;
             values[name] = [];
           }
-
           values[name].push(value);
         }
         checkboxCount[name] += 1;
@@ -498,6 +500,7 @@ dom.formdata = function(selector, data) {
     for (let i = 0; i < selects.length; i++) {
       let select = selects[i];
       let name = select.name;
+      values[name] = null;
       if (select.selectedIndex != -1) {
         if (name.indexOf('[]') != -1) {
           values[name] = [select.value];
@@ -511,6 +514,7 @@ dom.formdata = function(selector, data) {
     for (let i = 0; i < textareas.length; i++) {
       let textarea = textareas[i];
       let name = textarea.name;
+      values[name] = null;
       if (textarea.innerHTML.trim() != '') {
         values[name] = textarea.innerHTML.replaceAll('<br>', '\n');
       } else {
@@ -764,7 +768,7 @@ dom.height = function(selector, offset, parent) {
   element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
 };
 
-dom.templatize = function(template, model) {
+        dom.templatize = function(template, model) {
   let tpl = Handlebars.compile(template);
   let html = tpl(model);
   return dom.element(html);

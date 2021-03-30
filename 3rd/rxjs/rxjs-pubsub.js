@@ -5,34 +5,43 @@
 (function (window, module, Rx) {
   "use strict";
 
-  var CustomSubject = function(){
-      Rx.Subject.call(this);
+  let CustomSubject = function() {
+    Rx.Subject.call(this);
+    this.handlerSources = {};
   }
   CustomSubject.prototype = Object.create(Rx.Subject.prototype);
-  CustomSubject.prototype.onCompleted = function(){}
-  CustomSubject.prototype.onError = function(error){
-      this.error = error;
-      this.observers.forEach(function(o){
-          o.isStopped = false;
-          o.onError(error);
-      });
-  }
+  CustomSubject.prototype.onCompleted = function() {
 
+  };
+  CustomSubject.prototype.subscribe = function(handler) {
+    if (!this.handlerSources[handler.toString()]) {
+      this.handlerSources[handler.toString()] = true;
+      Rx.Subject.prototype.subscribe.call(this, handler);
+    }
+  };
+  CustomSubject.prototype.onError = function(error) {
+    this.error = error;
+    this.observers.forEach(function(o){
+      o.isStopped = false;
+      o.onError(error);
+    });
+  };
 
   function create(){
-    var listeners = [];
-    function publish(channel,value){
-     var listener = listeners[channel];
-     if(listener!=null){
-        listener.next(value)
+    let listeners = [];
+
+    function publish(channel, value){
+     let listener = listeners[channel];
+     if(listener != null){
+        listener.next(value);
      }
     }
     function subscribe(channel){
-     var listener = listeners[channel];
-     if(listener==null){
+      let listener = listeners[channel];
+      if(listener == null) {
         listeners[channel] = listener = new CustomSubject();
-     }
-     return listener;
+      }
+      return listener;
     }
     subscribe.publish = publish;
     return subscribe;

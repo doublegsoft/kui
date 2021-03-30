@@ -172,6 +172,7 @@ $.fn.searchselect = function (opts) {
     validate($(this).get(0));
     complete([]);
   }
+  return this;
 };
 
 $.fn.multiselect = function (opts) {
