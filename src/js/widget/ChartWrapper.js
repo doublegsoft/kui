@@ -7,9 +7,11 @@ function ChartWrapper(opts) {
   this.interval = opts.interval || 0;
   this.scheduleName = opts.scheduleName;
   this.refresh = opts.refresh;
+  this.formatX = opts.formatX;
   this.convertRow = opts.convert || function(data) {
     return data;
   };
+  this.click = opts.click;
 }
 
 /**
@@ -142,6 +144,7 @@ ChartWrapper.prototype.process = function(data) {
 };
 
 ChartWrapper.prototype.paint = function() {
+  let self = this;
   if (this.chartType == 'pie') {
     this.pie();
   } else if (this.chartType == 'bar') {
@@ -179,6 +182,14 @@ ChartWrapper.prototype.paint = function() {
 
   this.echart = echarts.init(this.container);
   this.echart.setOption(this.echartOptions);
+
+  // 事件绑定
+  if (this.click) {
+    this.echart.on('click', 'series.scatter', function(event) {
+      event.event.stop();
+      self.click(event);
+    });
+  }
 };
 
 /**
@@ -336,7 +347,14 @@ ChartWrapper.prototype.stack = function() {
 ChartWrapper.prototype.scatter = function() {
   this.echartOptions = this.convert();
   let series = [];
-  let xAxis = {type: 'category', data: []};
+  let xAxis = {
+    type: 'category', data: [],
+  };
+  if (this.formatX) {
+    xAxis.axisLabel = {
+      formatter: this.formatX
+    }
+  }
   for (let i = 0; i < this.options.values.length; i++) {
     let seriesItem = {
       name: this.options.values[i].text,
