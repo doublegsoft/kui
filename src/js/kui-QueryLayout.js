@@ -164,11 +164,13 @@ QueryLayout.prototype.createInput = function (field, columnCount) {
     input.style.width = '100%';
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input == 'cascade') {
     input = dom.create('div', 'form-control');
     if (this.readonly)
       input.style.backgroundColor = 'rgb(240, 243, 245)';
     input.setAttribute('data-cascade-name', field.name);
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input == 'check') {
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
@@ -195,12 +197,14 @@ QueryLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请输入...');
   }
   if (input != null)
     group.appendChild(input);
 
   if (field.input == 'date') {
     input.setAttribute('data-domain-type', 'date');
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input.indexOf('number') == 0) {
     input.setAttribute('data-domain-type', field.input);
   }

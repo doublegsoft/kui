@@ -502,6 +502,8 @@ else
 	mxClient.imageBasePath = mxClient.basePath + '/images';	
 }
 
+mxClient.imageBasePath = 'img/mxgraph';
+
 /**
  * Variable: language
  *

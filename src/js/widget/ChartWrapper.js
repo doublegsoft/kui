@@ -156,7 +156,15 @@ ChartWrapper.prototype.paint = function() {
   } else if (this.chartType == 'scatter') {
     this.scatter();
   } else if (this.chartType == 'orgchart') {
-    this.orgchart();
+    // this.orgchart();
+    $(this.container).orgchart({
+      data : this.options.data[0],
+      nodeContent: this.options.fieldContent,
+      nodeTitle: this.options.fieldTitle,
+      pan: true,
+      // zoom: true
+    });
+    return;
   }
 
   // text color

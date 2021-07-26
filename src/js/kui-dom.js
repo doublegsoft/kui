@@ -179,6 +179,7 @@ dom.bind = function (selector, event, handler) {
   } else {
     element = selector;
   }
+  if (element == null)  return;
   element.addEventListener(event, handler);
 };
 
@@ -474,6 +475,8 @@ dom.formdata = function(selector, data) {
           } else {
             values[name] = value;
           }
+        } else {
+          values[name] = '';
         }
       } else if (type == 'radio') {
         // values[name] = null;
@@ -507,6 +510,8 @@ dom.formdata = function(selector, data) {
         } else {
           values[name] = select.value;
         }
+      } else {
+        values[name] = '';
       }
     }
     // TEXTAREA
@@ -515,11 +520,12 @@ dom.formdata = function(selector, data) {
       let textarea = textareas[i];
       let name = textarea.name;
       values[name] = null;
-      if (textarea.innerHTML.trim() != '') {
-        values[name] = textarea.innerHTML.replaceAll('<br>', '\n');
-      } else {
-        values[name] = textarea.value;
-      }
+      // if (textarea.innerHTML.trim() != '') {
+      //   values[name] = textarea.innerHTML.replaceAll('<br>', '\n');
+      // } else {
+      //   values[name] = textarea.value;
+      // }
+      values[name] = textarea.value;
     }
     // 名称下只存在一个checkbox，就不用变成数组了
     for (let name in checkboxCount) {
@@ -740,6 +746,11 @@ dom.outer = function(element) {
   }
 };
 
+/*
+* 根据父元素和偏移量重新制定元素的高度
+*  @param element
+* */
+
 dom.height = function(selector, offset, parent) {
   offset = offset || 0;
   parent = parent || document.body;
@@ -754,7 +765,6 @@ dom.height = function(selector, offset, parent) {
 
   let paddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
   let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
-
   computedStyle = getComputedStyle(element,null);
   let borderTopWidth = parseInt(computedStyle.getPropertyValue('border-top-width'));
   let borderBottomWidth = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
@@ -768,8 +778,76 @@ dom.height = function(selector, offset, parent) {
   element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
 };
 
-        dom.templatize = function(template, model) {
+dom.templatize = function(template, model) {
   let tpl = Handlebars.compile(template);
   let html = tpl(model);
   return dom.element(html);
 };
+
+/*
+* 根据后台返回的对象渲染值进入dom
+* selector:父元素节点
+* data:需要渲染的数据
+* isRadioToMulti:是否将单选框渲染为多选框
+* */
+dom.render=function (selector,data,isRadioToMulti) {
+  let container = null;
+  if (typeof selector === 'string') {
+    container = document.querySelector(selector);
+  } else {
+    container = selector;
+  }
+  /*
+   *将单选框的值设置为多选框
+   *parentSelector：多选框组的父元素，通过data中的key得到
+   *keyValue：需要渲染的值与多选框中的let-id相对应
+  */
+  function setRadioToCheckBox(parentSelector,keyValue){
+    let checkedCheckBox=dom.find('[value=\'' + keyValue + '\']', parentSelector)
+    if(checkedCheckBox!=null){
+      checkedCheckBox.checked=true
+    }
+  }
+  /*
+  *
+  * 根据当前元素的类型进行赋值
+  *
+  * */
+  function setElementValue(container, name, val) {
+    let el = dom.find('[name=\'' + name + '\']', container);
+    if (el == null) return;
+    let nodeName= el.nodeName
+
+    //div下的checkbox
+    if (nodeName === 'DIV' && isRadioToMulti) {
+      // console.log(name,el,val)
+      if(val){
+        setRadioToCheckBox(el,val)
+      }
+    }
+    else if (el.tagName == 'INPUT') {
+      if (el.type == 'radio') {
+        // TODO
+      } else {
+        el.value = val;
+      }
+    }
+    else if (el.tagName == 'SPAN') {
+      if(val){
+        el.innerHTML = val;
+      }
+    }
+    else if (el.tagName == 'SELECT') {
+      $('select[name=\'' + name + '\']').val(val).trigger('change');
+    }
+  }
+  for (let key in data) {
+    if (typeof data[key] === 'object') {
+      for (let innerKey in data[key]) {
+        setElementValue(container, key + '.' + innerKey, data[key][innerKey]);
+      }
+    } else {
+      setElementValue(container, key, data[key]);
+    }
+  }
+}

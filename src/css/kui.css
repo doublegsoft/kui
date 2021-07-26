@@ -45,12 +45,23 @@ body {
   font-size: 15px;
 }
 
+main {
+  overflow-y: hidden;
+}
+
+[contenteditable]:focus {
+  outline: 1px solid #0d86ff;
+}
+
 #container {
   padding: 10px;
   /*padding-right: 12px;*/
   /*padding-left: 12px;*/
   overflow-y: auto;
   overflow-x: hidden;
+  /*background: #f0f2f5;*/
+  background: #E8ECF0;
+  width: 100%;
 }
 
 /*!
@@ -126,7 +137,7 @@ body {
   display: none!important;
 }
 
-.dialog {
+.page.dialog {
   margin: 20px 20px 0 10px;
 }
 

@@ -159,3 +159,27 @@ dialog.select = function(opts) {
     }
   });
 };
+
+dialog.html = function(opt) {
+  layer.open({
+    type: 0,
+    closeBtn: 1,
+    offset: '150px',
+    shade: 0.5,
+    area : ['50%', ''],
+    shadeClose: true,
+    title: opt.title || '&nbsp;',
+    content: opt.html,
+    btn: ['确定', '关闭'],
+    success: function(layero, index) {
+      if (opt.load) opt.load(layero, index);
+    },
+    yes: function (index) {
+      layer.close(index);
+      opt.success();
+    },
+    btn1: function () {
+
+    }
+  });
+};

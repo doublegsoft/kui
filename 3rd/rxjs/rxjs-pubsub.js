@@ -13,7 +13,7 @@
   CustomSubject.prototype.onCompleted = function() {
 
   };
-  CustomSubject.prototype.subscribe = function(handler) {
+  CustomSubject.prototype.subscribe = function(handler, force) {
     if (!this.handlerSources[handler.toString()]) {
       this.handlerSources[handler.toString()] = true;
       Rx.Subject.prototype.subscribe.call(this, handler);

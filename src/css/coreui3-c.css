@@ -217,7 +217,7 @@
 }
 
 .c-switch-primary .c-switch-input:checked + .c-switch-slider {
-    background-color: #20a8d8;
+    background-color: #2A70FF;
     border-color: #1985ac;
 }
 
@@ -227,29 +227,29 @@
 
 .c-switch-outline-primary .c-switch-input:checked + .c-switch-slider {
     background-color: #fff;
-    border-color: #20a8d8;
+    border-color: #2A70FF;
 }
 
 .c-switch-outline-primary .c-switch-input:checked + .c-switch-slider::before {
-    border-color: #20a8d8;
+    border-color: #2A70FF;
 }
 
 .c-switch-outline-primary .c-switch-input:checked + .c-switch-slider::after {
-    color: #20a8d8;
+    color: #2A70FF;
 }
 
 .c-switch-outline-primary-alt .c-switch-input:checked + .c-switch-slider {
     background-color: #fff;
-    border-color: #20a8d8;
+    border-color: #2A70FF;
 }
 
 .c-switch-outline-primary-alt .c-switch-input:checked + .c-switch-slider::before {
-    background-color: #20a8d8;
-    border-color: #20a8d8;
+    background-color: #2A70FF;
+    border-color: #2A70FF;
 }
 
 .c-switch-outline-primary-alt .c-switch-input:checked + .c-switch-slider::after {
-    color: #20a8d8;
+    color: #2A70FF;
 }
 
 .c-switch-secondary .c-switch-input:checked + .c-switch-slider {
@@ -536,4 +536,25 @@ html:not([dir=rtl]) .mfe-3 {
 
 .text-info {
     color: #39f!important;
+}
+
+@media(max-width:1024px) {
+.c-sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 200px;
+    z-index: 1030;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000015;
+    transition: .3s
+}
+
+.c-sidebar-backdrop.c-fade {
+    opacity: 0
+}
+
+.c-sidebar-backdrop.c-show {
+    opacity: .5
+}
 }

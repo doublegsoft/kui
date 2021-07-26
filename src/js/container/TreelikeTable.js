@@ -27,7 +27,7 @@ function TreelikeTable(opts) {
   // 表格显示列
   this.columns = opts.columns || [];
   // 固定的请求参数
-  this.data = opts.data || {};
+  this.data = opts.data || opts.params || {};
 
   this.start = opts.start || 0;
 
@@ -171,6 +171,9 @@ TreelikeTable.prototype.request = function (params) {
 TreelikeTable.prototype.requestChildren = function (clicked, params) {
   let self = this;
   params = params || {};
+  for (let key in this.data) {
+    params[key] = this.data[key];
+  }
   for (let k in this.filters['child']) {
     params[k] = this.filters['child'][k];
   }

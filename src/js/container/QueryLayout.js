@@ -5,6 +5,9 @@ function QueryLayout(opts) {
   this.fields = opts.fields;
   this.actions = opts.actions || [];
   this.queryOpt = opts.query || {};
+
+  // 查询值转换函数，用于复杂查询
+  this.convert = opts.convert;
 }
 
 QueryLayout.prototype.render = function (containerId, read, data) {
@@ -51,7 +54,8 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   for (let i = 0; i < rows.length; i++) {
     let row = rows[i];
-    let formGroup = dom.create('div', 'form-group', 'row', 'ml-0', 'mr-0');
+    console.log(row);
+    let formGroup = dom.create('div', (row.first&&row.first.input=='check'?'form-group-check':'form-group'), 'row', 'ml-0', 'mr-0');
     let group = this.createInput(row.first, columnCount);
 
     formGroup.appendChild(group.label);
@@ -106,36 +110,50 @@ QueryLayout.prototype.render = function (containerId, read, data) {
     }
   }
 
-  let buttonRow = dom.element('<div class="row"><div class="col-md-12"></div></div>');
+  let buttonRow = dom.element('<div class="row ml-0 mr-0"><div class="col-md-12"></div></div>');
   let buttons = dom.create('div', 'float-right');
   buttons.style.paddingRight = '15px';
-  let buttonQuery = dom.create('button', 'btn', 'btn-sm', 'btn-query');
-  buttonQuery.textContent = '查询';
+  let buttonQuery = dom.create('button', 'btn', 'btn-query');
+  buttonQuery.textContent = '搜索';
   dom.bind(buttonQuery, 'click', function() {
     if (self.queryOpt.callback) {
-      self.queryOpt.callback(dom.formdata(self.container));
+      // 查询条件转换函数
+      if (self.queryOpt.convert) {
+        self.queryOpt.callback(self.queryOpt.convert(dom.formdata(self.container)));
+      } else {
+        self.queryOpt.callback(dom.formdata(self.container));
+      }
     }
   });
   buttons.appendChild(buttonQuery);
   buttons.append(' ');
-  let buttonReset = dom.create('button', 'btn', 'btn-sm', 'btn-reset');
-  buttonReset.textContent = '重置';
+  let buttonReset = dom.create('button', 'btn', 'btn-reset');
+  buttonReset.textContent = '清除';
   dom.bind(buttonReset, 'click', function() {
     $(self.container).formdata({});
   });
   buttons.appendChild(buttonReset);
   buttons.append(' ');
-  let buttonClose = dom.create('button', 'btn', 'btn-sm', 'btn-close');
-  buttonClose.textContent = '关闭';
-  dom.bind(buttonClose, 'click', function() {
-    self.container.classList.remove('show');
-  });
-  buttons.appendChild(buttonClose);
+  // let buttonClose = dom.create('button', 'btn', 'btn-sm', 'btn-close');
+  // buttonClose.textContent = '关闭';
+  // dom.bind(buttonClose, 'click', function() {
+  //   self.container.classList.remove('show');
+  // });
+  // buttons.appendChild(buttonClose);
   buttonRow.firstElementChild.appendChild(buttons);
   form.appendChild(buttonRow);
+
+  this.container.addEventListener('keypress', function(ev) {
+    if (ev.keyCode === 13) {
+      buttonQuery.click();
+    }
+  });
 };
 
 QueryLayout.prototype.getQuery = function() {
+  if (this.convert) {
+    return this.convert(dom.formdata(this.container));
+  }
   return dom.formdata(this.container);
 };
 
@@ -155,21 +173,24 @@ QueryLayout.prototype.getQuery = function() {
 QueryLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
   columnCount = columnCount || 1;
-  let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-4', 'col-form-label');
+  // let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-4', 'col-form-label');
+  let label = dom.create('div', 'col-form-label');
   label.innerText = field.title + '：';
   let group = dom.create('div', columnCount == 2 ? 'col-md-4' : 'col-md-8', 'input-group');
 
   let input = null;
   if (field.input == 'select') {
-    input = dom.create('select', 'form-control');
+    input = dom.create('select', 'form-control' ,'sm30');
     input.style.width = '100%';
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input == 'cascade') {
-    input = dom.create('div', 'form-control');
+    input = dom.create('div', 'form-control','sm30');
     if (this.readonly)
       input.style.backgroundColor = 'rgb(240, 243, 245)';
     input.setAttribute('data-cascade-name', field.name);
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input == 'check') {
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
@@ -193,33 +214,35 @@ QueryLayout.prototype.createInput = function (field, columnCount) {
       group.append(check);
     }
   } else {
-    input = dom.create('input', 'form-control');
+    input = dom.create('input', 'form-control','sm30');
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请输入...');
   }
   if (input != null)
     group.appendChild(input);
 
   if (field.input == 'date') {
     input.setAttribute('data-domain-type', 'date');
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input.indexOf('number') == 0) {
     input.setAttribute('data-domain-type', field.input);
   }
 
-  let clear = dom.element('<div class="input-group-append pointer"><span class="input-group-text width-36 icon-error"></span></div>');
-  dom.find('span', clear).innerHTML = ICON_CLEAR;
-  dom.bind(clear, 'click', function() {
-    dom.find('input', clear.parentElement).value = '';
-  });
+  // let clear = dom.element('<div class="input-group-append pointer"><span class="input-group-text width-36 icon-error"></span></div>');
+  // dom.find('span', clear).innerHTML = ICON_CLEAR;
+  // dom.bind(clear, 'click', function() {
+  //   dom.find('input', clear.parentElement).value = '';
+  // });
 
-  if (field.input !== 'checklist' &&
-    field.input !== 'longtext' &&
-    field.input !== 'select' &&
-    field.input !== 'check' &&
-    field.input !== 'radio' &&
-    field.input !== 'checktree' &&
-    field.input !== 'fileupload')
-    group.append(clear);
+  // if (field.input !== 'checklist' &&
+  //   field.input !== 'longtext' &&
+  //   field.input !== 'select' &&
+  //   field.input !== 'check' &&
+  //   field.input !== 'radio' &&
+  //   field.input !== 'checktree' &&
+  //   field.input !== 'fileupload')
+  //   group.append(clear);
 
   return {label: label, input: group};
 };

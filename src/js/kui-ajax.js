@@ -55,8 +55,9 @@ ajax.save = function(opts) {
     return;
   }
 
-  if (button) 
+  if (button){
     button.prop('disabled', true);
+  }
 
   var data = form.formdata();
   $.ajax({
@@ -481,13 +482,15 @@ ajax.shade = function(opts) {
   let callback = opts.success;
 
   let shade = document.querySelector('.page.full');
-  if (shade != null) shade.remove();
+  if (shade != null) shade.parentElement.remove();
   xhr.get({
     url : url,
     success : function(resp) {
       let range = document.createRange();
       let fragment = range.createContextualFragment(resp);
-      document.body.appendChild(fragment);
+      let el = dom.element('<div></div>');
+      el.appendChild(fragment);
+      document.body.appendChild(el);
       if (callback)
         callback(resp);
     }
@@ -633,52 +636,55 @@ ajax.template = function(opts) {
  * 
  * @param {object} opts - 配置项，包括title, url, params, success, end
  */
-ajax.dialog = function(opts) {
-  var title = opts.title || '';
-  var url = opts.url || '';
-  var data = opts.params || {};
-  var callback = opts.success;
-  var end = opts.end;
-
-  if (window.parameters) {
-    for (var key in data) {
-      window.parameters[key] = data[key];
-    }
-  }
-  $.ajax({
-    url : url,
-    data : data,
-    async : true,
-    success : function(html) {
-      layer.open({
-        type : 1,
-        offset: '120px',
-        title : title,
-        closeBtn: 0,
-        shadeClose : true,
-        area : ['50%', ''],
-        content : html,
-        success: function (layero, index) {
-          var layerContent = document.querySelector('.layui-layer-content');
-          layerContent.style += '; overflow: hidden;';
-          $('.kui-dialog').css('padding', '15px 25px 25px 25px');
-          if (callback) callback();
-        },
-        end: end || function () {}
-      });
-    }
-  });
-};
+// ajax.dialog = function(opts) {
+//   let title = opts.title || '';
+//   let url = opts.url || '';
+//   let data = opts.params || {};
+//   let callback = opts.success;
+//   let end = opts.end;
+//   let shadeClose = opts.shadeClose !== false;
+//
+//   if (window.parameters) {
+//     for (var key in data) {
+//       window.parameters[key] = data[key];
+//     }
+//   }
+//   $.ajax({
+//     url : url,
+//     data : data,
+//     async : true,
+//     success : function(html) {
+//       layer.open({
+//         type : 1,
+//         offset: '120px',
+//         title : title,
+//         closeBtn: 0,
+//         shadeClose : shadeClose,
+//         area : ['50%', '50%'],
+//         content : html,
+//         success: function (layero, index) {
+//           var layerContent = document.querySelector('.layui-layer-content');
+//           layerContent.style += '; overflow: hidden;';
+//           if (callback) callback();
+//         },
+//         end: end || function () {}
+//       });
+//     }
+//   });
+// };
 
 /**
  * 支持shade close。
  */
 ajax.dialog = function(opts) {
-  var title = opts.title || '';
-  var url = opts.url || '';
-  var data = opts.params || {};
-  var callback = opts.success;
-  var end = opts.end;
+  let title = opts.title || '';
+  let url = opts.url || '';
+  let data = opts.params || {};
+  let callback = opts.success;
+  let end = opts.end;
+  let shadeClose = opts.shadeClose !== false;
+  let allowClose = opts.allowClose === true;
+  let width=opts.width || '80%'
 
   if (window.parameters) {
     for (var key in data) {
@@ -692,17 +698,16 @@ ajax.dialog = function(opts) {
     success : function(html) {
       layer.open({
         type : 1,
-        offset: '120px',
+        offset: 'auto',
         title : title,
-        closeBtn: 0,
+        closeBtn: (allowClose === true) ? 1: 0,
         shade: 0.3,
-        shadeClose : true,
-        area : ['50%', ''],
+        shadeClose : shadeClose,
+        area : [width, ''],
         content : html,
         success: function (layero, index) {
-          var layerContent = document.querySelector('.layui-layer-content');
+          let layerContent = document.querySelector('.layui-layer-content');
           layerContent.style += '; overflow: hidden;';
-          $('.kui-dialog').css('padding', '15px 25px 25px 25px');
           if (callback) callback();
         },
         end: end || function () {}
@@ -805,13 +810,14 @@ ajax.sidebar = function(opt) {
   if (sidebar != null) sidebar.remove();
   sidebar = dom.element(`
     <div class="right-bar fade show">
+      <div class="modal-mask"></div>
       <div class="modal-dialog" role="document">
         <div class="modal-content">
-          <div class="card-header pt-2 pb-2">
-            <button type="button" class="close text-danger">
-              <i class="fas fa-times"></i>
-            </button>
+          <div class="card-header">
             <h5 class="modal-title"></h5>
+            <button type="button" class="close text-danger">
+<!--              <i class="fas fa-times"></i>-->
+            </button>
           </div>
           <div class="modal-body" style="overflow-y: auto"></div>
         </div>
@@ -828,10 +834,33 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('.right-bar').classList.add('out');
-          // 关闭回调
-          if (opt.close)
-            opt.close();
+          layer.open({
+            title: '提示',
+            content: '确定当前信息已保存？',
+            btn: ['确定', '取消'],
+            yes: function(index, layero){
+              layer.close(index);
+              //关闭弹窗
+              dom.find('.right-bar').classList.add('out');
+              if (opt.close)
+                opt.close();
+            },
+            cancel: function(){}
+          });
+        });
+        dom.find('.modal-mask', sidebar).addEventListener('click', function () {
+          layer.open({
+            title: '提示',
+            content: '确定当前信息已保存？',
+            btn: ['确定', '取消'],
+            yes: function(index, layero){
+              layer.close(index);
+              dom.find('.right-bar').classList.add('out');
+              if (opt.close)
+                opt.close();
+            },
+            cancel: function(){}
+          });
         });
         utils.append(dom.find('.modal-body', sidebar), resp);
         if (success) success(resp);

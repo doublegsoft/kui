@@ -7,6 +7,7 @@
  */
 let xhr = {};
 
+
 /**
  * @private
  */
@@ -37,7 +38,7 @@ xhr.request = function (opts, method) {
     }
   };
   req.onerror = function () {
-    if (error) error({error: {code: -500, message: '网络请求错误！'}});
+    if (error) error({error: {code: -500, message: '网络访问错误！'}});
   };
   req.ontimeout = function () {
     if (error) error({error: {code: -501, message: '网络请求超时！'}});
@@ -45,12 +46,63 @@ xhr.request = function (opts, method) {
   req.open(method, url, true);
   req.setRequestHeader("Content-Type", "application/json");
   req.setRequestHeader("usecase", usecase);
+  if (typeof APPTOKEN !== 'undefined') {
+    req.setRequestHeader("apptoken", APPTOKEN);
+  }
   if (data)
     req.send(JSON.stringify(data));
   else
     req.send(null);
 };
+/*
+* 同步请求
+* */
+xhr.asyncRequest = function (opts, method) {
+  let url = opts.url;
+  let data = opts.data || opts.params;
+  let type = opts.type || 'json';
+  let useCase = opts.usecase || '';
+  return new Promise((resolve,reject) =>{
+    if(url){
+      let request  = new XMLHttpRequest();
+      request.timeout = 10 * 1000;
+      request.onload = function () {
+        let resp = request.responseText;
+        if (type == 'json')
+          try {
+            resp = JSON.parse(resp);
+          } catch (err) {
+            console.log(err)
+            reject(err)
+            return;
+          }
+        if (request.readyState == 4 && request.status == "200") {
+          resolve(resp)
+        } else {
+          reject(resp)
+        }
+      };
+      request.onerror = function () {
+        reject({error: {code: -500, message: '网络访问错误！'}})
+      };
+      request.ontimeout = function () {
+        reject({error: {code: -501, message: '网络请求超时！'}})
+      };
+      request.open(method, url, true);
+      request.setRequestHeader("Content-Type", "application/json");
+      request.setRequestHeader("usecase", useCase);
+      if (typeof APPTOKEN !== 'undefined') {
+        request.setRequestHeader("apptoken", APPTOKEN);
+      }
+      if (data)
+        request.send(JSON.stringify(data));
+      else
+        request.send(null);
 
+
+    }
+  } )
+};
 /**
  * @see xhr.request
  */
@@ -59,7 +111,6 @@ xhr.get = function (opts) {
   let data = opts.data;
   let success = opts.success;
   let error = opts.error;
-
   let req  = new XMLHttpRequest();
   req.open('GET', url, true);
   req.onload = function () {
@@ -82,6 +133,15 @@ xhr.post = function (opts) {
   xhr.request(opts, 'POST');
 };
 
+xhr.asyncPost = function (opts) {
+  let url = opts.url;
+  if (typeof HOST !== 'undefined' && url.indexOf('http') == -1) {
+    url = HOST + url;
+    opts.url = url;
+  }
+  return xhr.asyncRequest(opts, 'POST');
+};
+
 xhr.put = function (opts) {
   xhr.request(opts, 'PUT');
 };
@@ -92,6 +152,55 @@ xhr.delete = function (opts) {
 
 xhr.connect = function (opts) {
   xhr.request(opts, 'CONNECT');
+};
+
+xhr.upload = function(opts) {
+  let url = opts.url;
+  let params = opts.data || opts.params;
+  let type = opts.type || 'json';
+  let success = opts.success;
+  let error = opts.error;
+
+  let formdata = new FormData();
+  for (let k in params) {
+    formdata.append(k, params[k]);
+  }
+  formdata.append('file', opts.file);
+
+  let req  = new XMLHttpRequest();
+  req.timeout = 10 * 1000;
+  req.onload = function () {
+    let resp = req.responseText;
+    if (type == 'json')
+      try {
+        resp = JSON.parse(resp);
+      } catch (err) {
+        if (error) error(resp);
+        return;
+      }
+    if (req.readyState == 4 && req.status == "200") {
+      if (success) success(resp);
+    } else {
+      if (error) error(resp);
+    }
+  };
+  if (opts.progress) {
+    req.onprogress = function(ev) {
+      opts.progress(ev.loaded, ev.total);
+    };
+  }
+  req.onerror = function () {
+    if (error) error({error: {code: -500, message: '网络访问错误！'}});
+  };
+  req.ontimeout = function () {
+    if (error) error({error: {code: -501, message: '网络请求超时！'}});
+  };
+  req.open('POST', url, true);
+  console.log(APPTOKEN)
+  if (typeof APPTOKEN !== 'undefined') {
+    req.setRequestHeader("apptoken", APPTOKEN);
+  }
+  req.send(formdata);
 };
 
 xhr.chain = function(opts) {
@@ -119,6 +228,8 @@ xhr.promise = function(xhrOpt, then) {
     xhr.post(xhrOpt);
   }).then(then);
 };
+
+
 
 if (typeof module !== 'undefined')
   module.exports = xhr;

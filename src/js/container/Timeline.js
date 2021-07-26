@@ -39,11 +39,6 @@ Timeline.prototype.render = function(container, params) {
           <div class="timeline-title done">${this.fnTitle(row)}</div>
           <div style="margin-top: 10px;">
             ${this.fnContent(row)}
-            <div class="ui yellow image label bg-info text-white pointer">
-              <img src="img/avatars/christian.jpg" height="32">
-              <span>杜玲浪</span>
-              <p class="detail">项目经理</p>
-            </div>
           </div>
         </div>
       </div>

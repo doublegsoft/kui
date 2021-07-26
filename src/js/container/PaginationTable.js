@@ -19,7 +19,10 @@ function PaginationTable(opts) {
   this.url = opts.url;
   // 用例
   this.usecase = opts.usecase;
-
+  this.refreshable = opts.refreshable !== false;
+  if (typeof opts.resultFilters !== "undefined") {
+    this.resultFilters=opts.resultFilters;
+  }
   // 本地数据源，未封装的数据源
   this.local = opts.local;
   if (typeof opts.local !== "undefined") {
@@ -119,6 +122,10 @@ function PaginationTable(opts) {
     };
     this.widgetFilter = new QueryLayout(opts.filter);
   }
+  //新增额外的excess
+  if(opts.excess){
+    this.widgetExcess=opts.excess;
+  }
   if (opts.sort) {
     opts.sort.local = opts.sort.fields;
     opts.sort.create = function(idx, row) {
@@ -206,9 +213,12 @@ PaginationTable.prototype.render = function (containerId, params) {
   } else {
     this.container = containerId;
   }
-  $(this.container).empty();
-  $(this.container).append(this.pagination()).append(this.root(params));
-
+  $(this.container).empty();  //tableTopActions
+  $(this.container).append(this.tableTopActions(params));
+  if(this.widgetExcess){
+    $(this.container).append(this.widgetExcess.template);
+  }
+  $(this.container).append(this.root(params)).append(this.pagination());
   if (typeof params === "undefined" || params == '' || params == '{}') {
     this.go(1);
     this.afterRequest();
@@ -383,9 +393,9 @@ PaginationTable.prototype.root = function (initParams) {
  */
 PaginationTable.prototype.pagination = function () {
   let self = this;
-  let div = $('<div style="z-index: 900;"></div>');
-  let ul = $('<ul></ul>');
-  ul.addClass('pagination mb-0');
+  let div = $('<div class="table-pagination"></div>');
+  let ul = $('<ul class="pagination mb-0"></ul>');
+  // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
   let a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
@@ -411,7 +421,7 @@ PaginationTable.prototype.pagination = function () {
   this.prevPage.append(a);
   ul.append(this.prevPage);
 
-  li = $('<li class="page-item disabled" style="padding-top: 4px;"></li>');
+  li = $('<li class="page-item disabled"></li>');
   li.addClass('disabled');
   this.pagebar = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
@@ -447,7 +457,18 @@ PaginationTable.prototype.pagination = function () {
   li = $('<li class="page-item disabled"></li>');
   a = $('<a class="page-link b-a-0 pt-0"></a>');
   a.attr('style', 'cursor: default');
-
+  if (this.limit < 0) {
+    ul.empty();
+  }else{
+    ul.css('height', '34.75px');
+  }
+  div.get(0).appendChild(ul.get(0));
+  return div;
+};
+//表格过滤搜索
+PaginationTable.prototype.tableTopActions= function () {
+  let self = this;
+  let div = $('<div class="table-top-actions"></div>');
   let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
 
   if (this.group) {
@@ -465,9 +486,9 @@ PaginationTable.prototype.pagination = function () {
     this.container.appendChild(containerSort);
 
     let action = dom.element('' +
-      '<a widget-id="toggleSort" class="card-header-action text-primary">\n' +
-      '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
-      '</a>');
+        '<a widget-id="toggleSort" class="card-header-action text-primary">\n' +
+        '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
+        '</a>');
     dom.bind(action, 'click', function() {
       if (containerSort.classList.contains('show')) {
         containerSort.classList.remove('show');
@@ -479,14 +500,15 @@ PaginationTable.prototype.pagination = function () {
   }
 
   if (this.widgetFilter) {
-    let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
+    // let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
+    let containerQuery = dom.create('div', 'card', 'widget-query',);
     this.widgetFilter.render(containerQuery);
     this.container.appendChild(containerQuery);
 
     let action = dom.element('' +
-      '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
-      '  <i class="fas fa-filter position-relative" style="top: 4px;"></i>\n' +
-      '</a>');
+        '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
+        '  <i class="fas fa-filter position-relative" style="top: 4px;"></i>\n' +
+        '</a>');
     dom.bind(action, 'click', function() {
       let query = containerQuery;
       if (query.classList.contains('show')) {
@@ -495,29 +517,29 @@ PaginationTable.prototype.pagination = function () {
         query.classList.add('show');
       }
     });
+    // actions.appendChild(action);
+  }
+  if (this.refreshable) {
+    let action = dom.element('' +
+        '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
+        '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
+        '</a>');
+    dom.bind(action, 'click', function () {
+      self.request();
+    });
     actions.appendChild(action);
   }
-
-  let action = dom.element('' +
-    '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
-    '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
-    '</a>');
-  dom.bind(action, 'click', function() {
-    self.request();
-  });
-  actions.appendChild(action);
-
   div.get(0).appendChild(actions);
 
-  if (this.limit < 0) {
-    ul.empty();
-    if (this.widgetFilter)
-      ul.css('height', '34.75px');
-  }
-  div.get(0).appendChild(ul.get(0));
-  return div;
-};
+  // if (this.limit < 0) {
+  //   ul.empty();
+  //   if (this.widgetFilter)
+  //     ul.css('height', '34.75px');
+  // }
+  // div.get(0).appendChild(ul.get(0));
 
+  return div;
+}
 /**
  * Shows the page number in the page bar and controls each link status.
  * 
@@ -730,6 +752,9 @@ PaginationTable.prototype.request = function (others) {
           result.total = 0;
           result.data = [];
         }
+        if(self.resultFilters){
+          result=self.resultFilters(result);
+        }
         self.total = result.total;
         self.fill(result);
         self.showPageNumber();
@@ -784,9 +809,7 @@ PaginationTable.prototype.replace = function (str, find, replace) {
 PaginationTable.prototype.fill = function (result) {
   this.clear();
   let self = this;
-  /*!
-  ** 
-  */
+
   function incrementTotalOrSubtotalColumns(totalRow, subtotalRow, rawRow) {
     for (let i = 0; i < self.totalFields.length; i++) {
       let rc = self.totalFields[i];
@@ -890,21 +913,33 @@ PaginationTable.prototype.fill = function (result) {
           if (col.template) {
             let html = col.template.toString();
             for (k in row) {
-              row[k] = row[k] == null ? "" : row[k];
+              row[k] = row[k] == null ? "-" : row[k];
               html = this.replace(html, "\\{" + k + "\\}", row[k]);
             }
             if (html.indexOf('{') == 0 && html.indexOf('}') != -1) {
-              html = '';
+              html = '-';
             }
             td.html(html);
           }
           if (col.display) {
             col.display(row, td.get(0), j, i);
           }
+          // console.log('td.get',td.get(0).innerText,td.get(0).innerText ==='')
+          // if(td.get(0).innerText ===''){
+          //   td.get(0).innerText="-";
+          // }
           tr.append(td);
         }
         tbody.append(tr);
       } // if (i < result.data.length)  
+    }
+  }else{
+    console.log("laile",resultNew,this.table)
+    let tbody = $(this.table.find('tbody'));
+    if(tbody){
+      tbody.append('<tr class="nodata">暂无数据</tr>');
+    }else{
+      this.table.append('<tr class="nodata">暂无数据</tr>');
     }
   }
 };

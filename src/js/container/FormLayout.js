@@ -1,13 +1,14 @@
-let ICON_REQUIRED = '<i class="fas fa-asterisk icon-required"></i>';
-let ICON_GENERAL = '<i class="fas fa-question icon-general"></i>';
-let ICON_CORRECT = '<i class="fas fa-check text-success" style="width: 10px;"></i>';
-let ICON_ERROR = '<i class="fas fa-exclamation text-warning" style="width: 10px;"></i>';
+let ICON_REQUIRED = '<i class="fas fa-asterisk icon-required"></i>'//*
+let ICON_GENERAL = '<i class="fas fa-question icon-general"></i>';//?
+let ICON_CORRECT = '<i class="fas fa-check text-success" style="width: 10px;"></i>';//√
+let ICON_ERROR = '<i class="fas fa-exclamation text-warning" style="width: 10px;"></i>';//!
 
 function FormLayout(opts) {
   let self = this;
   this.fields = opts.fields;
   this.readonly = opts.readonly || false;
   this.actions = opts.actions || [];
+  this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
@@ -70,7 +71,7 @@ FormLayout.prototype.build = function(persisted) {
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
     // make default value working
-    if (!field.value) {
+    if (!field.value && field.name) {
       if (field.name.indexOf("[]") != -1) {
         let name = field.name.substring(0, field.name.indexOf('[]'));
         field.value = (typeof persisted[name] === 'undefined' || persisted[name] == 'null') ? null : persisted[name];
@@ -116,6 +117,12 @@ FormLayout.prototype.build = function(persisted) {
   // shown fields
   for (let i = 0; i < rows.length; i++) {
     let row = rows[i];
+    if (row.first.input == 'title') {
+      let el = dom.element('<div class="title-bordered" style="margin: 10px -10px;"><strong>' + row.first.title + '</strong></div>')
+      form.appendChild(el);
+      continue;
+    }
+
     let formGroup = dom.create('div', 'form-group', 'row');
     let group = this.createInput(row.first, columnCount);
 
@@ -239,6 +246,8 @@ FormLayout.prototype.build = function(persisted) {
       // this[field.name].setValues(field.value);
     } else if (field.input == 'fileupload') {
       new FileUpload(field.options).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'imageupload') {
+      new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -266,20 +275,12 @@ FormLayout.prototype.build = function(persisted) {
   }
 
   let containerButtons = dom.create('div');
+
   containerButtons.classList.add('buttons');
   let buttons = dom.create('div', 'float-right');
 
-  let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
-  buttonSave.textContent = '保存';
-  dom.bind(buttonSave, 'click', function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    self.save();
-  });
-  if (!this.readonly) {
-    buttons.appendChild(buttonSave);
-    buttons.append(' ');
-  }
+
+
 
   // custom buttons
   for (let i = 0; i < this.actions.length; i++) {
@@ -292,26 +293,50 @@ FormLayout.prototype.build = function(persisted) {
   dom.bind(buttonClose, 'click', function() {
     event.preventDefault();
     event.stopPropagation();
-    let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
-    if (rightbar != null) {
-      rightbar.classList.add('out');
-      setTimeout(function () {
-        rightbar.remove();
-      }, 1000);
-    }
+    layer.open({
+      title: '提示',
+      content: '确定当前信息已保存？',
+      btn: ['确定', '取消'],
+      yes: function(index, layero){
+        layer.close(index);
+        let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
+        if (rightbar != null) {
+          rightbar.classList.add('out');
+          setTimeout(function () {
+            rightbar.remove();
+          }, 1000);
+        }
+      },
+      cancel: function(){}
+    });
   });
-  buttons.appendChild(buttonClose);
+  if (this.actionable) {
+    buttons.appendChild(buttonClose);
+  }
+  let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
+  buttonSave.textContent = '保存';
+
+  dom.bind(buttonSave, 'click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    self.save();
+  });
+
+  if (!this.readonly && this.actionable) {
+    buttons.appendChild(buttonSave);
+    buttons.append(' ');
+  }
   // if (this.actions.length > 0) {
   let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
   // row.style.backgroundColor = '#f0f3f5';
-  row.style.paddingTop = '5px';
-  row.style.paddingBottom = '5px';
-  row.style.borderTop = '1px solid #c8ced3';
-  row.style.borderBottom = '1px solid #c8ced3';
-  row.style.paddingRight = '15px';
-  row.style.marginLeft = '-10px';
-  row.style.position = 'fixed';
-  row.style.zIndex = '2001';
+  // row.style.paddingTop = '5px';
+  // row.style.paddingBottom = '5px';
+  // row.style.borderTop = '1px solid #c8ced3';
+  // row.style.borderBottom = '1px solid #c8ced3';
+  // row.style.paddingRight = '15px';
+  // row.style.marginLeft = '-10px';
+  // row.style.position = 'fixed';
+  // row.style.zIndex = '2001';
   let rightbar = dom.find('.right-bar');
   if (rightbar != null) {
     //
@@ -320,9 +345,12 @@ FormLayout.prototype.build = function(persisted) {
     // top: -28px
     //
     // 只有在rightbar下，才允许
-    rightbar.style.height = (window.innerHeight + 28) + 'px';
-    form.style.marginBottom = '4rem';
-    row.style.top = (rightbar.clientHeight - buttons.clientHeight - 28 - 13) + 'px';
+    // rightbar.style.height = (window.innerHeight + 32) + 'px';
+    // rightbar.style.paddingBottom = '32px';
+    // if (form.actionable === true) {
+    //   form.style.marginBottom = '4rem';
+    // }
+    // row.style.top = (rightbar.clientHeight - buttons.clientHeight - 28 - 13) + 'px';
 
     containerButtons.appendChild(buttons);
     row.appendChild(containerButtons);
@@ -468,7 +496,8 @@ FormLayout.prototype.save = function () {
 FormLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
   columnCount = columnCount || 2;
-  let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-3', 'col-form-label');
+  let _required=field.required || false;
+  let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-3','col-form-label',(_required?'required':'norequired'));
   label.innerText = field.title + '：';
   let group = dom.create('div', columnCount == 2 ? 'col-md-4' : 'col-md-9', 'input-group');
 
@@ -493,6 +522,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.style = '-moz-appearance:none';
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input == 'bool') {
     input = dom.element(`
       <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1">
@@ -518,6 +548,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       dom.find('input', radio).name = field.name;
       if (field.value == val.value) {
         dom.find('input', radio).checked = true;
+      } else if (val.checked && !field.value) {
+        dom.find('input', radio).checked = true;
       }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
@@ -534,6 +566,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     if (field.style === '')
       input.rows = 4;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请输入...');
     input.innerHTML = field.value || '';
     if (this.readonly)
       input.setAttribute('disabled', true);
@@ -552,8 +585,12 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'fileupload') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-fileupload-name', field.name);
-  } else if (field.input == 'avatar') {
+  } else if (field.input == 'imageupload') {
+
     input = dom.create('div', 'full-width');
+    input.setAttribute('data-imageupload-name', field.name);
+  } else if (field.input == 'avatar') {
+    input = dom.create('div', 'full-width','avatar-img');
     input.setAttribute('data-avatar-name', field.name);
     group.classList.remove('col-md-4', 'col-md-9');
     group.classList.add('col-md-12');
@@ -577,7 +614,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     let dateInput = dom.create('input', 'form-control');
     dateInput.disabled = this.readonly || field.readonly || false;
     dateInput.setAttribute('name', field.name + '_date');
-
+    dateInput.setAttribute('placeholder', '请选择...');
     let timeIcon = dom.element(`
       <div class="input-group-prepend">
         <span class="input-group-text">
@@ -598,6 +635,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请输入...');
   }
   if (input != null) {
     group.appendChild(input);
@@ -607,8 +645,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('data-domain-type', field.domain);
   } else if (field.input == 'date') {
     input.setAttribute('data-domain-type', 'date');
+    input.setAttribute('placeholder', '请选择...');
   } else if (field.input.indexOf('number') == 0) {
     input.setAttribute('data-domain-type', field.input);
+    input.setAttribute('placeholder', '请输入...');
   } else if (field.input == 'file') {
     input.setAttribute('readonly', true);
     let fileinput = dom.create('input');
@@ -658,9 +698,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   `);
   if (field.required && input != null /* radio, check cause input is null*/) {
     input.setAttribute('data-required', field.title);
-    dom.find('span', tooltip).innerHTML = ICON_REQUIRED;
+    // dom.find('span', tooltip).innerHTML = ICON_REQUIRED;
   } else {
-    dom.find('span', tooltip).innerHTML = ICON_GENERAL;
+    // dom.find('span', tooltip).innerHTML = ICON_GENERAL;
   }
   if (field.tooltip) {
     tooltip.classList.add('pointer');
@@ -694,7 +734,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     field.input !== 'checklist' &&
     field.input !== 'longtext' &&
     field.input !== 'checktree' &&
-    field.input !== 'fileupload')
+    field.input !== 'fileupload' &&
+    field.input !== 'imageupload')
     group.append(tooltip);
 
   // user input
@@ -718,6 +759,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
     });
     input.value = field.value;
+    console.log('field',field);
   }
   if (field.input == 'select') {
     const {get, set} = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
@@ -788,6 +830,10 @@ FormLayout.prototype.error = function (message) {
   this.toast.style.zIndex = 11000;
   this.toast.classList.remove('bg-success', 'hidden');
   this.toast.classList.add('bg-danger');
+  let posInScreen = this.container.getBoundingClientRect();
+  let offsetTop = posInScreen.top - this.originalPositionTop;
+
+  this.toast.style.top = (-offsetTop + 10) + 'px';
   dom.find('.toast-body', this.toast).innerHTML = message;
   dom.find('strong', this.toast).innerText = '错误';
   this.toast.classList.add('show', 'in');

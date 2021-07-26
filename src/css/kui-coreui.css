@@ -34,8 +34,8 @@
   word-wrap: break-word;
   background-color: #fff;
   background-clip: border-box;
-  border: 1px solid #c8ced3;
-  border-radius: .25rem;
+  /*border: 1px solid #c8ced3;*/
+  border-radius: 4px;
   /*margin-bottom: 1.5rem;*/
   margin-bottom: 10px;
 }
@@ -72,7 +72,7 @@
 
 .btn-link {
   font-weight: 400;
-  color: #20a8d8!important;
+  color: #2A70FF!important;
   background-color: transparent;
 }
 

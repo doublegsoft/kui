@@ -36,7 +36,9 @@ Validation = {
       container = $(document);
     }
     if (typeof container === 'string') {
-      container = $('#' + container);
+      container = $(container);
+    } else {
+      container = $(container);
     }
     // 输入框
     container.find('input[type!=checkbox][type!=radio][type!=button]').each(function (idx, el) {

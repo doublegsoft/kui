@@ -13,7 +13,7 @@
   content: "";
   width: 3px;
   height: 100%;
-  background: #20a8d8;
+  background: #2A70FF;
   left: 5px!important;
   top: 0;
   position: absolute;
@@ -24,7 +24,7 @@
 }
 
 .timeline.done:before {
-  background-color: #20a8d8!important;
+  background-color: #2A70FF!important;
 }
 
 .timeline.rejected:before {
@@ -44,7 +44,7 @@
 }
 
 .timeline .timeline-item .timeline-icon {
-  background: #20a8d8;
+  background: #2A70FF;
   width: 24px;
   height: 24px;
   position: absolute;
@@ -63,7 +63,7 @@
 }
 
 .timeline .timeline-item .timeline-icon.done {
-  background-color: #20a8d8!important;
+  background-color: #2A70FF!important;
 }
 
 .timeline .timeline-item .timeline-icon.rejected {
@@ -105,7 +105,7 @@
 }
 
 .timeline .timeline-item .timeline-content.done {
-  border: 1px solid #20a8d8!important;
+  border: 1px solid #2A70FF!important;
 }
 
 .timeline .timeline-item .timeline-content.rejected {
@@ -114,7 +114,7 @@
 
 .timeline .timeline-item .timeline-content .timeline-title {
   font-size: 18px;
-  background: #20a8d8;
+  background: #2A70FF;
   color: #fff;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -133,7 +133,7 @@
 }
 
 .timeline .timeline-item .timeline-content .timeline-title.done {
-  background-color: #20a8d8!important;
+  background-color: #2A70FF!important;
 }
 
 .timeline .timeline-item .timeline-content .timeline-title.rejected {
@@ -151,7 +151,7 @@
   border-top: 7px solid transparent;
   border-bottom: 7px solid transparent;
   border-left: 0;
-  border-right: 7px solid #20a8d8;
+  border-right: 7px solid #2A70FF;
 }
 
 .timeline .timeline-item .timeline-content.completed:before {
@@ -159,7 +159,7 @@
 }
 
 .timeline .timeline-item .timeline-content.done:before {
-  border-right: 7px solid #20a8d8!important;
+  border-right: 7px solid #2A70FF!important;
 }
 
 .timeline .timeline-item .timeline-content.rejected:before {
@@ -175,7 +175,7 @@
   right: 45%;
   left: inherit;
   border-left: 0;
-  border-right: 7px solid #20a8d8;
+  border-right: 7px solid #2A70FF;
 }
 
 .timeline .timeline-item .timeline-content.right:before .completed {
@@ -183,7 +183,7 @@
 }
 
 .timeline .timeline-item .timeline-content.right:before .done {
-  border-right: 7px solid #20a8d8;
+  border-right: 7px solid #2A70FF;
 }
 
 .timeline .timeline-item .timeline-content.right:before .rejected {

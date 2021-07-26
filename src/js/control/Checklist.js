@@ -12,6 +12,7 @@ function Checklist(opts) {
   this.click = opts.click || function () {};
   this.usecase = opts.usecase || '';
   this.readonly = opts.readonly == true;
+  this.searchable = (typeof opts.searchable === 'undefined') ? true : opts.searchable;
 }
 
 Checklist.prototype.request = function (containerId) {
@@ -23,14 +24,18 @@ Checklist.prototype.request = function (containerId) {
   this.container.style.overflowY = 'auto';
   this.container.innerHTML = '';
   let self = this;
-  xhr.post({
-    url: this.url,
-    usecase: this.usecase,
-    data: this.data,
-    success: function(resp) {
-      self.container.appendChild(self.root(resp.data));
-    }
-  });
+  if (this.url) {
+    xhr.post({
+      url: this.url,
+      usecase: this.usecase,
+      data: this.data,
+      success: function (resp) {
+        self.container.appendChild(self.root(resp.data));
+      }
+    });
+  } else {
+    self.container.appendChild(self.root(this.data));
+  }
 };
 
 Checklist.prototype.getSelections = function() {
@@ -110,7 +115,9 @@ Checklist.prototype.top = function() {
 Checklist.prototype.root = function (data) {
   let self = this;
   let ret = dom.create('div');
-  ret.appendChild(this.top());
+  if (this.searchable === true) {
+    ret.appendChild(this.top());
+  }
 
   if (typeof data === 'undefined') data = [];
   let ul = document.createElement('ul');
@@ -128,7 +135,7 @@ Checklist.prototype.root = function (data) {
     if (this.readonly)
       li.style.backgroundColor = 'rgb(240, 243, 245)';
 
-    if (i == 0) {
+    if (i == 0 && this.searchable === true) {
       li.style.borderTopLeftRadius = 'unset';
       li.style.borderTopRightRadius = 'unset';
       li.style.borderTop = 'none';
