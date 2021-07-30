@@ -437,8 +437,9 @@ FormLayout.prototype.read = function (params) {
 /**
  * Saves form data to remote data source.
  */
-FormLayout.prototype.save = function () {
+FormLayout.prototype.save = async function () {
   let self = this;
+  let awaitConvert = this.saveOpt.awaitConvert || false
   let errors = Validation.validate($(this.containerId));
   if (errors.length > 0) {
     self.error(utils.message(errors));
@@ -455,22 +456,54 @@ FormLayout.prototype.save = function () {
     data[key] = formdata[key];
   }
   if (this.saveOpt.convert) {
-    data = this.saveOpt.convert(data);
+    if (awaitConvert) {
+      await this.saveOpt.convert(data).then(ret => {
+        if(ret.isReady){
+          xhr.post({
+            url: this.saveOpt.url,
+            usecase: this.saveOpt.usecase,
+            data: data,
+            success: function (resp) {
+              // enable all buttons
+              if (buttonSave != null)
+                buttonSave.innerHTML = '保存';
+              dom.enable('button', self.container);
+              if (resp.error) {
+                self.error(resp.error.message);
+                return;
+              }
+              let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
+              for (let i = 0; i < identifiables.length; i++) {
+                identifiables[i].value = resp.data[identifiables[i].name];
+              }
+              if (self.saveOpt.callback)
+                self.saveOpt.callback(resp.data);
+              self.success("数据保存成功！");
+            }
+          });
+        }else{ return }
+      })
+      return
+    } else {
+      console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+      data = this.saveOpt.convert(data);
+    }
   }
+  console.log(data)
   xhr.post({
     url: this.saveOpt.url,
     usecase: this.saveOpt.usecase,
     data: data,
-    success: function(resp) {
+    success: function (resp) {
       // enable all buttons
       if (buttonSave != null)
         buttonSave.innerHTML = '保存';
-      dom.enable( 'button', self.container);
+      dom.enable('button', self.container);
       if (resp.error) {
         self.error(resp.error.message);
         return;
       }
-      let identifiables = document.querySelectorAll( ' input[data-identifiable=true]', self.container);
+      let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
       for (let i = 0; i < identifiables.length; i++) {
         identifiables[i].value = resp.data[identifiables[i].name];
       }
@@ -759,7 +792,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
     });
     input.value = field.value;
-    console.log('field',field);
   }
   if (field.input == 'select') {
     const {get, set} = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
