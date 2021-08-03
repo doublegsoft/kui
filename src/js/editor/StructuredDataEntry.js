@@ -130,7 +130,8 @@ StructuredDataEntry.prototype.bindNumberInput = function(el) {
     }
   });
   dom.bind(el, 'focus', function(ev) {
-    document.execCommand('selectAll',false,null)
+    // issued on desktop when selecting all
+    // document.execCommand('selectAll',false,null)
   });
   dom.bind(el, 'blur', function(ev) {
     let value=el.innerText;
