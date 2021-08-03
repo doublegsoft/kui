@@ -54,55 +54,7 @@ xhr.request = function (opts, method) {
   else
     req.send(null);
 };
-/*
-* 同步请求
-* */
-xhr.asyncRequest = function (opts, method) {
-  let url = opts.url;
-  let data = opts.data || opts.params;
-  let type = opts.type || 'json';
-  let useCase = opts.usecase || '';
-  return new Promise((resolve,reject) =>{
-    if(url){
-      let request  = new XMLHttpRequest();
-      request.timeout = 10 * 1000;
-      request.onload = function () {
-        let resp = request.responseText;
-        if (type == 'json')
-          try {
-            resp = JSON.parse(resp);
-          } catch (err) {
-            console.log(err)
-            reject(err)
-            return;
-          }
-        if (request.readyState == 4 && request.status == "200") {
-          resolve(resp)
-        } else {
-          reject(resp)
-        }
-      };
-      request.onerror = function () {
-        reject({error: {code: -500, message: '网络访问错误！'}})
-      };
-      request.ontimeout = function () {
-        reject({error: {code: -501, message: '网络请求超时！'}})
-      };
-      request.open(method, url, true);
-      request.setRequestHeader("Content-Type", "application/json");
-      request.setRequestHeader("usecase", useCase);
-      if (typeof APPTOKEN !== 'undefined') {
-        request.setRequestHeader("apptoken", APPTOKEN);
-      }
-      if (data)
-        request.send(JSON.stringify(data));
-      else
-        request.send(null);
 
-
-    }
-  } )
-};
 /**
  * @see xhr.request
  */
@@ -131,15 +83,6 @@ xhr.post = function (opts) {
     opts.url = url;
   }
   xhr.request(opts, 'POST');
-};
-
-xhr.asyncPost = function (opts) {
-  let url = opts.url;
-  if (typeof HOST !== 'undefined' && url.indexOf('http') == -1) {
-    url = HOST + url;
-    opts.url = url;
-  }
-  return xhr.asyncRequest(opts, 'POST');
 };
 
 xhr.put = function (opts) {
@@ -214,22 +157,75 @@ xhr.chain = function(opts) {
   xhr.promise(xhrOpts, then);
 };
 
-xhr.promise = function(xhrOpt, then) {
-  let resolveProxy = null;
-  xhrOpt.success = function (resp) {
-    if (resp.error) {
-      dialog.error(resp.error.message);
-      return;
-    }
-    resolveProxy(resp);
-  };
-  new Promise(function(resolve) {
-    resolveProxy = resolve;
+xhr.promise = function(xhrOpt) {
+  return new Promise(function(resolve, reject) {
+    xhrOpt.success = function (resp) {
+      if (resp.error) {
+        dialog.error(resp.error.message);
+        return;
+      }
+      resolve(resp.data);
+    };
     xhr.post(xhrOpt);
-  }).then(then);
+  });
 };
 
+/*
+* 同步请求
+* */
+xhr.asyncRequest = function (opts, method) {
+  let url = opts.url;
+  let data = opts.data || opts.params;
+  let type = opts.type || 'json';
+  let useCase = opts.usecase || '';
+  return new Promise((resolve,reject) =>{
+    if(url){
+      let request  = new XMLHttpRequest();
+      request.timeout = 10 * 1000;
+      request.onload = function () {
+        let resp = request.responseText;
+        if (type == 'json')
+          try {
+            resp = JSON.parse(resp);
+          } catch (err) {
+            console.log(err)
+            reject(err)
+            return;
+          }
+        if (request.readyState == 4 && request.status == "200") {
+          resolve(resp)
+        } else {
+          reject(resp)
+        }
+      };
+      request.onerror = function () {
+        reject({error: {code: -500, message: '网络访问错误！'}})
+      };
+      request.ontimeout = function () {
+        reject({error: {code: -501, message: '网络请求超时！'}})
+      };
+      request.open(method, url, true);
+      request.setRequestHeader("Content-Type", "application/json");
+      request.setRequestHeader("usecase", useCase);
+      if (typeof APPTOKEN !== 'undefined') {
+        request.setRequestHeader("apptoken", APPTOKEN);
+      }
+      if (data)
+        request.send(JSON.stringify(data));
+      else
+        request.send(null);
+    }
+  });
+};
 
+xhr.asyncPost = function (opts) {
+  let url = opts.url;
+  if (typeof HOST !== 'undefined' && url.indexOf('http') == -1) {
+    url = HOST + url;
+    opts.url = url;
+  }
+  return xhr.asyncRequest(opts, 'POST');
+};
 
 if (typeof module !== 'undefined')
   module.exports = xhr;
