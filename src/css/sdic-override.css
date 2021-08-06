@@ -1,7 +1,22 @@
 ﻿:root {
     --color-info: #2A70FF;
 }
-select:focus{
+input[type="submit"],
+input[type="text"],
+input[type="password"],
+input[type="button"],
+select,
+button,p,div,input {
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    outline: none
+}
+select:focus,.ql-editor:focus{
+    -webkit-appearance: none;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    outline: none
+}
+*:focus {
     outline: none;
 }
 .page{
@@ -603,11 +618,148 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
 .tabmin-header div.active{
     color: #2A70FF;
 }
-
-@media screen and (max-width: 992px){
-
+.add-btn,.deleted-btn{
+    height: 37px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 37px;
+    color: #73818f;
+    border: 1px solid #D9D9D9;
+    font-size: 14px;
 }
-
+.deleted-btn{
+    color: #ff0000;
+}
+.input-item{
+    margin-bottom: 10px;
+}
+.moredata{
+    display: flex;
+    margin: 0 -7.5px;
+}
+.form-list{
+  padding: 30px 0;
+}
+.form-item{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.form-item>span{
+    white-space: nowrap;
+    display: inline-block;
+    min-width: 100px;
+    text-align: right;
+    margin-right: 10px;
+}
+.ql-container {
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+.max500{
+    max-width: 500px;
+}
+.phone-img{
+    width: 330px;
+    height: 643px;
+    margin-top: 30px;
+}
+.notice-form{
+    flex: 1;
+}
+.notice-phone{
+    width: 330px;
+    margin-left: 20px;
+    position: relative;
+    margin-right: 20px;
+}
+.notice-cont{
+    position: absolute;
+    top: 84px;
+    width: 270px;
+    left: 30px;
+    height: 558px;
+    overflow: hidden;
+}
+.notice-scroll{
+    height: 100%;
+    overflow-y: auto;
+}
+.img-item{
+    position: relative;
+    width: 148px;
+    height: 148px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+.img-item img{
+    height: 100%;
+    width: 100%;
+}
+.paclose::after{
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    content: "";
+    animation: all 0.3;
+    background: rgba(0,0,0,0.5);
+}
+.img-close{
+    display: none;
+}
+.paclose:hover::after{
+    top: 0;
+}
+.img-item:hover .img-close{
+    display: block;
+    color: red;
+    font-size: 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -15px;
+    margin-left: -15px;
+    z-index: 3;
+}
+.notice-title{
+    font-size: 20px;
+    color: #333;
+    line-height: 30px;
+    text-align: center;
+}
+.notice-img{
+    max-width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    margin: 20px auto;
+}
+.notice-img img,.notice-info img{
+    max-width: 100%;
+    height: auto;
+}
+.notice-info{
+    line-height: 20px;
+    font-size: 14px;
+}
+.isClickBg,.isClickBg a.nav-link{
+    background: #2A70FF;
+}
+.isClickBg .nav-icon{
+    color: #fff !important;
+}
+.isClickBg:hover a.nav-link{
+    background: #2A70FF !important;
+}
+.nav-item:hover>a.nav-link{
+    background: #0F1012 ;
+}
+.nav-dropdown-items
 @media screen and (max-width: 1024px) {
     .app-header .navbar-brand {
         position: absolute;
@@ -627,9 +779,7 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
         margin: 40px 0 0 160px !important;
     }
     .app-body {
-        margin-top: 45px
-
-    ;
+        margin-top: 45px;
     }
     .sidebar-mobile{
         width: 200px !important;
@@ -649,4 +799,74 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
     .app-header .btn-toggler{
        display: none;
     }
+}
+/*编辑器*/
+.ql-snow .ql-tooltip[data-mode="link"]::before {
+    content: "请输入链接地址:";
+}
+.ql-snow .ql-tooltip.ql-editing a.ql-action::after {
+    border-right: 0px;
+    content: "保存";
+    padding-right: 0px;
+}
+.ql-snow .ql-tooltip[data-mode="video"]::before {
+    content: "请输入视频地址:";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item::before {
+    content: "14px";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="small"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="small"]::before {
+    content: "10px";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="large"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="large"]::before {
+    content: "18px";
+}
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="huge"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="huge"]::before {
+    content: "32px";
+}
+
+.ql-snow .ql-picker.ql-header .ql-picker-label::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item::before {
+    content: "文本";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="1"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="1"]::before {
+    content: "标题1";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="2"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="2"]::before {
+    content: "标题2";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="3"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="3"]::before {
+    content: "标题3";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="4"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="4"]::before {
+    content: "标题4";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="5"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="5"]::before {
+    content: "标题5";
+}
+.ql-snow .ql-picker.ql-header .ql-picker-label[data-value="6"]::before,
+.ql-snow .ql-picker.ql-header .ql-picker-item[data-value="6"]::before {
+    content: "标题6";
+}
+
+.ql-snow .ql-picker.ql-font .ql-picker-label::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item::before {
+    content: "标准字体";
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="serif"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="serif"]::before {
+    content: "衬线字体";
+}
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="monospace"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="monospace"]::before {
+    content: "等宽字体";
 }
