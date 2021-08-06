@@ -727,7 +727,7 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
     z-index: 3;
 }
 .notice-title{
-    font-size: 20px;
+    font-size: 18px;
     color: #333;
     line-height: 30px;
     text-align: center;
@@ -747,19 +747,18 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
     line-height: 20px;
     font-size: 14px;
 }
-.isClickBg,.isClickBg a.nav-link{
+.sidebar-nav .isClickBg,sidebar-nav .isClickBg a.nav-link{
     background: #2A70FF;
 }
-.isClickBg .nav-icon{
+.sidebar-nav .isClickBg .nav-icon{
     color: #fff !important;
 }
-.isClickBg:hover a.nav-link{
+.sidebar-nav .isClickBg:hover a.nav-link{
     background: #2A70FF !important;
 }
-.nav-item:hover>a.nav-link{
+.sidebar-nav .nav-item:hover>a.nav-link{
     background: #0F1012 ;
 }
-.nav-dropdown-items
 @media screen and (max-width: 1024px) {
     .app-header .navbar-brand {
         position: absolute;
