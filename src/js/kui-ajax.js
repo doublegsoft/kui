@@ -853,18 +853,21 @@ ajax.sidebar = function(opt) {
             opt.close();
         });
         dom.find('.modal-mask', sidebar).addEventListener('click', function () {
-          layer.open({
-            title: '提示',
-            content: '确定当前信息已保存？',
-            btn: ['确定', '取消'],
-            yes: function(index, layero){
-              layer.close(index);
-              dom.find('.right-bar').classList.add('out');
-              if (opt.close)
-                opt.close();
-            },
-            cancel: function(){}
-          });
+          // layer.open({
+          //   title: '提示',
+          //   content: '确定当前信息已保存？',
+          //   btn: ['确定', '取消'],
+          //   yes: function(index, layero){
+          //     layer.close(index);
+          //     dom.find('.right-bar').classList.add('out');
+          //     if (opt.close)
+          //       opt.close();
+          //   },
+          //   cancel: function(){}
+          // });
+          dom.find('.right-bar').classList.add('out');
+          if (opt.close)
+            opt.close();
         });
         utils.append(dom.find('.modal-body', sidebar), resp);
         if (success) success(resp);
