@@ -834,19 +834,23 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          layer.open({
-            title: '提示',
-            content: '确定当前信息已保存？',
-            btn: ['确定', '取消'],
-            yes: function(index, layero){
-              layer.close(index);
-              //关闭弹窗
-              dom.find('.right-bar').classList.add('out');
-              if (opt.close)
-                opt.close();
-            },
-            cancel: function(){}
-          });
+          // layer.open({
+          //   title: '提示',
+          //   content: '确定当前信息已保存？',
+          //   btn: ['确定', '取消'],
+          //   yes: function(index, layero){
+          //     layer.close(index);
+          //     //关闭弹窗
+          //     dom.find('.right-bar').classList.add('out');
+          //     if (opt.close)
+          //       opt.close();
+          //   },
+          //   cancel: function(){}
+          // });
+          //关闭弹窗
+          dom.find('.right-bar').classList.add('out');
+          if (opt.close)
+            opt.close();
         });
         dom.find('.modal-mask', sidebar).addEventListener('click', function () {
           layer.open({
