@@ -54,7 +54,7 @@ function PaginationBox(opt) {
  */
 PaginationBox.prototype.root = function () {
   this.root = dom.element(`
-    <div class="card">
+    <div class="card" style="min-height: 200px;">
       <div class="card-body">
         <div class="row" style="margin-left: -5px; margin-right: -5px;"></div>
       </div>

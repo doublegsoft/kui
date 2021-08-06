@@ -423,7 +423,7 @@ PaginationTable.prototype.pagination = function () {
 
   li = $('<li class="page-item disabled"></li>');
   li.addClass('disabled');
-  this.pagebar = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
+  this.pagebar = $('<a class="page-link b-a-0 pt-1" style="padding-bottom: 2px;"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
   this.pagebar.attr('style', 'cursor: default');
   this.pagebar.text("0/0");
