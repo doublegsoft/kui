@@ -211,7 +211,7 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
 .tabel td,.tabel td .pl-2,.table-outline td{
     color: #595959;
     font-size: 14px;
-    text-align: left !important;
+    /*text-align: left !important;*/
 }
 .p10-30{
     padding: 10px 30px;
@@ -334,6 +334,11 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
 .table .thead-light th {
     background-color: #FAFAFA;
     font-size: 14px;
+}
+.table .thead-light th:nth-child(n+2){
+    text-align: left !important;
+}
+.table tr td:nth-child(n+2){
     text-align: left !important;
 }
 .table td .pl-2{
