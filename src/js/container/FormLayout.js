@@ -293,22 +293,29 @@ FormLayout.prototype.build = function(persisted) {
   dom.bind(buttonClose, 'click', function() {
     event.preventDefault();
     event.stopPropagation();
-    layer.open({
-      title: '提示',
-      content: '确定当前信息已保存？',
-      btn: ['确定', '取消'],
-      yes: function(index, layero){
-        layer.close(index);
-        let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
-        if (rightbar != null) {
-          rightbar.classList.add('out');
-          setTimeout(function () {
-            rightbar.remove();
-          }, 1000);
-        }
-      },
-      cancel: function(){}
-    });
+    // layer.open({
+    //   title: '提示',
+    //   content: '确定当前信息已保存？',
+    //   btn: ['确定', '取消'],
+    //   yes: function(index, layero){
+    //     layer.close(index);
+    //     let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
+    //     if (rightbar != null) {
+    //       rightbar.classList.add('out');
+    //       setTimeout(function () {
+    //         rightbar.remove();
+    //       }, 1000);
+    //     }
+    //   },
+    //   cancel: function(){}
+    // });
+    let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
+    if (rightbar != null) {
+      rightbar.classList.add('out');
+      setTimeout(function () {
+        rightbar.remove();
+      }, 1000);
+    }
   });
   if (this.actionable) {
     buttons.appendChild(buttonClose);
