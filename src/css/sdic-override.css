@@ -211,6 +211,7 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
 .tabel td,.tabel td .pl-2,.table-outline td{
     color: #595959;
     font-size: 14px;
+    text-align: left !important;
 }
 .p10-30{
     padding: 10px 30px;
@@ -333,6 +334,10 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
 .table .thead-light th {
     background-color: #FAFAFA;
     font-size: 14px;
+    text-align: left !important;
+}
+.table td .pl-2{
+    padding-left: 0 !important;
 }
 .col-form-label{
     font-size: 14px;
