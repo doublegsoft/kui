@@ -660,7 +660,7 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
     white-space: nowrap;
     display: inline-block;
     min-width: 100px;
-    text-align: right;
+    text-align: left;
     margin-right: 10px;
 }
 .ql-container {
@@ -768,6 +768,22 @@ input[type=checkbox].checkbox.color-info.is-outline:before, input[type=radio].ch
 }
 .sidebar-nav .nav-item:hover>a.nav-link{
     background: #0F1012 ;
+}
+.right-bar,.bottom-bar{
+   z-index: 2000 !important;
+}
+.mb-3{
+    margin-bottom: 60px !important;
+}
+.el-radio__inner::after {
+    background-color: #409eff;
+}
+.el-radio__input.is-checked .el-radio__inner {
+    border:2px solid #409EFF;
+     background: #fff;
+}
+.el-select {
+    width: 100%;
 }
 @media screen and (max-width: 1024px) {
     .app-header .navbar-brand {

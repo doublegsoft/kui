@@ -34,17 +34,15 @@ StructuredDataEntry.prototype.initialize = function(data) {
     if (data[el.getAttribute('data-sde-name')]) {
       let _value=data[el.getAttribute('data-sde-name')];
       let selectvalue=el.getAttribute('data-sde-values');
+      let trigger = el;
+      let par = trigger.parentElement.parentElement;
+      console.log(data,_value,selectvalue);
       if(input=='number'&&data[el.getAttribute('data-sde-name')]!=0
-        || (input=='select'||input=='multiselect')&&selectvalue.indexOf(_value)>-1
+        || input=='select'&&selectvalue.indexOf(_value)>-1
+        || input=='multiselect' && _value.length>0
         || input=='text'&&data[el.getAttribute('data-sde-name')]!=el.getAttribute('data-sde-label') ){
         el.classList.remove('sde-input-default');
         el.innerText = data[el.getAttribute('data-sde-name')];
-      }
-      let trigger = el;
-      let par = trigger.parentElement.parentElement;
-      if(input=='number'&&data[el.getAttribute('data-sde-name')]!=0
-        || (input=='select'||input=='multiselect')&&selectvalue.indexOf(_value)>-1
-        || input=='text'&&data[el.getAttribute('data-sde-name')]!=el.getAttribute('data-sde-label') ){
         par.dataset.nodata='false';
       }
       par.children.forEach(function(el, idx) {
@@ -111,6 +109,20 @@ StructuredDataEntry.prototype.getHasDataHtml = function() {
     let nodata = p.getAttribute('data-nodata');
     if (nodata=='true') {
       p.remove();
+    }else {
+      let spans = p.querySelectorAll('span[data-sde-name]');
+      console.log(spans);
+      for (let i = 0; i < spans.length; i++) {
+        let span = spans[i];
+        let name = span.getAttribute('data-sde-name');
+        let label = span.getAttribute('data-sde-label');
+        let type = span.getAttribute('data-sde-input');
+        let values = span.getAttribute('data-sde-values');
+        let val=span.innerText.trim();
+        if (label ===val  || (type=='select'&&values.indexOf(val)==-1)) {
+          span.parentElement.remove();
+        }
+      }
     }
   }
   _html = root.innerHTML;
@@ -130,8 +142,7 @@ StructuredDataEntry.prototype.bindNumberInput = function(el) {
     }
   });
   dom.bind(el, 'focus', function(ev) {
-    // issued on desktop when selecting all
-    // document.execCommand('selectAll',false,null)
+    document.execCommand('selectAll',false,null)
   });
   dom.bind(el, 'blur', function(ev) {
     let value=el.innerText;
