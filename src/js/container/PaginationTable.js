@@ -56,7 +56,7 @@ function PaginationTable(opts) {
     }
   }
 
-  this.showLoading = opts.showLoading || true;
+  this.showLoading = opts.showLoading || false;
 
 
   // 高度和宽度，用来固定表头和列的参数
@@ -927,7 +927,7 @@ PaginationTable.prototype.fill = function (result) {
             td.html(html);
           }
           if (col.display) {
-            col.display(row, td.get(0), j, i);
+            col.display(row, td.get(0), j, i, this.start);
           }
           tr.append(td);
         }
