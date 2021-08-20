@@ -5,7 +5,7 @@
 
 static const struct mg_str        GM_HTTP_METHOD_POST     = MG_MK_STR("POST");
 
-static const char*                s_http_port             = "9000";
+static const char*                s_http_port             = "9999";
 
 static struct mg_serve_http_opts  s_http_server_opts;
 

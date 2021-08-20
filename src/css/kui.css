@@ -2438,3 +2438,7 @@ div.number-danger {
 .pt-02 {
   padding-top: 2px!important;
 }
+
+.table-hover>tbody>tr.no-hover:hover {
+  background-color: #ffffff;
+}

@@ -394,7 +394,7 @@ PaginationTable.prototype.root = function (initParams) {
 PaginationTable.prototype.pagination = function () {
   let self = this;
   let div = $('<div class="table-pagination"></div>');
-  let ul = $('<ul class="pagination mb-0"></ul>');
+  let ul = $('<ul class="pagination mb-0 mt-2" style="float: right;"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
   let a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
@@ -468,7 +468,7 @@ PaginationTable.prototype.pagination = function () {
 //表格过滤搜索
 PaginationTable.prototype.tableTopActions= function () {
   let self = this;
-  let div = $('<div class="table-top-actions"></div>');
+  let div = $('<div class="full-width" style="height: 24px;"></div>');
   let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
 
   if (this.group) {
@@ -924,22 +924,29 @@ PaginationTable.prototype.fill = function (result) {
           if (col.display) {
             col.display(row, td.get(0), j, i);
           }
-          // console.log('td.get',td.get(0).innerText,td.get(0).innerText ==='')
-          // if(td.get(0).innerText ===''){
-          //   td.get(0).innerText="-";
-          // }
           tr.append(td);
         }
         tbody.append(tr);
       } // if (i < result.data.length)  
     }
   }else{
-    console.log("laile",resultNew,this.table)
     let tbody = $(this.table.find('tbody'));
     if(tbody){
-      tbody.append('<tr class="nodata">暂无数据</tr>');
+      tbody.append('' +
+        '<tr class="no-hover">' +
+        '  <td colspan="100" class="text-center pt-3">' +
+        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2">' +
+        '    <p>没有匹配的数据</p>' +
+        '  </td>' +
+        '</tr>');
     }else{
-      this.table.append('<tr class="nodata">暂无数据</tr>');
+      this.table.append('' +
+        '<tr class="no-hover">' +
+        '  <td colspan="100" class="text-center pt-3">' +
+        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2">' +
+        '    <p>没有匹配的数据</p>' +
+        '  </td>' +
+        '</tr>');
     }
   }
 };
