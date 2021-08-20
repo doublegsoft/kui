@@ -56,7 +56,7 @@ function PaginationTable(opts) {
     }
   }
 
-  this.showLoading = opts.showLoading || false;
+  this.showLoading = opts.showLoading || true;
 
 
   // 高度和宽度，用来固定表头和列的参数
@@ -288,6 +288,7 @@ PaginationTable.prototype.root = function (initParams) {
   if (this.hoverable) {
     this.table.addClass('table-hover');
   }
+  this.table.css('overflow', 'hidden');
 
   let self = this;
   let thead = $('<thead class="thead-light" style="height: 43px;"></thead>');
@@ -295,7 +296,7 @@ PaginationTable.prototype.root = function (initParams) {
     let tr = $("<tr></tr>");
     for (let j = 0; j < this.columnMatrix[i].length; ++j) {
       let col = this.columnMatrix[i][j];
-      let th = $('<th style="text-align: center; vertical-align: middle;z-index:900;"></th>');
+      let th = $('<th style="vertical-align: middle;z-index:900;"></th>');
       // 冻结列
       if (j < this.frozenColumnCount) th.addClass('headcol');
       let span = $("<span class='pull-right fa fa-arrows-v'></span>");
@@ -346,7 +347,11 @@ PaginationTable.prototype.root = function (initParams) {
         th.css('float', 'left');
       }
       // 默认居中
-      // th.css('text-align', 'center');
+      if (col.style) {
+        th.attr('style', th.style + ';' + col.style);
+      } else {
+        th.css('text-align', 'center');
+      }
       if (typeof col.headerClick === "undefined") {
         //th.text(col.title);
         th.append(col.title);
@@ -906,7 +911,7 @@ PaginationTable.prototype.fill = function (result) {
             td.attr("style", "text-align: center; vertical-align:middle");
           }
           if (typeof col.width !== 'undefined') td.css('width', col.width);
-          if (this.frozenHeader == true) {
+          if (this.frozenHeader === true) {
             tbody.css('float', 'left');
             td.css('float', 'left');
           }
