@@ -940,7 +940,7 @@ PaginationTable.prototype.fill = function (result) {
       tbody.append('' +
         '<tr class="no-hover">' +
         '  <td colspan="100" class="text-center pt-3">' +
-        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2">' +
+        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
         '    <p>没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');
@@ -948,7 +948,7 @@ PaginationTable.prototype.fill = function (result) {
       this.table.append('' +
         '<tr class="no-hover">' +
         '  <td colspan="100" class="text-center pt-3">' +
-        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2">' +
+        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
         '    <p>没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');

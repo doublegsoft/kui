@@ -309,9 +309,10 @@ FormLayout.prototype.build = function(persisted) {
     //   },
     //   cancel: function(){}
     // });
-    let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
+    let rightbar = dom.find('div[widget-id=right-bar]')
+    // let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
     if (rightbar != null) {
-      rightbar.classList.add('out');
+      rightbar.children[0].classList.add('out');
       setTimeout(function () {
         rightbar.remove();
       }, 1000);

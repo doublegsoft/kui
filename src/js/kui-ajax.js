@@ -805,21 +805,23 @@ ajax.sidebar = function(opt) {
   let container = dom.find(opt.containerId);
   let success = opt.success || function() {};
   // only one instance
-  let sidebar = dom.find('.right-bar'/*, container */);
+  let sidebar = dom.find('[widget-id=right-bar]'/*, container */);
   let allowClose = opt.allowClose || false;
   if (sidebar != null) sidebar.remove();
   sidebar = dom.element(`
-    <div class="right-bar fade show">
-      <div class="modal-mask"></div>
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="card-header">
-            <h5 class="modal-title"></h5>
-            <button type="button" class="close text-danger">
-<!--              <i class="fas fa-times"></i>-->
-            </button>
+    <div widget-id="right-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: transparent;">
+      <div class="right-bar fade show">
+        <div class="modal-mask"></div>
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="card-header">
+              <h5 class="modal-title"></h5>
+              <button type="button" class="close text-danger">
+  <!--              <i class="fas fa-times"></i>-->
+              </button>
+            </div>
+            <div class="modal-body" style="overflow-y: auto"></div>
           </div>
-          <div class="modal-body" style="overflow-y: auto"></div>
         </div>
       </div>
     </div>
@@ -848,7 +850,8 @@ ajax.sidebar = function(opt) {
           //   cancel: function(){}
           // });
           //关闭弹窗
-          dom.find('.right-bar').classList.add('out');
+          sidebar.children[0].classList.add('out');
+          sidebar.remove();
           if (opt.close)
             opt.close();
         });
@@ -865,15 +868,16 @@ ajax.sidebar = function(opt) {
           //   },
           //   cancel: function(){}
           // });
-          dom.find('.right-bar').classList.add('out');
+          sidebar.children[0].classList.add('out');
+          sidebar.remove();
           if (opt.close)
             opt.close();
         });
         utils.append(dom.find('.modal-body', sidebar), resp);
         if (success) success(resp);
         setTimeout(function () {
-          sidebar.classList.remove('out');
-          sidebar.classList.add('in');
+          sidebar.children[0].classList.remove('out');
+          sidebar.children[0].classList.add('in');
         }, 200);
       }
     });
