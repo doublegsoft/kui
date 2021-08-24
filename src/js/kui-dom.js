@@ -753,6 +753,9 @@ dom.outer = function(element) {
 
 dom.height = function(selector, offset, parent) {
   offset = offset || 0;
+  if (typeof parent === 'undefined') {
+    parent = dom.find('#container');
+  }
   parent = parent || document.body;
   let element = null;
   if (typeof selector === 'string') {
@@ -761,7 +764,7 @@ dom.height = function(selector, offset, parent) {
     element = selector;
   }
   let offsetTop = dom.top(element);
-  let computedStyle = getComputedStyle(dom.find('#container'),null);
+  let computedStyle = getComputedStyle(parent,null);
 
   let paddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
   let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
