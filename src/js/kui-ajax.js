@@ -811,21 +811,37 @@ ajax.sidebar = function(opt) {
   sidebar = dom.element(`
     <div widget-id="right-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: transparent;">
       <div class="right-bar fade show">
-        <div class="modal-mask"></div>
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="card-header">
               <h5 class="modal-title"></h5>
               <button type="button" class="close text-danger">
-  <!--              <i class="fas fa-times"></i>-->
+                <i class="fas fa-times"></i>
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto"></div>
+            <div style="position: absolute; bottom: 32px; left: 0; width: 100%; border-top: 1px solid lightgrey;display:none;">
+              <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   `);
+  if (opt.showBottom === true) {
+    dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
+  }
+  sidebar.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    let widgetId = evt.target.getAttribute('widget-id');
+    if (widgetId !== 'right-bar') return;
+    sidebar.children[0].classList.remove('in');
+    sidebar.children[0].classList.add('out');
+    setTimeout(function () {
+      sidebar.remove();
+    }, 300);
+  });
   container.appendChild(sidebar);
   if (opt.url) {
     xhr.get({
@@ -855,30 +871,12 @@ ajax.sidebar = function(opt) {
           if (opt.close)
             opt.close();
         });
-        dom.find('.modal-mask', sidebar).addEventListener('click', function () {
-          // layer.open({
-          //   title: '提示',
-          //   content: '确定当前信息已保存？',
-          //   btn: ['确定', '取消'],
-          //   yes: function(index, layero){
-          //     layer.close(index);
-          //     dom.find('.right-bar').classList.add('out');
-          //     if (opt.close)
-          //       opt.close();
-          //   },
-          //   cancel: function(){}
-          // });
-          sidebar.children[0].classList.add('out');
-          sidebar.remove();
-          if (opt.close)
-            opt.close();
-        });
         utils.append(dom.find('.modal-body', sidebar), resp);
         if (success) success(resp);
         setTimeout(function () {
           sidebar.children[0].classList.remove('out');
           sidebar.children[0].classList.add('in');
-        }, 200);
+        }, 300);
       }
     });
   } else {
@@ -904,7 +902,7 @@ ajax.sidebar = function(opt) {
         setTimeout(function () {
           sidebar.classList.remove('out');
           sidebar.classList.add('in');
-        }, 200);
+        }, 300);
       }
     });
   }

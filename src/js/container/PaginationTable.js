@@ -58,7 +58,6 @@ function PaginationTable(opts) {
 
   this.showLoading = opts.showLoading || false;
 
-
   // 高度和宽度，用来固定表头和列的参数
   this.width = opts.width;
   this.height = opts.height;
@@ -348,6 +347,7 @@ PaginationTable.prototype.root = function (initParams) {
       }
       // 默认居中
       if (col.style) {
+        th.style = th.style || '';
         th.attr('style', th.style + ';' + col.style);
       } else {
         th.css('text-align', 'center');
@@ -939,17 +939,17 @@ PaginationTable.prototype.fill = function (result) {
     if(tbody){
       tbody.append('' +
         '<tr class="no-hover">' +
-        '  <td colspan="100" class="text-center pt-3">' +
+        '  <td colspan="100" class="text-center pt-4">' +
         '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
-        '    <p>没有匹配的数据</p>' +
+        '    <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');
     }else{
       this.table.append('' +
         '<tr class="no-hover">' +
-        '  <td colspan="100" class="text-center pt-3">' +
+        '  <td colspan="100" class="text-center pt-4">' +
         '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
-        '    <p>没有匹配的数据</p>' +
+        '    <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');
     }

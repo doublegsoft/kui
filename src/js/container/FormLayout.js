@@ -330,21 +330,13 @@ FormLayout.prototype.build = function(persisted) {
     self.save();
   });
 
-  if (!this.readonly && this.actionable) {
+  let rightBarBottom = dom.find('div[widget-id=right-bar-bottom]');
+  if (!this.readonly) {
     buttons.appendChild(buttonSave);
     buttons.append(' ');
   }
   // if (this.actions.length > 0) {
   let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
-  // row.style.backgroundColor = '#f0f3f5';
-  // row.style.paddingTop = '5px';
-  // row.style.paddingBottom = '5px';
-  // row.style.borderTop = '1px solid #c8ced3';
-  // row.style.borderBottom = '1px solid #c8ced3';
-  // row.style.paddingRight = '15px';
-  // row.style.marginLeft = '-10px';
-  // row.style.position = 'fixed';
-  // row.style.zIndex = '2001';
   let rightbar = dom.find('.right-bar');
   if (rightbar != null) {
     //
@@ -360,9 +352,15 @@ FormLayout.prototype.build = function(persisted) {
     // }
     // row.style.top = (rightbar.clientHeight - buttons.clientHeight - 28 - 13) + 'px';
 
-    containerButtons.appendChild(buttons);
-    row.appendChild(containerButtons);
-    this.container.appendChild(row);
+    if (rightBarBottom.parentElement.style.display !== 'none') {
+      rightBarBottom.appendChild(buttonSave);
+      rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+      rightBarBottom.appendChild(buttonClose);
+    } else {
+      containerButtons.appendChild(buttons);
+      row.appendChild(containerButtons);
+      this.container.appendChild(row);
+    }
   }
 
   this.originalPosition = this.container.getBoundingClientRect();
