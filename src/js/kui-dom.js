@@ -369,7 +369,7 @@ dom.switch = function (selector, resolve) {
   for (let i = 0; i < elements.length; i++) {
     let element = elements[i];
     element.addEventListener('click',  function() {
-      let accordion = this.getAttribute('data-switch');
+      let accordion = element.getAttribute('data-switch');
       let sources = accordion.split('+');
 
       // clear all

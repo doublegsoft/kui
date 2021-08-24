@@ -2442,3 +2442,8 @@ div.number-danger {
 .table-hover>tbody>tr.no-hover:hover {
   background-color: #ffffff;
 }
+
+.active-bg-info {
+  background-color: #ecf5ff;
+  color: #409EFF!important;
+}

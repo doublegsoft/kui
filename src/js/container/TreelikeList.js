@@ -155,6 +155,7 @@ TreelikeList.prototype.appendItem = function(ul, item, level) {
 
   if (!this.readonly) {
     li.addEventListener('click', function (ev) {
+      ev.stopPropagation();
       if (ev.target.tagName == 'INPUT') {
         let check = ev.target;
         check.setAttribute('style', 'background: transparent!important;')
@@ -355,6 +356,7 @@ TreelikeList.prototype.setValues = function(values) {
       let input = dom.find('input', li);
       if (val[this.fieldId] === input.value) {
         input.checked = true;
+        input.setAttribute('data-tree-item-state', 'all');
         break;
       }
     }

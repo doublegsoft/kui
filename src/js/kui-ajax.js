@@ -832,8 +832,6 @@ ajax.sidebar = function(opt) {
     dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
   }
   sidebar.addEventListener('click', (evt) => {
-    evt.preventDefault();
-    evt.stopPropagation();
     let widgetId = evt.target.getAttribute('widget-id');
     if (widgetId !== 'right-bar') return;
     sidebar.children[0].classList.remove('in');
