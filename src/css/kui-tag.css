@@ -1,0 +1,91 @@
+span.tag-readonly {
+  background-color: #ecf5ff;
+  border-color: #d9ecff;
+  display: inline-block;
+  height: 32px;
+  padding: 0 10px;
+  line-height: 30px;
+  font-size: 12px;
+  color: #409EFF;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  margin: 10px;
+}
+
+span.tag-removable {
+  background-color: #ecf5ff;
+  border-color: #d9ecff;
+  display: inline-block;
+  height: 32px;
+  padding: 0 10px;
+  line-height: 30px;
+  font-size: 12px;
+  color: #409EFF;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 4px;
+  box-sizing: border-box;
+  white-space: nowrap;
+  margin: 10px;
+}
+
+span.tag-removable > i {
+  border-radius: 50%;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  font-size: 12px;
+  height: 16px;
+  width: 16px;
+  line-height: 16px;
+  vertical-align: middle;
+  top: -1px;
+  right: -5px;
+}
+
+span.tag-removable.info {
+  background-color: #ecf5ff;
+  border-color: #d9ecff;
+  color: #409EFF;
+}
+
+span.tag-removable.info > i:hover {
+  color: #FFF;
+  background-color: #409EFF;
+}
+
+span.tag-removable.success {
+  background-color: #f0f9eb;
+  border-color: #e1f3d8;
+  color: #67c23a;
+}
+
+span.tag-removable.success > i:hover {
+  color: #FFF;
+  background-color: #67c23a;
+}
+
+span.tag-removable.warning {
+  background-color: #fdf6ec;
+  border-color: #faecd8;
+  color: #e6a23c;
+}
+
+span.tag-removable.warning > i:hover {
+  color: #FFF;
+  background-color: #e6a23c;
+}
+
+span.tag-removable.danger {
+  background-color: #fef0f0;
+  border-color: #fde2e2;
+  color: #f56c6c;
+}
+
+span.tag-removable.danger > i:hover {
+  color: #FFF;
+  background-color: #f56c6c;
+}

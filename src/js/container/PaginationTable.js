@@ -348,9 +348,10 @@ PaginationTable.prototype.root = function (initParams) {
       // 默认居中
       if (col.style) {
         th.style = th.style || '';
-        th.attr('style', th.style + ';' + col.style);
+        th.attr('style', th.style + '; vertical-align:middle;' + col.style);
       } else {
         th.css('text-align', 'center');
+        th.css('vertical-align', 'middle');
       }
       if (typeof col.headerClick === "undefined") {
         //th.text(col.title);
@@ -908,7 +909,7 @@ PaginationTable.prototype.fill = function (result) {
           if (col.style) {
             td.attr("style", col.style);
           } else {
-            td.attr("style", "text-align: center; vertical-align:middle");
+            td.attr("style", "text-align: center; vertical-align:middle;");
           }
           if (typeof col.width !== 'undefined') td.css('width', col.width);
           if (this.frozenHeader === true) {

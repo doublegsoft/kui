@@ -407,6 +407,20 @@ dom.switch = function (selector, resolve) {
   }
 };
 
+dom.tabs = function(tabsSelector) {
+  let tabs = dom.find(tabsSelector);
+  if (tabs == null) return;
+  let activeClass = tabs.getAttribute('data-tab-active-class');
+  tabs.children.forEach((el, idx) => {
+    el.addEventListener('click', (ev) => {
+      tabs.children.forEach((el, idx) => {
+        el.classList.remove(activeClass);
+      });
+      el.classList.add(activeClass);
+    })
+  });
+};
+
 /**
  * Gets the top location Y of the given element in client area.
  *
