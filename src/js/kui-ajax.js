@@ -684,7 +684,8 @@ ajax.dialog = function(opts) {
   let end = opts.end;
   let shadeClose = opts.shadeClose !== false;
   let allowClose = opts.allowClose === true;
-  let width=opts.width || '80%'
+  let width=opts.width || '80%';
+  let height = opts.height || '';
 
   if (window.parameters) {
     for (var key in data) {
@@ -703,7 +704,7 @@ ajax.dialog = function(opts) {
         closeBtn: (allowClose === true) ? 1: 0,
         shade: 0.3,
         shadeClose : shadeClose,
-        area : [width, ''],
+        area : [width, height],
         content : html,
         success: function (layero, index) {
           let layerContent = document.querySelector('.layui-layer-content');

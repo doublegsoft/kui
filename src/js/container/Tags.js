@@ -13,7 +13,8 @@
  */
 function Tags(opts) {
   this.container = dom.find(opts.containerId);
-  this.removable = (opts.removable === true);
+  this.onRemove = opts.onRemove;
+  this.onClick = opts.onClick;
 }
 
 Tags.TEMPLATE_HTML = `
@@ -24,11 +25,24 @@ Tags.TEMPLATE_HTML = `
 `;
 
 Tags.prototype.addTag = function(tag) {
+  // check duplicated
+  console.log(this.container);
+  for (let i = 0; i < this.container.children.length; i++) {
+    let elTag = this.container.children[i];
+    let tagId = elTag.getAttribute('data-tag-id');
+    if (tagId == tag.id) {
+      return;
+    }
+  }
+  let self = this;
   let el = dom.templatize(Tags.TEMPLATE_HTML, tag);
   let i = dom.find('i', el);
-  if (this.removable === true) {
+  if (this.onRemove) {
     el.classList.add('tag-removable');
     dom.bind(i, 'click', (ev) => {
+      self.onRemove({
+        id: el.getAttribute('data-tag-id'),
+      });
       el.remove();
     });
   } else {
@@ -38,6 +52,6 @@ Tags.prototype.addTag = function(tag) {
   this.container.appendChild(el);
 };
 
-Tags.prototype.render = function() {
+Tags.prototype.getValues = function() {
 
 };
