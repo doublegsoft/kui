@@ -88,7 +88,7 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
     display: flex;
     font-size: 14px;
     color: #585858;
-    padding: 10px 0;
+    padding: 4px 0;
 }
 .tab-header{
     display: flex;
@@ -1378,4 +1378,11 @@ a{
 }
 .card-block-head .birth-title{
     margin-top: 0;
+}
+.pb60{
+   padding-bottom: 60px;
+}
+.plr12{
+  padding-left: 12px;
+  padding-right: 12px;
 }
