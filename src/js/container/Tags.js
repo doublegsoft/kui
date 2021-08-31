@@ -26,7 +26,6 @@ Tags.TEMPLATE_HTML = `
 
 Tags.prototype.addTag = function(tag) {
   // check duplicated
-  console.log(this.container);
   for (let i = 0; i < this.container.children.length; i++) {
     let elTag = this.container.children[i];
     let tagId = elTag.getAttribute('data-tag-id');
@@ -36,6 +35,16 @@ Tags.prototype.addTag = function(tag) {
   }
   let self = this;
   let el = dom.templatize(Tags.TEMPLATE_HTML, tag);
+
+  if (this.onClick) {
+    el.classList.add('pointer');
+    dom.bind(el, 'click', (ev) => {
+      self.onClick({
+        id: el.getAttribute('data-tag-id'),
+      })
+    });
+  }
+
   let i = dom.find('i', el);
   if (this.onRemove) {
     el.classList.add('tag-removable');

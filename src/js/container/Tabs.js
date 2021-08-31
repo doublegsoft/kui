@@ -4,15 +4,18 @@ function Tabs(opts) {
   this.content = dom.find(opts.contentId);
   this.tabActiveClass = opts.tabActiveClass;
   this.tabs = opts.tabs;
-  this.lazy = opts.lazy !== false || true;
+  this.lazy = opts.lazy !== false;
 }
 
-Tabs.prototype.loadPage = function(id, url) {
+Tabs.prototype.loadPage = function(id, url, hidden) {
   let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
   ajax.view({
     url: url,
     containerId: contentPage,
   });
+  if (hidden === true) {
+    contentPage.style.display = 'none';
+  }
   this.content.appendChild(contentPage);
 };
 
@@ -59,7 +62,7 @@ Tabs.prototype.render = function() {
     });
 
     // 激活默认页签及内容
-    if (self.lazy) {
+    if (self.lazy === true) {
       if (idx == 0) {
         nav.classList.add(this.tabActiveClass);
         self.loadPage(tab.id, tab.url);
@@ -67,8 +70,11 @@ Tabs.prototype.render = function() {
     } else {
       if (idx == 0) {
         nav.classList.add(this.tabActiveClass);
+        self.loadPage(tab.id, tab.url);
+      } else {
+        self.loadPage(tab.id, tab.url, true);
       }
-      self.loadPage(tab.id, tab.url);
+
     }
   });
 };

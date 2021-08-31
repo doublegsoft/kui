@@ -43,12 +43,18 @@ function ListView(opt) {
   this.onAdd = opt.onAdd;
   this.onSearch = opt.onSearch;
   this.onClick = opt.onClick;
+
+  this.observableItems = new rxjs.Observable();
 };
 
 /**
  * Fetch data from remote data source.
  */
-ListView.prototype.fetch = function () {
+ListView.prototype.fetch = function (params) {
+  let requestParams = {};
+  params = params || {};
+  utils.clone(this.params, requestParams);
+  utils.clone(params, requestParams);
   let self = this;
   if (this.url) {
     this.data = this.data || {};
@@ -56,8 +62,7 @@ ListView.prototype.fetch = function () {
     this.data.limit = this.limit;
     xhr.post({
       url: this.url,
-      usecase: this.usecase,
-      params: this.params,
+      params: requestParams,
       success: function (resp) {
         Array.prototype.push.apply(self.local, resp.data);
         self.append(resp.data);
@@ -74,7 +79,7 @@ ListView.prototype.fetch = function () {
 /**
  * Renders a list view under its container.
  */
-ListView.prototype.render = function(containerId) {
+ListView.prototype.render = function(containerId, loading) {
   if (typeof containerId === 'string')
     this.container = document.querySelector(containerId);
   else
@@ -136,20 +141,22 @@ ListView.prototype.render = function(containerId) {
     this.container.appendChild(ul);
   }
 
-  this.reload();
+  if (loading !== false)
+    this.reload();
 };
 
 /**
  * Reloads list items into a list.
  */
-ListView.prototype.reload = function() {
+ListView.prototype.reload = function(params) {
+  params = params || {};
   let ul = dom.find('ul', this.container);
   ul.innerHTML = '';
 
   this.start = 0;
   if (this.url)
     this.local = [];
-  this.fetch();
+  this.fetch(params);
 };
 
 /**
@@ -314,5 +321,8 @@ ListView.prototype.setReorderable = function(li) {
     event.dataTransfer.setData("id", dom.model(event.target).id);
     event.dataTransfer.setData("y", y);
   });
+};
+
+ListView.prototype.subscribe = function(name, callback) {
 
 };
