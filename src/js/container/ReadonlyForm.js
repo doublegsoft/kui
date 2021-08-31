@@ -48,12 +48,13 @@ ReadonlyForm.prototype.fetch = function(params) {
 };
 
 ReadonlyForm.prototype.root = function(data) {
-  this.container.innerHTML = '',self=this;
+  this.container.innerHTML = '';
+  let self = this;
   let root = dom.element('<div class="row ml-0 mr-0"></div>');
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
     field.emptyText = field.emptyText || '-';
-    let colnum=parseInt(12/Number(self.columnCount))
+    let colnum= parseInt(12/Number(self.columnCount));
     let col = dom.element("<div class='col-lg-"+colnum+" col-sm-12 row-flex'></div>");
     let caption = dom.element('<span></span>');
     let value = dom.element('<div></div>');
@@ -99,11 +100,9 @@ ReadonlyForm.prototype.root = function(data) {
 };
 
 ReadonlyForm.prototype.reload = function(params) {
-	console.log('reload');
   this.fetch(params);
 };
 
 ReadonlyForm.prototype.render = function() {
-	console.log('render');
   this.fetch({});
 };

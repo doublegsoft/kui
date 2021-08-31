@@ -18,6 +18,8 @@ function ListView(opt) {
   this.usecase = opt.usecase;
   this.params = opt.params || {};
 
+  this.idField = opt.idField;
+
   /*!
   ** 用于比较用的标识字段。
   */
@@ -172,22 +174,35 @@ ListView.prototype.load = function() {
  * <p>
  * And it is an event handler.
  */
-ListView.prototype.remove = function(event) {
-  event.preventDefault();
-  event.stopPropagation();
-  let self = this;
-  let clicked = event.target;
-  let found = clicked;
-  while (found.tagName != 'LI') {
-    found = found.parentElement;
-  }
+// ListView.prototype.remove = function(event) {
+//   event.preventDefault();
+//   event.stopPropagation();
+//   let self = this;
+//   let clicked = event.target;
+//   let found = clicked;
+//   while (found.tagName != 'LI') {
+//     found = found.parentElement;
+//   }
+//
+//   let model = dom.model(found);
+//   if (self.onRemove) {
+//     self.onRemove(model);
+//   }
+//   // remove dom element
+//   found.remove();
+// };
 
-  let model = dom.model(found);
-  if (self.onRemove) {
-    self.onRemove(model);
+ListView.prototype.remove = function(model) {
+  if (this.idField) {
+    let ul = dom.find('ul', this.container);
+    for (let i = 0; i < ul.children.length; i++) {
+      let child = ul.children[i];
+      let childModel = dom.model(child);
+      if (childModel[this.idField] === model[this.idField]) {
+        child.remove();
+      }
+    }
   }
-  // remove dom element
-  found.remove();
 };
 
 ListView.prototype.reorder = function(event) {
@@ -229,6 +244,18 @@ ListView.prototype.append = function(data) {
     }
   } else {
     let row = data;
+
+    // check duplicated
+    if (this.idField) {
+      for (let i = 0; i < ul.children.length; i++) {
+        let child = ul.children[i];
+        let childModel = dom.model(child);
+        if (childModel[this.idField] === row[this.idField]) {
+          return;
+        }
+      }
+    }
+
     let li = dom.create('li', 'list-group-item', 'list-group-item-action');
     if (this.borderless) {
       li.classList.add('b-a-0');
@@ -268,10 +295,15 @@ ListView.prototype.append = function(data) {
       li.appendChild(input);
     }
     li.appendChild(div);
+
+    dom.model(li, row);
+    ul.appendChild(li);
+
     if (this.onRemove) {
+
       let link = dom.element(`
-        <a class="btn text-danger float-right font-18" style="padding: 0; margin-left: auto">
-          <i class="fas fa-times position-relative" style="top: 2px;"></i>
+        <a class="btn text-danger float-right font-18" style="padding: 0; margin-left: auto;">
+          <i class="fas fa-times" style=""></i>
         </a>
       `);
       dom.bind(link, 'click', function() {
@@ -280,8 +312,7 @@ ListView.prototype.append = function(data) {
       dom.model(link, row);
       li.appendChild(link);
     }
-    dom.model(li, row);
-    ul.appendChild(li);
+
     if (this.onReorder)
       this.setReorderable(li);
   }

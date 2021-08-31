@@ -573,6 +573,51 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       dom.find('input', input).checked = true;
     }
     dom.find('input', input).setAttribute('name', field.name);
+  } else if (field.input == 'radiotext') {
+    let radios = [];
+    for (let i = 0; i < field.values.length; i++) {
+      let val = field.values[i];
+      let radio = dom.element(`
+        <div class="form-check form-check-inline">
+          <input id="" name="" value="" type="radio"
+                 class="form-check-input radio color-primary is-outline">
+          <label class="form-check-label" for=""></label>
+        </div>
+      `);
+      dom.find('input', radio).id = 'radio_' + val.value;
+      dom.find('input', radio).name = field.name;
+      if (field.value == val.value) {
+        dom.find('input', radio).checked = true;
+      } else if (val.checked && !field.value) {
+        dom.find('input', radio).checked = true;
+      }
+      dom.find('input', radio).value = val.value;
+      dom.find('input', radio).disabled = this.readonly || field.readonly || false;
+      dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
+      dom.find('label', radio).textContent = val.text;
+      group.append(radio);
+      radios.push(radio);
+    }
+    for (let i = 0; i < field.values.length; i++) {
+      let val = field.values[i];
+      // 有输入框
+      if (val.input) {
+        dom.bind(radios[i], 'click', (ev) => {
+          let textInput = dom.find('input[type=text]', group);
+          textInput.style.display = '';
+        });
+        let input = dom.element('<input type="text" class="form-control">');
+        input.name = val.input.name;
+        input.placeholder = val.input.placeholder;
+        input.style.display = 'none';
+        group.appendChild(input);
+      } else {
+        dom.bind(radios[i], 'click', (ev) => {
+          let textInput = dom.find('input[type=text]', group);
+          textInput.style.display = 'none';
+        });
+      }
+    }
   } else if (field.input == 'radio') {
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
