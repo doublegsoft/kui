@@ -17,6 +17,8 @@ function ListView(opt) {
   this.url = opt.url;
   this.usecase = opt.usecase;
   this.params = opt.params || {};
+  // 懒加载标志，通常用于多级联动时的次级列表，不主动加载
+  this.lazy = opt.lazy === true;
 
   this.idField = opt.idField;
 
@@ -143,7 +145,7 @@ ListView.prototype.render = function(containerId, loading) {
     this.container.appendChild(ul);
   }
 
-  if (loading !== false)
+  if (loading !== false && this.lazy !== true)
     this.reload();
 };
 
@@ -276,7 +278,7 @@ ListView.prototype.append = function(data) {
       li.style.borderBottomWidth = '0';
     }
 
-    let div = this.create(len, row);
+    let div = this.create(len, row, li);
 
     if (this.onCheck) {
       let input = dom.element(`
