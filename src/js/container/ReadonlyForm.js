@@ -17,7 +17,6 @@ function ReadonlyForm(opts) {
 	}else{
   	this.render();
 	}
-  console.log('ReadonlyForm',opts);
 }
 
 /**
