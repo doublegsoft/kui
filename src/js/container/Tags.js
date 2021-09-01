@@ -24,12 +24,13 @@ Tags.TEMPLATE_HTML = `
   </span>
 `;
 
-Tags.prototype.addTag = function(tag) {
+Tags.prototype.replaceTag = function(tag) {
   // check duplicated
   for (let i = 0; i < this.container.children.length; i++) {
     let elTag = this.container.children[i];
     let tagId = elTag.getAttribute('data-tag-id');
     if (tagId == tag.id) {
+      elTag.setAttribute('class', tag.severity);
       return;
     }
   }

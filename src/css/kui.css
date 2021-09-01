@@ -2439,6 +2439,14 @@ div.number-danger {
   padding-top: 2px!important;
 }
 
+.pl-30 {
+  padding-left: 30px!important;
+}
+
+.pr-30 {
+  padding-right: 30px!important;
+}
+
 .table-hover>tbody>tr.no-hover:hover {
   background-color: #ffffff;
 }

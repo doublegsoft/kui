@@ -4470,7 +4470,7 @@ input[type="button"].btn-block {
 .card-header {
   min-height: 54px;
   line-height: 54px;
-  padding: 0 30px;
+  padding: 0 0;
   margin-bottom: 0;
   background-color: white;
   border-bottom: 1px solid #D9D9D9;
