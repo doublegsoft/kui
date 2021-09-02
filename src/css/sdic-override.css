@@ -581,6 +581,18 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
 .reportP p{
   position: relative;
 }
+#pageRecordPcos .card-header,.right-bar .card-header{
+  padding: 0 30px;
+}
+#pageRecordPcos .card-body,.right-bar .card-body{
+   padding: 30px;
+ }
+.pl30{
+  padding-left: 30px;
+}
+.pr30{
+  padding-right: 30px;
+}
 input[type=checkbox].checkbox.color-info:checked, input[type=radio].checkbox.color-info:checked {
   border-color: #2a70ff;
   background-color: #2a70ff;

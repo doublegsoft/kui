@@ -111,7 +111,6 @@ StructuredDataEntry.prototype.getHasDataHtml = function() {
       p.remove();
     }else {
       let spans = p.querySelectorAll('span[data-sde-name]');
-      console.log(spans);
       for (let i = 0; i < spans.length; i++) {
         let span = spans[i];
         let name = span.getAttribute('data-sde-name');
@@ -178,8 +177,6 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
     div = dom.create('div');
     div.style.zIndex = 999999999;
     div.setAttribute('sde-select', true);
-    // div.style.position = 'fixed';
-    // div.style.top = (rectThis.top) + 'px';
     div.style.position = 'absolute';
     div.style.top = '0px';
     div.style.left = (this.parentElement.offsetLeft + 60) + 'px';
@@ -199,6 +196,7 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
       li.style.fontSize = '12px';
       li.style.lineHeight = '2rem';
       li.style.width = '100%';
+			li.style.whiteSpace='nowrap';
       li.innerText = vals[i];
       li.style.cursor = 'pointer';
       dom.bind(li, 'click', function() {
@@ -221,9 +219,8 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
       });
       ul.appendChild(li);
     }
-    div.appendChild(ul);
-    this.parentElement.appendChild(div);
-
+		div.appendChild(ul);
+		this.parentElement.appendChild(div);
     // 重新调整位置
     let rectDiv = div.getBoundingClientRect();
     let containerHeight = self.container.getBoundingClientRect().height;
@@ -234,6 +231,11 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
     if (containerWidth < (rectDiv.left)) {
       div.style.left = (this.parentElement.offsetLeft) + 'px';
     }
+		let _container=dom.find('.right-bar').getBoundingClientRect()
+    if(_container.right < rectDiv.right){
+			div.style.right ='0px';
+			div.style.left = 'auto';
+		}
   });
 };
 
@@ -254,9 +256,7 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
 
     div = dom.create('div');
     div.setAttribute('sde-select', true);
-    // div.style.position = 'fixed';
     div.style.zIndex = '99999999';
-    // div.style.top = (rect.top) + 'px';
     div.style.position = 'absolute';
     div.style.top = '0px';
     div.style.left = (this.parentElement.offsetLeft + 60) + 'px';
@@ -279,8 +279,9 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       li.style.fontSize = '12px';
       li.style.lineHeight = '2rem';
       li.style.width = '100%';
+			li.style.cursor = 'pointer';
+			li.style.whiteSpace='nowrap';
       li.innerText = vals[i];
-      li.style.cursor = 'pointer';
       for (let j = 0; j < strs.length; j++) {
         if (li.innerText === strs[j]) {
           li.style.background = '#efefef';
@@ -341,21 +342,21 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       });
       ul.appendChild(li);
     }
-    div.appendChild(ul);
-    this.parentElement.appendChild(div);
-
+		div.appendChild(ul);
+		this.parentElement.appendChild(div);
     // 重新调整位置
     let rectDiv = div.getBoundingClientRect();
-
     let containerHeight = dom.find('.right-bar').getBoundingClientRect().height;
     let containerWidth = self.container.getBoundingClientRect().width;
-    if (containerHeight < (rectDiv.top + this.scrollTop + rectDiv.height)) {
+    if (containerHeight < (rectDiv.top + this.scrollTop + rectDiv.height),rectDiv,rectDiv.width) {
       // div.style.top = (containerHeight - rectDiv.height) + 'px';
       // console.log(div.style.top);
     }
-    if (containerWidth < (rectDiv.left)) {
-      div.style.left = (this.parentElement.offsetLeft) + 'px';
-    }
+    let _container=dom.find('.right-bar').getBoundingClientRect()
+		if(_container.right < rectDiv.right){
+			div.style.right ='0px';
+			div.style.left = 'auto';
+		}
   });
 };
 

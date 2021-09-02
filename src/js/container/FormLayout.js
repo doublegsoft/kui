@@ -487,11 +487,16 @@ FormLayout.prototype.save = async function () {
               self.success("数据保存成功！");
             }
           });
-        }else{ return }
+        }else{
+					if (buttonSave != null)
+						if (buttonSave != null)
+							buttonSave.innerHTML = '保存';
+					    dom.enable('button', self.container);
+        	return
+        }
       })
       return
     } else {
-      console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxx')
       data = this.saveOpt.convert(data);
     }
   }
