@@ -391,9 +391,7 @@ html:not([dir="rtl"]) .sidebar .btn-toggler{
 .first-column{
   color: #989898;
 }
-.mb10{
-  margin-bottom: 10px;
-}
+
 .card-header-btn{
   cursor: pointer !important;
 }
@@ -1394,7 +1392,9 @@ a{
 .pb60{
   padding-bottom: 60px;
 }
-
+.p12{
+  padding: 12px;
+}
 .plr12{
   padding-left: 12px;
   padding-right: 12px;
@@ -1501,4 +1501,123 @@ a{
 .tag-hp-v > i:hover {
   color: #FFF;
   background-color: #eb2f96;
+}
+
+/*tab*/
+.tabs-card{
+  height: 100%;
+  overflow-y: auto;
+}
+.tabs-card .tab {
+  width: 100%;
+  color: white;
+  overflow: hidden;
+}
+.tabs-card .tab-label {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background:#ecf5ff;
+  cursor: pointer;
+  margin-bottom: 0;
+  color: #2a70ff;
+  font-size: 14px;
+  border-bottom: 1px solid #409eff;
+}
+.tabs-card .tab-label:hover {
+  background: #77b2f3;
+}
+.tabs-card .tab-label::after {
+  content: "❯";
+  width: 1em;
+  height: 1em;
+  text-align: center;
+  transition: all 0.35s;
+}
+.tabs-card .tab-content {
+  max-height: 0;
+  color: #2c3e50;
+  background: white;
+  transition: all 0.35s;
+  margin-top: 0;
+  border:0;
+}
+.tabs-card .tab-close {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1em;
+  font-size: 0.75em;
+  background: #2c3e50;
+  cursor: pointer;
+}
+.tabs-card .tab-close:hover {
+  background: #ecf5ff;
+}
+.tabs-card input {
+  position: absolute;
+  opacity: 0;
+  z-index: -1;
+}
+.tabs-card input:checked + .tab-label {
+  background: #ecf5ff;
+  border-bottom: 0;
+}
+.tabs-card input:checked + .tab-label::after {
+  transform: rotate(90deg);
+}
+.tabs-card input:checked ~ .tab-content {
+  max-height: 100vh;
+}
+.tab-child{
+  width: 100%;
+}
+.tabs-card .tab-content .tab-label-min{
+  padding: 12px;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 0;
+  position: relative;
+}
+.tabs-card input:checked + .tab-label-min {
+  color: #2a70ff;
+}
+.tabs-card input:checked + .tab-label-min::before {
+  content: "";
+  width: 4px;
+  height: 10px;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -5px;
+  border-radius: 2px;
+  background: #2A70FF;
+}
+.tabs-card .tab-label-min:hover {
+  color: #2a70ff;
+}
+.tabs-card .tab-content .tab-child:nth-child(n+2){
+  border-top: 1px solid #eee;
+}
+/*end*/
+.card-flexX{
+  display: flex;
+  height: calc(100vh - 160px);
+  overflow: hidden;
+}
+.w240{
+  width: 240px;
+}
+.mr12{
+  margin-right: 12px;
+}
+.card-left-body{
+  height: 100%;
+  overflow: hidden;
+}
+.card-right-body{
+  flex: 1;
+}
+.reportTabs{
+  height: calc(100% - 60px);
+  overflow: hidden;
 }
