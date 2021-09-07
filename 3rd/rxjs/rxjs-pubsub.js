@@ -14,7 +14,7 @@
 
   };
   CustomSubject.prototype.subscribe = function(handler, force) {
-    if (!this.handlerSources[handler.toString()]) {
+    if (this.handlerSources[handler.toString()] !== true) {
       this.handlerSources[handler.toString()] = true;
       Rx.Subject.prototype.subscribe.call(this, handler);
     }

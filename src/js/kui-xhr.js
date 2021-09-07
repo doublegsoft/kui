@@ -157,11 +157,12 @@ xhr.chain = function(opts) {
   xhr.promise(xhrOpts, then);
 };
 
-xhr.promise = function(xhrOpt) {
+xhr.promise = function(xhrOpt, error) {
   return new Promise(function(resolve, reject) {
     xhrOpt.success = function (resp) {
       if (resp.error) {
         dialog.error(resp.error.message);
+        if (error) error(resp.error);
         return;
       }
       resolve(resp.data);

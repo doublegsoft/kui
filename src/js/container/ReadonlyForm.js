@@ -48,6 +48,7 @@ ReadonlyForm.prototype.fetch = function(params) {
 
 ReadonlyForm.prototype.root = function(data) {
   this.container.innerHTML = '';
+  data = data || {};
   let self = this;
   let root = dom.element('<div class="row ml-0 mr-0"></div>');
   for (let i = 0; i < this.fields.length; i++) {

@@ -54,7 +54,6 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   for (let i = 0; i < rows.length; i++) {
     let row = rows[i];
-    console.log(row);
     let formGroup = dom.create('div', (row.first&&row.first.input=='check'?'form-group-check':'form-group'), 'row', 'ml-0', 'mr-0');
     let group = this.createInput(row.first, columnCount);
 

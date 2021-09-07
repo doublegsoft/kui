@@ -308,8 +308,9 @@ ListView.prototype.append = function(data) {
           <i class="fas fa-times" style=""></i>
         </a>
       `);
-      dom.bind(link, 'click', function() {
-        self.onRemove(this.parentElement, dom.model(this));
+      dom.bind(link, 'click', function(ev) {
+        ev.stopPropagation();
+        self.onRemove(this.parentElement, dom.model(this.parentElement));
       });
       dom.model(link, row);
       li.appendChild(link);

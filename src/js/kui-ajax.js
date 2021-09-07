@@ -814,7 +814,7 @@ ajax.sidebar = function(opt) {
       <div class="right-bar fade show">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
-            <div class="card-header">
+            <div class="card-header pl-3">
               <h5 class="modal-title"></h5>
               <button type="button" class="close text-danger">
                 <i class="fas fa-times"></i>

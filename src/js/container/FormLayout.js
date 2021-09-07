@@ -279,9 +279,6 @@ FormLayout.prototype.build = function(persisted) {
   containerButtons.classList.add('buttons');
   let buttons = dom.create('div', 'float-right');
 
-
-
-
   // custom buttons
   for (let i = 0; i < this.actions.length; i++) {
     buttons.appendChild(this.createButton(this.actions[i]));
