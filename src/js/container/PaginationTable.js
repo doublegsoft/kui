@@ -472,9 +472,13 @@ PaginationTable.prototype.pagination = function () {
   return div;
 };
 //表格过滤搜索
-PaginationTable.prototype.tableTopActions= function () {
+PaginationTable.prototype.tableTopActions = function () {
   let self = this;
-  let div = $('<div class="full-width" style="height: 24px;"></div>');
+  let div = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
+
+  // 测试
+  div.append(new QueryFilter({}).getRoot());
+
   let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
 
   if (this.group) {
@@ -937,7 +941,7 @@ PaginationTable.prototype.fill = function (result) {
     }
   }else{
     let tbody = $(this.table.find('tbody'));
-    if(tbody){
+    if (tbody) {
       tbody.append('' +
         '<tr class="no-hover">' +
         '  <td colspan="100" class="text-center pt-4">' +
@@ -945,7 +949,7 @@ PaginationTable.prototype.fill = function (result) {
         '    <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');
-    }else{
+    } else {
       this.table.append('' +
         '<tr class="no-hover">' +
         '  <td colspan="100" class="text-center pt-4">' +

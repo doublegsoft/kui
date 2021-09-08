@@ -40,6 +40,17 @@ span.tag-removable > i {
   right: -5px;
 }
 
+span.tag-removable.gray {
+  background-color: #f3f4f7;
+  border-color: #f3f4f7;
+  color: #0a0a0d;
+}
+
+span.tag-removable.gray > i:hover {
+  color: #f3f4f7;
+  background-color: #0a0a0d;
+}
+
 span.tag-removable.info {
   background-color: #ecf5ff;
   border-color: #d9ecff;
