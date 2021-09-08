@@ -1,10 +1,10 @@
 
 function QueryFilter(opts) {
   this.fields = [{
-    label: '文本',
+    label: '这里是文本',
     input: 'text',
   },{
-    label: '日期',
+    label: '这里是日期',
     input: 'date',
   }];
 }
@@ -56,7 +56,7 @@ QueryFilter.prototype.getConditions = function() {
   let ul = dom.find('ul', this.conditions);
   for (let i = 0; i < this.fields.length; i++) {
     let li = dom.templatize(`
-      <li class='list-group-item pointer'>{{label}}</li>
+      <li class='list-group-item font-weight-bold pointer pt-0 pb-0 pl-1 pr-1'>{{label}}</li>
     `, this.fields[i]);
     dom.model(li, this.fields[i]);
     ul.appendChild(li);
@@ -70,6 +70,17 @@ QueryFilter.prototype.getConditions = function() {
       ev.stopImmediatePropagation();
     });
   }
+  let li = dom.element(`
+    <li class='list-group-item pointer text-success font-weight-bold pt-0 pb-0 pl-1 pr-1' style="text-align: center;">关闭</li>
+  `);
+  ul.appendChild(li);
+
+  dom.bind(li, 'click', ev => {
+    let li = dom.ancestor(ev.target, 'li');
+    self.conditions.style.display = 'none';
+    self.dummy.blur();
+    ev.stopImmediatePropagation();
+  });
   return this.conditions;
 };
 
@@ -95,7 +106,7 @@ QueryFilter.prototype.addFilter = function(filter) {
   dom.bind(strong, 'click', ev => {
     ev.stopImmediatePropagation();
     if (filter.input === 'date') {
-      self.displayTextInput(strong);
+      self.displayDateInput(strong);
     }
   });
   dom.bind(strong, 'keydown', ev => {
@@ -113,8 +124,7 @@ QueryFilter.prototype.addFilter = function(filter) {
     strong.setAttribute('contenteditable', 'true');
     strong.focus();
   } else if (filter.input === 'date') {
-    $(strong).datetimepicker({});
-    // self.displayTextInput(strong);
+    self.displayDateInput(strong);
   }
 };
 
@@ -144,8 +154,33 @@ QueryFilter.prototype.displayTextInput = function(triggeredEl) {
   this.root.appendChild(el);
 };
 
-QueryFilter.prototype.displayDateInput = function() {
-
+QueryFilter.prototype.displayDateInput = function(triggeredEl) {
+  let el = dom.element(`
+    <div class="p-2" style="position: absolute;
+         border: 1px solid rgba(0, 0, 0, 0.1); background: white;">
+    </div>
+  `);
+  let rectRoot = this.root.getBoundingClientRect();
+  let rectInput = triggeredEl.getBoundingClientRect();
+  let input = dom.find('input', el);
+  el.style.left = (rectInput.left - rectRoot.left) + 'px';
+  el.style.top = '25px';
+  dom.bind(el, 'click', ev => {
+    ev.stopImmediatePropagation();
+    el.remove();
+  });
+  dom.bind(input, 'click', ev => {
+    ev.stopImmediatePropagation();
+  });
+  $(el).datetimepicker({
+    format: 'YYYY-MM-DD',
+    locale: 'zh_CN',
+    inline: true,
+  }).on('dp.change', ev => {
+    triggeredEl.innerText = moment(ev.date).format('YYYY-MM-DD');
+    el.remove();
+  });
+  this.root.appendChild(el);
 };
 
 QueryFilter.prototype.displayDateRangeInput = function() {

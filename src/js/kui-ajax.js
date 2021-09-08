@@ -832,7 +832,7 @@ ajax.sidebar = function(opt) {
   if (opt.showBottom === true) {
     dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
   }
-  dom.height(sidebar, 0, document.body);
+  sidebar.height = document.body.clientHeight;
   sidebar.addEventListener('click', (evt) => {
     let widgetId = evt.target.getAttribute('widget-id');
     if (widgetId !== 'right-bar') return;
