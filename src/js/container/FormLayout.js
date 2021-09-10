@@ -497,7 +497,6 @@ FormLayout.prototype.save = async function () {
       data = this.saveOpt.convert(data);
     }
   }
-  console.log(data)
   xhr.post({
     url: this.saveOpt.url,
     usecase: this.saveOpt.usecase,

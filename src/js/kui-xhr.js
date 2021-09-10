@@ -139,7 +139,6 @@ xhr.upload = function(opts) {
     if (error) error({error: {code: -501, message: '网络请求超时！'}});
   };
   req.open('POST', url, true);
-  console.log(APPTOKEN)
   if (typeof APPTOKEN !== 'undefined') {
     req.setRequestHeader("apptoken", APPTOKEN);
   }

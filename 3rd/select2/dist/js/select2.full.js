@@ -4481,10 +4481,14 @@ S2.define('select2/dropdown/attachBody',[
     var enoughRoomAbove = viewport.top < (offset.top - dropdown.height);
     var enoughRoomBelow = viewport.bottom > (offset.bottom + dropdown.height);
 
+    // console.log(this.$container.get()[0].getBoundingClientRect());
+    let rect = this.$container.get()[0].getBoundingClientRect();
     var css = {
-      left: offset.left,
-      top: container.bottom
+      left: rect.left, // offset.left,
+      top: rect.bottom, // container.bottom
     };
+
+    // console.log(css);
 
     // Determine what the parent element is to use for calculating the offset
     var $offsetParent = this.$dropdownParent;
@@ -4507,8 +4511,8 @@ S2.define('select2/dropdown/attachBody',[
       parentOffset = $offsetParent.offset();
     }
 
-    css.top -= parentOffset.top;
-    css.left -= parentOffset.left;
+    css.top -= (parentOffset.top || 0);
+    css.left -= (parentOffset.left || 0);
 
     if (!isCurrentlyAbove && !isCurrentlyBelow) {
       newDirection = 'below';
@@ -4533,7 +4537,7 @@ S2.define('select2/dropdown/attachBody',[
         .removeClass('select2-container--below select2-container--above')
         .addClass('select2-container--' + newDirection);
     }
-
+    // console.log(css);
     this.$dropdownContainer.css(css);
   };
 

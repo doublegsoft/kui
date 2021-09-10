@@ -120,6 +120,7 @@ function PaginationTable(opts) {
       }
     };
     this.widgetFilter = new QueryLayout(opts.filter);
+    this.optsFilter = opts.filter;
   }
   //新增额外的excess
   if(opts.excess){
@@ -477,7 +478,10 @@ PaginationTable.prototype.tableTopActions = function () {
   let div = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
 
   // 测试
-  div.append(new QueryFilter({}).getRoot());
+  let optQueryFilter = {};
+  utils.clone(this.optsFilter, optQueryFilter);
+  optQueryFilter.table = this;
+  div.append(new QueryFilter(optQueryFilter).getRoot());
 
   let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
 

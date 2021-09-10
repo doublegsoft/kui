@@ -4,17 +4,21 @@ let utils = {};
  * 
  */
 utils.append = function (container, html, empty) {
-  let div = dom.create('div');
-  div.style.height = '100%';
-  div.style.width = '100%';
+  let fragmentContainer = dom.create('div');
+  fragmentContainer.style.height = '100%';
+  fragmentContainer.style.width = '100%';
   empty = empty || false;
   let range = document.createRange();
   let fragment = range.createContextualFragment(html);
   if (empty)
     container.innerHTML = '';
-  container.appendChild(div)
-  div.appendChild(fragment);
-  return fragment;
+  container.appendChild(fragmentContainer)
+  fragmentContainer.appendChild(fragment);
+  let page = dom.find('[id^=page]', fragmentContainer);
+  return {
+    id: page ?  page.id : '',
+    container: fragmentContainer,
+  };
 };
 
 utils.message = function (errors) {
