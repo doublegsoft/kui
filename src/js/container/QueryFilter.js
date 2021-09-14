@@ -1,19 +1,5 @@
 
 function QueryFilter(opts) {
-  this.fields = [{
-    label: '这里是文本',
-    input: 'text',
-  },{
-    label: '这里是日期',
-    input: 'date',
-  },{
-    label: '这里是选项',
-    input: 'select',
-    values: [
-      {text: '选项A', value: 'A'},{text: '选项B', value: 'B'},
-      {text: '选项C', value: 'C'},{text: '选项D', value: 'D'}
-    ]
-  }];
   this.fields = opts.fields;
   this.table = opts.table;
 }
@@ -277,7 +263,7 @@ QueryFilter.prototype.getValues = function() {
     let filterValues = el.getAttribute('data-filter-values');
     if (filterName && filterName !== '') {
       if (filterValues == null || filterValues === '') {
-        ret[filterName] = el.innerText;
+        ret[filterName] = el.innerText.trim();
       } else {
         ret[filterName] = filterValues.split(",")
       }
@@ -288,7 +274,6 @@ QueryFilter.prototype.getValues = function() {
 
 QueryFilter.prototype.request = function() {
   if (this.table) {
-    console.log(this.getValues());
     this.table.go(1);
   }
 };

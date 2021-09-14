@@ -11,7 +11,7 @@ function ReadonlyForm(opts) {
   this.columnCount = opts.columnCount || 1;
   // 显示字段
   this.fields = opts.fields;
-  this.convert=opts.convert;
+  this.convert = opts.convert;
   if(opts.url){
   	this.reload(opts.params)
 	}else{
@@ -35,9 +35,9 @@ ReadonlyForm.prototype.fetch = function(params) {
       url: this.url,
       params: requestParams,
     }).then((data) => {
-    	let _data=data;
+    	let _data = data;
     	if(self.convert){
-				_data=self.convert(data)
+				_data = self.convert(data);
 			}
       self.root(_data);
     });
@@ -86,7 +86,7 @@ ReadonlyForm.prototype.root = function(data) {
 				}
 			}
 			if(field.unit){
-				_value=_value+field.unit;
+				_value = _value + field.unit;
 			}
 		}else{
 			_value='-'

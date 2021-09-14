@@ -112,7 +112,7 @@ function PaginationTable(opts) {
   this.buildMatrix(this.columns, 0);
   this.buildMappingColumns(this.columns);
 
-  // 改版后的功能按钮
+  // 改版后的功能按钮（传统模式，FIXME: 暂时兼容）
   if (opts.filter) {
     opts.filter.query = {
       callback: function(params) {
@@ -121,6 +121,10 @@ function PaginationTable(opts) {
     };
     this.widgetFilter = new QueryLayout(opts.filter);
     this.optsFilter = opts.filter;
+  }
+  // 最新的查询条件输入
+  if (opts.filter2) {
+    this.optsFilter2 = opts.filter2;
   }
   //新增额外的excess
   if(opts.excess){
@@ -478,16 +482,21 @@ PaginationTable.prototype.tableTopActions = function () {
   let div = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
 
   // 测试
-  let optQueryFilter = {};
-  utils.clone(this.optsFilter, optQueryFilter);
-  optQueryFilter.table = this;
-  div.append(new QueryFilter(optQueryFilter).getRoot());
+  if (this.optsFilter2) {
+    let optQueryFilter = {};
+    utils.clone(this.optsFilter2, optQueryFilter);
+    optQueryFilter.table = this;
+    this.queryFilter = new QueryFilter(optQueryFilter);
+    div.append(this.queryFilter.getRoot());
+  } else {
+    div.removeClass('d-flex');
+  }
 
-  let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
+  let actions = div.get(0); // dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
 
   if (this.group) {
     let action = dom.element('' +
-        '<a widget-id="toggleGroup" class="card-header-action text-primary">\n' +
+        '<a widget-id="toggleGroup" class="card-header-action text-primary ml-2">\n' +
         '  <i class="fas fa-bars"></i>\n' +
         '</a>');
     actions.appendChild(action);
@@ -500,7 +509,7 @@ PaginationTable.prototype.tableTopActions = function () {
     this.container.appendChild(containerSort);
 
     let action = dom.element('' +
-        '<a widget-id="toggleSort" class="card-header-action text-primary">\n' +
+        '<a widget-id="toggleSort" class="card-header-action text-primary ml-2">\n' +
         '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
         '</a>');
     dom.bind(action, 'click', function() {
@@ -535,7 +544,7 @@ PaginationTable.prototype.tableTopActions = function () {
   }
   if (this.refreshable) {
     let action = dom.element('' +
-        '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
+        '<a widget-id="toggleFilter" class="card-header-action text-primary ml-2">\n' +
         '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
         '</a>');
     dom.bind(action, 'click', function () {
@@ -543,7 +552,7 @@ PaginationTable.prototype.tableTopActions = function () {
     });
     actions.appendChild(action);
   }
-  div.get(0).appendChild(actions);
+  // div.get(0).appendChild(actions);
 
   // if (this.limit < 0) {
   //   ul.empty();
@@ -722,6 +731,12 @@ PaginationTable.prototype.request = function (others) {
   // the parameters from query for this table
   if (this.widgetFilter) {
     let queryParams = this.widgetFilter.getQuery();
+    for (let k in queryParams) {
+      params[k] = queryParams[k];
+    }
+  }
+  if (this.queryFilter) {
+    let queryParams = this.queryFilter.getValues();
     for (let k in queryParams) {
       params[k] = queryParams[k];
     }
