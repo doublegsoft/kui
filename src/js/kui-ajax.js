@@ -757,6 +757,7 @@ ajax.dialog = function(opts) {
   let allowClose = opts.allowClose === true;
   let width=opts.width || '80%';
   let height = opts.height || '';
+  let offset=opts.offset || 'auto'
 
   if (window.parameters) {
     for (var key in data) {
@@ -770,7 +771,7 @@ ajax.dialog = function(opts) {
     success : function(html) {
       layer.open({
         type : 1,
-        offset: 'auto',
+        offset: offset,
         title : title,
         closeBtn: (allowClose === true) ? 1: 0,
         shade: 0.3,
