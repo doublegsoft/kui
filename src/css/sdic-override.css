@@ -2177,3 +2177,9 @@ a {
 #pageObmPatientList .card-flexX{
   box-shadow: none;
 }
+.oh{
+  overflow:hidden;
+}
+.el-image-viewer__wrapper{
+  z-index: 20200101 !important;
+}
