@@ -5,8 +5,7 @@
  * 
  * @version 1.0.0 - Created on Jan 26, 2019.
  */
-let xhr = {};
-
+const xhr = {};
 
 /**
  * @private
@@ -18,7 +17,7 @@ xhr.request = function (opts, method) {
   let success = opts.success;
   let error = opts.error;
 
-  let usecase = opts.usecase || '';
+  let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
   req.timeout = 10 * 1000;
@@ -170,9 +169,11 @@ xhr.promise = function(xhrOpt, error) {
   });
 };
 
-/*
-* 同步请求
-* */
+/**
+ * 同步请求
+ * 
+ * @deprecated
+ */
 xhr.asyncRequest = function (opts, method) {
   let url = opts.url;
   let data = opts.data || opts.params;
@@ -218,6 +219,11 @@ xhr.asyncRequest = function (opts, method) {
   });
 };
 
+/**
+ * 同步请求
+ * 
+ * @deprecated
+ */
 xhr.asyncPost = function (opts) {
   let url = opts.url;
   if (typeof HOST !== 'undefined' && url.indexOf('http') == -1) {
@@ -227,5 +233,6 @@ xhr.asyncPost = function (opts) {
   return xhr.asyncRequest(opts, 'POST');
 };
 
-if (typeof module !== 'undefined')
-  module.exports = xhr;
+if (typeof module !== 'undefined') {
+  module.exports = { xhr };
+}

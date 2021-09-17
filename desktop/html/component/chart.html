@@ -1,11 +1,11 @@
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>堆栈图示例</strong>
   </div>
   <div class="card-body row">
     <div class="col-md-12">
-      <div class="card-title title-bordered full-width">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
         <h6>按照日期显示不同组的值0和值1</h6>
       </div>
       <div id="chartStack0" class="full-width height300"></div>
@@ -13,13 +13,13 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>折线图示例</strong>
   </div>
   <div class="card-body row">
     <div class="col-md-12">
-      <div class="card-title title-bordered full-width">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
         <h6>按照日期显示两个时间序列值</h6>
       </div>
       <div id="chartLine0" class="full-width height300"></div>
@@ -27,19 +27,19 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>饼图示例</strong>
   </div>
   <div class="card-body row">
     <div class="col-md-6">
-      <div class="card-title title-bordered full-width">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
         <h6>按照分组显示值0</h6>
       </div>
       <div id="chartPie0" class="full-width height300"></div>
     </div>
     <div class="col-md-6">
-      <div class="card-title title-bordered full-width">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
         <h6>按照日期显示值1</h6>
       </div>
       <div id="chartPie1" class="full-width height300"></div>
@@ -47,52 +47,71 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>柱状图示例</strong>
   </div>
   <div class="card-body row">
     <div class="col-md-6">
-      <div class="card-title title-bordered full-width">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
         <h6>按照日期显示两个序列值</h6>
       </div>
       <div id="chartBar0" class="full-width height300"></div>
     </div>
     <div class="col-md-6">
-      <div class="card-title title-bordered full-width">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
         <h6>按照分组显示两个序列值</h6>
       </div>
       <div id="chartBar1" class="full-width height300"></div>
     </div>
   </div>
 </div>
+<div class="card">
+  <div class="card-header pl-3 pr-3">
+    <i class="fa fa-list"></i>
+    <strong>BMI示例</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-6">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
+        <h6>BMI瘦子</h6>
+      </div>
+      <div id="chartBMI0" class="full-width height300 overflow-hidden">
+        <canvas id="canvasBMI0" style="width: 100%; height: 100%;"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card-title title-bordered full-width pl-4 pr-4">
+        <h6>BMI胖子</h6>
+      </div>
+      <div id="chartBMI1" class="full-width height300 overflow-hidden">
+        <canvas id="canvasBMI1" style="width: 100%; height: 100%;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
-data = [
-  {date: '2020-01-01', group: '1', groupName: '药品', value0: 100, value1: 200},
-  {date: '2020-01-02', group: '1', groupName: '药品', value0: 110, value1: 220},
-  {date: '2020-01-03', group: '1', groupName: '药品', value0: 120, value1: 240},
-  {date: '2020-01-04', group: '1', groupName: '药品', value0: 130, value1: 260},
-  {date: '2020-01-05', group: '1', groupName: '药品', value0: 140, value1: 280},
-  {date: '2020-01-06', group: '1', groupName: '药品', value0: 150, value1: 300},
-  {date: '2020-01-07', group: '1', groupName: '药品', value0: 150, value1: 300},
-  {date: '2020-01-01', group: '2', groupName: '耗材', value0: 100, value1: 200},
-  {date: '2020-01-02', group: '2', groupName: '耗材', value0: 110, value1: 220},
-  {date: '2020-01-03', group: '2', groupName: '耗材', value0: 120, value1: 240},
-  {date: '2020-01-04', group: '2', groupName: '耗材', value0: 130, value1: 260},
-  {date: '2020-01-05', group: '2', groupName: '耗材', value0: 140, value1: 280},
-  {date: '2020-01-06', group: '2', groupName: '耗材', value0: 150, value1: 300},
-  {date: '2020-01-07', group: '2', groupName: '耗材', value0: 150, value1: 300},
-  {date: '2020-01-01', group: '3', groupName: '服务', value0: 100, value1: 200},
-  {date: '2020-01-02', group: '3', groupName: '服务', value0: 110, value1: 220},
-  {date: '2020-01-03', group: '3', groupName: '服务', value0: 120, value1: 240},
-  {date: '2020-01-04', group: '3', groupName: '服务', value0: 130, value1: 260},
-  {date: '2020-01-05', group: '3', groupName: '服务', value0: 140, value1: 280},
-  {date: '2020-01-06', group: '3', groupName: '服务', value0: 150, value1: 300},
-  {date: '2020-01-07', group: '3', groupName: '服务', value0: 150, value1: 300}
-];
+new ChartWrapper({
+  url: 'data/chart/sales.json',
+  chartType: 'stack',
+  values: [{
+    name: 'value0',
+    text: '毛利润',
+    operator: 'groupName' // 指向数据集的某个字段，说明用其来作为legend，并且子分组
+  }, {
+    name: 'value1',
+    text: '销售额',
+    operator: 'groupName' // 指向数据集的某个字段，说明用其来作为legend，并且子分组
+  }],
+  category: {
+    name: 'date'
+  },
+}).render(dom.find('#chartStack0'));
 
-chart.pie('#chartPie0', {
+new ChartWrapper({
+  url: 'data/chart/sales.json',
+  chartType: 'pie',
   values: [{
     name: 'value0',
     text: '销售额',
@@ -107,10 +126,11 @@ chart.pie('#chartPie0', {
       '3': {text: '服务', color: 'yellow'}
     }
   },
-  data: data
-});
+}).render(dom.find('#chartPie0'));
 
-chart.pie('#chartPie1', {
+new ChartWrapper({
+  url: 'data/chart/sales.json',
+  chartType: 'pie',
   values: [{
     name: 'value1',
     text: '销售额',
@@ -120,10 +140,11 @@ chart.pie('#chartPie1', {
     name: 'date',
     legend: {}
   },
-  data: data
-});
+}).render(dom.find('#chartPie1'));
 
-chart.bar('#chartBar0', {
+new ChartWrapper({
+  url: 'data/chart/sales.json',
+  chartType: 'bar',
   values: [{
     name: 'value0',
     text: '毛利润',
@@ -138,10 +159,11 @@ chart.bar('#chartBar0', {
   category: {
     name: 'date'
   },
-  data: data
-});
+}).render(dom.find('#chartBar0'));
 
-chart.bar('#chartBar1', {
+new ChartWrapper({
+  url: 'data/chart/sales.json',
+  chartType: 'bar',
   values: [{
     name: 'value0',
     text: '毛利润',
@@ -161,10 +183,11 @@ chart.bar('#chartBar1', {
       '3': {text: '服务', color: 'yellow'}
     }
   },
-  data: data
-});
+}).render(dom.find('#chartBar1'));
 
-chart.line('#chartLine0', {
+new ChartWrapper({
+  url: 'data/chart/sales.json',
+  chartType: 'line',
   values: [{
     name: 'value0',
     text: '毛利润',
@@ -179,23 +202,10 @@ chart.line('#chartLine0', {
   category: {
     name: 'date'
   },
-  data: data
-});
+}).render(dom.find('#chartLine0'));
 
-chart.stack('#chartStack0', {
-  values: [{
-    name: 'value0',
-    text: '毛利润',
-    operator: 'groupName' // 指向数据集的某个字段，说明用其来作为legend，并且子分组
-  },{
-    name: 'value1',
-    text: '销售额',
-    operator: 'groupName' // 指向数据集的某个字段，说明用其来作为legend，并且子分组
-  }],
-  category: {
-    name: 'date'
-  },
-  data: data
-});
+new BMI({}).render(dom.find('#canvasBMI0'));
+
+new BMI({}).render(dom.find('#canvasBMI1'));
 
 </script>

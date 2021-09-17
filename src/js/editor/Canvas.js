@@ -22,14 +22,9 @@ function Canvas(options) {
   this.propertiesEditor.addPropertyChangedListener(this);
 
   this.canvas = document.createElement('canvas');
-  this.canvas.setAttribute('width', this.containerWidth);
-  this.canvas.setAttribute('height', options.canvasHeight);
-
-  this.bindDragOverEventListener();
-  this.bindDropEventListener(this, this.drop);
-  this.bindMouseDownEventListener(this, this.select);
-  this.bindMouseMoveEventListener(this, this.move);
-  this.bindMouseUpEventListener();
+  this.canvas.style = 'width: 100%; height: 100%';
+  // this.canvas.setAttribute('width', this.containerWidth);
+  // this.canvas.setAttribute('height', options.canvasHeight);
 
   //
   // 鼠标点击，只支持删除对象
@@ -53,6 +48,18 @@ function Canvas(options) {
   // 初始化设置
   this.container.innerHTML = '';
   this.container.appendChild(this.canvas);
+
+  let dpr = window.devicePixelRatio || 1;
+  let rect = this.canvas.getBoundingClientRect();
+  this.canvas.width = rect.width * dpr;
+  this.canvas.height = rect.height * dpr;
+  this.canvas.getContext('2d').scale(dpr, dpr);
+
+  this.bindDragOverEventListener();
+  this.bindDropEventListener(this, this.drop);
+  this.bindMouseDownEventListener(this, this.select);
+  this.bindMouseMoveEventListener(this, this.move);
+  this.bindMouseUpEventListener();
 
   // 数据结构定义
   this.dragging = null;

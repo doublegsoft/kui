@@ -108,7 +108,7 @@
   
     <!-- Main content -->
     <main class="main header-fixed" style="overflow: hidden">
-      <div id="container"></div>
+      <div id="container" class="overflow-y: auto;"></div>
     </main>
     <aside class="aside-menu"></aside>
   </div>
@@ -192,7 +192,6 @@
 
 <script src="/src/js/kui-svg.js"></script> 
 <script src="/src/js/kui-searchbox.js"></script>
-<script src="/src/js/kui-Workflow.js"></script>
 <script src="/src/js/kui-utils.js"></script>
 <script src="/src/js/kui-xhr.js"></script>
 
@@ -206,16 +205,13 @@
 <script src="/src/js/container/FormLayout.js"></script>
 <script src="/src/js/container/QueryLayout.js"></script>
 <script src="/src/js/container/TreelikeList.js"></script>
+<script src="/src/js/container/TreelikeTable.js"></script>
+<script src="/src/js/container/Topology.js"></script>
+<script src="/src/js/container/QueryFilter.js"></script>
 
-<script src="/src/js/kui-TreelikeTable.js"></script>
 <script src="/src/js/kui-GroupLayout.js"></script>
 <script src="/src/js/kui-chart.js"></script>
 
-<script src="/src/js/kui-PropertiesEditor.js"></script>
-<script src="/src/js/kui-DesignCanvas.js"></script>
-<script src="/src/js/kui-ReportDesigner.js"></script>
-<script src="/src/js/kui-ReportElements.js"></script>
-<script src="/src/js/kui-ReportElementRenderers.js"></script>
 <script src="/src/js/kui-Kesigner.js"></script>
 <script src="/src/js/kui-Rx-parser.js"></script>
 <script src="/src/js/kui-rx.js"></script>
@@ -236,15 +232,20 @@
 <script src="/src/js/widget/TwoLine.js"></script>
 <script src="/src/js/widget/SparkLine.js"></script>
 <script src="/src/js/widget/ChartWrapper.js"></script>
+<script src="/src/js/widget/BMI.js"></script>
 <script src="/src/js/widget/Kanban.js"></script>
-
-<script src="/src/js/container/Topology.js"></script>
 
 <script src="/src/js/editor/Canvas.js"></script>
 <script src="/src/js/editor/CanvasElement.js"></script>
 <script src="/src/js/editor/CanvasElementRenderer.js"></script>
 <script src="/src/js/editor/PropertiesEditor.js"></script>
 <script src="/src/js/editor/NetworkTopology.js"></script>
+<script src="/src/js/editor/PropertiesEditor.js"></script>
+<script src="/src/js/editor/DesignCanvas.js"></script>
+<script src="/src/js/editor/ReportDesigner.js"></script>
+<script src="/src/js/editor/ReportElements.js"></script>
+<script src="/src/js/editor/ReportElementRenderers.js"></script>
+<script src="/src/js/editor/Workflow.js"></script>
 </body>
 </html>
 
@@ -337,7 +338,7 @@ $('.navbar-toggler').on('click', function(evt) {
 
 // 重算容器高度
 // document.getElementById('container').style.height = (document.body.clientHeight - 60) + 'px';
-dom.height(document.getElementById('container'), 0);
+dom.height(document.getElementById('container'), 0, document.body);
 
 new PerfectScrollbar('.sidebar-nav');
 // new PerfectScrollbar('.container-fluid');
