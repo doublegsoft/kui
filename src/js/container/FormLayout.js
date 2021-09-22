@@ -5,6 +5,7 @@ let ICON_ERROR = '<i class="fas fa-exclamation text-warning" style="width: 10px;
 
 function FormLayout(opts) {
   let self = this;
+  this.changed = false;
   this.fields = opts.fields;
   this.readonly = opts.readonly || false;
   this.actions = opts.actions || [];
@@ -481,6 +482,8 @@ FormLayout.prototype.save = async function () {
               }
               if (self.saveOpt.callback)
                 self.saveOpt.callback(resp.data);
+              else if (self.saveOpt.success)
+                self.saveOpt.success(resp.data);
               self.success("数据保存成功！");
             }
           });
@@ -826,6 +829,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   // user input
   if (input != null) {
     dom.bind(input, 'input', function (event) {
+      self.changed = true;
       FormLayout.validate(this);
     });
   }
@@ -839,6 +843,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       },
       set(newVal) {
         set.call(this, newVal);
+        self.changed = true;
         FormLayout.validate(this);
         return newVal;
       }
@@ -853,6 +858,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       },
       set(newVal) {
         set.call(this, newVal);
+        self.changed = true;
         FormLayout.validate(this);
         return newVal;
       }
@@ -876,6 +882,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         } else {
           this.value = "";
         }
+        self.changed = true;
         FormLayout.validate(this);
       });
     });

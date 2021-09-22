@@ -3,13 +3,13 @@ if (typeof split === 'undefined') split = {};
 split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   const splitterId = "__split_splitterId";
   leftDefaultSize = (leftDefaultSize || 300)
-  let container = document.getElementById(containerId);
+  let container = dom.find(containerId);
   let splitter = document.createElement('a');
   splitter.setAttribute('id', splitterId);
   container.appendChild(splitter);
   splitter.style.backgroundColor = '#cdcdcd';
   splitter.style.position = 'absolute';
-  splitter.style.width = '3px';
+  splitter.style.width = '5px';
   splitter.style.cursor = 'ew-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
@@ -19,8 +19,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
 
   let heightContainer = container.clientHeight;
 
-  let left = document.getElementById(leftId);
-  let right = document.getElementById(rightId);
+  let left = dom.find(leftId);
+  let right = dom.find(rightId);
 
   left.style.width = leftDefaultSize + 'px';
   left.style.flex = leftDefaultSize + 'px';

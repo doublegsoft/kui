@@ -147,6 +147,7 @@ utils.nameAttr = function(name) {
  * @return {string} javascript variable name
  */
 utils.nameVar = function(name) {
+  if (name.indexOf('-') == -1) return name;
   const names = name.split('-');
   let ret = '';
   for (let i = 0; i < names.length; i++) {

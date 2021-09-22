@@ -12,7 +12,7 @@ const xhr = {};
  */
 xhr.request = function (opts, method) {
   let url = opts.url;
-  let data = opts.data || opts.params;
+  let data = opts.data || opts.params || {};
   let type = opts.type || 'json';
   let success = opts.success;
   let error = opts.error;
