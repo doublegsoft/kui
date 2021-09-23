@@ -1,5 +1,5 @@
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>树型表</strong>
   </div>
@@ -8,7 +8,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>可分页树型表（第一级节点分页）</strong>
   </div>
@@ -17,7 +17,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <i class="fa fa-list"></i>
     <strong>分页表</strong>
   </div>
@@ -83,7 +83,7 @@ var treelikeTable = new TreelikeTable({
     }
   }]
 });
-treelikeTable.render('treelikeTable', {});
+treelikeTable.render('#treelikeTable', {});
 
 var paginationTreelikeTable = new TreelikeTable({
   url: 'data/treepage.json',
@@ -118,7 +118,7 @@ var paginationTreelikeTable = new TreelikeTable({
     }
   }]
 });
-paginationTreelikeTable.render('paginationTreelikeTable', {});
+paginationTreelikeTable.render('#paginationTreelikeTable', {});
 
 var paginationTable = new PaginationTable({
   url: 'data/paginationtable.json',
@@ -167,5 +167,5 @@ var paginationTable = new PaginationTable({
     }
   }]
 });
-paginationTable.render('paginationTable');
+paginationTable.render('#paginationTable');
 </script>

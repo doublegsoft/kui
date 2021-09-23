@@ -959,7 +959,7 @@ PaginationTable.prototype.fill = function (result) {
         tbody.append(tr);
       } // if (i < result.data.length)  
     }
-  }else{
+  } else {
     let tbody = $(this.table.find('tbody'));
     if (tbody) {
       tbody.append('' +

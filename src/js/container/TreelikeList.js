@@ -13,6 +13,8 @@ function TreelikeList(opts) {
   this.fieldId = opts.fields.id;
   this.fieldName = opts.fields.name;
   this.fieldParentId = opts.fields.parentId;
+  this.fieldChildId = opts.fields.childId;
+  this.fieldChildName = opts.fields.childName;
 
   this.urlRoot = opts.url.root;
   this.urlChild = opts.url.child;
@@ -131,8 +133,14 @@ TreelikeList.prototype.appendItem = function(ul, item, level) {
   }
 
   li.setAttribute('data-tree-item-level', level);
-  li.setAttribute('data-tree-item-parent-id', item[this.fieldParentId]);
-  li.setAttribute('data-tree-item-id', item[this.fieldId]);
+  if (item[this.fieldChildId]) {
+    li.setAttribute('data-tree-item-parent-id', item[this.fieldParentId]);
+    li.setAttribute('data-tree-item-id', item[this.fieldChildId]);
+  } else {
+    if (level != 0)
+      li.setAttribute('data-tree-item-parent-id', item[this.fieldParentId]);
+    li.setAttribute('data-tree-item-id', item[this.fieldId]);
+  }
 
   let expand = dom.create('a', 'text-primary', 'font-16', 'mr-2');
   expand.innerHTML = '<i class="far fa-minus-square position-relative" style="top: 1px;"></i>';
@@ -142,16 +150,24 @@ TreelikeList.prototype.appendItem = function(ul, item, level) {
 
   let check = dom.create('input', 'form-check-input', 'pointer', 'checkbox', 'color-info', 'is-outline');
   check.disabled = self.readonly;
-  check.value = item[this.fieldId];
+
   check.setAttribute('name', this.name);
   check.setAttribute('type', 'checkbox');
-  check.setAttribute('data-tree-item-id', item[this.fieldId]);
+  if (item[this.fieldChildId]) {
+    check.value = item[this.fieldChildId];
+  } else {
+    check.value = item[this.fieldId];
+  }
   check.setAttribute('data-tree-item-state', 'none');
   dom.model(check, item);
 
   let label = document.createElement('label');
   label.classList.add('form-check-label', 'pointer');
-  label.textContent = item[this.fieldName];
+  if (item[this.fieldChildId]) {
+    label.textContent = item[this.fieldChildName];
+  } else {
+    label.textContent = item[this.fieldName];
+  }
 
   if (!this.readonly) {
     li.addEventListener('click', function (ev) {
@@ -238,6 +254,7 @@ TreelikeList.prototype.getChildStates = function (li) {
     let liChild = ul.children[i];
     if (liChild.getAttribute('data-tree-item-id') == li.getAttribute('data-tree-item-id')) {
       start = true;
+    } else {
       continue;
     }
     if (start) {

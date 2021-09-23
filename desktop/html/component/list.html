@@ -6,7 +6,7 @@
 
 </style>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：列表视图</strong>
   </div>
   <div class="card-body row">
@@ -37,7 +37,6 @@ var data = [
 ];
 
 var listFilter = new ListView({
-  containerId: '#listFilter',
   local: data,
   height: 200,
   create: function(idx, row) {
@@ -55,10 +54,9 @@ var listFilter = new ListView({
 
   }
 });
-listFilter.render();
+listFilter.render('#listFilter');
 
 var listFilterAdd = new ListView({
-  containerId: '#listFilterAdd',
   local: data,
   height: 200,
   create: function(idx, row) {
@@ -79,10 +77,9 @@ var listFilterAdd = new ListView({
 
   }
 });
-listFilterAdd.render();
+listFilterAdd.render('#listFilterAdd');
 
 var listFilterAddRequired = new ListView({
-  containerId: '#listFilterAddRequired',
   local: data,
   height: 200,
   required: true,
@@ -104,10 +101,9 @@ var listFilterAddRequired = new ListView({
 
   }
 });
-listFilterAddRequired.render();
+listFilterAddRequired.render('#listFilterAddRequired');
 
 var listReorderable = new ListView({
-  containerId: '#listReorderable',
   local: data,
   create: function(idx, row) {
     let colors = ['#db2828', '#21ba45', '#a333c8'];
@@ -121,5 +117,5 @@ var listReorderable = new ListView({
     console.log(row);
   }
 });
-listReorderable.render();
+listReorderable.render('#listReorderable');
 </script>

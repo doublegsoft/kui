@@ -42,9 +42,10 @@ function PaginationGrid(opt) {
         self.go(1, params);
       }
     };
-    this.widgetFilter = new QueryLayout(opt.filter);
+    // this.widgetFilter = new QueryLayout(opt.filter);
+    opt.filter.table = this;
+    this.queryFilter = new QueryFilter(opt.filter);
   }
-
 }
 
 /**
@@ -92,6 +93,12 @@ PaginationGrid.prototype.request = function (params) {
       params[k] = queryParams[k];
     }
   }
+  if (this.queryFilter) {
+    let queryParams = this.queryFilter.getValues();
+    for (let k in queryParams) {
+      params[k] = queryParams[k];
+    }
+  }
   // static parameters
   for (let k in this.filters) {
     params[k] = this.filters[k];
@@ -112,6 +119,15 @@ PaginationGrid.prototype.request = function (params) {
       self.rootBody.innerHTML = '';
 
       self.showPageNumber();
+      if (rows.length == 0) {
+        let tbody = self.rootBody;
+        tbody.innerHTML = ('' +
+          '<div class="text-center pt-4 full-width">' +
+          '  <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
+          '  <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
+          '</div>');
+        return;
+      }
       for (let i = 0; i < rows.length; i++) {
         let row = rows[i];
         self.addRow(row, i);
@@ -208,10 +224,11 @@ PaginationGrid.prototype.render = function (containerId, params) {
     this.container = containerId;
   }
   this.container.innerHTML = '';
-  this.container.appendChild(this.pagination());
 
   let table = this.root();
+  this.container.appendChild(this.actionbar());
   this.container.appendChild(table);
+  this.container.appendChild(this.pagination());
   let top = dom.top(this.container);
   table.style.height = 'calc(100% - 20px - ' + top + 'px)';
 
@@ -219,18 +236,102 @@ PaginationGrid.prototype.render = function (containerId, params) {
   this.request(params);
 };
 
+PaginationGrid.prototype.actionbar = function() {
+  let self = this;
+  let top = $('<div class="full-width d-flex overflow-hidden mb-3" style="height: 26px;"></div>');
+
+  if (this.queryFilter) {
+    top.append(this.queryFilter.getRoot());
+  } else {
+    top.append(dom.element('<div class="full-width"></div>'));
+    // div.removeClass('d-flex');
+  }
+
+  let actions = top.get(0); // dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
+
+  if (this.favourite) {
+    let action = dom.element('' +
+      '<a widget-id="toggleFavourite" class="card-header-action text-yellow">\n' +
+      '  <i class="far fa-star position-relative font-16" style="top: 4px;"></i>\n' +
+      '</a>');
+    actions.appendChild(action);
+    dom.bind(action, 'click', function() {
+      let icon = dom.find('i', action);
+      if (icon.classList.contains('far')) {
+        icon.classList.remove('far');
+        icon.classList.add('fas');
+        self.go(1, {_favourite: 'true'});
+      } else {
+        icon.classList.remove('fas');
+        icon.classList.add('far');
+        self.go(1, {_favourite: 'false'});
+      }
+    });
+  }
+
+  if (this.widgetFilter) {
+    let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
+    this.widgetFilter.render(containerQuery);
+    this.container.appendChild(containerQuery);
+
+    let action = dom.element('' +
+      '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
+      '  <i class="fas fa-filter position-relative" style="top: 4px;"></i>\n' +
+      '</a>');
+    dom.bind(action, 'click', function() {
+      let query = containerQuery;
+      if (query.classList.contains('show')) {
+        query.classList.remove('show');
+      } else {
+        query.classList.add('show');
+      }
+    });
+    // WARNING: REPLACE BY QUERY FILTER
+    // actions.appendChild(action);
+
+  }
+
+  if (this.group) {
+    let action = dom.element('' +
+      '<a widget-id="toggleGroup" class="card-header-action">\n' +
+      '  <i class="fas fa-bars"></i>\n' +
+      '</a>');
+    actions.appendChild(action);
+  }
+
+  if (this.sort) {
+    let action = dom.element('' +
+      '<a widget-id="toggleSort" class="card-header-action">\n' +
+      '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
+      '</a>');
+    actions.appendChild(action);
+  }
+
+  let action = dom.element('' +
+    '<a widget-id="toggleFilter" class="card-header-action text-primary ml-2">\n' +
+    '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
+    '</a>');
+  dom.bind(action, 'click', function () {
+    self.request();
+  });
+  actions.appendChild(action);
+
+  return top.get(0);
+};
+
 /**
  * Displays pagination bar on the bottom of table.
  */
 PaginationGrid.prototype.pagination = function () {
   let self = this;
-  let div = dom.create('div', 'full-width');
-  div.style.position = 'sticky';
-  div.style.top = '0';
-  div.style.zIndex = 900;
+  let bottom = dom.create('div', 'full-width', 'd-flex');
+  // bottom.style.position = 'sticky';
+  bottom.style.top = '0';
+  bottom.style.zIndex = 900;
   // div.style.backgroundColor = 'white';
 
   let ul = dom.create('ul', 'pagination', 'mb-0');
+  ul.style.marginLeft = 'auto';
   this.firstPage = dom.create('li', 'page-item');
   let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
@@ -291,69 +392,10 @@ PaginationGrid.prototype.pagination = function () {
   this.lastPage.appendChild(a);
   ul.append(this.lastPage);
 
-  let actions = dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
-
-  if (this.favourite) {
-    let action = dom.element('' +
-        '<a widget-id="toggleFavourite" class="card-header-action text-yellow">\n' +
-        '  <i class="far fa-star position-relative font-16" style="top: 4px;"></i>\n' +
-        '</a>');
-    actions.appendChild(action);
-    dom.bind(action, 'click', function() {
-      let icon = dom.find('i', action);
-      if (icon.classList.contains('far')) {
-        icon.classList.remove('far');
-        icon.classList.add('fas');
-        self.go(1, {_favourite: 'true'});
-      } else {
-        icon.classList.remove('fas');
-        icon.classList.add('far');
-        self.go(1, {_favourite: 'false'});
-      }
-    });
-  }
-
-  if (this.widgetFilter) {
-    let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
-    this.widgetFilter.render(containerQuery);
-    this.container.appendChild(containerQuery);
-
-    let action = dom.element('' +
-      '<a widget-id="toggleFilter" class="card-header-action text-primary">\n' +
-      '  <i class="fas fa-filter position-relative" style="top: 4px;"></i>\n' +
-      '</a>');
-    dom.bind(action, 'click', function() {
-      let query = containerQuery;
-      if (query.classList.contains('show')) {
-        query.classList.remove('show');
-      } else {
-        query.classList.add('show');
-      }
-    });
-    actions.appendChild(action);
-  }
-
-  if (this.group) {
-    let action = dom.element('' +
-      '<a widget-id="toggleGroup" class="card-header-action">\n' +
-      '  <i class="fas fa-bars"></i>\n' +
-      '</a>');
-    actions.appendChild(action);
-  }
-
-  if (this.sort) {
-    let action = dom.element('' +
-      '<a widget-id="toggleSort" class="card-header-action">\n' +
-      '  <i class="fas fa-sort-amount-down-alt position-relative" style="top: 4px; font-size: 17px;"></i>\n' +
-      '</a>');
-    actions.appendChild(action);
-  }
-  div.appendChild(actions);
-
   if (this.limit > 0) {
-    div.appendChild(ul);
+    bottom.appendChild(ul);
   }
-  return div;
+  return bottom;
 };
 
 /**
