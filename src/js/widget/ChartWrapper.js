@@ -544,8 +544,12 @@ ChartWrapper.prototype.fetch = function(refresh) {
  * @param containerId
  *        the container or the container selector
  */
-ChartWrapper.prototype.render = function(containerId) {
+ChartWrapper.prototype.render = function(containerId, params) {
   let self = this;
+  params = params || {};
+  for (let k in params) {
+    this.params[k] = params[k];
+  }
   this.container = dom.find(containerId);
   if (self.url) {
     this.fetch();

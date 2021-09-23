@@ -489,7 +489,8 @@ PaginationTable.prototype.tableTopActions = function () {
     this.queryFilter = new QueryFilter(optQueryFilter);
     div.append(this.queryFilter.getRoot());
   } else {
-    div.removeClass('d-flex');
+    div.append(dom.element('<div class="full-width"></div>'));
+    // div.removeClass('d-flex');
   }
 
   let actions = div.get(0); // dom.create('div', 'card-header-actions', 'pt-0', 'pr-2');
