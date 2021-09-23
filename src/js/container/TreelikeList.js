@@ -254,7 +254,6 @@ TreelikeList.prototype.getChildStates = function (li) {
     let liChild = ul.children[i];
     if (liChild.getAttribute('data-tree-item-id') == li.getAttribute('data-tree-item-id')) {
       start = true;
-    } else {
       continue;
     }
     if (start) {
