@@ -10,6 +10,7 @@ function Accordion(opts) {
 	this.Data = opts.data;
 	this.convert = opts.convert;
 	this.rowClick = opts.rowClick;
+	this.defaultIndex=opts.defaultIndex || 0;
 	this.mode=opts.mode || 'radio'
 	if (opts.url) {
 		this.reload(opts.params)
@@ -52,8 +53,12 @@ Accordion.prototype.root = function (data) {
 	for (let i = 0; i < data.length; i++) {
 		let item = data[i];
 		let _id = 'check' + (i + 1);
+		let input='<input type='+self.mode+' id=' + _id +' '+(self.mode=='radio'?'name=radio_name':'')+'>';
+		if(this.defaultIndex == i ){
+			input=`<input type=${self.mode} id=${_id} ${self.mode=='radio'?'name=radio_name':''}  checked="true">`;
+		}
 		let Item = dom.element('<div class="tab">\n' +
-				'            <input type='+self.mode+' id=' + _id +' '+(self.mode=='radio'?'name=radio_name':'')+'>\n' +
+				input+
 				'            <label class="tab-label" for=' + _id + '>' + item.title + '</label>\n' +
 				'          </div>');
 		let Child = dom.element('<div class="tab-content"></div>');
