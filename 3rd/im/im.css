@@ -795,18 +795,18 @@
 }
 
 /*page*/
-.page-item {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
+/*.page-item {*/
+/*  display: flex;*/
+/*  align-items: center;*/
+/*  height: 100%;*/
+/*}*/
 
-.page-item .page-link {
-  font-size: 12px !important;
-  padding: 0 3px;
-  padding-bottom: 0 !important;
-  padding-top: 0 !important;
-}
+/*.page-item .page-link {*/
+/*  font-size: 12px !important;*/
+/*  padding: 0 3px;*/
+/*  padding-bottom: 0 !important;*/
+/*  padding-top: 0 !important;*/
+/*}*/
 
 .textover h6 {
   white-space: nowrap;

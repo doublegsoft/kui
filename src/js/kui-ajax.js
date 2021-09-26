@@ -218,81 +218,6 @@ ajax.view = function(opt) {
 };
 
 /**
- * 加载服务器端的页面，替换现有容器中的元素。支持独立页面和数据库配置页面的加载。
- *
- * @param opt
- *        配置选项
- */
-ajax.view = function(opt) {
-  if (typeof schedule !== 'undefined' && opt.clear)
-    schedule.stop();
-  let url = opt.url;
-  let empty = false;
-  if (typeof opt.empty === 'undefined')
-    empty = true;
-  else
-    empty = opt.empty;
-  let page = opt.page;
-  if (url && url.indexOf(":") == 0) {
-    page = url.substring(1);
-    url = null;
-  }
-
-  let title = opt.title || '';
-  let containerId = opt.containerId;
-  let data = opt.params;
-  let callback = opt.success;
-
-  let container = null;
-  if (typeof containerId === 'string') {
-    container = document.getElementById(containerId.trim());
-    if (container == null) {
-      container = document.querySelector(containerId.trim());
-    }
-  } else {
-    container = containerId;
-  }
-
-  if (typeof data === 'undefined')
-    data = {};
-  if (window.parameters) {
-    for (let k in data) {
-      window.parameters[k] = data[k];
-    }
-  }
-
-  if (url) {
-    xhr.get({
-      url: url,
-      success: function (resp) {
-        let fragment = null;
-        if (container) {
-          fragment = utils.append(container, resp, empty);
-        }
-        if (callback)
-          callback(title, fragment);
-      }
-    });
-  } else if (page) {
-    xhr.post({
-      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
-      data: {
-        customWindowId: page
-      },
-      success: function (resp) {
-        let script = resp.data.script
-        let fragment = null;
-        if (container) {
-          fragment = utils.append(container, script, empty);
-        }
-        if (callback)
-          callback(title, fragment);
-      }
-    });
-  }
-};
-
-/**
  * 添加服务器端页面到指定容器中，同样支持独立页面和数据库配置页面的加载。
  * <p>
  * 该模式只有在存在顶部可关闭菜单的情况下才有效。
@@ -915,6 +840,11 @@ ajax.sidebar = function(opt) {
     }, 300);
   });
   container.appendChild(sidebar);
+  // get page id and reset url to null
+  if (opt.url.indexOf(':') == 0) {
+    opt.page = opt.url.substring(1);
+    opt.url = null;
+  }
   if (opt.url) {
     xhr.get({
       url: opt.url,
@@ -954,13 +884,13 @@ ajax.sidebar = function(opt) {
   } else {
     xhr.post({
       url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
-      data: {
+      params: {
         customWindowId: opt.page
       },
       success: function (resp) {
         let script = resp.data.script;
-        utils.append(dom.find('.modal-body', sidebar), script);
-        dom.find('.modal-title', sidebar).innerHTML = opt.title;
+        let fragment = utils.append(dom.find('.modal-body', sidebar), script);
+        dom.find('.modal-title', sidebar).innerHTML = opt.title || '&nbsp;';
         if (!allowClose && !opt.close) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
@@ -970,10 +900,10 @@ ajax.sidebar = function(opt) {
           if (opt.close)
             opt.close();
         });
-        if (success) success(resp);
+        if (success) success(fragment);
         setTimeout(function () {
-          sidebar.classList.remove('out');
-          sidebar.classList.add('in');
+          sidebar.children[0].classList.remove('out');
+          sidebar.children[0].classList.add('in');
         }, 300);
       }
     });

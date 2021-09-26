@@ -408,7 +408,7 @@ PaginationTable.prototype.pagination = function () {
   let ul = $('<ul class="pagination mb-0 mt-2" style="float: right;"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
-  let a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
+  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('首页');
   a.html('<i class="material-icons">first_page</i>');
@@ -422,7 +422,7 @@ PaginationTable.prototype.pagination = function () {
   }
 
   this.prevPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('上一页');
   a.html('<i class="material-icons">chevron_left</i>');
@@ -434,7 +434,7 @@ PaginationTable.prototype.pagination = function () {
 
   li = $('<li class="page-item disabled"></li>');
   li.addClass('disabled');
-  this.pagebar = $('<a class="page-link b-a-0 pt-1" style="padding-bottom: 2px;"></a>');
+  this.pagebar = $('<a class="page-link b-a-0 pt-1 font-14" style="padding-bottom: 2px; height: 30px; line-height: 30px"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
   this.pagebar.attr('style', 'cursor: default');
   this.pagebar.text("0/0");
@@ -442,7 +442,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(li);
 
   this.nextPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0" style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('下一页');
   a.html('<i class="material-icons">chevron_right</i>');
@@ -453,7 +453,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(this.nextPage);
 
   this.lastPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0"  style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14"  style="padding-bottom: 2px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('末页');
   a.html('<i class="material-icons">last_page</i>');

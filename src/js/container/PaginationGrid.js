@@ -333,9 +333,11 @@ PaginationGrid.prototype.pagination = function () {
   let ul = dom.create('ul', 'pagination', 'mb-0');
   ul.style.marginLeft = 'auto';
   this.firstPage = dom.create('li', 'page-item');
-  let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
+  let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.lineHeight = '30px';
+  a.style.height = '30px';
   // a.innerText = '首页';
   a.innerHTML = '<i class="material-icons">first_page</i>';
   dom.bind(a, 'click', function() {
@@ -346,7 +348,7 @@ PaginationGrid.prototype.pagination = function () {
   ul.appendChild(this.firstPage);
 
   this.prevPage = dom.create('li', 'page-item');
-  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
+  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '上一页';
@@ -359,7 +361,7 @@ PaginationGrid.prototype.pagination = function () {
 
   li = dom.create('li', 'page-item', 'disabled');
   li.style.paddingTop = '4px';
-  this.pagebar = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
+  this.pagebar = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   this.pagebar.setAttribute('href', 'javascript:void(0)');
   this.pagebar.style.cursor = 'default';
 
@@ -369,7 +371,7 @@ PaginationGrid.prototype.pagination = function () {
   ul.appendChild(li);
 
   this.nextPage = dom.create('li', 'page-item');
-  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
+  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '下一页';
@@ -381,7 +383,7 @@ PaginationGrid.prototype.pagination = function () {
   ul.appendChild(this.nextPage);
 
   this.lastPage = dom.create('li', 'page-item');
-  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
+  a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
   // a.innerText = '末页';
