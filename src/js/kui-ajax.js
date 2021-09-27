@@ -483,14 +483,29 @@ ajax.shade = function(opts) {
 
   let shade = document.querySelector('.page.full');
   if (shade != null) shade.parentElement.remove();
-  xhr.get({
-    url : url,
-    success : function(resp) {
-      let fragment = utils.append(document.body, resp);
-      if (callback)
-        callback(fragment);
-    }
-  });
+  if (url.indexOf(':') === -1) {
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let fragment = utils.append(document.body, resp);
+        if (callback)
+          callback(fragment);
+      }
+    });
+  } else {
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: url.substring(1)
+      },
+      success: function (resp) {
+        let script = resp.data.script;
+        let fragment = utils.append(document.body, script);
+        if (callback)
+          callback(fragment);
+      }
+    });
+  }
 };
 
 /**
