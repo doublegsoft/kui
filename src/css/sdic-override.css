@@ -41,6 +41,12 @@ select:focus, .ql-editor:focus {
 /*::-webkit-scrollbar-thumb:horizontal:hover{*/
 /*  background-color: rgba(144,147,153,.3);*/
 /*}*/
+.fl{
+  float: left;
+}
+.oh{
+  overflow:hidden;
+}
 .page {
   overflow-x: inherit;
 }
@@ -84,6 +90,12 @@ html:not([dir="rtl"]) .sidebar .nav-link span {
 
 html:not([dir="rtl"]) .sidebar .btn-toggler {
   justify-content: center;
+}
+
+.position-relative {
+  top: 0 !important;
+  height: 16px;
+  width: 16px;
 }
 
 @media (min-width: 992px) {
@@ -417,13 +429,22 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
 .col-form-label {
   font-size: 14px;
   white-space: nowrap;
+  margin-right: 5px;
 }
-
+.rowx{
+  display: flex;
+  flex-flow: wrap;
+}
+.form-horizontal .col-md-4 .input-group,.form-horizontal .col-md-3 .input-group,.form-horizontal .col-md-6 .input-group{
+  margin-right: 5%;
+}
 .btns-list {
   margin-bottom: 10px;
   display: flex;
 }
-
+.row-button{
+  margin-top: 20px;
+}
 .btns-list .btn {
   height: 30px;
   font-size: 14px;
@@ -2171,9 +2192,7 @@ a {
 #pageObmPatientList .card-flexX{
   box-shadow: none;
 }
-.oh{
-  overflow:hidden;
-}
+
 .el-image-viewer__wrapper{
   z-index: 20200101 !important;
 }

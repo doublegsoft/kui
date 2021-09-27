@@ -5,7 +5,6 @@ let ICON_ERROR = '<i class="fas fa-exclamation text-warning" style="width: 10px;
 
 function FormLayout(opts) {
   let self = this;
-  this.changed = false;
   this.fields = opts.fields;
   this.readonly = opts.readonly || false;
   this.actions = opts.actions || [];
@@ -13,6 +12,7 @@ function FormLayout(opts) {
   this.columnCount = opts.columnCount || 2;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
+	this.mode=opts.mode || 'rightbar';
   this.toast = dom.element(`
     <div class="toast fade b-a-1 text-white" data-autohide="false" 
          style="position: absolute; left: 20%; top: 10px; width: 60%; z-index: -1;">
@@ -65,7 +65,7 @@ FormLayout.prototype.render = function (containerId, params) {
 FormLayout.prototype.build = function(persisted) {
   let self = this;
   persisted = persisted || {};
-  let form = dom.create('div', 'col-md-12', 'form-horizontal');
+  let form = dom.create('div', 'col-md-12', 'form-horizontal','rowx');
   let columnCount = this.columnCount;
   let hiddenFields = [];
   let shownFields = [];
@@ -94,15 +94,15 @@ FormLayout.prototype.build = function(persisted) {
 
   let rows = [];
   let len = shownFields.length;
-  for (let i = 0; i < shownFields.length; i++) {
-    let field = shownFields[i];
-    rows.push({
-      first: field,
-      second: (i + 1 < len) ? shownFields[i + 1] : null
-    });
-    if (columnCount == 2)
-      i += 1;
-  }
+  // for (let i = 0; i < shownFields.length; i++) {
+  //   let field = shownFields[i];
+  //   rows.push({
+  //     first: field,
+  //     second: (i + 1 < len) ? shownFields[i + 1] : null
+  //   });
+  //   if (columnCount == 2)
+  //     i += 1;
+  // }
 
   // hidden fields
   for (let i = 0; i < hiddenFields.length; i++) {
@@ -114,30 +114,31 @@ FormLayout.prototype.build = function(persisted) {
     hidden.setAttribute('data-identifiable', field.identifiable || false);
     form.appendChild(hidden);
   }
-
   // shown fields
-  for (let i = 0; i < rows.length; i++) {
-    let row = rows[i];
-    if (row.first.input == 'title') {
-      let el = dom.element('<div class="title-bordered" style="margin: 10px -10px;"><strong>' + row.first.title + '</strong></div>')
+  for (let i = 0; i < shownFields.length; i++) {
+    let row = shownFields[i];
+		columnCount = columnCount || 2;
+		let _classname='col-md-'+parseInt(12/columnCount);
+		let itemInput=dom.create('div',_classname,'row-flex');
+
+    if (row.input == 'title') {
+      let el = dom.element('<div class="title-bordered col-md-12" style="margin: 10px -10px;"><strong>' + row.title + '</strong></div>')
       form.appendChild(el);
       continue;
     }
-
-    let formGroup = dom.create('div', 'form-group', 'row');
-    let group = this.createInput(row.first, columnCount);
-
+    // let formGroup = dom.create('div', 'form-group', 'row');
+    let group = this.createInput(row, columnCount);
     if (group.label) {
-      formGroup.appendChild(group.label);
+			itemInput.appendChild(group.label);
     }
-    formGroup.appendChild(group.input);
-
-    if (columnCount == 2 && row.second) {
-      group = this.createInput(row.second);
-      formGroup.appendChild(group.label);
-      formGroup.appendChild(group.input);
-    }
-    form.appendChild(formGroup);
+		itemInput.appendChild(group.input);
+    // if (columnCount == 2 && row.second) {
+    //   group = this.createInput(row.second);
+    //   formGroup.appendChild(group.label);
+    //   formGroup.appendChild(group.input);
+    // }
+		// formGroup.appendChild(itemInput);
+    form.appendChild(itemInput);
   }
   // 必须放在这里，否者后续容器会找不到
   this.container.appendChild(form);
@@ -274,11 +275,14 @@ FormLayout.prototype.build = function(persisted) {
       }).render(dom.find('div[data-logo-name=\'' + field.name + '\']', this.container), field.value);
     }
   }
-
   let containerButtons = dom.create('div');
-
   containerButtons.classList.add('buttons');
-  let buttons = dom.create('div', 'float-right');
+  let buttons = dom.create('div');
+	if(this.mode!='page'){
+		buttons.classList.add('float-right');
+	}else{
+		buttons.classList.add('row-button');
+	}
 
   // custom buttons
   for (let i = 0; i < this.actions.length; i++) {
@@ -316,7 +320,7 @@ FormLayout.prototype.build = function(persisted) {
       }, 1000);
     }
   });
-  if (this.actionable) {
+  if (this.actionable && this.mode!='page') {
     buttons.appendChild(buttonClose);
   }
   let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
@@ -359,7 +363,9 @@ FormLayout.prototype.build = function(persisted) {
       row.appendChild(containerButtons);
       this.container.appendChild(row);
     }
-  }
+  }else{
+		this.container.appendChild(buttons);
+	}
 
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
@@ -482,8 +488,6 @@ FormLayout.prototype.save = async function () {
               }
               if (self.saveOpt.callback)
                 self.saveOpt.callback(resp.data);
-              else if (self.saveOpt.success)
-                self.saveOpt.success(resp.data);
               self.success("数据保存成功！");
             }
           });
@@ -529,7 +533,7 @@ FormLayout.prototype.save = async function () {
  * @param field
  *        field option
  *
- * @param columnCount
+ * @param FormLayout.js
  *        column count in a row
  *
  * @returns {object} label and input with add-ons dom elements
@@ -538,11 +542,14 @@ FormLayout.prototype.save = async function () {
  */
 FormLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
-  columnCount = columnCount || 2;
-  let _required=field.required || false;
-  let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-3','col-form-label',(_required?'required':'norequired'));
+  // columnCount = columnCount || 2;
+	// let _classname='col-md-'+parseInt(12/columnCount);
+	// let itemInput=dom.create('div',_classname);
+
+	let _required=field.required || false;
+  let label = dom.create('div', 'col-form-label','col-md-3',(_required?'required':'norequired'));
   label.innerText = field.title + '：';
-  let group = dom.create('div', columnCount == 2 ? 'col-md-4' : 'col-md-9', 'input-group');
+  let group = dom.create('div', 'input-group','col-md-9');
 
   let input = null;
   if (field.input == 'code') {
@@ -674,7 +681,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-fileupload-name', field.name);
   } else if (field.input == 'imageupload') {
-
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
   } else if (field.input == 'avatar') {
@@ -829,7 +835,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   // user input
   if (input != null) {
     dom.bind(input, 'input', function (event) {
-      self.changed = true;
       FormLayout.validate(this);
     });
   }
@@ -843,7 +848,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       },
       set(newVal) {
         set.call(this, newVal);
-        self.changed = true;
         FormLayout.validate(this);
         return newVal;
       }
@@ -858,7 +862,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       },
       set(newVal) {
         set.call(this, newVal);
-        self.changed = true;
         FormLayout.validate(this);
         return newVal;
       }
@@ -882,7 +885,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         } else {
           this.value = "";
         }
-        self.changed = true;
         FormLayout.validate(this);
       });
     });
