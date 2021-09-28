@@ -5,6 +5,7 @@ let ICON_ERROR = '<i class="fas fa-exclamation text-warning" style="width: 10px;
 
 function FormLayout(opts) {
   let self = this;
+  this.changed = false;
   this.fields = opts.fields;
   this.readonly = opts.readonly || false;
   this.actions = opts.actions || [];
@@ -12,7 +13,6 @@ function FormLayout(opts) {
   this.columnCount = opts.columnCount || 2;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
-	this.mode=opts.mode || 'rightbar';
   this.toast = dom.element(`
     <div class="toast fade b-a-1 text-white" data-autohide="false" 
          style="position: absolute; left: 20%; top: 10px; width: 60%; z-index: -1;">
@@ -65,7 +65,7 @@ FormLayout.prototype.render = function (containerId, params) {
 FormLayout.prototype.build = function(persisted) {
   let self = this;
   persisted = persisted || {};
-  let form = dom.create('div', 'col-md-12', 'form-horizontal','rowx');
+  let form = dom.create('div', 'col-md-12', 'form-horizontal');
   let columnCount = this.columnCount;
   let hiddenFields = [];
   let shownFields = [];
@@ -80,29 +80,43 @@ FormLayout.prototype.build = function(persisted) {
         let parentName = field.name.substring(0, field.name.indexOf('.'));
         let childName = field.name.substring(field.name.indexOf('.') + 1);
         field.value = (typeof persisted[parentName] === 'undefined' || persisted[parentName] == 'null') ? null :
-            (typeof persisted[parentName][childName] === 'undefined' || persisted[childName] == 'null') ? null : persisted[parentName][childName];
+          (typeof persisted[parentName][childName] === 'undefined' || persisted[childName] == 'null') ? null : persisted[parentName][childName];
       } else {
         field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
       }
     }
-    if (field.input == 'hidden') {
+    if (field.input === 'hidden') {
       hiddenFields.push(field);
     } else {
       shownFields.push(field);
     }
   }
 
+  // @deprecated
   let rows = [];
   let len = shownFields.length;
-  // for (let i = 0; i < shownFields.length; i++) {
-  //   let field = shownFields[i];
-  //   rows.push({
-  //     first: field,
-  //     second: (i + 1 < len) ? shownFields[i + 1] : null
-  //   });
-  //   if (columnCount == 2)
-  //     i += 1;
-  // }
+
+  let groups = [];
+  let group = {
+    title: '',
+    fields: []
+  };
+  for (let i = 0; i < shownFields.length; i++) {
+    let field = shownFields[i];
+
+    // 重新分组
+    if (field.input === 'title') {
+      groups.push(group);
+      group = {
+        title: field.title,
+        fields: []
+      };
+    } else {
+      group.fields.push(field);
+    }
+  }
+
+  if (group.fields.length !== 0) groups.push(group);
 
   // hidden fields
   for (let i = 0; i < hiddenFields.length; i++) {
@@ -114,31 +128,25 @@ FormLayout.prototype.build = function(persisted) {
     hidden.setAttribute('data-identifiable', field.identifiable || false);
     form.appendChild(hidden);
   }
-  // shown fields
-  for (let i = 0; i < shownFields.length; i++) {
-    let row = shownFields[i];
-		columnCount = columnCount || 2;
-		let _classname='col-md-'+parseInt(12/columnCount);
-		let itemInput=dom.create('div',_classname,'row-flex');
 
-    if (row.input == 'title') {
-      let el = dom.element('<div class="title-bordered col-md-12" style="margin: 10px -10px;"><strong>' + row.title + '</strong></div>')
+  for (let i = 0; i < groups.length; i++) {
+    let group = groups[i];
+    if (group.title) {
+      let el = dom.element('<div class="title-bordered" style="margin: 10px -10px;"><strong>' + group.title + '</strong></div>')
       form.appendChild(el);
-      continue;
     }
-    // let formGroup = dom.create('div', 'form-group', 'row');
-    let group = this.createInput(row, columnCount);
-    if (group.label) {
-			itemInput.appendChild(group.label);
+    let row = dom.create('div', 'row');
+    for (let j = 0; j < group.fields.length; j++) {
+      let field = group.fields[j];
+      let pair = this.createInput(field, columnCount);
+      if (pair.label != null) {
+        pair.label.classList.add('pl-3');
+        pair.input.classList.add('mb-2', 'pr-3');
+        row.appendChild(pair.label);
+      }
+      row.appendChild(pair.input);
     }
-		itemInput.appendChild(group.input);
-    // if (columnCount == 2 && row.second) {
-    //   group = this.createInput(row.second);
-    //   formGroup.appendChild(group.label);
-    //   formGroup.appendChild(group.input);
-    // }
-		// formGroup.appendChild(itemInput);
-    form.appendChild(itemInput);
+    form.appendChild(row);
   }
   // 必须放在这里，否者后续容器会找不到
   this.container.appendChild(form);
@@ -275,14 +283,11 @@ FormLayout.prototype.build = function(persisted) {
       }).render(dom.find('div[data-logo-name=\'' + field.name + '\']', this.container), field.value);
     }
   }
+
   let containerButtons = dom.create('div');
+
   containerButtons.classList.add('buttons');
-  let buttons = dom.create('div');
-	if(this.mode!='page'){
-		buttons.classList.add('float-right');
-	}else{
-		buttons.classList.add('row-button');
-	}
+  let buttons = dom.create('div', 'float-right');
 
   // custom buttons
   for (let i = 0; i < this.actions.length; i++) {
@@ -320,7 +325,7 @@ FormLayout.prototype.build = function(persisted) {
       }, 1000);
     }
   });
-  if (this.actionable && this.mode!='page') {
+  if (this.actionable) {
     buttons.appendChild(buttonClose);
   }
   let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
@@ -363,9 +368,7 @@ FormLayout.prototype.build = function(persisted) {
       row.appendChild(containerButtons);
       this.container.appendChild(row);
     }
-  }else{
-		this.container.appendChild(buttons);
-	}
+  }
 
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
@@ -492,11 +495,11 @@ FormLayout.prototype.save = async function () {
             }
           });
         }else{
-					if (buttonSave != null)
-						if (buttonSave != null)
-							buttonSave.innerHTML = '保存';
-					    dom.enable('button', self.container);
-        	return
+          if (buttonSave != null)
+            if (buttonSave != null)
+              buttonSave.innerHTML = '保存';
+          dom.enable('button', self.container);
+          return
         }
       })
       return
@@ -533,7 +536,7 @@ FormLayout.prototype.save = async function () {
  * @param field
  *        field option
  *
- * @param FormLayout.js
+ * @param columnCount
  *        column count in a row
  *
  * @returns {object} label and input with add-ons dom elements
@@ -542,14 +545,30 @@ FormLayout.prototype.save = async function () {
  */
 FormLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
-  // columnCount = columnCount || 2;
-	// let _classname='col-md-'+parseInt(12/columnCount);
-	// let itemInput=dom.create('div',_classname);
+  field.columnCount = field.columnCount || 1;
+  columnCount = columnCount || 2;
+  let _required = field.required || false;
 
-	let _required=field.required || false;
-  let label = dom.create('div', 'col-form-label','col-md-3',(_required?'required':'norequired'));
+  let averageSpace = 24 / columnCount;
+  let labelGridCount = 0;
+  let inputGridCount = 0;
+  if (averageSpace === 24) {
+    labelGridCount = 6;
+    inputGridCount = 18;
+  } else if (averageSpace === 12) {
+    labelGridCount = 4;
+    inputGridCount = 8;
+  } else if (averageSpace === 8) {
+    labelGridCount = 3;
+    inputGridCount = 5;
+  } else if (averageSpace === 6) {
+    labelGridCount = 2;
+    inputGridCount = 4;
+  }
+  let label = dom.create('div', 'col-24-' + this.formatGridCount(labelGridCount),'col-form-label', (_required?'required':'norequired'));
   label.innerText = field.title + '：';
-  let group = dom.create('div', 'input-group','col-md-9');
+  inputGridCount += (labelGridCount + inputGridCount) * (field.columnCount - 1);
+  let group = dom.create('div', 'col-24-' + this.formatGridCount(inputGridCount), 'input-group');
 
   let input = null;
   if (field.input == 'code') {
@@ -681,20 +700,20 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-fileupload-name', field.name);
   } else if (field.input == 'imageupload') {
+
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
     input.setAttribute('data-avatar-name', field.name);
     group.classList.remove('col-md-4', 'col-md-9');
-    group.classList.add('col-md-12');
+    group.classList.add('col-24-' + this.formatGridCount(labelGridCount + inputGridCount));
     group.appendChild(input);
     return {label: null, input: group};
   } else if (field.input == 'logo') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-logo-name', field.name);
-    group.classList.remove('col-md-4', 'col-md-9');
-    group.classList.add('col-md-12');
+    group.classList.add('col-24-' + this.formatGridCount(labelGridCount + inputGridCount));
     group.appendChild(input);
     return {label: null, input: group};
   } else if (field.input == 'datetime') {
@@ -724,6 +743,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(dateInput);
     group.appendChild(timeIcon);
     group.appendChild(timeInput);
+    return {label: label, input: group};
+  } else if (typeof field.input === 'undefined') {
+    label.innerText = '';
     return {label: label, input: group};
   } else {
     input = dom.create('input', 'form-control');
@@ -835,7 +857,11 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   // user input
   if (input != null) {
     dom.bind(input, 'input', function (event) {
+      self.changed = true;
       FormLayout.validate(this);
+      if (field.onInput) {
+        field.onInput(event);
+      }
     });
   }
 
@@ -848,6 +874,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       },
       set(newVal) {
         set.call(this, newVal);
+        self.changed = true;
         FormLayout.validate(this);
         return newVal;
       }
@@ -862,6 +889,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       },
       set(newVal) {
         set.call(this, newVal);
+        self.changed = true;
         FormLayout.validate(this);
         return newVal;
       }
@@ -885,6 +913,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         } else {
           this.value = "";
         }
+        self.changed = true;
         FormLayout.validate(this);
       });
     });
@@ -957,6 +986,7 @@ FormLayout.prototype.success = function (message) {
  *        the dom element for user input
  */
 FormLayout.validate = function(input) {
+  if (typeof input === 'undefined') return;
   if (input.tagName == 'OPTION')
     input = input.parentElement;
   if (input == null) return;
@@ -1031,79 +1061,9 @@ FormLayout.prototype.input = function(nameAndValue) {
   control.append(newOption).trigger('change');
 };
 
-FormLayout.skeleton = function() {
-  return dom.element(`
-    <div style="border: 1px solid rgba(0, 0, 0, 0.3); border-radius: 4px; width: 100%;">
-      <div
-          style="align-items: center; border-bottom: 1px solid rgba(0, 0, 0, 0.3); display: flex; justify-content: space-between; padding: 16px;">
-        <div style="width: 60%;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
-        </div>
-        <div style="color: rgba(0, 0, 0, 0.7);">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 16px; width: 16px;"></div>
-        </div>
-      </div>
-      <div style="padding: 16px;">
-        <div style="margin-bottom: 16px;">
-          <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-          </div>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-      <div style="border-top: 1px solid rgba(0, 0, 0, 0.3); display: flex; justify-content: flex-end; padding: 16px;">
-        <div style="margin-right: 8px; width: 30%;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 32px; width: 100%;"></div>
-        </div>
-        <div style="width: 30%;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 32px; width: 100%;"></div>
-        </div>
-      </div>
-    </div>  
-  `);
+FormLayout.prototype.formatGridCount = function(count) {
+  if (count < 10) {
+    return '0' + count;
+  }
+  return '' + count;
 };

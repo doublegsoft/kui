@@ -92,12 +92,6 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
   justify-content: center;
 }
 
-.position-relative {
-  top: 0 !important;
-  height: 16px;
-  width: 16px;
-}
-
 @media (min-width: 992px) {
   html:not([dir="rtl"]) .sidebar-lg-show .sidebar, html:not([dir="rtl"]) .sidebar-show .sidebar {
     width: 200px;
@@ -429,8 +423,8 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
 .col-form-label {
   font-size: 14px;
   white-space: nowrap;
-  margin-right: 5px;
 }
+
 .rowx{
   display: flex;
   flex-flow: wrap;

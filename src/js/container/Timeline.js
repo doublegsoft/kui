@@ -1,26 +1,40 @@
 
 function Timeline(opt) {
-  // 远程数据源配置
-  let remote = opt.remote || {};
-  let local = opt.local || {};
+  this.url = opt.url;
+  this.params = opt.params || {};
 
-  this.url = remote.url;
-  this.usecase = remote.usecase;
+  this.data = opt.data || [];
 
-  // 本地数据源配置
-  this.data = local.data || [];
-
-  this.model = opt.model;
-
-  // 标题显示函数
-  this.fnTitle = this.model.fnTitle;
-  // 内容显示函数
-  this.fnContent = this.model.fnContent;
-  // 判断此步骤是否结束
-  this.fnCompleted = this.model.fnCompleted;
+  this.fnTitle = opt.title;
+  this.fnSubtitle = opt.subtitle;
+  this.fnContent = opt.content;
 }
 
+Timeline.prototype.createTile = function(row) {
+  let ret = dom.element(`
+    <li class="timeline-item">
+      <div class="time"></div>
+      <div class="small text-muted"></div>
+      <p></p>
+    </li>
+  `);
+  let title = ret.children[0];
+  let subtitle = ret.children[1];
+  let content = ret.children[2];
+  if (this.fnTitle) {
+    title.innerHTML = this.fnTitle(row);
+  }
+  if (this.fnSubtitle) {
+    subtitle.innerHTML = this.fnSubtitle(row);
+  }
+  if (this.fnContent) {
+    content.innerHTML = this.fnContent(row);
+  }
+  return ret;
+};
+
 Timeline.prototype.render = function(container, params) {
+  let self = this;
   if (typeof container === 'string') {
     this.container = document.querySelector(container);
   } else {
@@ -28,180 +42,22 @@ Timeline.prototype.render = function(container, params) {
   }
   this.container.innerHTML = '';
 
-  let timeline = dom.create('div', 'timeline');
-  for (let i = 0; i < this.data.length; i++) {
-    let row = this.data[i];
-    let timelineItem = dom.element(`
-      <div class="timeline-item">
-        <div class="timeline-icon done">
-        </div>
-        <div class="timeline-content done">
-          <div class="timeline-title done">${this.fnTitle(row)}</div>
-          <div style="margin-top: 10px;">
-            ${this.fnContent(row)}
-          </div>
-        </div>
-      </div>
-    `);
-    timeline.appendChild(timelineItem);
-  }
-  this.container.appendChild(timeline);
-};
+  params = params || {};
+  let ul = dom.create('ul', 'timeline-ia');
+  this.container.appendChild(ul);
 
-Timeline.skeleton = function() {
-  return dom.element(`
-<div style="position: relative; width: 100%;">
-  <div
-      style="border-right: 2px solid rgb(170, 170, 170); height: 100%; left: 16px; position: absolute; top: 0px;"></div>
-  <ul style="list-style-type: none; margin: 0px; padding: 0px;">
-    <li style="margin-bottom: 8px;">
-      <div style="align-items: center; display: flex; margin-bottom: 4px;">
-        <div style="background-color: rgb(170, 170, 170); border-radius: 9999px; height: 32px; width: 32px;"></div>
-        <div style="flex: 1 1 0%; margin-left: 16px;">
-          <div style="width: 80%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-      <div style="margin-left: 48px;">
-        <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-    </li>
-    <li style="margin-bottom: 8px;">
-      <div style="align-items: center; display: flex; margin-bottom: 4px;">
-        <div style="background-color: rgb(170, 170, 170); border-radius: 9999px; height: 32px; width: 32px;"></div>
-        <div style="flex: 1 1 0%; margin-left: 16px;">
-          <div style="width: 60%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-      <div style="margin-left: 48px;">
-        <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-    </li>
-    <li style="margin-bottom: 8px;">
-      <div style="align-items: center; display: flex; margin-bottom: 4px;">
-        <div style="background-color: rgb(170, 170, 170); border-radius: 9999px; height: 32px; width: 32px;"></div>
-        <div style="flex: 1 1 0%; margin-left: 16px;">
-          <div style="width: 60%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-      <div style="margin-left: 48px;">
-        <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 2px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-    </li>
-  </ul>
-</div>
-  `);
-}
+  let requestParams = {};
+  utils.clone(this.params, requestParams);
+  utils.clone(params, requestParams);
+  xhr.post({
+    url: this.url,
+    params: requestParams,
+    success: function(resp) {
+      if (!resp.data) return;
+      let data = resp.data;
+      for (let i = 0; i < data.length; i++) {
+        ul.appendChild(self.createTile(data[i]));
+      }
+    }
+  });
+};

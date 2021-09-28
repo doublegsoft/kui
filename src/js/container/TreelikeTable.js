@@ -374,7 +374,7 @@ TreelikeTable.prototype.render = function (containerId, params) {
   this.container.appendChild(table);
   this.container.appendChild(this.pagination());
   let top = dom.top(this.container);
-  table.style.height = 'calc(100% - 20px - ' + top + 'px)';
+  // table.style.height = 'calc(100% - 20px - ' + top + 'px)';
 
   this.tbody = dom.find('tbody', this.container);
   this.tbodyPosition = this.tbody.getBoundingClientRect();
@@ -477,7 +477,7 @@ TreelikeTable.prototype.pagination = function () {
   // div.style.zIndex = 900;
   div.style.backgroundColor = 'white';
 
-  let ul = dom.create('ul', 'pagination', 'mb-0');
+  let ul = dom.create('ul', 'pagination', 'mb-0', 'mt-2');
   ul.style.marginLeft = 'auto';
   this.firstPage = dom.create('li', 'page-item');
   let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
