@@ -43,7 +43,7 @@ Timeline.prototype.render = function(container, params) {
   this.container.innerHTML = '';
 
   params = params || {};
-  let ul = dom.create('ul', 'timeline-ia');
+  let ul = dom.create('ul', 'timeline-simple');
   this.container.appendChild(ul);
 
   let requestParams = {};

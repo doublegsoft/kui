@@ -189,4 +189,56 @@
 .timeline .timeline-item .timeline-content.right:before .rejected {
   border-right: 7px solid #f86c6b;
 }
+
+.timeline-simple {
+  margin-top: 2rem;
+  border-radius: 12px;
+  position: relative;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline-simple .timeline-item {
+  list-style: none;
+  padding-bottom: 1.5rem;
+  border-left: 1px solid #D1D6E1;
+  position: relative;
+  padding-left: 20px;
+  margin-left: 10px;
+}
+
+.timeline-simple .timeline-item {
+  list-style: none;
+  padding-bottom: 1.5rem;
+  border-left: 1px solid #D1D6E1;
+  position: relative;
+  padding-left: 20px;
+  margin-left: 10px;
+}
+
+.timeline-simple .timeline-item::before {
+   content: '';
+   width: 34px;
+   height: 34px;
+   background: white;
+   border: 2px solid #ffffff;
+   border-radius: 50%;
+   position: absolute;
+   left: -19px;
+   top: -8px;
+ }
+
+.timeline-simple .timeline-item::after {
+  content: '';
+  width: 14px;
+  height: 14px;
+  background: white;
+  border: 2px solid #2A70FF;
+  border-radius: 50%;
+  position: absolute;
+  left: -7px;
+  top: 2px;
+}
+
+
  
