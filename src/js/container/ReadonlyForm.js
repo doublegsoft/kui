@@ -67,7 +67,7 @@ ReadonlyForm.prototype.root = function (data) {
       } else {
         _value = data[field.name] || field.emptyText;
       }
-      if (_value && (_value.length > 0 && _value != '' && _value != '-')) {
+      if (_value && _value != '' && _value != '-') {
         if (field.display) {
           _value = field.display(data[field.name]);
         } else {

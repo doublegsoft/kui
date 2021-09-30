@@ -432,6 +432,9 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
 .form-horizontal .col-md-4 .input-group,.form-horizontal .col-md-3 .input-group,.form-horizontal .col-md-6 .input-group{
   margin-right: 5%;
 }
+.select2-container{
+  min-width: 100%;
+}
 .btns-list {
   margin-bottom: 10px;
   display: flex;
@@ -2211,4 +2214,10 @@ border-top: 1px solid #f2f2f2;
 .img-show-item{
   margin-right: 10px;
   margin-bottom: 10px;
+}
+.h30{
+  height: 30px !important;
+}
+.plr10{
+  padding: 0 10px !important;
 }
