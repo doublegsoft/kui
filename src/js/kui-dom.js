@@ -793,6 +793,7 @@ dom.height = function(selector, offset, parent) {
     paddingBottom = 0;
   }
   element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
+  element.style.overflowY = 'auto';
 };
 
 dom.templatize = function(template, model) {
