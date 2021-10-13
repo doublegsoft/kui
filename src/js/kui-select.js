@@ -428,6 +428,11 @@ $.fn.cascadeselect = function(opts) {
             dom.model(link, model);
             if (cascadeIndex < levelCount - 1) {
               let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
+							//清空下一级的数据
+							next.setAttribute('data-cascade-value', '');
+							next.innerText='请选择';
+							dom.find('input', next.parentElement).value = '';
+
               let data = {};
               data[cascadeName] = model[cascadeFieldValue];
               let params = {};
@@ -448,7 +453,6 @@ $.fn.cascadeselect = function(opts) {
         }
       }
     });
-
     container.appendChild(popup);
   }
 
