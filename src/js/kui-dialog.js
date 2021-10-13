@@ -160,6 +160,45 @@ dialog.select = function(opts) {
   });
 };
 
+dialog.simplelist = async function(opt) {
+  let data = await xhr.promise({
+    url: opt.url,
+    params: opt.params || {},
+  });
+  let holder = dom.element(`
+    <div>
+      <ul class="list-group"></ul>
+    </div>
+  `);
+  let ul = dom.find('ul', holder);
+  for (let i = 0; i < data.length; i++) {
+    let item = data[i];
+    let li = dom.create('li', 'list-group-item', 'list-group-item-action');
+    dom.model(li, item);
+    li.innerText = item[opt.fields.text];
+    ul.appendChild(li);
+
+  }
+  layer.open({
+    type: 0,
+    closeBtn: 1,
+    btn: [],
+    shade: 0.5,
+    shadeClose: true,
+    title: '',
+    content: holder.innerHTML,
+    success: function(layro, index) {
+      layro.get(0).querySelectorAll('li').forEach((el, idx) => {
+        dom.bind(el, 'click', (ev) => {
+          layer.close(layer.index);
+          let model = dom.model(ev.target);
+          opt.onAccept(model);
+        });
+      })
+    }
+  });
+};
+
 dialog.html = function(opt) {
   layer.open({
     type: 0,

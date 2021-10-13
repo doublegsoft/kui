@@ -5,6 +5,7 @@
  * Time: 下午5:02
  * To change this template use File | Settings | File Templates.
  */
+UE.I18N = {};
 UE.I18N['zh-cn'] = {
     'labelMap':{
         'anchor':'锚点', 'undo':'撤销', 'redo':'重做', 'bold':'加粗', 'indent':'首行缩进', 'snapscreen':'截图',

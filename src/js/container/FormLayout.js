@@ -684,6 +684,48 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.innerHTML = field.value || '';
     if (this.readonly)
       input.setAttribute('disabled', true);
+  } else if (field.input == 'selecttext') {
+    let div = dom.create('div', 'full-width', 'position-relative');
+    div.style.height = '120px';
+    div.style.overflow = 'hidden';
+    input = dom.create('textarea', 'form-control', 'full-width');
+    field.style = field.style || '';
+    input.style = field.style;
+    input.style.height = '120px';
+    input.style.resize = 'none';
+
+    let corner = dom.create('div');
+    corner.style.position = 'absolute';
+    corner.style.bottom = '0';
+    corner.style.right = '0';
+    corner.style.background = 'transparent';
+    corner.style.borderWidth = '0px 0px 48px 48px';
+    corner.style.borderStyle = 'solid';
+    corner.style.borderColor = 'transparent transparent rgba(0, 0, 0, 0.3)';
+    input.setAttribute('name', field.name);
+    input.setAttribute('placeholder', '请输入...');
+    input.innerHTML = field.value || '';
+
+    div.appendChild(input);
+    div.appendChild(corner);
+
+    let select = dom.create('a', 'btn-link', 'font-11', 'text-light');
+    select.innerText = '选择';
+    select.style.position = 'absolute';
+    select.style.bottom = '-2px';
+    select.style.right = '-2px';
+    dom.bind(select, 'click', ev => {
+      if (field.onSelect) {
+        field.onSelect(input);
+      }
+    });
+    if (this.readonly)
+      input.setAttribute('disabled', true);
+    else
+      div.appendChild(select);
+
+    group.appendChild(div);
+    return {label: label, input: group};
   } else if (field.input == 'cascade') {
     input = dom.create('div', 'form-control');
     if (this.readonly)
