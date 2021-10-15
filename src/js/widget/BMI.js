@@ -5,6 +5,8 @@ function BMI(opts) {
 
   this.horizontalLines = [];
   this.verticalLines = [];
+
+  this.dpr = opts.dpr;
 }
 
 BMI._185_UPPER = [0.1,0.3,0.9,1.1,1.4,1.6,1.9,2.1,2.2,2.8,3.1,3.2,4,4.4,5,5.6,6,6.4,7,7.4,8,8.6,9,9.4,10,10.6,11,11.3,12,12.7,13.2,13.5,14.3,14.9,15.2,15.7,16.4,16.8,17.2,18];
@@ -13,27 +15,15 @@ BMI._185_LOWER = [0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.7,2,2.3,3,3.
 BMI.prototype.render = function(canvas, params) {
   this.context = canvas.getContext('2d');
 
-  this.height = canvas.clientHeight;
-  this.width = canvas.clientWidth;
-
-  let dpr = window.devicePixelRatio || 1;
-  let bsr = this.context.webkitBackingStorePixelRatio ||
-    this.context.mozBackingStorePixelRatio ||
-    this.context.msBackingStorePixelRatio ||
-    this.context.oBackingStorePixelRatio ||
-    this.context.backingStorePixelRatio || 1;
-  this.ratio = dpr / bsr;
-
-  // reset high dpi resolution
-  // canvas.width = this.width * this.ratio;
-  // canvas.height = this.height * this.ratio;
-  // canvas.style.width = (this.width * this.ratio) + 'px';
-  // canvas.style.height = (this.height * this.ratio) + 'px';
-
-  let rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  this.context.scale(dpr, dpr);
+  if (!this.dpr) {
+    this.dpr = window.devicePixelRatio || 1;
+    this.height = canvas.clientHeight;
+    this.width = canvas.clientWidth;
+    let rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * this.dpr;
+    canvas.height = rect.height * this.dpr;
+    this.context.scale(this.dpr, this.dpr);
+  }
 
   // this.context.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
   // 画网格线

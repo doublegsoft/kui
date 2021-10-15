@@ -65,7 +65,7 @@ FormLayout.prototype.render = function (containerId, params) {
 FormLayout.prototype.build = function(persisted) {
   let self = this;
   persisted = persisted || {};
-  let form = dom.create('div', 'col-md-12', 'form-horizontal','rowx');
+  let form = dom.create('div', 'col-md-12', 'form-horizontal');
   let columnCount = this.columnCount;
   let hiddenFields = [];
   let shownFields = [];
@@ -94,15 +94,28 @@ FormLayout.prototype.build = function(persisted) {
 
   let rows = [];
   let len = shownFields.length;
-  // for (let i = 0; i < shownFields.length; i++) {
-  //   let field = shownFields[i];
-  //   rows.push({
-  //     first: field,
-  //     second: (i + 1 < len) ? shownFields[i + 1] : null
-  //   });
-  //   if (columnCount == 2)
-  //     i += 1;
-  // }
+
+  let groups = [];
+  let group = {
+    title: '',
+    fields: []
+  };
+  for (let i = 0; i < shownFields.length; i++) {
+    let field = shownFields[i];
+
+    // 重新分组
+    if (field.input === 'title') {
+      groups.push(group);
+      group = {
+        title: field.title,
+        fields: []
+      };
+    } else {
+      group.fields.push(field);
+    }
+  }
+
+  if (group.fields.length !== 0) groups.push(group);
 
   // hidden fields
   for (let i = 0; i < hiddenFields.length; i++) {
@@ -114,31 +127,25 @@ FormLayout.prototype.build = function(persisted) {
     hidden.setAttribute('data-identifiable', field.identifiable || false);
     form.appendChild(hidden);
   }
-  // shown fields
-  for (let i = 0; i < shownFields.length; i++) {
-    let row = shownFields[i];
-		columnCount = columnCount || 2;
-		let _classname='col-md-'+parseInt(12/columnCount);
-		let itemInput=dom.create('div',_classname,'row-flex');
 
-    if (row.input == 'title') {
-      let el = dom.element('<div class="title-bordered col-md-12" style="margin: 10px -10px;"><strong>' + row.title + '</strong></div>')
+  for (let i = 0; i < groups.length; i++) {
+    let group = groups[i];
+    if (group.title) {
+      let el = dom.element('<div class="title-bordered" style="margin: 10px -10px;"><strong>' + group.title + '</strong></div>')
       form.appendChild(el);
-      continue;
     }
-    // let formGroup = dom.create('div', 'form-group', 'row');
-    let group = this.createInput(row, columnCount);
-    if (group.label) {
-			itemInput.appendChild(group.label);
+    let row = dom.create('div', 'row');
+    for (let j = 0; j < group.fields.length; j++) {
+      let field = group.fields[j];
+      let pair = this.createInput(field, columnCount);
+      if (pair.label != null) {
+        pair.label.classList.add('pl-3');
+        pair.input.classList.add('mb-2', 'pr-3');
+        row.appendChild(pair.label);
+      }
+      row.appendChild(pair.input);
     }
-		itemInput.appendChild(group.input);
-    // if (columnCount == 2 && row.second) {
-    //   group = this.createInput(row.second);
-    //   formGroup.appendChild(group.label);
-    //   formGroup.appendChild(group.input);
-    // }
-		// formGroup.appendChild(itemInput);
-    form.appendChild(itemInput);
+    form.appendChild(row);
   }
   // 必须放在这里，否者后续容器会找不到
   this.container.appendChild(form);
@@ -419,7 +426,7 @@ FormLayout.prototype.fetch = function (params) {
       }
     }
   });
-  this.params = params;
+  // this.params = params;
 };
 
 FormLayout.prototype.read = function (params) {

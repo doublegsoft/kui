@@ -7,44 +7,14 @@
 <link rel="shortcut icon" href="img/favicon.png">
 <title>KUI-BS4展示应用</title>
 <link href="/3rd/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-<link href="/3rd/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
-<link href="/3rd/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
-<link href="/3rd/jstree/themes/default/style.min.css" rel="stylesheet">
-<link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
-<link href="/3rd/bootstrap-datetimepicker/css/bootstrap-datetimepicker-standalone.css" rel="stylesheet">
-<link href="/3rd/bootstrap-fileinput/css/fileinput.min.css" rel="stylesheet">
-<link href="/3rd/bootstrap-lightbox/ekko-lightbox.css" rel="stylesheet">
-<link href="/3rd/trumbowyg/ui/trumbowyg.min.css" rel="stylesheet">
-<link href="/3rd/perfect-scrollbar/css/perfect-scrollbar.min.css" rel="stylesheet">
 
 <!-- Main styles for this application -->
 <link href="/src/css/coreui.css" rel="stylesheet">
 <link href="/src/css/kui-coreui.css" rel="stylesheet">
 <link href="/src/css/kui.css" rel="stylesheet">
-<link href="/src/css/kui-timeline.bak" rel="stylesheet">
-<link href="/src/css/kui-toc.css" rel="stylesheet">
-<link href="/src/css/kui-districtpicker.css" rel="stylesheet">
-<link href="/src/css/kui-alarm.css" rel="stylesheet">
-<link href="/src/css/kui-checks.css" rel="stylesheet">
 </head>
 
-<body id="body" class="app header-fixed sidebar-fixed aside-menu-fixed" style="overflow-y: hidden">
-  <header class="app-header navbar">
-    <a class="navbar-brand" href="#">
-      <img class="navbar-brand-full" src="/desktop/img/logo.png" width="145" height="45">
-    </a>
-    <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button"> 
-      <span class="navbar-toggler-icon"></span> 
-    </button>
-    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button"> 
-      <span class="navbar-toggler-icon"></span> 
-    </button>
-    
-    <button class="navbar-toggler aside-menu-toggler" onclick="toggleRightBar();"> 
-      <span class="navbar-toggler-icon"></span> 
-    </button>
-  </header>
-  
+<body id="body" class="app header-fixed sidebar-fixed aside-menu-fixed" style="overflow-x: hidden">
   <div class="app-body">
     <!-- side menu -->
     <div class="sidebar" style="margin-top: 55px;">
@@ -58,136 +28,13 @@
     </main>
     <aside class="aside-menu"></aside>
   </div>
-  <!--
-  <footer class="app-footer">
-    <div>
-      <a href="#">Good Manager</a>
-      <span>© 2018 Christian Gann.</span>
-    </div>
-    <div class="ml-auto">
-      <span>Powered by</span>
-      <a href="https://github.com/doublegsoft/kui-bs4">KUI</a>
-    </div>
-  </footer>
-  -->
-
 <script src="/3rd/jquery/jquery-3.2.1.min.js"></script> 
-<script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script> 
-<script src="/3rd/echarts/echarts-v3.min.js"></script>
-<script src="/3rd/d3/d3.min.js"></script> 
-<script src="/3rd/three/three.js"></script> 
-<script src="/3rd/three/loaders/OBJLoader.js"></script> 
-<script src="/3rd/three/controls/TrackballControls.js"></script> 
-<script src="/3rd/layer/layer.js"></script> 
-<script src="/3rd/jstree/jstree.min.js"></script> 
-<script src="/3rd/moment/moment.min.js"></script>
-<script src="/3rd/handlebars/handlebars-v4.0.11.js"></script> 
+<script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script>
 
-<script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-<script src="/3rd/bootstrap-datetimepicker/js/zh-cn.js"></script>  
-<script src="/3rd/bootstrap-fileinput/js/fileinput.min.js"></script> 
-<script src="/3rd/bootstrap-fileinput/js/locales/zh.js"></script> 
-<script src="/3rd/bootstrap-fileinput/themes/fa/theme.min.js"></script> 
-<script src="/3rd/bootstrap-lightbox/ekko-lightbox.min.js"></script> 
-
-<script src="/3rd/sparkline/jquery.sparkline.min.js"></script> 
-<script src="/3rd/trumbowyg/trumbowyg.min.js"></script> 
-<script src="/3rd/perfect-scrollbar/js/perfect-scrollbar.min.js"></script>
-<script src="/3rd/raphael/raphael.min.js"></script>
-<script src="/3rd/flowchart/flowchart.min.js"></script>
-
-<script src="/src/js/kui-mainframe.js"></script> 
-<script src="/src/js/kui-bootstrap.js"></script> 
-<script src="/src/js/kui-ajax.js"></script> 
-<script src="/src/js/kui-Alarm.js"></script>
-<script src="/src/js/kui-dialog.js"></script> 
-<script src="/src/js/kui-formdata.js"></script> 
-<script src="/src/js/kui-validation.js"></script>  
-<script src="/src/js/kui-calendar.js"></script> 
-<script src="/src/js/kui-districtpicker.data.js"></script> 
-<script src="/src/js/kui-districtpicker.js"></script> 
-<script src="/src/js/kui-frozencolumnstable.js"></script> 
-<script src="/src/js/kui-paginationtable.js"></script> 
-<script src="/src/js/kui-statisticstable.js"></script> 
-<script src="/src/js/kui-calendartable.dev.js"></script> 
-<script src="/src/js/kui-svg.js"></script> 
-<script src="/src/js/kui-searchbox.js"></script>
-<script src="/src/js/kui-Workflow.js"></script>
-<script src="/src/js/kui-utils.js"></script>
 <script src="/src/js/kui-xhr.js"></script>
 </body>
 </html>
 
-<script id="sidemenu-template" type="text/x-handlebars-template">
-  <ul class="nav">
-    {{#each items}}
-      {{#if entpt}}
-    <li class="nav-item">
-      <a class="nav-link" href="{{entpt}}">
-        <i class="{{ico}}"></i>{{funnm}}
-      </a>
-    </li>
-      {{else if ico}}
-      {{else if items}}
-    <li class="nav-item nav-dropdown"> 
-      <a class="nav-link nav-dropdown-toggle" href="#">
-        <i class="{{icon}}"></i>{{text}}
-      </a>
-      <ul class="nav-dropdown-items">
-        {{#each items}}
-        <li class="nav-item"> 
-          <a class="nav-link" href="{{url}}">
-            <i class="{{icon}}"></i>{{text}}
-          </a> 
-        </li>
-        {{/each}}
-      </ul>
-    </li>
-      {{else}}
-    <li class="nav-title">{{funnm}}</li>
-      {{/if}}
-    {{/each}}
-  </ul>
-</script>
-
 <script>
-  
-// load menus
-ajax.post('/mobile/data/menu.json', {}, function(resp) {
-  var items = [];
-  var categoryItem = {};
-  for (var i = 0; i < resp.data.length; i++) {
-    var item = resp.data[i];
-    var type = item.funtyp;
-  }
-  var source = document.getElementById('sidemenu-template').innerHTML;
-  var template = Handlebars.compile(source);
-  var html = template({items: resp.data});
-  $('#sidemenu').append(html);
-  
-  // 由于后加载数据，所以事件无法由bootstrap加载，只能自己加载
-  $('#sidemenu .nav-dropdown').on('click', function(e) {
-    var dropdown = $(e.target).parent();
-    if (dropdown.hasClass('open')) {
-      dropdown.removeClass('open');
-    } else {
-      dropdown.addClass('open');
-    }
-  });
-});
 
-$('.navbar-toggler').on('click', function(evt) {
-  var body = $('#body');
-  if (body.hasClass('sidebar-show')) {
-    body.removeClass('sidebar-show');
-  } else {
-    body.addClass('sidebar-show');
-  }
-});
-
-// 重算容器高度
-document.getElementById('container').style.height = (document.body.clientHeight - 56 - 25) + 'px';
-
-new PerfectScrollbar('.sidebar-nav');
-new PerfectScrollbar('.container-fluid');    
 </script>
