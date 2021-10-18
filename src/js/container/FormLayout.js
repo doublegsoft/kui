@@ -496,6 +496,8 @@ FormLayout.prototype.save = async function () {
               }
               if (self.saveOpt.callback)
                 self.saveOpt.callback(resp.data);
+              if (self.saveOpt.success)
+                self.saveOpt.success(resp.data);
               self.success("数据保存成功！");
             }
           });
