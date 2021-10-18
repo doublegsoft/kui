@@ -532,6 +532,7 @@ FormLayout.prototype.save = async function () {
         identifiables[i].value = resp.data[identifiables[i].name];
       }
       if (self.saveOpt.callback) self.saveOpt.callback(resp.data);
+      if (self.saveOpt.success) self.saveOpt.success(resp.data);
       self.success("数据保存成功！");
     }
   });
