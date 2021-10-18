@@ -302,9 +302,13 @@ TreelikeTable.prototype.addRow = function (trParent, trParentSibling, row, show)
     a.innerHTML = self.iconLeaf;
 
   td.append(a);
-  let strong = dom.create('strong');
-  strong.textContent = text;
-  td.append(strong);
+  if (this.columns[0].display) {
+    this.columns[0].display(row, td);
+  } else {
+    let strong = dom.create('strong');
+    strong.textContent = text;
+    td.append(strong);
+  }
   tr.append(td);
 
   for (let i = 1; i < this.columns.length; i++) {

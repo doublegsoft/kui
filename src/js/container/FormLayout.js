@@ -371,7 +371,8 @@ FormLayout.prototype.build = function(persisted) {
       this.container.appendChild(row);
     }
   }else{
-		this.container.appendChild(buttons);
+    // FIXME: WHY DO THIS?
+		// this.container.appendChild(buttons);
 	}
 
   this.originalPosition = this.container.getBoundingClientRect();
