@@ -429,6 +429,7 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
   display: flex;
   flex-flow: wrap;
 }
+
 .form-horizontal .col-md-4 .input-group,.form-horizontal .col-md-3 .input-group,.form-horizontal .col-md-6 .input-group{
   margin-right: 5%;
 }
