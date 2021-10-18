@@ -550,14 +550,30 @@ FormLayout.prototype.save = async function () {
  */
 FormLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
-  // columnCount = columnCount || 2;
-	// let _classname='col-md-'+parseInt(12/columnCount);
-	// let itemInput=dom.create('div',_classname);
+  field.columnCount = field.columnCount || 1;
+  columnCount = columnCount || 2;
+  let _required = field.required || false;
 
-	let _required=field.required || false;
-  let label = dom.create('div', 'col-form-label','col-md-3',(_required?'required':'norequired'));
+  let averageSpace = 24 / columnCount;
+  let labelGridCount = 0;
+  let inputGridCount = 0;
+  if (averageSpace === 24) {
+    labelGridCount = 6;
+    inputGridCount = 18;
+  } else if (averageSpace === 12) {
+    labelGridCount = 4;
+    inputGridCount = 8;
+  } else if (averageSpace === 8) {
+    labelGridCount = 3;
+    inputGridCount = 5;
+  } else if (averageSpace === 6) {
+    labelGridCount = 2;
+    inputGridCount = 4;
+  }
+  let label = dom.create('div', 'col-24-' + this.formatGridCount(labelGridCount),'col-form-label', (_required?'required':'norequired'));
   label.innerText = field.title + '：';
-  let group = dom.create('div', 'input-group','col-md-9');
+  inputGridCount += (labelGridCount + inputGridCount) * (field.columnCount - 1);
+  let group = dom.create('div', 'col-24-' + this.formatGridCount(inputGridCount), 'input-group');
 
   let input = null;
   if (field.input == 'code') {
@@ -1079,6 +1095,13 @@ FormLayout.prototype.input = function(nameAndValue) {
   if (!control) return;
   let newOption = new Option(text, value, false, true);
   control.append(newOption).trigger('change');
+};
+
+FormLayout.prototype.formatGridCount = function(count) {
+  if (count < 10) {
+    return '0' + count;
+  }
+  return '' + count;
 };
 
 FormLayout.skeleton = function() {
