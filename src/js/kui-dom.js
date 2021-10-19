@@ -365,44 +365,20 @@ dom.toggle = function (selector, resolve) {
  * @param resolve
  */
 dom.switch = function (selector, resolve) {
-  let elements = document.querySelectorAll(selector);
+  let container = dom.find(selector);
+  let accordion = container.getAttribute('data-switch');
+  let sources = accordion.split('+');
+  let elements = container.querySelectorAll(sources[0]);
   for (let i = 0; i < elements.length; i++) {
     let element = elements[i];
     element.addEventListener('click',  function() {
-      let accordion = element.getAttribute('data-switch');
-      let sources = accordion.split('+');
-
       // clear all
-      let elements = document.querySelectorAll(selector);
-      for (let i = 0; i < elements.length; i++) {
-        let element = elements[i];
-        for (let j = 0; j < sources.length; j++) {
-          let source = sources[j].trim();
-          if (source.indexOf('.') == 0) {
-            element.classList.remove(source.substring(1));
-          } else {
-            let child = element.querySelector(source);
-            if (child != null) {
-              child.classList.remove(source.substring(source.indexOf('.') + 1));
-            }
-          }
-        }
+      let siblings = container.querySelectorAll(sources[0]);
+      for (let i = 0; i < siblings.length; i++) {
+        siblings[i].classList.remove(sources[1].substring(1));
       }
-
-      // add to this
-      for (let j = 0; j < sources.length; j++) {
-        let source = sources[j].trim();
-        if (source.indexOf('.') == 0) {
-          this.classList.add(source.substring(1));
-        } else {
-          let child = this.querySelector(source.substring(0, source.indexOf('.')));
-          if (child != null) {
-            child.classList.add(source.substring(source.indexOf('.') + 1));
-          }
-        }
-      }
-
-      if (resolve) resolve(this);
+      element.classList.add(sources[1].substring(1));
+      if (resolve) resolve(element);
     });
   }
 };

@@ -3,17 +3,18 @@ function SurveyDesigner(opt) {
   this.title = opt.title || '问卷调查';
   this.questions = opt.questions || [];
   this.draggingTarget = null;
+  this.onDelete = opt.onDelete || function(model) {};
 }
 
 SurveyDesigner.QUESTION_MULTIPLE_CHOICE = 'multiple';
 SurveyDesigner.QUESTION_SINGLE_CHOICE = 'single';
 SurveyDesigner.QUESTION_SHORT_ANSWER = 'answer';
 
-SurveyDesigner.ATTRIBUTE_TITLE = 'data-survey-title';
-SurveyDesigner.ATTRIBUTE_TYPE = 'data-survey-type';
-SurveyDesigner.ATTRIBUTE_ORDINAL_POSITION = 'data-survey-ordinal-position';
-SurveyDesigner.ATTRIBUTE_VALUES = 'data-survey-values';
-SurveyDesigner.ATTRIBUTE_MODEL = 'data-survey-model';
+SurveyDesigner.ATTRIBUTE_TITLE = 'data-survey-question-title';
+SurveyDesigner.ATTRIBUTE_TYPE = 'data-survey-question-type';
+SurveyDesigner.ATTRIBUTE_ORDINAL_POSITION = 'data-survey-question-ordinal-position';
+SurveyDesigner.ATTRIBUTE_VALUES = 'data-survey-question-values';
+SurveyDesigner.ATTRIBUTE_MODEL = 'data-survey-question-model';
 
 SurveyDesigner.COLOR_SELECTED = '#3880ff';
 
@@ -87,24 +88,25 @@ SurveyDesigner.prototype.canvas = function() {
       </div>
     </div>
   `);
-  this.questions.forEach(question => {
-    this.renderQuestion(widgetSurveyCanvas, question);
-  });
   let widgetSurveyCanvas = dom.find('[widget-id=widgetSurveyCanvas]', ret);
   dom.height(widgetSurveyCanvas, 0, this.container);
+  this.questions.forEach((question, index) => {
+    question.ordinalPosition = (index + 1);
+    this.renderQuestion(widgetSurveyCanvas, question);
+  });
   widgetSurveyCanvas.addEventListener('dragover', (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
     let x = ev.clientX;
     let y = ev.clientY;
 
-    let existing = dom.find('[data-survey-clone=true]', widgetSurveyCanvas);
+    let existing = dom.find('[data-survey-question-clone=true]', widgetSurveyCanvas);
     if (existing != null) existing.remove();
     if (self.draggingTarget == null) return;
 
     let cloned = self.draggingTarget.cloneNode(true);
     cloned.style.opacity = '0.5';
-    cloned.setAttribute('data-survey-clone', 'true');
+    cloned.setAttribute('data-survey-question-clone', 'true');
     self.draggingTarget.remove();
 
     let inserted = false;
@@ -126,9 +128,9 @@ SurveyDesigner.prototype.canvas = function() {
     if (self.draggingTarget != null) {
       self.draggingTarget.remove();
       self.draggingTarget = null;
-      let dragged = dom.find('[data-survey-clone=true]', widgetSurveyCanvas);
+      let dragged = dom.find('[data-survey-question-clone=true]', widgetSurveyCanvas);
       dragged.style.opacity = '';
-      dragged.removeAttribute('data-survey-clone');
+      dragged.removeAttribute('data-survey-question-clone');
       dom.bind(dragged, 'click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -139,8 +141,7 @@ SurveyDesigner.prototype.canvas = function() {
     } else {
       this.renderQuestion(widgetSurveyCanvas, JSON.parse(data.model));
     }
-    let ifbody = self.ifPreview.contentDocument.body || self.ifPreview.contentWindow.document.body;
-    ifbody.innerHTML = widgetSurveyCanvas.innerHTML;
+    self.refresh();
   });
 
   dom.bind(widgetSurveyCanvas, 'click', ev => {
@@ -169,10 +170,18 @@ SurveyDesigner.prototype.preview = function(container) {
   let imgrect = img.getBoundingClientRect();
   this.ifPreview.style.left = (img.offsetLeft + 25) + 'px';
   this.ifPreview.style.top = (img.offsetTop + 82) + 'px';
-  this.ifPreview.src  = 'html/mobile/index.html';
+  this.ifPreview.src  = 'mobile.html';
+
+  this.ifPreview.onload = () => {
+    this.refresh();
+  };
+
 };
 
 SurveyDesigner.prototype.render = function(containerId, params) {
+  if (params.questions) {
+    this.questions = params.questions;
+  }
   this.container = dom.find(containerId);
   this.container.innerHTML = '';
   this.container.appendChild(this.palette());
@@ -187,12 +196,12 @@ SurveyDesigner.prototype.renderMultipleChoice = function(container, question) {
   let existing = true;
   if (!question.id) {
     question.ordinalPosition = container.children.length + 1;
-    question.id = 'multiple_' + new Date().getMilliseconds();
+    question.id = 'multiple_' + Date.now();
     existing = false;
   }
   question.model = JSON.stringify(question);
   let el = dom.templatize(`
-    <div data-survey-id="{{id}}" data-survey-model="{{model}}" class="followup-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
+    <div data-survey-question-id="{{id}}" data-survey-question-model="{{model}}" class="survey-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
       <div style="margin-bottom: 6px">
         <strong>{{ordinalPosition}}. {{title}}：</strong>
       </div>
@@ -207,7 +216,7 @@ SurveyDesigner.prototype.renderMultipleChoice = function(container, question) {
     this.clearAndSelect(el);
   });
   if (existing === true) {
-    let old = dom.find('[data-survey-id=' + question.id + ']');
+    let old = dom.find('[data-survey-question-id=' + question.id + ']');
     container.replaceChild(el, old);
   } else {
     container.appendChild(el);
@@ -226,12 +235,17 @@ SurveyDesigner.prototype.renderSingleChoice = function(container, question) {
   }
   question.model = JSON.stringify(question);
   let el = dom.templatize(`
-    <div data-survey-id="{{id}}" data-survey-model="{{model}}" class="followup-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
+    <div data-survey-question-id="{{id}}" data-survey-question-model="{{model}}" 
+         data-switch=".survey-answer+.checked"
+         class="survey-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
       <div style="margin-bottom: 6px">
         <strong>{{ordinalPosition}}. {{title}}：</strong>
       </div>
       {{#each values}}
-      <div><input type="radio" name="{{../id}}" style="margin-right: 5px;">{{this}}</div>
+      <div class="survey-answer" data-survey-question-name="{{../id}}">
+        <i class="far fa-check-circle"></i>
+        <label>{{this}}</label>
+      </div>
       {{/each}}
     </div>
   `, question);
@@ -241,8 +255,11 @@ SurveyDesigner.prototype.renderSingleChoice = function(container, question) {
     this.clearAndSelect(el);
   });
   if (existing === true) {
-    let old = dom.find('[data-survey-id=' + question.id + ']');
-    container.replaceChild(el, old);
+    let old = dom.find('[data-survey-question-id=' + question.id + ']');
+    if (old)
+      container.replaceChild(el, old);
+    else
+      container.appendChild(el);
   } else {
     container.appendChild(el);
   }
@@ -260,7 +277,7 @@ SurveyDesigner.prototype.renderShortAnswer = function(container, question) {
   }
   question.model = JSON.stringify(question);
   let el = dom.templatize(`
-    <div data-survey-id="{{id}}" data-survey-model="{{model}}" class="followup-question"  style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
+    <div data-survey-question-id="{{id}}" data-survey-question-model="{{model}}" class="survey-question"  style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
       <div style="margin-bottom: 6px">
         <strong>{{ordinalPosition}}. {{title}}：</strong>
       </div>
@@ -275,7 +292,7 @@ SurveyDesigner.prototype.renderShortAnswer = function(container, question) {
     this.clearAndSelect(el);
   });
   if (existing === true) {
-    let old = dom.find('[data-survey-id=' + question.id + ']');
+    let old = dom.find('[data-survey-question-id=' + question.id + ']');
     container.replaceChild(el, old);
   } else {
     container.appendChild(el);
@@ -297,7 +314,7 @@ SurveyDesigner.prototype.clearAndSelect = function(element, clear) {
   element.style.borderColor = SurveyDesigner.COLOR_SELECTED;
 
   let operations = dom.element(`
-    <div widget-id="operations" style="position: relative; float: right; right: -6px; bottom: 24px;">
+    <div widget-id="operations" style="position: relative; float: right; right: -6px; bottom: 25px;">
       <a widget-id="buttonMove" class="btn text-light" style="cursor: move;">
         <i class="fas fa-arrows-alt"></i>
       </a>
@@ -313,9 +330,9 @@ SurveyDesigner.prototype.clearAndSelect = function(element, clear) {
 
   let buttonMove = dom.find('a[widget-id=buttonMove', operations);
   dom.bind(buttonMove, 'mousedown', ev => {
-    let root = dom.ancestor(ev.target, 'div', 'followup-question');
+    let root = dom.ancestor(ev.target, 'div', 'survey-question');
     dnd.setDraggable(root, {
-      model: root.getAttribute('data-survey-model')
+      model: root.getAttribute('data-survey-question-model')
     }, function(x, y, target) {
       self.draggingTarget = target; // target.cloneNode(true);
       // self.draggingTarget.style.opacity = '0.50';
@@ -333,9 +350,8 @@ SurveyDesigner.prototype.clearAndSelect = function(element, clear) {
 
   let buttonDelete = dom.find('a[widget-id=buttonDelete]', operations);
   dom.bind(buttonDelete, 'click', ev => {
-    let parent = element.parentElement;
-    element.remove();
-    this.resort(parent);
+    let model = JSON.parse(element.getAttribute('data-survey-question-model'));
+    this.onDelete(model, element)
   });
   element.appendChild(operations);
 };
@@ -346,25 +362,10 @@ SurveyDesigner.prototype.resort = function(container) {
     let strong = dom.find('strong', child);
     let text = strong.innerText;
     strong.innerText = text.replace(/\d+\./i, i + 1 + '.');
+    let model = JSON.parse(child.getAttribute('data-survey-question-model'));
+    model.ordinalPosition = i + 1;
+    child.setAttribute('data-survey-question-model', JSON.stringify(model));
   }
-};
-
-SurveyDesigner.prototype.renderWhenDragging = function(container) {
-  for (let i = 0; i < container.children.length; i++) {
-    let child = container.children[i];
-    let strong = dom.find('strong', child);
-    let text = strong.innerText;
-    strong.innerText = text.replace(/\d+\./i, i + 1 + '.');
-  }
-};
-
-/**
- *
- * @param question
- */
-SurveyDesigner.prototype.addAndRenderQuestion = function(question) {
-  this.questions.push(question);
-  this.renderQuestion(question);
 };
 
 SurveyDesigner.prototype.renderQuestion = function(container, question) {
@@ -481,8 +482,13 @@ SurveyDesigner.prototype.edit = function(question) {
         }
       });
       self.renderQuestion(dom.find("[widget-id=widgetSurveyCanvas]"), question);
-      let ifbody = self.ifPreview.contentDocument.body || self.ifPreview.contentWindow.document.body;
-      ifbody.innerHTML = dom.find("[widget-id=widgetSurveyCanvas]").innerHTML;
+      self.refresh();
     }
   });
+};
+
+SurveyDesigner.prototype.refresh = function() {
+  let ifbody = this.ifPreview.contentDocument.body || this.ifPreview.contentWindow.document.body;
+  ifbody.innerHTML = dom.find("[widget-id=widgetSurveyCanvas]").innerHTML;
+  this.ifPreview.contentWindow.reload();
 };

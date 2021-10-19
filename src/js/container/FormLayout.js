@@ -593,6 +593,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     }
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
+    input.setAttribute('autocomplete', 'off');
     input.setAttribute('name', field.name);
   } else if (field.input == 'select') {
     input = dom.create('select', 'form-control');
