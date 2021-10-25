@@ -12,9 +12,11 @@ utils.append = function (container, html, empty) {
   let fragment = range.createContextualFragment(html);
   if (empty)
     container.innerHTML = '';
-  container.appendChild(fragmentContainer)
+  container.appendChild(fragmentContainer);
   fragmentContainer.appendChild(fragment);
   let page = dom.find('[id^=page]', fragmentContainer);
+  if (page) fragmentContainer.setAttribute('page-id', page.id);
+  else fragmentContainer.setAttribute('page-id', 'page.not.in.database');
   return {
     id: page ?  page.id : '',
     container: fragmentContainer,

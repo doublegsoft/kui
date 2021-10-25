@@ -106,6 +106,8 @@ function PaginationTable(opts) {
   this.total = 0;
   this.table = null;
   this.result = null;
+  // 是否显示顶端的查询
+  this.showTop = opts.showTop !== false;
   for (let i = 0; i < max; ++i) {
     this.columnMatrix.push([]);
   }
@@ -478,6 +480,7 @@ PaginationTable.prototype.pagination = function () {
 };
 //表格过滤搜索
 PaginationTable.prototype.tableTopActions = function () {
+  if (this.showTop === false) return;
   let self = this;
   let div = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
 
@@ -965,7 +968,7 @@ PaginationTable.prototype.fill = function (result) {
       tbody.append('' +
         '<tr class="no-hover">' +
         '  <td colspan="100" class="text-center pt-4">' +
-        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
+        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 25%;">' +
         '    <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');
@@ -973,7 +976,7 @@ PaginationTable.prototype.fill = function (result) {
       this.table.append('' +
         '<tr class="no-hover">' +
         '  <td colspan="100" class="text-center pt-4">' +
-        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
+        '    <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 25%;">' +
         '    <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
         '  </td>' +
         '</tr>');

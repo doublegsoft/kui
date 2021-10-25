@@ -170,18 +170,19 @@ xhr.promise = function(xhrOpt, error) {
 };
 
 xhr.download = function(xhrOpt) {
-  xhr.open('POST', xhrOpt.url, true);
-  xhr.responseType = 'arraybuffer';
-  xhr.onload = function () {
+  let req  = new XMLHttpRequest();
+  req.open('POST', xhrOpt.url, true);
+  req.responseType = 'arraybuffer';
+  req.onload = function () {
     if (this.status === 200) {
       let filename = "";
-      let disposition = xhr.getResponseHeader('Content-Disposition');
+      let disposition = req.getResponseHeader('Content-Disposition');
       if (disposition && disposition.indexOf('attachment') !== -1) {
         let filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
         let matches = filenameRegex.exec(disposition);
         if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
       }
-      let type = xhr.getResponseHeader('Content-Type');
+      let type = req.getResponseHeader('Content-Type');
 
       let blob = new Blob([this.response], { type: type });
       if (typeof window.navigator.msSaveBlob !== 'undefined') {
@@ -191,28 +192,32 @@ xhr.download = function(xhrOpt) {
         var URL = window.URL || window.webkitURL;
         var downloadUrl = URL.createObjectURL(blob);
 
-        if (filename) {
-          // use HTML5 a[download] attribute to specify filename
-          var a = document.createElement("a");
-          // safari doesn't support this yet
-          if (typeof a.download === 'undefined') {
-            window.location = downloadUrl;
-          } else {
-            a.href = downloadUrl;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-          }
-        } else {
+        // use HTML5 a[download] attribute to specify filename
+        var a = document.createElement("a");
+        // safari doesn't support this yet
+        if (typeof a.download === 'undefined') {
           window.location = downloadUrl;
+        } else {
+          a.href = downloadUrl;
+          a.download = xhrOpt.filename || '下载的文件';
+          document.body.appendChild(a);
+          a.click();
         }
+        // if (filename) {
+        //
+        // } else {
+        //   window.location = downloadUrl;
+        // }
 
         setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100); // cleanup
       }
     }
   };
-  xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-  xhr.send(xhrOpt.params);
+  req.setRequestHeader('Content-type', 'application/json');
+  if (typeof APPTOKEN !== 'undefined') {
+    req.setRequestHeader("apptoken", APPTOKEN);
+  }
+  req.send(JSON.stringify(xhrOpt.params || {}));
 };
 
 /**

@@ -123,7 +123,7 @@ PaginationGrid.prototype.request = function (params) {
         let tbody = self.rootBody;
         tbody.innerHTML = ('' +
           '<div class="text-center pt-4 full-width">' +
-          '  <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 40%;">' +
+          '  <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 25%;">' +
           '  <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
           '</div>');
         return;
@@ -327,6 +327,7 @@ PaginationGrid.prototype.pagination = function () {
   let bottom = dom.create('div', 'full-width', 'd-flex');
   // bottom.style.position = 'sticky';
   bottom.style.top = '0';
+  bottom.style.overflow = 'hidden';
   bottom.style.zIndex = 900;
   // div.style.backgroundColor = 'white';
 

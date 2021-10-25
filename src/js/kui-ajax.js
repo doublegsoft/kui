@@ -205,7 +205,7 @@ ajax.view = function(opt) {
         customWindowId: page
       },
       success: function (resp) {
-        let script = resp.data.script
+        let script = resp.data.script;
         let fragment = null;
         if (container) {
           fragment = utils.append(container, script, empty);
@@ -381,7 +381,6 @@ ajax.append = function(opts) {
     }
     tabsMain.insertBefore(tab, tabsMain.children[0]);
 
-
     // render text and style
     let span = dom.find('span', tab);
     let a = dom.find('a', tab);
@@ -443,13 +442,14 @@ ajax.append = function(opts) {
         customWindowId: customWindowId
       },
       success: function (resp) {
-        let script = resp.data.script
+        let script = resp.data.script;
         let fragment = null;
-        if (container) {
-          let range = document.createRange();
-          fragment = range.createContextualFragment(script);
-          container.appendChild(fragment);
-        }
+        utils.append(container, script, false);
+        // if (container) {
+        //   let range = document.createRange();
+        //   fragment = range.createContextualFragment(script);
+        //   container.appendChild(fragment);
+        // }
         for (let i = container.children.length - 1; i >= 0; i--) {
           let div = container.children[i];
           if (div.tagName == 'DIV') {
@@ -489,7 +489,7 @@ ajax.shade = function(opts) {
       success: function (resp) {
         let fragment = utils.append(document.body, resp);
         if (callback)
-          callback(fragment);
+          callback(opts.title || '', fragment);
       }
     });
   } else {
@@ -502,7 +502,7 @@ ajax.shade = function(opts) {
         let script = resp.data.script;
         let fragment = utils.append(document.body, script);
         if (callback)
-          callback(fragment);
+          callback(opts.title || '', fragment);
       }
     });
   }
@@ -519,29 +519,16 @@ ajax.stack = function(opt) {
     schedule.stop();
 
   let pageId = opt.pageId;
-  let containerId = opt.containerId;
+  let params = opt.params;
+  let container = dom.find(opt.containerId);
 
-  let container = null;
-  if (typeof containerId === 'string') {
-    container = document.getElementById(containerId.trim());
-    if (container == null) {
-      container = document.querySelector(containerId.trim());
-    }
-  } else {
-    container = containerId;
-  }
-
-  if (typeof data === 'undefined')
-    data = {};
-  if (window.parameters) {
-    for (let k in data) {
-      window.parameters[k] = data[k];
-    }
-  }
+  if (typeof params === 'undefined')
+    params = {};
 
   let existing = false;
   for (let i = 0; i < container.children.length; i++) {
     let page = container.children[i];
+    if (page.tagName != 'DIV' || page.getAttribute('data-stack-back') == 'true') continue;
     page.classList.remove('show');
     page.classList.add('hide');
     if (page.id == pageId) {
@@ -554,7 +541,42 @@ ajax.stack = function(opt) {
     opt.empty = false;
     ajax.view(opt);
   }
+  // floating back button
+  let back = dom.find('div[data-stack-back]', container);
+  if (back != null) return;
+  back = dom.element(`
+    <div data-stack-back="true" class="pointer">
+      <i class="fas fa-angle-left font-32" style="margin-top: 12px;"></i>
+    </div>
+  `);
+  back.style.position = 'fixed';
+  back.style.width = '60px';
+  back.style.height = '60px';
+  back.style.bottom = '40px';
+  back.style.right = '40px';
+  back.style.backgroundColor = '#0C9';
+  back.style.color = '#fff';
+  back.style.borderRadius = '50px';
+  back.style.textAlign = 'center';
+  back.style.boxShadow = '2px 2px 3px #999';
+  back.style.zIndex = '99';
+  dom.bind(back, 'click', ev => {
+    back.remove();
+    ajax.unstack({
+      containerId: container,
+    });
+  });
+  container.appendChild(back);
 };
+
+ajax.unstack = function(opt) {
+  let container = dom.find(opt.containerId);
+  let stackedPage = container.querySelector('div[page-id]');
+  stackedPage.remove();
+  let hiddenPage = container.querySelector('.hide');
+  hiddenPage.classList.remove('hide');
+  hiddenPage.classList.add('show');
+}
 
 /**
  * Uses handlebars template engine to render a template block after 
@@ -832,8 +854,8 @@ ajax.sidebar = function(opt) {
                 <i class="fas fa-times"></i>
               </button>
             </div>
-            <div class="modal-body" style="overflow-y: auto"></div>
-            <div style="position: absolute; bottom: 8px; left: 0; width: 100%; border-top: 1px solid lightgrey;display:none;">
+            <div class="modal-body" style="overflow-y: auto;"></div>
+            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>
@@ -842,9 +864,10 @@ ajax.sidebar = function(opt) {
     </div>
   `);
   if (opt.showBottom === true) {
+    dom.find('.modal-body', sidebar).style.marginBottom = '36px';
     dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
   }
-  sidebar.height = document.body.clientHeight;
+  dom.height(sidebar, 0, document.body);
   sidebar.addEventListener('click', (evt) => {
     let widgetId = evt.target.getAttribute('widget-id');
     if (widgetId !== 'right-bar') return;
@@ -889,7 +912,7 @@ ajax.sidebar = function(opt) {
             opt.close();
         });
         let fragment = utils.append(dom.find('.modal-body', sidebar), resp);
-        if (success) success(fragment);
+        if (success) success(opt.title || '', fragment);
         setTimeout(function () {
           sidebar.children[0].classList.remove('out');
           sidebar.children[0].classList.add('in');
@@ -915,7 +938,7 @@ ajax.sidebar = function(opt) {
           if (opt.close)
             opt.close();
         });
-        if (success) success(fragment);
+        if (success) success(opt.title || '', fragment);
         setTimeout(function () {
           sidebar.children[0].classList.remove('out');
           sidebar.children[0].classList.add('in');

@@ -11,11 +11,6 @@ function ReadonlyForm(opts) {
   // 显示字段
   this.fields = opts.fields;
   this.convert = opts.convert;
-  if (opts.url) {
-    this.reload(opts.params)
-  } else {
-    this.render();
-  }
 }
 
 /**
@@ -55,9 +50,25 @@ ReadonlyForm.prototype.root = function (data) {
     field.emptyText = field.emptyText || '-';
     field.columnCount = field.columnCount || 1;
     let colnum = parseInt(12 / Number(self.columnCount));
-    let col = dom.element("<div class='col-md-" + (colnum  * field.columnCount) + " row'></div>");
-    let caption = dom.element('<strong style="line-height: 32px; min-width: 100px;"></strong>');
-    let value = dom.element('<span style="line-height: 32px;"></span>');
+
+    let averageSpace = 24 / self.columnCount;
+    let labelGridCount = 0;
+    let inputGridCount = 0;
+    if (averageSpace === 24) {
+      labelGridCount = 6;
+      inputGridCount = 18;
+    } else if (averageSpace === 12) {
+      labelGridCount = 4;
+      inputGridCount = 8;
+    } else if (averageSpace === 8) {
+      labelGridCount = 3;
+      inputGridCount = 5;
+    } else if (averageSpace === 6) {
+      labelGridCount = 2;
+      inputGridCount = 4;
+    }
+    let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px;"></div>');
+    let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) +  '" style="line-height: 32px;"></strong>');
 
     if (field.title) {
       caption.innerText = field.title + '：';
@@ -93,9 +104,8 @@ ReadonlyForm.prototype.root = function (data) {
       }
       value.innerText = _value;
     }
-    col.appendChild(caption);
-    col.appendChild(value);
-    root.appendChild(col);
+    root.appendChild(caption);
+    root.appendChild(value);
   }
   this.container.appendChild(root);
 };
@@ -104,8 +114,15 @@ ReadonlyForm.prototype.reload = function (params) {
   this.fetch(params);
 };
 
-ReadonlyForm.prototype.render = function (containerId) {
+ReadonlyForm.prototype.render = function (containerId, params) {
   if (typeof containerId !== 'undefined')
     this.container = dom.find(containerId);
-  this.fetch({});
+  this.fetch(params);
+};
+
+ReadonlyForm.prototype.formatGridCount = function(count) {
+  if (count < 10) {
+    return '0' + count;
+  }
+  return '' + count;
 };

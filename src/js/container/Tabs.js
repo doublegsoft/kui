@@ -29,7 +29,7 @@ Tabs.prototype.render = function() {
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
     let nav = dom.templatize(`
-      <div class="nav-item font-weight-bold mr-0" style="{{style}}"
+      <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"
            data-tab-id="{{{id}}}" >{{{text}}}</div>
     `, tab);
@@ -46,9 +46,10 @@ Tabs.prototype.render = function() {
         let _nav = self.navigator.children[i];
         _nav.classList.remove(self.tabActiveClass);
       }
-      self.content.children.forEach((el, idx) => {
-        el.style.display = 'none';
-      });
+
+      for (let i = 0; i < self.content.children.length; i++) {
+        self.content.children[i].style.display = 'none';
+      }
 
       // 激活现在点击的页签及内容
       nav.classList.add(self.tabActiveClass);
