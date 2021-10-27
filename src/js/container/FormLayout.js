@@ -756,15 +756,15 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
     input.setAttribute('data-avatar-name', field.name);
-    group.classList.remove('col-md-4', 'col-md-9');
-    group.classList.add('col-md-12');
+    // group.classList.remove('col-md-4', 'col-md-9');
+    group.classList.add('col-24-24');
     group.appendChild(input);
     return {label: null, input: group};
   } else if (field.input == 'logo') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-logo-name', field.name);
-    group.classList.remove('col-md-4', 'col-md-9');
-    group.classList.add('col-md-12');
+    // sgroup.classList.remove('col-md-4', 'col-md-9');
+    group.classList.add('col-24-24');
     group.appendChild(input);
     return {label: null, input: group};
   } else if (field.input == 'datetime') {
@@ -779,6 +779,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     dateInput.disabled = this.readonly || field.readonly || false;
     dateInput.setAttribute('name', field.name + '_date');
     dateInput.setAttribute('placeholder', '请选择...');
+    dateInput.setAttribute('autocomplete', 'off');
     let timeIcon = dom.element(`
       <div class="input-group-prepend">
         <span class="input-group-text">
@@ -789,7 +790,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     let timeInput = dom.create('input', 'form-control');
     timeInput.disabled = this.readonly || field.readonly || false;
     timeInput.setAttribute('name', field.name + '_time');
-
+    timeInput.setAttribute('autocomplete', 'off');
     group.appendChild(dateIcon);
     group.appendChild(dateInput);
     group.appendChild(timeIcon);

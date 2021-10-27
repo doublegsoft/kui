@@ -222,3 +222,15 @@ dialog.html = function(opt) {
     }
   });
 };
+
+dialog.iframe = function(opt) {
+  layer.open({
+    title: opt.title,
+    type: 2,
+    area: [opt.width, opt.height],
+    // fixed: false, //不固定
+    // maxmin: true,
+    content: opt.url,
+    success: opt.success || function(layro, index) {},
+  });
+}

@@ -1697,10 +1697,11 @@ a {
 div.search {
   margin-bottom: auto;
   margin-top: auto;
-  height: 40px;
+  height: 32px;
   background-color: #353b48;
   border-radius: 9999px;
   padding: 6px;
+  /*width: 100%;*/
 }
 
 div.search > input {
@@ -1708,22 +1709,21 @@ div.search > input {
   border: 0;
   outline: 0;
   background: none;
-  width: 0;
   caret-color:transparent;
-  line-height: 24px;
-  transition: width 0.4s linear;
+  line-height: 20px;
+  /*transition: width 0.4s linear;*/
 }
 
 div.search:hover > input {
-  padding: 0 10px;
-  width: 450px;
-  caret-color: white;
-  transition: width 0.4s linear;
+  /*padding: 0 10px;*/
+  /*width: 450px;*/
+  /*caret-color: white;*/
+  /*transition: width 0.4s linear;*/
 }
 
 div.search > a {
-  height: 24px;
-  width: 24px;
+  height: 18px;
+  width: 18px;
   float: right;
   display: flex;
   justify-content: center;
@@ -2599,4 +2599,9 @@ div.number-danger {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
   max-width: 100%;
+}
+
+a.disabled {
+  pointer-events: none;
+  opacity: 0.25;
 }

@@ -11,6 +11,10 @@ function ReadonlyForm(opts) {
   // 显示字段
   this.fields = opts.fields;
   this.convert = opts.convert;
+
+  if (this.container) {
+    this.render(this.container, this.params);
+  }
 }
 
 /**
