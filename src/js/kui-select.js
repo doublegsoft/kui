@@ -485,7 +485,19 @@ $.fn.cascadeselect = function(opts) {
 
     link.addEventListener('click', function() {
       if (opts.readonly) return;
-      displayPopup(this, levels[i].params);
+      let params = {};
+      if (i - 1 >= 0) {
+        let prev = dom.find('a', link.parentElement.previousElementSibling.previousElementSibling);
+        let selected = prev.getAttribute('data-cascade-value');
+        console.log(selected);
+        if (selected == null || selected == '') return;
+        params[prev.getAttribute('data-cascade-name')] = selected;
+        // for (let key in levels[i].params) {
+        //   let tpl = Handlebars.compile(levels[i].params[key]);
+        //   // params[key] = tpl(data);
+        // }
+      }
+      displayPopup(this, params);
     });
 
     if (i != levels.length - 1) {

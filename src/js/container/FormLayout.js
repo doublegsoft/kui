@@ -801,6 +801,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('autocomplete', 'off');
   }
   if (input != null) {
     group.appendChild(input);

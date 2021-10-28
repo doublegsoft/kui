@@ -838,7 +838,7 @@ ajax.upload = function(opts) {
 
 ajax.sidebar = function(opt) {
   let container = dom.find(opt.containerId);
-  let success = opt.success || function() {};
+  let success = opt.success || function(title, fragment) {};
   // only one instance
   let sidebar = dom.find('[widget-id=right-bar]'/*, container */);
   let allowClose = opt.allowClose || false;
