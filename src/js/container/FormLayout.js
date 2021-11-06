@@ -534,6 +534,16 @@ FormLayout.prototype.save = async function () {
       if (self.saveOpt.callback) self.saveOpt.callback(resp.data);
       if (self.saveOpt.success) self.saveOpt.success(resp.data);
       self.success("数据保存成功！");
+      // 默认自动关闭
+      if (self.saveOpt.autoClose !== false) {
+        let rightbar = dom.find('div[widget-id=right-bar]');
+        if (rightbar != null) {
+          rightbar.children[0].classList.add('out');
+          setTimeout(function () {
+            rightbar.remove();
+          }, 1000);
+        }
+      }
     }
   });
 };

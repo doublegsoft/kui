@@ -9,11 +9,18 @@ dnd.setDraggable = function (selector, payload, callback) {
     element = selector;
   }
   element.setAttribute("draggable", "true");
-  element.addEventListener("dragstart", function(event) {
+  element.addEventListener("dragstart", function(ev) {
+    let li = dom.ancestor(ev.target, 'li');
+    let dragImage = li.getAttribute('widget-drag-image');
     let x = event.layerX;
     let y = event.layerY;
     for (let key in payload)
-      event.dataTransfer.setData(key, payload[key]);
+      ev.dataTransfer.setData(key, payload[key]);
+    if (dragImage && dragImage != '') {
+      let image = new Image();
+      image.src = dragImage;
+      ev.dataTransfer.setDragImage(image, x, y);
+    }
     let target = event.target;
     if (callback) {
       callback(x, y, target);

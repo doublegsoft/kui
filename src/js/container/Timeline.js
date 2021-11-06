@@ -5,9 +5,9 @@ function Timeline(opt) {
 
   this.data = opt.data || [];
 
-  this.fnTitle = opt.title;
-  this.fnSubtitle = opt.subtitle;
-  this.fnContent = opt.content;
+  this.fnTitle = opt.fnTitle;
+  this.fnSubtitle = opt.fnSubtitle;
+  this.fnContent = opt.fnContent;
 }
 
 Timeline.prototype.createTile = function(row) {

@@ -49,6 +49,18 @@ main {
   overflow-y: hidden;
 }
 
+.pull-right {
+  float: right!important;
+}
+
+.list-group {
+  border-radius: unset!important;
+}
+
+.list-group-item {
+  border-radius: unset!important;
+}
+
 [contenteditable]:focus {
   outline: 1px solid #0d86ff;
 }
@@ -145,6 +157,12 @@ main {
   border-radius: 9999px;
 }
 
+.circle-128 {
+  border-radius: 50%;
+  height: 128px!important;
+  width: 128px!important;
+}
+
 .circle-64 {
   border-radius: 50%;
   height: 64px!important;
@@ -201,6 +219,61 @@ main {
 
 .circle-18 {
   border-radius: 50%;
+  height: 18px;
+  width: 18px;
+}
+
+.square-128 {
+  height: 128px!important;
+  width: 128px!important;
+}
+
+.square-64 {
+  height: 64px!important;
+  width: 64px!important;
+}
+
+.square-48 {
+  height: 48px!important;
+  width: 48px!important;
+}
+
+.square-40 {
+  height: 40px!important;
+  width: 40px!important;
+}
+
+.square-36 {
+  height: 36px!important;
+  width: 36px!important;
+}
+
+.square-32 {
+  height: 32px!important;
+  width: 32px!important;
+}
+
+.square-28 {
+  height: 28px;
+  width: 28px;
+}
+
+.square-24 {
+  height: 24px;
+  width: 24px;
+}
+
+.square-22 {
+  height: 22px;
+  width: 22px;
+}
+
+.square-20 {
+  height: 20px;
+  width: 20px;
+}
+
+.square-18 {
   height: 18px;
   width: 18px;
 }
@@ -823,7 +896,7 @@ input.query-check {
 .message {
   position: relative;
   padding: 1rem 1rem 1rem 2rem;
-  cursor: pointer;
+  /*cursor: pointer;*/
   border-bottom: 1px solid #c8ced3;
 }
 
@@ -1064,6 +1137,10 @@ h6, .h6 {
 
 .font-20 {
   font-size: 20px !important;
+}
+
+.font-24 {
+  font-size: 24px !important;
 }
 
 .font-32 {

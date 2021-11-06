@@ -132,7 +132,7 @@
 <script src="/3rd/codemirror/codemirror.js"></script>
 <script src="/3rd/codemirror/mode/xml/xml.js"></script>
 
-  <script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
+<script src="/3rd/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="/3rd/bootstrap-datetimepicker/js/zh-cn.js"></script>  
 <script src="/3rd/bootstrap-fileinput/js/fileinput.min.js"></script> 
 <script src="/3rd/bootstrap-fileinput/js/locales/zh.js"></script> 
@@ -242,6 +242,8 @@
 <script src="/src/js/editor/ReportElements.js"></script>
 <script src="/src/js/editor/ReportElementRenderers.js"></script>
 <script src="/src/js/editor/Workflow.js"></script>
+<script src="/src/js/editor/Kesigner.js"></script>
+<script src="/src/js/editor/MobileDesigner.js"></script>
 </body>
 </html>
 
@@ -294,12 +296,6 @@ var alarm = new Alarm({
   iconId: 'alarm_notification',
   mp3url: '/desktop/img/ring.mp3'
 });
-// setTimeout(function () {
-//   alarm.start();
-// }, 5000);
-// setTimeout(function () {
-//   alarm.stop();
-// }, 1000 * 60 * 2);
   
 // load menus
 xhr.post({

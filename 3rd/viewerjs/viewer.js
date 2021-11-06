@@ -1043,8 +1043,8 @@
     },
     initBody: function initBody() {
       var ownerDocument = this.element.ownerDocument;
-      var body = ownerDocument.body || ownerDocument.documentElement;
-      // this.body = document.body;
+      let body = ownerDocument.body || ownerDocument.documentElement;
+      this.body = document.body;
       this.scrollbarWidth = window.innerWidth - ownerDocument.documentElement.clientWidth;
       this.initialBodyPaddingRight = body.style.paddingRight;
       this.initialBodyComputedPaddingRight = window.getComputedStyle(body).paddingRight;
@@ -2980,7 +2980,7 @@
         var viewer = _this.viewer;
 
         if (target !== document && target !== viewer && !viewer.contains(target)) {
-          viewer.focus();
+          // viewer.focus();
         }
       });
     },

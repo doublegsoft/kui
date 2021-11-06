@@ -109,7 +109,12 @@ $.fn.searchselect = function (opts) {
             option.attr('value', item[objname][attrname]);
             hasSelected = hasSelected ? hasSelected : selection == item[objname][attrname];
           }
-          option.text(item[text]);
+          if (typeof text === 'function') {
+            option.text(text.apply(null, [item]));
+          } else {
+            option.text(item[text]);
+          }
+
           self.append(option);
         }
         self.select2({

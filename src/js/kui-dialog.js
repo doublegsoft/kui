@@ -231,6 +231,9 @@ dialog.iframe = function(opt) {
     // fixed: false, //不固定
     // maxmin: true,
     content: opt.url,
+    resize: false,
+    maxmin: true,
+    shade: false,
     success: opt.success || function(layro, index) {},
   });
 }

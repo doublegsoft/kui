@@ -36,6 +36,7 @@ xhr.request = function (opts, method) {
       if (error) error(resp);
     }
   };
+
   req.onerror = function () {
     if (error) error({error: {code: -500, message: '网络访问错误！'}});
   };
@@ -165,6 +166,7 @@ xhr.promise = function(xhrOpt, error) {
       }
       resolve(resp.data);
     };
+    xhrOpt.error = error;
     xhr.post(xhrOpt);
   });
 };

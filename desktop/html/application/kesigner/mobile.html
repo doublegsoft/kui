@@ -1,117 +1,159 @@
-<div class="context-menu" style="display: none">
-  <ul class="context-menu-options">
-    <li class="context-menu-option">
-      <a class="pointer" onclick="deleteSelectable();">
-        <i class="fa fa-times text-danger mr-3"></i>删除
-      </a>
-    </li>
-  </ul>
-</div>
-<div id="widgetDesigner" class="row" style="overflow: hidden;">
-  <div class="col-md-2" style="padding: 0">
-    <ul id="widgetComponents" class="list-group">
-      <li data-type='panel' draggable="true" class="list-group-item grab">面板</li>
-      <li data-type='panel' draggable="true" class="list-group-item grab">图片</li>
-      <li data-type='card' draggable="true" class="list-group-item grab">卡片</li>
-      <li data-type='form' draggable="true" class="list-group-item grab">表单</li>
-      <li data-type='list' draggable="true" class="list-group-item grab">列表</li>
-      <li data-type='squares' draggable="true" class="list-group-item grab">九宫格</li>
-      <li data-type='chart' draggable="true" class="list-group-item grab">图表</li>
-      <li data-type='button' draggable="true" class="list-group-item grab">按钮</li>
-      <li data-type='carousel' draggable="true" class="list-group-item grab">传送带</li>
+<div id="pageMobileDesigner" class="page">
+  <div class="context-menu" style="display: none">
+    <ul class="context-menu-options">
+      <li class="context-menu-option">
+        <a class="pointer" onclick="deleteSelectable();">
+          <i class="fa fa-times text-danger mr-3"></i>删除
+        </a>
+      </li>
     </ul>
   </div>
-  <div class="col-md-8 m-0 p-0">
-    <div class="bg-white" id="widgetCanvas"
-         style="overflow: hidden; height: 700px; width: 375px; margin: auto;">
-      <iframe id="widgetCanvasInternal" frameborder="0"
-              src="html/application/kesigner/mobile_frame.html" width="100%" height="100%"
-              sandbox="allow-scripts
-                       allow-forms
-                       allow-modals
-                       allow-pointer-lock
-                       allow-orientation-lock
-                       allow-popups
-                       allow-presentation
-                       allow-top-navigation
-                       allow-same-origin"></iframe>
+  <div widget-id="widgetDesigner" class="row mr-0 ml-0" style="overflow: hidden;">
+    <div class="col-md-2" style="padding: 0">
+      <ul widget-id="widgetComponents" class="list-group">
+        <li data-type='panel' draggable="true" class="list-group-item grab">
+          <img src="img/emulator/widget/StatisticNumber.png" class="square-20 mr-2"/>
+          <strong>统计数字</strong>
+        </li>
+        <li data-type='panel' draggable="true"
+            widget-drag-image="img/emulator/designer/PaginationNavigator.png"
+            class="list-group-item grab">
+          <img src="img/emulator/widget/TitledSpacer.png" class="square-20 mr-2"/>
+          <strong>标题分隔</strong>
+        </li>
+        <li data-type='panel' draggable="true"
+            widget-drag-image="img/emulator/designer/PaginationNavigator.png"
+            class="list-group-item grab">
+          <img src="img/emulator/widget/PaginationNavigator.png" class="square-20 mr-2"/>
+          <strong>分页导航</strong>
+        </li>
+        <li data-type='panel' draggable="true"
+            widget-drag-image="img/emulator/designer/ScrollNavigator.png"
+            class="list-group-item grab">
+          <img src="img/emulator/widget/ScrollNavigator.png" class="square-20 mr-2"/>
+          <strong>滚动导航</strong>
+        </li>
+        <li data-type='card' draggable="true" class="list-group-item grab">
+          <img src="img/emulator/widget/Card.png" class="square-20 mr-2"/>
+          <strong>卡片展示</strong>
+        </li>
+        <li data-type='panel' draggable="true" class="list-group-item grab">
+          <img src="img/emulator/widget/FormLayout.png" class="square-20 mr-2"/>
+          <strong>编辑表单</strong>
+        </li>
+        <li data-type='panel' draggable="true"
+            widget-drag-image="img/emulator/designer/FeatureListView.png"
+            class="list-group-item grab">
+          <img src="img/emulator/widget/FeatureListView.png" class="square-20 mr-2"/>
+          <strong>特征列表</strong>
+        </li>
+        <li data-type='panel' draggable="true" class="list-group-item grab">
+          <img src="img/emulator/widget/ListView.png" class="square-20 mr-2"/>
+          <strong>瓦片列表</strong>
+        </li>
+        <li data-type='panel' draggable="true"
+            widget-drag-image="img/emulator/designer/GridButtons.png"
+            class="list-group-item grab">
+          <img src="img/emulator/widget/GridLayout.png" class="square-20 mr-2"/>
+          <strong>网格按钮</strong>
+        </li>
+        <li data-type='panel' draggable="true" class="list-group-item grab">
+          <img src="img/emulator/widget/ChartWrapper.png" class="square-20 mr-2"/>
+          <strong>统计图表</strong>
+        </li>
+      </ul>
     </div>
-  </div>
-  <div id="widgetProperties" class="col-md-2 properties-container">
+    <div class="col-md-7 m-0 p-0 d-flex">
+      <img widget-id="imagePhone" src="img/emulator/iphone-full.png" class="m-auto" style="width: 365px; height: 750px;">
+      <iframe widget-id="framePhone" class="position-absolute" style="width: 314px; height: 612px; background-color: white; left: 33px; top: 78px;" src="/mobile/index.html" frameborder="0"></iframe>
+    </div>
+    <div id="widgetProperties" class="col-md-3 properties-container">
+    </div>
   </div>
 </div>
 
 <script>
-var widgetDesigner = document.getElementById('widgetDesigner');
-var widgetCanvas = document.getElementById('widgetCanvas');
+function PageMobileDesigner() {
+  this.page = dom.find('#pageMobileDesigner');
+  this.widgetDesigner = dom.find('[widget-id=widgetDesigner]', this.page);
+  this.widgetComponents = dom.find('[widget-id=widgetComponents]', this.page);
+  this.widgetCanvas = dom.find('[widget-id=widgetCanvas]', this.page);
+  this.framePhone = dom.find('[widget-id=framePhone]', this.page);
+  this.imagePhone = dom.find('img[widget-id=imagePhone]', this.page);
+}
 
-var offsetTop = dom.top(widgetCanvas);
-var width = widgetCanvas.getBoundingClientRect().width;
+PageMobileDesigner.prototype.initialize = async function(params) {
+  this.framePhone.style.left = (this.imagePhone.offsetLeft + 26) + 'px';
+  this.framePhone.style.top = (this.imagePhone.offsetTop + 112) + 'px';
+  dom.height(this.widgetDesigner, 12, document.body);
 
-var height = document.body.clientHeight - offsetTop - 56;
-widgetDesigner.style.height = height + 'px';
-
-
-$('#widgetComponents li').each(function(idx, elm) {
-  let payload = {};
-  payload.type = $(elm).attr('data-type');
-  dnd.setDraggable('#widgetComponents li[data-type=' + $(elm).attr('data-type') + ']', payload, function(x, y, target) {
-    // console.log(target);
-  });
-});
-
-var iframe = document.getElementById("widgetCanvasInternal");
-iframe.onload = function() {
-  let elementBody = iframe.contentWindow.document.getElementsByTagName("body")[0];
-  dnd.setDroppable(elementBody, function(x, y, data) {
-    console.log(data);
-    Kesigner.unselect(widgetCanvas);
-    let component = Kesigner.getComponent(data.type);
-    let offsetX = widgetCanvas.getBoundingClientRect().left;
-    let offsetY = widgetCanvas.getBoundingClientRect().top;
-    let container = document.elementFromPoint(offsetX + x, offsetY + y);
-
-    let fragment = Kesigner.getFragment(component);
-    let element = fragment.firstElementChild;
-    element.classList.add('kesigner-selected');
-
-    let values = JSON.parse(element.getAttribute('data-values'));
-    container.appendChild(fragment);
-    if (container.childNodes.length > 0) {
-      container.classList.remove("height200");
-      container.classList.remove("height300");
+  for (let i = 0; i < this.widgetComponents.children.length; i++) {
+    let child = this.widgetComponents.children[i];
+    let dragImage = child.getAttribute('widget-drag-image');
+    if (dragImage && dragImage != '') {
+      let img = new Image();
+      img.src = dragImage;
     }
-    widgetProperties.render(component.properties(), values);
-  });
+    let payload = {};
+    payload.type = '';
+    dnd.setDraggable(child, payload, (x, y, target) => {
+      // console.log(target);
+    });
+  }
 };
 
-widgetCanvas.addEventListener('click', function(event) {
-  let x = event.clientX;
-  let y = event.clientY;
-  Kesigner.select(widgetCanvas, widgetProperties, x, y);
+PageMobileDesigner.prototype.show = function(params) {
+  this.initialize(params);
+};
 
-  let contextMenu = document.querySelector('.context-menu');
-  contextMenu.style.display = 'none';
-});
+pageMobileDesigner = new PageMobileDesigner();
+pageMobileDesigner.show({});
 
-widgetCanvas.addEventListener('contextmenu', function(event) {
-  event.preventDefault();
-  let contextMenu = document.querySelector('.context-menu');
-  contextMenu.style.left = event.clientX + 'px';
-  contextMenu.style.top = event.clientY + 'px';
-  contextMenu.style.display = '';
-  return false;
-}, false);
 
-var widgetProperties = new Kesigner.PropertiesEditor('widgetProperties');
 
-function deleteSelectable() {
-  let element = widgetCanvas.querySelector('.kesigner-selected');
-  if (element != null) {
-    element.remove();
-    let contextMenu = document.querySelector('.context-menu');
-    contextMenu.style.display = 'none';
-  }
-}
+// var iframe = document.getElementById("widgetCanvasInternal");
+// iframe.onload = function() {
+//   let elementBody = iframe.contentWindow.document.getElementsByTagName("body")[0];
+//   dnd.setDroppable(elementBody, function(x, y, data) {
+//     console.log(data);
+//     Kesigner.unselect(widgetCanvas);
+//     let component = Kesigner.getComponent(data.type);
+//     let offsetX = widgetCanvas.getBoundingClientRect().left;
+//     let offsetY = widgetCanvas.getBoundingClientRect().top;
+//     let container = document.elementFromPoint(offsetX + x, offsetY + y);
+//
+//     let fragment = Kesigner.getFragment(component);
+//     let element = fragment.firstElementChild;
+//     element.classList.add('kesigner-selected');
+//
+//     let values = JSON.parse(element.getAttribute('data-values'));
+//     container.appendChild(fragment);
+//     if (container.childNodes.length > 0) {
+//       container.classList.remove("height200");
+//       container.classList.remove("height300");
+//     }
+//     widgetProperties.render(component.properties(), values);
+//   });
+// };
+
+// widgetCanvas.addEventListener('click', function(event) {
+//   let x = event.clientX;
+//   let y = event.clientY;
+//   Kesigner.select(widgetCanvas, widgetProperties, x, y);
+//
+//   let contextMenu = document.querySelector('.context-menu');
+//   contextMenu.style.display = 'none';
+// });
+//
+// widgetCanvas.addEventListener('contextmenu', function(event) {
+//   event.preventDefault();
+//   let contextMenu = document.querySelector('.context-menu');
+//   contextMenu.style.left = event.clientX + 'px';
+//   contextMenu.style.top = event.clientY + 'px';
+//   contextMenu.style.display = '';
+//   return false;
+// }, false);
+
+
 
 </script>

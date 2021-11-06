@@ -1,40 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link rel="shortcut icon" href="img/favicon.png">
-<title>KUI-BS4展示应用</title>
-<link href="/3rd/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="shortcut icon" href="img/favicon.png">
+  <title></title>
+  <style>
+    body {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      overflow-y: scroll;
+    }
 
-<!-- Main styles for this application -->
-<link href="/src/css/coreui.css" rel="stylesheet">
-<link href="/src/css/kui-coreui.css" rel="stylesheet">
-<link href="/src/css/kui.css" rel="stylesheet">
+    body::-webkit-scrollbar {
+      display: none;
+    }
+  </style>
+  <link href="/3rd/font-awesome/css/all.min.css" rel="stylesheet">
+  <link href="/3rd/animation/animate.min.css" rel="stylesheet">
+  <link href="/3rd/material-icons/material-icons.css" rel="stylesheet">
+  <link href="/3rd/viewerjs/viewer.css" rel="stylesheet">
+  <link href="/3rd/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="/src/css/coreui.css" rel="stylesheet">
+  <link href="/src/css/kui-coreui.css" rel="stylesheet">
+  <link href="/src/css/kui.css" rel="stylesheet">
+  <link href="/src/css/kui-chat.css" rel="stylesheet">
+  <link href="/src/css/kuim.css" rel="stylesheet">
+
+  <script src="/3rd/jquery/jquery-3.2.1.min.js"></script>
+  <script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/3rd/moment/moment.min.js"></script>
+  <script src="/3rd/handlebars/handlebars-v4.0.11.js"></script>
+  <script src="/3rd/rxjs/rxjs.umd.js"></script>
+  <script src="/3rd/rxjs/rxjs-pubsub.js"></script>
+  <script src="/3rd/viewerjs/viewer.js"></script>
+  <script src="/3rd/layer/layer.js"></script>
+  <script src="/3rd/swiper/swiper-bundle.min.js"></script>
+  <script src="/src/js/application/Chat.js"></script>
+  <script src="/src/js/container/PaginationTable.js"></script>
+  <script src="/src/js/container/QueryLayout.js"></script>
+  <script src="/src/js/kui-xhr.js"></script>
+  <script src="/src/js/kui-ajax.js"></script>
+  <script src="/src/js/kui-dialog.js"></script>
+  <script src="/src/js/kui-dom.js"></script>
+  <script src="/src/js/kui-utils.js"></script>
 </head>
-
-<body id="body" class="app header-fixed sidebar-fixed aside-menu-fixed" style="overflow-x: hidden">
-  <div class="app-body">
-    <!-- side menu -->
-    <div class="sidebar" style="margin-top: 55px;">
-      <nav id="sidemenu" class="sidebar-nav ps ps--active-y"></nav>
-      <button class="sidebar-minimizer brand-minimizer" type="button"></button>
-    </div>
-  
-    <!-- Main content -->
-    <main class="main header-fixed" style="overflow-y: hidden">
-      <div id="container" class="container-fluid" style="width: 100%; overflow-y: auto"></div>
-    </main>
-    <aside class="aside-menu"></aside>
+<body style="overflow-x: hidden; background-color: rgb(250, 250, 252);">
+  <div style="height: 30px; width: 100%; display: flex; display: none;">
+    <i class="fas fa-sync font-20 text-gray m-auto"></i>
   </div>
-<script src="/3rd/jquery/jquery-3.2.1.min.js"></script> 
-<script src="/3rd/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<script src="/src/js/kui-xhr.js"></script>
+  <main>
+  <div widget-id="widgetCarousel" class="swiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/360x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/360x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/360x150">
+      </div>
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+  <div class="square-menu">
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column">
+        <i class="fas fa-monument text-gray font-4xl"></i>
+        <span class="font-14 text-gray mt-2">功能入口</span>
+      </div>
+    </a>
+    <div class="entry btn">
+    </div>
+  </div>
+  <div widget-id="widgetMyCards" class="swiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+      <div class="swiper-slide height-150">
+        <img src="https://via.placeholder.com/240x150">
+      </div>
+    </div>
+  </div>
+  <div class="spacer" style="height: 12px; background: transparent;"></div>
+  <ul class="list-group border-less">
+    <li class="list-group-item">
+      <div class="d-flex align-items-center">
+        <div class="bg-gradient-primary mr-2">
+          <img src="https://via.placeholder.com/64" style="width:56px; height: 56px">
+        </div>
+        <div>
+          <div class="text-value text-primary font-16">标题</div>
+          <div class="text-muted font-weight-bold small">这里是简介</div>
+        </div>
+      </div>
+    </li>
+    <li class="list-group-item">
+      <div class="d-flex align-items-center mr-2">
+        <div>
+          <div class="text-value text-primary font-16">标题</div>
+          <div class="text-muted font-weight-bold small">这里是简介</div>
+        </div>
+        <div class="bg-gradient-primary ml-auto">
+          <img src="https://via.placeholder.com/64" style="width:56px; height: 56px">
+        </div>
+      </div>
+    </li>
+  </ul>
+  <ul class="list-grid">
+    <li class="list-grid-item">
+      <div class="card">
+        <div class="card-image card-image flowers"></div>
+        <div class="card-content">
+          <div class="card-title">Flex Shrink</div>
+          <p class="card-text"></p>
+          <button class="btn">Button</button>
+        </div>
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <div class="card-image card-image fence"></div>
+        <div class="card-content">
+          <div class="card-title">Flex</div>
+          <p class="card-text"></p>
+          <button class="btn">Button</button>
+        </div>
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <div class="card-image card-image river"></div>
+        <div class="card-content">
+          <div class="card-title">Flex Grow</div>
+          <p class="card-text"></p>
+          <button class="btn">Button</button>
+        </div>
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <div class="card-image card-image record"></div>
+        <div class="card-content">
+          <div class="card-title">Flex Shrink</div>
+          <p class="card-text"></p>
+          <button class="btn">Button</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+  </main>
+  <footer>
+    <div class="tabs-bar">
+      <div class="tabs">
+        <a class="btn text-success">
+          <i class="fas fa-home font-24"></i>
+        </a>
+        <a class="btn text-primary mr-4">
+          <i class="fas fa-building font-24"></i>
+        </a>
+        <a class="btn text-primary ml-4">
+          <i class="fas fa-comment-alt font-24"></i>
+        </a>
+        <a class="btn text-primary">
+          <i class="fas fa-user font-24"></i>
+        </a>
+        <div class="circle bg-success">
+          <i class="fas fa-plus plus-icon font-24"></i>
+          <i class="fab fa-youtube social"></i>
+          <i class="fab fa-twitter social"></i>
+          <i class="fab fa-github  social"></i>
+        </div>
+        <div class="circle-background plus-icon bg-white"></div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
 
 <script>
+  let swiper = new Swiper(dom.find('[widget-id=widgetCarousel]'), {
+    direction: 'horizontal',
+    loop: true,
+    pagination: {
+      el: '.swiper-pagination',
+    },
+  });
+  swiper = new Swiper(dom.find('[widget-id=widgetMyCards]'), {
+    slidesPerView: "auto",
+    spaceBetween: 30,
+    loop: true,
+  });
 
+  document.body.addEventListener('dragover', ev => {
+    console.log(ev);
+  });
+
+  window.onscroll = ev => {
+    console.log(ev);
+  };
 </script>
