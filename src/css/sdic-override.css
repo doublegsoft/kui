@@ -2199,6 +2199,7 @@ a {
   font-size: 12px;
   cursor: pointer;
   line-height: 24px;
+  height: 24px;
 }
 .td-min-item:nth-child(n+2){
 border-top: 1px solid #f2f2f2;
