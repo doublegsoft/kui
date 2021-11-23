@@ -193,4 +193,16 @@ utils.getParameter = function(url, name) {
   if (!results) return null;
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
-}
+};
+
+utils.getParameters = function(url) {
+  if (url.indexOf('?') == -1) return {};
+  let ret = {};
+  url = url.substring(url.indexOf('?') + 1);
+  let strs = url.split('&');
+  for (let i = 0; i < strs.length; i++) {
+    let pair = strs[i].split('=');
+    ret[pair[0].trim()] = pair[1].trim();
+  }
+  return ret;
+};

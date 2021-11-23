@@ -134,7 +134,7 @@ QueryFilter.prototype.addFilter = function(filter) {
     ev.stopImmediatePropagation();
   });
   strong.setAttribute('data-filter-name', filter.name);
-
+  strong.setAttribute('data-filter-input', filter.input);
   if (filter.input === 'text') {
     strong.setAttribute('contenteditable', 'true');
     strong.focus();
@@ -142,6 +142,10 @@ QueryFilter.prototype.addFilter = function(filter) {
     self.displayDateInput(strong);
   } else if (filter.input === 'select' || filter.input === 'check') {
     self.displaySelectInput(strong, filter)
+  } else if (filter.input === 'bool') {
+    strong.setAttribute('data-filter-values', filter.values);
+    strong.innerText = '是';
+    self.request();
   }
 };
 
@@ -260,7 +264,13 @@ QueryFilter.prototype.getValues = function() {
   let ret = {};
   this.root.querySelectorAll('strong').forEach((el, idx) => {
     let filterName = el.getAttribute('data-filter-name');
+    let filterInput = el.getAttribute('data-filter-input');
     let filterValues = el.getAttribute('data-filter-values');
+    if (filterInput === 'bool') {
+      if (!ret['_and_condition']) ret['_and_condition'] = '';
+      ret['_and_condition'] += ' ' + filterValues;
+      return;
+    }
     if (filterName && filterName !== '') {
       if (filterValues == null || filterValues === '') {
         ret[filterName] = el.innerText.trim();

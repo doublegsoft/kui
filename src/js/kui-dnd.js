@@ -10,7 +10,7 @@ dnd.setDraggable = function (selector, payload, callback) {
   }
   element.setAttribute("draggable", "true");
   element.addEventListener("dragstart", function(ev) {
-    let li = dom.ancestor(ev.target, 'li');
+    let li = element;// dom.ancestor(ev.target, 'li');
     let dragImage = li.getAttribute('widget-drag-image');
     let x = event.layerX;
     let y = event.layerY;

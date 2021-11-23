@@ -1,0 +1,52 @@
+<div id="pageSurveyDesign" class="page" style="overflow-y: auto;">
+  <div class="card" style="margin: auto; width: 100%; height: 100%;">
+    <div widget-id="widgetSourceCode" class="card-body">
+      <div class="editor full-height">
+        <div class="editor-toolbar">
+          <span class="button-group">
+            <a widget-id="buttonClose" class="button text-danger"><i class="fas fa-times"></i></a>
+          </span>
+          <span class="separator"></span>
+          <span class="button-group">
+            <a widget-id="buttonSave" class="button text-success"><i class="fas fa-save"></i></a>
+          </span>
+        </div>
+        <div widget-id="widgetDesigner" class="row full-height full-width" style="overflow: hidden;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function PageSurveyDesign() {
+  this.page = dom.find('#pageSurveyDesign');
+  this.widgetSourceCode = dom.find('[widget-id=widgetSourceCode]', this.page);
+  this.widgetDesigner = dom.find('[widget-id=widgetDesigner]', this.page);
+}
+
+PageSurveyDesign.prototype.initialize = async function(params) {
+
+  dom.height(this.widgetSourceCode, 12, document.body);
+  dom.height(this.widgetDesigner, 12, document.body);
+
+  this.designer = new SurveyDesigner({
+    mobileFramePath: '/mobile/index.html',
+  });
+  this.designer.render(this.widgetDesigner, {});
+
+  this.page.classList.add('show');
+};
+
+PageSurveyDesign.prototype.getType = function(type) {
+  if (type === 'single') return '01';
+  if (type === 'multiple') return '02';
+  if (type === 'short_answer') return '05';
+};
+
+PageSurveyDesign.prototype.show = function(params) {
+  this.initialize(params);
+};
+
+pageSurveyDesign = new PageSurveyDesign();
+pageSurveyDesign.show();
+</script>

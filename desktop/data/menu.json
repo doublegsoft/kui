@@ -12,7 +12,7 @@
       "items": [{
         "text": "随访设计",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/application/followup/design.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/application/survey/design.html', containerId: 'container'});"
       },{
         "text": "报表设计",
         "icon": "nav-icon icon-note",

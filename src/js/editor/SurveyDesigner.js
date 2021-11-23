@@ -4,6 +4,7 @@ function SurveyDesigner(opt) {
   this.questions = opt.questions || [];
   this.draggingTarget = null;
   this.onDelete = opt.onDelete || function(model) {};
+  this.mobileFramePath = opt.mobileFramePath;
 }
 
 SurveyDesigner.QUESTION_MULTIPLE_CHOICE = 'multiple';
@@ -170,7 +171,7 @@ SurveyDesigner.prototype.preview = function(container) {
   let imgrect = img.getBoundingClientRect();
   this.ifPreview.style.left = (img.offsetLeft + 25) + 'px';
   this.ifPreview.style.top = (img.offsetTop + 82) + 'px';
-  this.ifPreview.src  = 'mobile.html';
+  this.ifPreview.src  = this.mobileFramePath;
 
   this.ifPreview.onload = () => {
     this.refresh();
@@ -179,6 +180,7 @@ SurveyDesigner.prototype.preview = function(container) {
 };
 
 SurveyDesigner.prototype.render = function(containerId, params) {
+  params = params || {};
   if (params.questions) {
     this.questions = params.questions;
   }
@@ -201,12 +203,16 @@ SurveyDesigner.prototype.renderMultipleChoice = function(container, question) {
   }
   question.model = JSON.stringify(question);
   let el = dom.templatize(`
-    <div data-survey-question-id="{{id}}" data-survey-question-model="{{model}}" class="survey-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
+    <div data-survey-question-id="{{id}}" data-survey-question-model="{{model}}" 
+         class="survey-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
       <div style="margin-bottom: 6px">
         <strong>{{ordinalPosition}}. {{title}}：</strong>
       </div>
       {{#each values}}
-      <div><input type="checkbox" name="{{id}}" style="margin-right: 5px;">{{this}}</div>
+      <div class="survey-answer">
+        <i class="far fa-check-square"></i>
+        <label>{{this}}</label>
+      </div>
       {{/each}}
     </div>
   `, question);
@@ -490,5 +496,5 @@ SurveyDesigner.prototype.edit = function(question) {
 SurveyDesigner.prototype.refresh = function() {
   let ifbody = this.ifPreview.contentDocument.body || this.ifPreview.contentWindow.document.body;
   ifbody.innerHTML = dom.find("[widget-id=widgetSurveyCanvas]").innerHTML;
-  this.ifPreview.contentWindow.reload();
+  // this.ifPreview.contentWindow.reload();
 };

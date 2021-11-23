@@ -387,14 +387,16 @@ dom.tabs = function(tabsSelector) {
   let tabs = dom.find(tabsSelector);
   if (tabs == null) return;
   let activeClass = tabs.getAttribute('data-tab-active-class');
-  tabs.children.forEach((el, idx) => {
+  for (let i = 0; i < tabs.children.length; i++) {
+    let el = tabs.children[i];
     el.addEventListener('click', (ev) => {
-      tabs.children.forEach((el, idx) => {
+      for (let i = 0; i < tabs.children.length; i++) {
+        let el = tabs.children[i];
         el.classList.remove(activeClass);
-      });
+      }
       el.classList.add(activeClass);
     })
-  });
+  }
 };
 
 /**
@@ -765,7 +767,6 @@ dom.height = function(selector, offset, parent) {
   let borderBottomWidth = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
 
   element.style.marginBottom = '0px';
-
   let ancestor = dom.ancestor(element, 'div', 'full');
   if (ancestor == null) {
     paddingBottom = 0;
@@ -845,4 +846,4 @@ dom.render=function (selector,data,isRadioToMulti) {
       setElementValue(container, key, data[key]);
     }
   }
-}
+};

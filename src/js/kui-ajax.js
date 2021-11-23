@@ -206,6 +206,9 @@ ajax.view = function(opt) {
       },
       success: function (resp) {
         let script = resp.data.script;
+        if (!script) {
+          script = '<div class="full-width full-height d-flex"><img src="img/under-construction.jpeg" class="m-auto full-width"></div>'
+        }
         let fragment = null;
         if (container) {
           fragment = utils.append(container, script, empty);
