@@ -1,0 +1,302 @@
+.ab-chat {
+
+}
+
+.ab-chat .contact {
+  position: relative;
+  padding-left: 5rem;
+  height: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ab-chat .contact.active {
+  background: #cecece;
+  color: white;
+}
+
+.ab-chat .contact.active .seen {
+  color: white;
+}
+
+.ab-chat .contact .avatar {
+  position: absolute;
+  left: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+}
+
+.ab-chat .contact .avatar .initial {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ab-chat .contact .name {
+  font-weight: 500;
+  margin-bottom: 0.125rem;
+}
+
+.ab-chat .contact .description {
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ab-chat .contact .seen {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.ab-chat .contact .on i{
+  color: #62bf6e;
+  font-size: 8px;
+  margin-right: 8px;
+}
+
+.ab-chat .contact .brb i {
+  color: #fd8064;
+  font-size: 8px;
+  margin-right: 8px;
+}
+
+.ab-chat .contact .off i {
+  color: #ababab;
+  font-size: 8px;
+  margin-right: 8px;
+}
+
+.ab-chat .conversation  {
+  overflow: auto;
+  padding: 20px 0 50px 0;
+  background-color: #F7F7F7;
+  opacity: 0.85;
+}
+
+.ab-chat .conversation .messages {
+  overflow: auto;
+  margin: 5px 20px;
+}
+
+.ab-chat .conversation .time {
+  font-size: 0.8rem;
+  background: #EEE;
+  padding: 0.25rem 1rem;
+  border-radius: 2rem;
+  color: #666;
+  width: fit-content;
+  margin: 8px auto;
+  text-align: center;
+}
+
+.ab-chat .conversation .messages .message {
+  display: inline-block;
+  margin-bottom: 2px;
+  clear: both;
+  padding: 7px 13px;
+  font-size: 14px;
+  border-radius: 15px;
+  line-height: 1.4;
+  max-width: 85%;
+  overflow: hidden;
+}
+
+.ab-chat .conversation .messages.incoming .message {
+  float: left;
+  background-color: #efefef;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.ab-chat .conversation .messages.incoming .message:first-child {
+  border-top-left-radius: 15px;
+}
+
+.ab-chat .conversation .messages.incoming .message:last-child {
+  border-bottom-left-radius: 15px;
+}
+
+.ab-chat .conversation .messages.outgoing .message {
+  float: right;
+  background-color: #79C7C5;
+  color: #fff;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.ab-chat .conversation .messages.outgoing .message:first-child {
+  border-top-right-radius: 15px;
+}
+
+.ab-chat .conversation .messages.outgoing .message:last-child {
+  border-bottom-right-radius: 15px;
+}
+
+.ab-chat .conversation .typing {
+  background: #eaeaea;
+  margin-left: 20px;
+  padding: 8px 13px 9px 13px;
+  position: relative;
+  display: inline-block;
+  margin-bottom: 5px;
+  color: #F9FBFF;
+  font-size: 0.7em;
+  border-radius: 20px;
+}
+
+.ab-chat .conversation .typing .ellipsis {
+  width: 5px;
+  height: 5px;
+  display: inline-block;
+  background: #b7b7b7;
+  border-radius: 50%;
+  animation: bounce 1.3s linear infinite;
+}
+
+.ab-chat .conversation .typing .ellipsis.one {
+  animation-delay: 0.6s;
+  margin-right: 3px;
+}
+
+.ab-chat .conversation .typing .ellipsis.two {
+  animation-delay: 0.5s;
+  margin-right: 3px;
+}
+
+.ab-chat .conversation .typing .ellipsis.three {
+  animation-delay: 0.8s;
+}
+
+@keyframes bounce {
+  30% { transform: translateY(-2px); }
+  60% { transform: translateY(0px); }
+  80% { transform: translateY(2px); }
+  100% { transform: translateY(0px); opacity: 0.5;  }
+}
+
+.ab-chat .typebar {
+  position: absolute;
+  width: 100%;
+  height: 90px;
+  padding-bottom: 10px;
+  bottom: 0;
+  left: 0;
+  background: #F7F7F7;
+  /*display: flex;*/
+  /*align-items: center;*/
+}
+
+.ab-chat .typebar input {
+  border: none;
+  background-image: none;
+  background-color: white;
+  padding: 0.5rem 1rem;
+  margin-right: 1rem;
+  border-radius: 1.125rem;
+  flex-grow: 2;
+  box-shadow: 0 0 1rem rgb(0 0 0 / 10%), 0rem 1rem 1rem -1rem rgb(0 0 0 / 20%);
+  font-family: Red hat Display, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+}
+
+.ab-chat .typebar button {
+  position: absolute;
+  border: 0;
+  font-size: 1em;
+  color: #A1E2D9;
+  top: 10px;
+  right: 5px;
+  cursor: pointer;
+  outline: 0;
+}
+
+.ab-chat .typebar text {
+  font-size: 1.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  color: #666;
+  cursor: pointer;
+  transition: color 200ms;
+}
+
+.ab-chat .typebar textarea {
+  resize: none;
+}
+
+.ab-recorder.show {
+  bottom: 300px!important;
+  height: 100% !important;
+  animation-name: backInUp;
+  animation-duration: 0.8s;
+}
+
+.ab-recorder.hide {
+  /*bottom: 0!important;*/
+  /*height: 0!important;*/
+  display: block!important;
+  animation-name: backOutDown;
+  animation-duration: 0.8s;
+}
+
+.ab-chat .voice {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 36px;
+  /*     background: black; */
+}
+
+.ab-chat .voice .bar {
+  background: #52467b;
+  bottom: 1px;
+  height: 3px;
+  width: 5px;
+  margin: 0px 4px;
+  border-radius: 5px;
+}
+
+.ab-chat .voice.playing .bar {
+  animation: sound 0ms -600ms linear infinite alternate;
+}
+
+@keyframes sound {
+  0% {
+    opacity: .35;
+    height: 3px;
+  }
+  100% {
+    opacity: 1;
+    height: 32px;
+  }
+}
+
+.ab-chat .playing .bar:nth-child(1)  { left: 1px; animation-duration: 474ms; }
+.ab-chat .playing .bar:nth-child(2)  { left: 15px; animation-duration: 433ms; }
+.ab-chat .playing .bar:nth-child(3)  { left: 29px; animation-duration: 407ms; }
+.ab-chat .playing .bar:nth-child(4)  { left: 43px; animation-duration: 458ms; }
+.ab-chat .playing .bar:nth-child(5)  { left: 57px; animation-duration: 400ms; }
+.ab-chat .playing .bar:nth-child(6)  { left: 71px; animation-duration: 427ms; }
+.ab-chat .playing .bar:nth-child(7)  { left: 85px; animation-duration: 441ms; }
+.ab-chat .playing .bar:nth-child(8)  { left: 99px; animation-duration: 419ms; }
+.ab-chat .playing .bar:nth-child(9)  { left: 113px; animation-duration: 487ms; }
+.ab-chat .playing .bar:nth-child(10) { left: 127px; animation-duration: 442ms; }
+
+.ab-chat .indicator {
+  bottom: 0;
+  position: absolute;
+  right: 0;
+  transform: translate(50%, 50%);
+
+  border-radius: 9999px;
+  height: 8px;
+  width: 8px;
+
+  background-color: #FF4136;
+}

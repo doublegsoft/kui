@@ -1,0 +1,38 @@
+.survey-question {
+
+}
+
+.survey-question .survey-answer {
+  border: solid 2px #cfcfcf;
+  line-height: 18px;
+  padding: 6px 12px;
+  margin: 6px;
+  font-size: 14px;
+  color: #cfcfcf;
+}
+
+.survey-question .survey-answer label {
+  color: rgba(0,0,0,0.5);
+  margin-bottom: 0!important;
+}
+
+.survey-question .survey-answer i {
+  position: relative;
+  top: 2px;
+  font-size: 18px;
+  margin-right: 12px;
+  color: #cfcfcf;
+}
+
+.survey-question .survey-answer.checked {
+  border-color: #0e90d2;
+}
+
+.survey-question .survey-answer.checked i {
+  color: #0e90d2;
+}
+
+.survey-question .survey-answer.checked label {
+  color: #0e90d2;
+  font-weight: bolder;
+}
