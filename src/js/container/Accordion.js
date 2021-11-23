@@ -13,7 +13,6 @@ function Accordion(opts) {
 	this.defaultIndex=opts.defaultIndex || 0;
 	this.mode=opts.mode || 'radio';
 	this.modeId=opts.modeId || 'check';
-
 	if (opts.url) {
 		this.reload(opts.params)
 	} else {
@@ -55,7 +54,6 @@ Accordion.prototype.root = function (data) {
 	for (let i = 0; i < data.length; i++) {
 		let item = data[i];
 		let _id = self.modeId + (i + 1);
-		console.log("1234",_id);
 		let input='<input type='+self.mode+' id=' + _id +' '+(self.mode=='radio'?'name=radio_name':'')+'>';
 		if(this.defaultIndex == i ){
 			input=`<input type=${self.mode} id=${_id} ${self.mode=='radio'?'name=radio_name':''}  checked="true">`;
