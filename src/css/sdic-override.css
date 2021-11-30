@@ -41,12 +41,14 @@ select:focus, .ql-editor:focus {
 /*::-webkit-scrollbar-thumb:horizontal:hover{*/
 /*  background-color: rgba(144,147,153,.3);*/
 /*}*/
-.fl{
+.fl {
   float: left;
 }
-.oh{
-  overflow:hidden;
+
+.oh {
+  overflow: hidden;
 }
+
 .page {
   overflow-x: inherit;
 }
@@ -425,24 +427,28 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
   white-space: nowrap;
 }
 
-.rowx{
+.rowx {
   display: flex;
   flex-flow: wrap;
 }
 
-.form-horizontal .col-md-4 .input-group,.form-horizontal .col-md-3 .input-group,.form-horizontal .col-md-6 .input-group{
+.form-horizontal .col-md-4 .input-group, .form-horizontal .col-md-3 .input-group, .form-horizontal .col-md-6 .input-group {
   margin-right: 5%;
 }
-.select2-container{
+
+.select2-container {
   min-width: 100%;
 }
+
 .btns-list {
   margin-bottom: 10px;
   display: flex;
 }
-.row-button{
+
+.row-button {
   margin-top: 20px;
 }
+
 .btns-list .btn {
   height: 30px;
   font-size: 14px;
@@ -454,6 +460,12 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.btn-line {
+  border: 1px solid #2a70ff;
+  color: #2a70ff;
+  background: #fff;
 }
 
 .add-img {
@@ -2020,9 +2032,11 @@ a {
   animation-name: show-extra-from-top;
   animation-duration: 0.4s;
 }
+
 .active-bg-info {
   line-height: 52px;
 }
+
 /*obm*/
 .header-info-wrapper {
   width: 100%;
@@ -2165,9 +2179,11 @@ a {
   background: #fff;
   border: 1px solid #d9d9d9;
 }
-.twinkling{
+
+.twinkling {
   animation: twinkling .5s ease-in-out 0s infinite normal;
 }
+
 @-webkit-keyframes twinkling {
   0% {
     opacity: 0
@@ -2187,39 +2203,47 @@ a {
     opacity: 1
   }
 }
-#pageObmPatientList .card-flexX{
+
+#pageObmPatientList .card-flexX {
   box-shadow: none;
 }
 
-.el-image-viewer__wrapper{
+.el-image-viewer__wrapper {
   z-index: 20200101 !important;
 }
-.td-min-item{
+
+.td-min-item {
   padding: 0 10px;
   font-size: 12px;
   cursor: pointer;
   line-height: 24px;
   height: 24px;
 }
-.td-min-item:nth-child(n+2){
-border-top: 1px solid #f2f2f2;
+
+.td-min-item:nth-child(n+2) {
+  border-top: 1px solid #f2f2f2;
 }
-.textover{
+
+.textover {
   width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
-.img-show-list{
+
+.img-show-list {
   display: flex;
 }
-.img-show-item{
+
+.img-show-item {
   margin-right: 10px;
   margin-bottom: 10px;
 }
-.h30{
+
+.h30 {
   height: 30px !important;
 }
-.plr10{
+
+.plr10 {
   padding: 0 10px !important;
 }
