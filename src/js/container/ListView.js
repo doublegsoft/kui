@@ -64,6 +64,7 @@ ListView.prototype.fetch = function (params) {
     this.data = this.data || {};
     this.data.start = this.start;
     this.data.limit = this.limit;
+
     xhr.post({
       url: this.url,
       params: requestParams,
@@ -128,7 +129,7 @@ ListView.prototype.render = function(containerId, loading) {
     this.container.appendChild(topbar);
   }
 
-  let ul = dom.create('ul', 'list-group');
+  let ul = dom.create('ul', 'list-group', 'full-width');
   if (this.borderless) {
     ul.classList.add('b-a-0');
   }
@@ -355,6 +356,11 @@ ListView.prototype.setReorderable = function(li) {
     event.dataTransfer.setData("id", dom.model(event.target).id);
     event.dataTransfer.setData("y", y);
   });
+};
+
+ListView.prototype.setHeight = function(height) {
+  let ul = this.container.querySelector('ul');
+  ul.style.height = height + 'px';
 };
 
 ListView.prototype.subscribe = function(name, callback) {

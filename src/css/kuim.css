@@ -1,15 +1,69 @@
 :root {
+  /* main colors */
+  --color-primary: #1976d2;
+  --color-secondary: #9c27b0;
+  --color-success: #2e7d32;
+  --color-error: #d32f2f;
+  --color-warning: #ed6c02;
+  --color-info: #0288d1;
 
+  --color-text-primary: rgba(0, 0, 0, 0.87);
+  --color-text-secondary: rgba(0, 0, 0, 0.6);
+  --color-text-disabled: rgba(0, 0, 0, 0.38);
+  --color-background: white;
+  --color-divider: rgba(0, 0, 0, 0.12);
+
+  --color-primary-light: #42a5f5;
+  --color-secondary-light: #ba68c8;
+  --color-success-light: #4caf50;
+  --color-error-light: #ef5350;
+  --color-warning-light: #ff9800;
+  --color-info-light: #03a9f4;
+
+  --color-primary-dark: #1565c0;
+  --color-secondary-dark: #7b1fa2;
+  --color-success-dark: #1b5e20;
+  --color-error-dark: #c62828;
+  --color-warning-dark: #e65100;
+  --color-info-dark: #01579b;
+
+  --color-text-primary-dark: #fff;
+  --color-text-secondary-dark: rgba(255, 255, 255, 0.7);
+  --color-text-disabled-dark: rgba(255, 255, 255, 0.5);
+  --color-background-dark: #121212;
+  --color-divider-dark: rgba(255, 255, 255, 0.12);
 }
 
 * {
   font-size: 14px;
 }
 
+body {
+  overflow-x: hidden;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+}
+
+body.dark {
+  color: var(--color-text-primary-dark);
+  background-color: var(--color-background-dark);
+}
+
+.color-primary {
+  color: var(--color-primary);
+}
+
+.light .color-primary {
+  color: var(--color-primary-light);
+}
+
+.dark .text-primary {
+  color: var(--color-primary-dark);
+}
+
 main {
   flex-grow: 1;
   flex: 1;
-  margin-bottom: 60px;
 }
 
 header, main {
@@ -245,6 +299,57 @@ footer {
 
 .tabs .active {
   color: #4dbd74!important;
+}
+
+.wizard {
+  display: flex;
+  padding-bottom: 6px;
+  padding-top: 6px;
+}
+
+.wizard-step {
+  flex: 1;
+}
+
+.wizard-dot {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.wizard-connector-left, .wizard-connector-right {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.wizard-step:first-child .wizard-connector-left,
+.wizard-step:last-child .wizard-connector-right {
+  background-color: transparent;
+}
+
+.wizard-number {
+  /* Center the content */
+  align-items: center;
+  display: flex;
+  justify-content: center;
+
+  font-size: 16px;
+  font-weight: bold;
+  background-color: var(--color-info);
+  color: var(--color-light);
+  border-radius: 9999px;
+  height: 36px;
+  width: 36px;
+
+  /* OPTIONAL: Spacing between it and connectors */
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.wizard-step-completed .wizard-number {
+  background-color: var(--color-success);
+  color: var(--color-light);
 }
 
 .circle {
@@ -579,4 +684,37 @@ footer {
   font-weight: 400;
   color: #007AFF;
   line-height: 30px;
+}
+
+/*
+** 表单
+*/
+
+.form-horizontal {
+  font-size: 14px;
+  padding: 6px;
+  border-radius: 15px;
+}
+
+.form-horizontal .row {
+  margin: 6px 0!important;
+  border-bottom: #e0e0e0 solid 1px;
+}
+
+.form-horizontal .form-control {
+  border: none!important;
+  font-size: 14px!important;
+}
+
+.form-horizontal .form-control:read-only {
+  border: none!important;
+  background-color: transparent;
+}
+
+.form-horizontal .form-control::placeholder {
+  font-size: 12px;
+}
+
+.form-horizontal .input-group {
+  align-items: center!important;
 }

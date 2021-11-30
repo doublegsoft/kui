@@ -180,6 +180,7 @@ dom.bind = function (selector, event, handler) {
     element = selector;
   }
   if (element == null)  return;
+  if (element)
   element.addEventListener(event, handler);
 };
 
@@ -771,6 +772,7 @@ dom.height = function(selector, offset, parent) {
   if (ancestor == null) {
     paddingBottom = 0;
   }
+
   element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
   element.style.overflowY = 'auto';
 };

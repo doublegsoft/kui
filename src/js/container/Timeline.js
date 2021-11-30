@@ -10,7 +10,7 @@ function Timeline(opt) {
   this.fnContent = opt.content;
 }
 
-Timeline.prototype.createTile = function(row) {
+Timeline.prototype.createTile = function(row, index) {
   let ret = dom.element(`
     <li class="timeline-item">
       <div class="time"></div>
@@ -22,13 +22,31 @@ Timeline.prototype.createTile = function(row) {
   let subtitle = ret.children[1];
   let content = ret.children[2];
   if (this.fnTitle) {
-    title.innerHTML = this.fnTitle(row);
+    let el = this.fnTitle(row, index);
+    if (typeof el === 'undefined')
+      title.innerHTML = '';
+    else if (typeof el === 'string' || typeof el === 'number')
+      title.innerHTML = el;
+    else
+      title.appendChild(el);
   }
   if (this.fnSubtitle) {
-    subtitle.innerHTML = this.fnSubtitle(row);
+    let el = this.fnSubtitle(row, index);
+    if (typeof el === 'undefined')
+      subtitle.innerHTML = '';
+    else if (typeof el === 'string' || typeof el === 'number')
+      subtitle.innerHTML = el;
+    else
+      subtitle.appendChild(el);
   }
   if (this.fnContent) {
-    content.innerHTML = this.fnContent(row);
+    let el = this.fnContent(row, index);
+    if (typeof el === 'undefined')
+      content.innerHTML = '';
+    else if (typeof el === 'string' || typeof el === 'number')
+      content.innerHTML = el;
+    else
+      content.appendChild(el);
   }
   return ret;
 };
@@ -56,7 +74,7 @@ Timeline.prototype.render = function(container, params) {
       if (!resp.data) return;
       let data = resp.data;
       for (let i = 0; i < data.length; i++) {
-        ul.appendChild(self.createTile(data[i]));
+        ul.appendChild(self.createTile(data[i]), i);
       }
     }
   });
