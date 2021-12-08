@@ -445,6 +445,7 @@ $.fn.cascadeselect = function(opts) {
                 let tpl = Handlebars.compile(levels[cascadeIndex + 1].params[key]);
                 params[key] = tpl(data);
               }
+              dom.model(link, params);
               displayPopup(next, params);
               // 阻止繁殖的click事件
               event.stopImmediatePropagation();
