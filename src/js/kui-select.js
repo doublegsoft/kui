@@ -387,7 +387,7 @@ $.fn.cascadeselect = function(opts) {
       elm.style.borderBottom = 'none';
     });
     link.style.borderBottom = '2px solid #1976D2';
-
+    dom.model(link, data);
     let url = link.getAttribute('data-url');
     // let data = dom.model(link);
     data = data || {};
@@ -445,7 +445,6 @@ $.fn.cascadeselect = function(opts) {
                 let tpl = Handlebars.compile(levels[cascadeIndex + 1].params[key]);
                 params[key] = tpl(data);
               }
-              dom.model(link, params);
               displayPopup(next, params);
               // 阻止繁殖的click事件
               event.stopImmediatePropagation();
