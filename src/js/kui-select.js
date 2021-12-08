@@ -491,7 +491,7 @@ $.fn.cascadeselect = function(opts) {
 
     link.addEventListener('click', function() {
       if (opts.readonly) return;
-      let params = {};
+      let params = dom.model(this);
       if (i - 1 >= 0) {
         let prev = dom.find('a', link.parentElement.previousElementSibling.previousElementSibling);
         let selected = prev.getAttribute('data-cascade-value');
