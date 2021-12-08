@@ -389,7 +389,6 @@ $.fn.cascadeselect = function(opts) {
     link.style.borderBottom = '2px solid #1976D2';
     dom.model(link, data);
     let url = link.getAttribute('data-url');
-    // let data = dom.model(link);
     data = data || {};
     data.cascadeIndex = link.getAttribute('data-cascade-index');
     let container = link.parentElement.parentElement;
@@ -411,6 +410,7 @@ $.fn.cascadeselect = function(opts) {
     } else {
       requestParams = data;
     }
+    requestParams[link.getAttribute('data-cascade-field-value')] = '';
     xhr.post({
       url: url,
       data: requestParams,
