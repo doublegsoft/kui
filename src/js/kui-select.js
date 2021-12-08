@@ -405,9 +405,15 @@ $.fn.cascadeselect = function(opts) {
     }
     popup.style.display = '';
     popup.innerHTML = '';
+    let requestParams = {};
+    if (data['_and_condition']) {
+      requestParams['_and_condition'] = data['_and_condition'];
+    } else {
+      requestParams = data;
+    }
     xhr.post({
       url: url,
-      data: data,
+      data: requestParams,
       success: function(resp) {
         let data = resp.data;
         for (let i = 0; i < data.length; i++) {
