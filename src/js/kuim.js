@@ -137,7 +137,7 @@ kuim.wizard = function(opt) {
     }
   });
   swiper.on('sliderMove', (swiper, ev) => {
-    console.log(ev);
+
   });
   return swiper;
 };

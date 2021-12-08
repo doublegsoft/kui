@@ -202,7 +202,7 @@ utils.getParameters = function(url) {
   let strs = url.split('&');
   for (let i = 0; i < strs.length; i++) {
     let pair = strs[i].split('=');
-    ret[pair[0].trim()] = pair[1].trim();
+    ret[pair[0].trim()] = decodeURIComponent(pair[1].trim());
   }
   return ret;
 };

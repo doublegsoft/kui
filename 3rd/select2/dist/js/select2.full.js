@@ -4487,8 +4487,8 @@ S2.define('select2/dropdown/attachBody',[
       left: rect.left, // offset.left,
       top: rect.bottom, // container.bottom
     };
-
-    // console.log(css);
+    console.log(rect);
+    console.log(css);
 
     // Determine what the parent element is to use for calculating the offset
     var $offsetParent = this.$dropdownParent;

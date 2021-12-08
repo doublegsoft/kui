@@ -480,6 +480,7 @@ $.fn.cascadeselect = function(opts) {
     link.setAttribute('data-cascade-field-value', level.fields.value);
     link.setAttribute('data-cascade-field-text', level.fields.text);
     link.style.borderRadius = 'unset';
+    dom.model(link, level.params || {});
 
     if (level.value && level.value[level.fields.text]) {
       link.innerText = level.value[level.fields.text];
@@ -494,7 +495,6 @@ $.fn.cascadeselect = function(opts) {
       if (i - 1 >= 0) {
         let prev = dom.find('a', link.parentElement.previousElementSibling.previousElementSibling);
         let selected = prev.getAttribute('data-cascade-value');
-        console.log(selected);
         if (selected == null || selected == '') return;
         params[prev.getAttribute('data-cascade-name')] = selected;
         // for (let key in levels[i].params) {

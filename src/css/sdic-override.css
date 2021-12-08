@@ -436,10 +436,6 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
   margin-right: 5%;
 }
 
-.select2-container {
-  min-width: 100%;
-}
-
 .btns-list {
   margin-bottom: 10px;
   display: flex;
@@ -671,8 +667,8 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
 }
 
 .right-bar {
-  right: -100vw;
-  width: 100%;
+  /*right: -100vw;*/
+  /*width: 100%;*/
   top: 0;
   height: 100vh !important;
   padding-bottom: 60px !important;

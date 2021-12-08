@@ -519,7 +519,6 @@ dom.formdata = function(selector, data) {
       //   values[name] = textarea.value;
       // }
       values[name] = textarea.value;
-      console.log(textarea.value);
     }
     // 名称下只存在一个checkbox，就不用变成数组了
     for (let name in checkboxCount) {
@@ -534,7 +533,6 @@ dom.formdata = function(selector, data) {
         values[name] = values[values[name].substring(2, values[name].length - 1)];
       }
     }
-    console.log(values);
     return values;
   } else {
 

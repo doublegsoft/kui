@@ -59,7 +59,11 @@ Tabs.prototype.render = function() {
       } else {
         let id = nav.getAttribute('data-tab-id');
         let url = nav.getAttribute('data-tab-url');
-        self.loadPage(id, url, false, tab.success);
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(id, url, false, tab.success);
+        }
       }
     });
 
@@ -67,14 +71,26 @@ Tabs.prototype.render = function() {
     if (self.lazy === true) {
       if (idx == 0) {
         nav.classList.add(this.tabActiveClass);
-        self.loadPage(tab.id, tab.url, false, tab.success);
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(tab.id, tab.url, false, tab.success);
+        }
       }
     } else {
       if (idx == 0) {
         nav.classList.add(this.tabActiveClass);
-        self.loadPage(tab.id, tab.url, false, tab.success);
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(tab.id, tab.url, false, tab.success);
+        }
       } else {
-        self.loadPage(tab.id, tab.url, true, tab.success);
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(tab.id, tab.url, true, tab.success);
+        }
       }
 
     }

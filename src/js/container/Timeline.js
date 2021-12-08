@@ -5,9 +5,9 @@ function Timeline(opt) {
 
   this.data = opt.data || [];
 
-  this.fnTitle = opt.title;
-  this.fnSubtitle = opt.subtitle;
-  this.fnContent = opt.content;
+  this.fnTitle = opt.title || function(row, index) { return ''; };
+  this.fnSubtitle = opt.subtitle || function(row, index) { return ''; };
+  this.fnContent = opt.content || function(row, index) { return ''; };
 }
 
 Timeline.prototype.createTile = function(row, index) {
@@ -67,15 +67,21 @@ Timeline.prototype.render = function(container, params) {
   let requestParams = {};
   utils.clone(this.params, requestParams);
   utils.clone(params, requestParams);
-  xhr.post({
-    url: this.url,
-    params: requestParams,
-    success: function(resp) {
-      if (!resp.data) return;
-      let data = resp.data;
-      for (let i = 0; i < data.length; i++) {
-        ul.appendChild(self.createTile(data[i]), i);
+  if (this.url) {
+    xhr.post({
+      url: this.url,
+      params: requestParams,
+      success: function (resp) {
+        if (!resp.data) return;
+        let data = resp.data;
+        for (let i = 0; i < data.length; i++) {
+          ul.appendChild(self.createTile(data[i], i));
+        }
       }
+    });
+  } else {
+    for (let i = 0; i < self.data.length; i++) {
+      ul.appendChild(self.createTile(self.data[i], i));
     }
-  });
+  }
 };
