@@ -8,6 +8,8 @@ function Timeline(opt) {
   this.fnTitle = opt.title || function(row, index) { return ''; };
   this.fnSubtitle = opt.subtitle || function(row, index) { return ''; };
   this.fnContent = opt.content || function(row, index) { return ''; };
+
+  this.onComplete = opt.onComplete;
 }
 
 Timeline.prototype.createTile = function(row, index) {
@@ -83,5 +85,8 @@ Timeline.prototype.render = function(container, params) {
     for (let i = 0; i < self.data.length; i++) {
       ul.appendChild(self.createTile(self.data[i], i));
     }
+  }
+  if (self.onComplete) {
+    self.onComplete();
   }
 };

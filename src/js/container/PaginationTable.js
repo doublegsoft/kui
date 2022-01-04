@@ -736,19 +736,31 @@ PaginationTable.prototype.request = function (others) {
   if (this.widgetFilter) {
     let queryParams = this.widgetFilter.getQuery();
     for (let k in queryParams) {
-      params[k] = queryParams[k];
+      if (params[k]) {
+        params[k] += ' ' + queryParams[k];
+      } else {
+        params[k] = queryParams[k];
+      }
     }
   }
   if (this.queryFilter) {
     let queryParams = this.queryFilter.getValues();
     for (let k in queryParams) {
-      params[k] = queryParams[k];
+      if (params[k]) {
+        params[k] += ' ' + queryParams[k];
+      } else {
+        params[k] = queryParams[k];
+      }
     }
   }
 
   // the parameters defined in table options
   for (let k in this.filters) {
-    params[k] = this.filters[k];
+    if (params[k]) {
+      params[k] += ' ' + this.filters[k];
+    } else {
+      params[k] = this.filters[k];
+    }
   }
 
   // the parameters of method arguemnts
@@ -759,7 +771,11 @@ PaginationTable.prototype.request = function (others) {
       } else if (k == "limit") {
         this.limit = parseInt(others[k]);
       } else {
-        params[k] = others[k];
+        if (params[k]) {
+          params[k] += ' ' + others[k];
+        } else {
+          params[k] = others[k];
+        }
       }
     }
   }

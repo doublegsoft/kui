@@ -204,6 +204,7 @@ dom.model = function(selector, data) {
     let attrs = Array.prototype.slice.call(arguments, 2);
     if (attrs.length == 0) {
       for (const key in data) {
+        if (key.indexOf('||') == 0 || key.indexOf('//') == 0 || key.indexOf('>>') == 0) continue;
         if (typeof data[key] === 'object') {
           elm.setAttribute(utils.nameAttr(key), JSON.stringify(data[key]));
         } else {
@@ -213,6 +214,7 @@ dom.model = function(selector, data) {
     } else {
       for (let i = 0; i < attrs.length; i++) {
         let key = attrs[i];
+        if (key.indexOf('||') == 0 || key.indexOf('//') == 0 || key.indexOf('>>') == 0) continue;
         if (typeof data[key] === 'object') {
           elm.setAttribute(utils.nameAttr(key), JSON.stringify(data[key]));
         } else {
@@ -847,3 +849,21 @@ dom.render=function (selector,data,isRadioToMulti) {
     }
   }
 };
+
+dom.popup = function(container, element) {
+  let mask = dom.create('div', 'full-width', 'full-height', 'position-absolute');
+  mask.style.background = 'transparent';
+  dom.bind(mask, 'click', ev => {
+    mask.remove();
+    element.remove();
+  });
+  document.body.appendChild(mask);
+  container.appendChild(element);
+  return mask;
+};
+
+dom.html = function(element) {
+  let div = dom.element('<div></div>');
+  div.appendChild(element);
+  return div.innerHTML;
+}

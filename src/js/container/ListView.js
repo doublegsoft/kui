@@ -19,6 +19,8 @@ function ListView(opt) {
   this.params = opt.params || {};
   // 懒加载标志，通常用于多级联动时的次级列表，不主动加载
   this.lazy = opt.lazy === true;
+  this.hoverable = opt.hoverable !== false;
+  this.itemClass = opt.itemClass || [];
 
   this.idField = opt.idField;
 
@@ -89,7 +91,7 @@ ListView.prototype.render = function(containerId, loading) {
     this.container = document.querySelector(containerId);
   else
     this.container = containerId;
-
+  this.container.innerHTML = '';
   let ulHeight = this.height - 37;
   // style="height: 120px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.125); border-top: none;"
   if (this.onFilter) {
@@ -247,7 +249,6 @@ ListView.prototype.append = function(data) {
     }
   } else {
     let row = data;
-
     // check duplicated
     if (this.idField) {
       for (let i = 0; i < ul.children.length; i++) {
@@ -259,7 +260,13 @@ ListView.prototype.append = function(data) {
       }
     }
 
-    let li = dom.create('li', 'list-group-item', 'list-group-item-action');
+    let li = dom.create('li', 'list-group-item');
+    if (this.hoverable !== false) {
+      li.classList.add('list-group-item-action');
+    }
+    for (let i = 0; i < this.itemClass.length; i++) {
+      li.classList.add(this.itemClass[i]);
+    }
     if (this.borderless) {
       li.classList.add('b-a-0');
     }
@@ -322,6 +329,20 @@ ListView.prototype.append = function(data) {
   }
 };
 
+ListView.prototype.replace = function(data) {
+  let ul = this.container.querySelector('ul');
+  for (let i = 0; i < ul.children.length; i++) {
+    let li = ul.children[i];
+    let model = dom.model(li);
+    if (model[this.idField] === data[this.idField]) {
+      dom.model(li, data);
+      li.innerHTML = '';
+      li.appendChild(this.create(i, data));
+      break;
+    }
+  }
+}
+
 ListView.prototype.setReorderable = function(li) {
   let ul = dom.find('ul', this.container);
 
@@ -362,6 +383,14 @@ ListView.prototype.setHeight = function(height) {
   let ul = this.container.querySelector('ul');
   ul.style.height = height + 'px';
 };
+
+ListView.prototype.activate = function(li) {
+  let ul = this.container.querySelector('ul');
+  for (let i = 0; i < ul.children.length; i++) {
+    ul.children[i].classList.remove('active');
+  }
+  li.classList.add('active');
+}
 
 ListView.prototype.subscribe = function(name, callback) {
 

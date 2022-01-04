@@ -408,10 +408,6 @@ html:not([dir="rtl"]) .sidebar .btn-toggler {
   margin-left: 10px;
 }
 
-.card-body {
-  position: relative;
-}
-
 .table .thead-light th {
   background-color: #FAFAFA;
   font-size: 14px;

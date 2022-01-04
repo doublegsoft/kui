@@ -32,6 +32,8 @@
   --color-dark: #636f83;
   --color-border: #d8dbe0;
   --color-white: #fff;
+
+  --color-orange: rgb(240,108,53);
 }
 
 :root .c-dark-theme {
@@ -40,9 +42,36 @@
   /*--color-success: red; IT'S WORKING*/
 }
 
+.theme-blue {
+  --color-background: #39f;
+}
+
 body {
   font-family: "微软雅黑" !important;
   font-size: 14px;
+}
+
+.theme-blue body {
+  background-color: var(--color-background);
+}
+
+.theme-blue main {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.theme-blue header {
+  background-color: var(--color-background);
+}
+
+.theme-blue #container {
+  padding: 0!important;
+  background: #fff;
+}
+
+.theme-blue .card {
+  margin-bottom: 0!important;
+  border-radius: unset!important;
 }
 
 main {
@@ -67,12 +96,8 @@ main {
 
 #container {
   padding: 10px;
-  /*padding-right: 12px;*/
-  /*padding-left: 12px;*/
   overflow-y: auto;
   overflow-x: hidden;
-  /*background: #f0f2f5;*/
-  background: #E8ECF0;
   width: 100%;
 }
 
@@ -2502,6 +2527,10 @@ div.number-danger {
 
 .border-less {
   border: none!important;
+}
+
+input.border-less:focus {
+  outline: none!important;
 }
 
 .border-light {

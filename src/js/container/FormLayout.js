@@ -12,7 +12,8 @@ function FormLayout(opts) {
   this.columnCount = opts.columnCount || 2;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
-	this.mode=opts.mode || 'rightbar';
+	this.mode = opts.mode || 'rightbar';
+	this.onInit = opts.onInit || function() {};
   this.toast = dom.element(`
     <div class="toast fade b-a-1 text-white" data-autohide="false" 
          style="position: absolute; left: 20%; top: 10px; width: 60%; z-index: -1;">
@@ -206,6 +207,9 @@ FormLayout.prototype.build = function(persisted) {
       } else {
         opts.selection = field.value;
       }
+      if (field.onInput) {
+        opts.onchange = field.onInput;
+      }
       this.controls[field.name] = $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
     } else if (field.input == 'cascade') {
       let opts = field.options;
@@ -302,22 +306,6 @@ FormLayout.prototype.build = function(persisted) {
   dom.bind(buttonClose, 'click', function() {
     event.preventDefault();
     event.stopPropagation();
-    // layer.open({
-    //   title: '提示',
-    //   content: '确定当前信息已保存？',
-    //   btn: ['确定', '取消'],
-    //   yes: function(index, layero){
-    //     layer.close(index);
-    //     let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
-    //     if (rightbar != null) {
-    //       rightbar.classList.add('out');
-    //       setTimeout(function () {
-    //         rightbar.remove();
-    //       }, 1000);
-    //     }
-    //   },
-    //   cancel: function(){}
-    // });
     let rightbar = dom.find('div[widget-id=right-bar]')
     // let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
     if (rightbar != null) {
@@ -348,19 +336,6 @@ FormLayout.prototype.build = function(persisted) {
   let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
   let rightbar = dom.find('.right-bar');
   if (rightbar != null) {
-    //
-    // kui.css
-    // right-bar
-    // top: -28px
-    //
-    // 只有在rightbar下，才允许
-    // rightbar.style.height = (window.innerHeight + 32) + 'px';
-    // rightbar.style.paddingBottom = '32px';
-    // if (form.actionable === true) {
-    //   form.style.marginBottom = '4rem';
-    // }
-    // row.style.top = (rightbar.clientHeight - buttons.clientHeight - 28 - 13) + 'px';
-
     if (rightBarBottom.parentElement.style.display !== 'none') {
       rightBarBottom.appendChild(buttonSave);
       rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
@@ -377,6 +352,9 @@ FormLayout.prototype.build = function(persisted) {
 
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
+
+  // 初始化显示
+  this.onInit();
 };
 
 /**
@@ -502,14 +480,14 @@ FormLayout.prototype.save = async function () {
             }
           });
         }else{
-					if (buttonSave != null)
-						if (buttonSave != null)
-							buttonSave.innerHTML = '保存';
-					    dom.enable('button', self.container);
-        	return
+          if (buttonSave != null) {
+            buttonSave.innerHTML = '保存';
+            dom.enable('button', self.container);
+          }
+        	return;
         }
-      })
-      return
+      });
+      return;
     } else {
       data = this.saveOpt.convert(data);
     }
@@ -619,7 +597,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       </label>
     `);
     if (field.value == true || field.value == 'true' || field.value == 'T') {
-      dom.find('input', input).checked = true;
+      dom.find('input', input).setAttribute('checked', true);
     }
     dom.find('input', input).setAttribute('name', field.name);
   } else if (field.input == 'radiotext') {
@@ -917,6 +895,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   // user input
   if (input != null) {
     dom.bind(input, 'input', function (event) {
+      if (field.onInput) {
+        field.onInput(event);
+      }
       FormLayout.validate(this);
     });
   }
@@ -1118,81 +1099,4 @@ FormLayout.prototype.formatGridCount = function(count) {
     return '0' + count;
   }
   return '' + count;
-};
-
-FormLayout.skeleton = function() {
-  return dom.element(`
-    <div style="border: 1px solid rgba(0, 0, 0, 0.3); border-radius: 4px; width: 100%;">
-      <div
-          style="align-items: center; border-bottom: 1px solid rgba(0, 0, 0, 0.3); display: flex; justify-content: space-between; padding: 16px;">
-        <div style="width: 60%;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 8px; width: 100%;"></div>
-        </div>
-        <div style="color: rgba(0, 0, 0, 0.7);">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 16px; width: 16px;"></div>
-        </div>
-      </div>
-      <div style="padding: 16px;">
-        <div style="margin-bottom: 16px;">
-          <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 50%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 10%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-            <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-              <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-            </div>
-          </div>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; justify-content: start; width: 100%;">
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 20%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 40%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-          <div style="margin-bottom: 8px; margin-right: 8px; width: 30%;">
-            <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 9999px; height: 4px; width: 100%;"></div>
-          </div>
-        </div>
-      </div>
-      <div style="border-top: 1px solid rgba(0, 0, 0, 0.3); display: flex; justify-content: flex-end; padding: 16px;">
-        <div style="margin-right: 8px; width: 30%;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 32px; width: 100%;"></div>
-        </div>
-        <div style="width: 30%;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 32px; width: 100%;"></div>
-        </div>
-      </div>
-    </div>  
-  `);
 };

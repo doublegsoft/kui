@@ -7,12 +7,16 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   let splitter = document.createElement('a');
   splitter.setAttribute('id', splitterId);
   container.appendChild(splitter);
-  splitter.style.backgroundColor = '#cdcdcd';
+  // splitter.style.backgroundColor = '#cdcdcd';
+  splitter.style.backgroundColor = 'var(--color-background)';
   splitter.style.position = 'absolute';
-  splitter.style.width = '5px';
+  splitter.style.width = '10px';
   splitter.style.cursor = 'ew-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
+  splitter.style.color = 'white';
+  splitter.style.display = 'flex';
+  splitter.innerHTML = '<i class="fas fa-grip-lines-vertical m-auto"></i>';
 
   // disable scroll-y for container
   container.style.overflowY = 'hidden';
@@ -65,7 +69,6 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
       let target = event.target;
 
       if (target.getAttribute('id') == splitterId) {
-        console.log('hello');
         let offsetLeft = parseInt(splitter.style.left);
         splitter.style.left = (offsetLeft/* + event.layerX*/) + 'px';
         left.style.width = (offsetLeft/* + event.layerX*/) + 'px';
@@ -93,27 +96,103 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         right.style.flex = (container.clientWidth - offset) + 'px';
         return
       }
-      // if (target.getAttribute('id') == containerId) {
-      //   splitter.style.left = event.layerX + 'px';
-      //   left.style.width = event.layerX + 'px';
-      //   right.style.width = (container.clientWidth - event.layerX) + 'px';
-      // } else if (target.getAttribute('id') == splitterId ||
-      //     target.getAttribute('id') == rightId ||
-      //     target.getAttribute('id') == leftId) {
-      //   let offsetLeft = parseInt(splitter.style.left);
-      //   splitter.style.left = (offsetLeft + event.layerX) + 'px';
-      //   left.style.width = (offsetLeft + event.layerX) + 'px';
-      //   right.style.width = (container.clientWidth - (offsetLeft + event.layerX) - 10) + 'px';
-      // } else {
-      //   offsetLeftPrevious = event.layerX;
-      //   splitter.style.left = event.layerX + 'px';
-      //   left.style.width = event.layerX + 'px';
-      //   right.style.width = (container.clientWidth - event.layerX) + 'px';
-      // }
-      // splitter.style.left = event.layerX + 'px';
-      // left.style.width = event.layerX + 'px';
-      // right.style.width = (container.clientWidth - event.layerX) + 'px';
     }
   });
+  return splitter;
+};
 
+split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
+  const splitterId = "__split_splitterId_" + topId.getAttribute('widget-id');
+  topDefaultSize = (topDefaultSize || 300);
+  let container = dom.find(containerId);
+  let splitter = document.createElement('a');
+  splitter.setAttribute('id', splitterId);
+  container.appendChild(splitter);
+  // splitter.style.backgroundColor = '#cdcdcd';
+  splitter.style.backgroundColor = 'var(--color-background)';
+  splitter.style.position = 'absolute';
+  splitter.style.width = '100%';
+  splitter.style.height = '10px';
+  splitter.style.top = topDefaultSize + 'px';
+  splitter.style.cursor = 'ns-resize';
+  splitter.style.padding = '2px';
+  splitter.style.zIndex = '3';
+  splitter.style.color = 'white';
+  splitter.style.display = 'flex';
+  splitter.innerHTML = '<i class="fas fa-grip-lines position-relative m-auto" style="top: -4px;"></i>';
+
+  // disable scroll-y for container
+  container.style.overflowY = 'hidden';
+
+  let heightContainer = container.clientHeight;
+
+  let top = dom.find(topId);
+  let bot = dom.find(bottomId);
+
+  top.style.height = topDefaultSize + 'px';
+  // top.style.flex = topDefaultSize + 'px';
+  top.style.overflowY = 'auto';
+
+  bot.style.height = (container.clientHeight - topDefaultSize - 10) + 'px';
+  // bot.style.flex = (container.clientHeight - topDefaultSize - 10) + 'px';
+  bot.style.overflowY = 'auto';
+
+  let dragging = false;
+  splitter.addEventListener('mousedown', function(event) {
+    event.preventDefault();
+    dragging = true;
+    document.body.style.cursor = 'ns-resize';
+  });
+
+  document.addEventListener('mouseup', function(event) {
+    dragging = false;
+    document.body.style.cursor = 'default';
+  });
+
+  function isUnderContainer(element, container) {
+    if (element == null) {
+      return false;
+    }
+    if (element == container) return true;
+    return isUnderContainer(element.parentElement, container);
+  }
+
+  let offsetLeftPrevious = -1;
+  container.addEventListener('mousemove', function(event) {
+    if (dragging) {
+      if (event.offsetY <= 0) return;
+      if (event.offsetY >= this.clientHeight) return;
+      let target = event.target;
+
+      if (target.getAttribute('id') == splitterId) {
+        let offsetTop = parseInt(splitter.style.top);
+        splitter.style.top = (offsetTop/* + event.layerX*/) + 'px';
+        top.style.height = (offsetTop/* + event.layerX*/) + 'px';
+        top.style.flex = (offsetTop/* + event.layerX*/) + 'px';
+        bot.style.height = (container.clientHeight - (offsetTop/* + event.layerX*/)) + 'px';
+        bot.style.flex = (container.clientHeight - (offsetTop/* + event.layerX*/)) + 'px';
+        return;
+      }
+      let offset = 0;
+      if (isUnderContainer(target, top)) {
+        offset = parseInt(splitter.style.top) - 10;
+        splitter.style.top = offset + 'px';
+        top.style.height = offset + 'px';
+        bot.style.height = (container.clientHeight - offset) + 'px';
+        top.style.flex = offset + 'px';
+        bot.style.flex = (container.clientHeight - offset) + 'px';
+        return;
+      }
+      if (isUnderContainer(target, bot)) {
+        offset = parseInt(splitter.style.top) + 10;
+        splitter.style.top = offset + 'px';
+        top.style.height = offset + 'px';
+        bot.style.height = (container.clientHeight - offset) + 'px';
+        top.style.flex = offset + 'px';
+        bot.style.flex = (container.clientHeight - offset) + 'px';
+        return;
+      }
+    }
+  });
+  return splitter;
 };

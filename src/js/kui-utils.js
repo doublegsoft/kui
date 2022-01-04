@@ -206,3 +206,11 @@ utils.getParameters = function(url) {
   }
   return ret;
 };
+
+utils.isExisting = (array, obj, idField) => {
+  for (let i = 0; i < array.length; i++) {
+    if (array[i][idField] === obj[idField])
+      return true;
+  }
+  return false;
+}

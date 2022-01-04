@@ -416,9 +416,7 @@ ajax.append = function(opts) {
     xhr.get({
       url: url,
       success: function (resp) {
-        let range = document.createRange();
-        let fragment = range.createContextualFragment(resp);
-        container.appendChild(fragment);
+        utils.append(container, resp, false)
 
         for (let i = container.children.length - 1; i >= 0; i--) {
           let div = container.children[i];
@@ -574,9 +572,9 @@ ajax.stack = function(opt) {
 
 ajax.unstack = function(opt) {
   let container = dom.find(opt.containerId);
-  let stackedPage = container.querySelector('div[page-id]');
+  let stackedPage = container.children[container.children.length - 1];
   stackedPage.remove();
-  let hiddenPage = container.querySelector('.hide');
+  let hiddenPage = container.children[container.children.length - 1];
   hiddenPage.classList.remove('hide');
   hiddenPage.classList.add('show');
 }
@@ -847,7 +845,7 @@ ajax.sidebar = function(opt) {
   let allowClose = opt.allowClose || false;
   if (sidebar != null) sidebar.remove();
   sidebar = dom.element(`
-    <div widget-id="right-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: transparent;">
+    <div widget-id="right-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 100%; background: transparent; z-index: 999999;">
       <div class="right-bar fade show">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -870,7 +868,7 @@ ajax.sidebar = function(opt) {
     dom.find('.modal-body', sidebar).style.marginBottom = '36px';
     dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
   }
-  dom.height(sidebar, 0, document.body);
+  // dom.height(sidebar, 0, document.body);
   sidebar.addEventListener('click', (evt) => {
     let widgetId = evt.target.getAttribute('widget-id');
     if (widgetId !== 'right-bar') return;
@@ -895,19 +893,6 @@ ajax.sidebar = function(opt) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
-          // layer.open({
-          //   title: '提示',
-          //   content: '确定当前信息已保存？',
-          //   btn: ['确定', '取消'],
-          //   yes: function(index, layero){
-          //     layer.close(index);
-          //     //关闭弹窗
-          //     dom.find('.right-bar').classList.add('out');
-          //     if (opt.close)
-          //       opt.close();
-          //   },
-          //   cancel: function(){}
-          // });
           //关闭弹窗
           sidebar.children[0].classList.add('out');
           sidebar.remove();

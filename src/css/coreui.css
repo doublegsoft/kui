@@ -5218,13 +5218,13 @@ input[type="button"].btn-block {
 
 .list-group-item.active {
   z-index: 2;
-  color: #fff;
+  /*color: #fff;*/
   /*
   background-color: #2A70FF;
   border-color: #2A70FF;
   */
-  background-color: #ababab;
-  border-color: #ababab;
+  background-color: #efefef;
+  border-color: #efefef;
 }
 
 .list-group-flush .list-group-item {
@@ -6161,7 +6161,8 @@ button.bg-success:focus {
 }
 
 .bg-info {
-  background-color: #63c2de !important;
+  /*background-color: #63c2de !important;*/
+  background-color: var(--color-info) !important;
 }
 
 a.bg-info:hover, a.bg-info:focus,

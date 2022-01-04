@@ -9,7 +9,7 @@ QueryFilter.prototype.getRoot = function() {
   this.root = dom.element(`
     <div class="pl-2 mr-5"
          style="width: 100%; height: 26px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); cursor: text; 
-                line-height: 26px;">
+                line-height: 26px; z-index: 999;">
       <i class="fas fa-search pr-2" style="opacity: 0.3;"></i>
       <style>#__input_dummy{outline: none}</style>
       <input id="__input_dummy" style="height: 22px; width: 6px; border: none;">

@@ -8,7 +8,6 @@ function Timer(option) {
 Timer.prototype.start = function () {
     console.log(this.runFunction)
     if( this.runFunction){
-        console.log('测试函数')
         this.timer=setInterval(this.runFunction,this.timeOut)
     }
 };
