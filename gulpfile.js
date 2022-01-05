@@ -7,7 +7,8 @@ var gulp = require('gulp');
 var jasmine = require('gulp-jasmine');
 // var jasmineBrowser = require('gulp-jasmine-browser');
 
-var uglify = require('gulp-uglify');
+var uglify = require('gulp-uglifyes');
+var babel = require('gulp-babel');
 var uglifycss = require('gulp-uglifycss');
 var concat = require('gulp-concat');
 var copy = require('gulp-copy');
@@ -21,16 +22,19 @@ gulp.task('specs', function () {
   */
 });
 
-gulp.task('compress', function() {
+gulp.task('dist', function() {
   // uglify js
-  gulp.src(['src/js/*.js'])
-      .pipe(concat('./kui-all.min.js'))
-      .pipe(uglify())
-      .pipe(gulp.dest('./dist/'));
-  
-  gulp.src(['src/js/*.js'])
-      .pipe(concat('./kui-all.js'))
-      .pipe(gulp.dest('./dist/'));
+  gulp.src(['src/js/*.js', 'src/js/application/*.js', 'src/js/container/*.js', 'src/js/control/*.js',
+    'src/js/editor/*.js', 'src/js/widget/*.js'])
+    // .pipe(babel({presets: ['es2015']}))
+    .pipe(concat('./kui-all.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist/'));
+
+  gulp.src(['src/js/*.js', 'src/js/application/*.js', 'src/js/container/*.js', 'src/js/control/*.js',
+    'src/js/editor/*.js', 'src/js/widget/*.js'])
+    .pipe(concat('./kui-all.js'))
+    .pipe(gulp.dest('./dist/'));
   
   // uglify css
   gulp.src(['src/css/*.css'])
@@ -49,4 +53,4 @@ gulp.task('default', function() {
 });
 
 // gulp.task('default', ['compress', 'specs']);
-gulp.task('compress');
+gulp.task('dist');

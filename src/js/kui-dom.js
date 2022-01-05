@@ -761,7 +761,7 @@ dom.height = function(selector, offset, parent) {
   let offsetTop = dom.top(element);
   let computedStyle = getComputedStyle(parent,null);
 
-  let paddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
+  let marginBottom = parseInt(computedStyle.getPropertyValue('margin-bottom'));
   let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
   computedStyle = getComputedStyle(element,null);
   let borderTopWidth = parseInt(computedStyle.getPropertyValue('border-top-width'));
@@ -773,7 +773,7 @@ dom.height = function(selector, offset, parent) {
     paddingBottom = 0;
   }
 
-  element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
+  element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom - marginBottom) + 'px';
   element.style.overflowY = 'auto';
 };
 
