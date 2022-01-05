@@ -5,7 +5,7 @@
  * 
  * @version 1.0.0 - Created on Jan 26, 2019.
  */
-const xhr = {};
+xhr = {};
 
 /**
  * @private

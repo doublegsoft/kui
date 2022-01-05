@@ -37,11 +37,11 @@ gulp.task('dist', function() {
     .pipe(gulp.dest('./dist/'));
   
   // uglify css
-  gulp.src(['src/css/*.css'])
+  gulp.src(['src/css/coreui.css', 'src/css/kui.css', 'src/css/kui-*.css'])
       .pipe(concat('./kui-all.css'))
       .pipe(gulp.dest('./dist/'));
   
-  gulp.src(['src/css/*.css'])
+  gulp.src(['src/css/coreui.css', 'src/css/kui.css', 'src/css/kui-*.css'])
       .pipe(concat('./kui-all.min.css'))
       .pipe(uglifycss())
       .pipe(gulp.dest('./dist/'));
