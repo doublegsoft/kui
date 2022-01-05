@@ -6168,7 +6168,7 @@ button.bg-success:focus {
 a.bg-info:hover, a.bg-info:focus,
 button.bg-info:hover,
 button.bg-info:focus {
-  background-color: #39b2d5 !important;
+  background-color: var(--color-info) !important;
 }
 
 .bg-warning {
@@ -8937,7 +8937,7 @@ a.text-success:hover, a.text-success:focus {
 }
 
 .text-info {
-  color: #63c2de !important;
+  color: var(--color-info) !important;
 }
 
 a.text-info:hover, a.text-info:focus {
