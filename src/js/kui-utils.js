@@ -1,4 +1,4 @@
-utils = {};
+let utils = {};
 
 /**
  * 

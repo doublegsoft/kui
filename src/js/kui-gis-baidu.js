@@ -309,7 +309,7 @@ gis.Baidu.NumberOverlay = function (map, data, coordinate, triggers) {
     this.triggers = triggers || {};
 };
 
-// gis.Baidu.NumberOverlay.prototype = new BMap.Overlay();
+gis.Baidu.NumberOverlay.prototype = new BMap.Overlay();
 
 /**
  * 继承实现百度地图覆盖物的初始化方法。
@@ -372,7 +372,7 @@ gis.Baidu.PaneControl = function(options) {
     this.display = options.display || false;
 };
 
-// gis.Baidu.PaneControl.prototype = new BMap.Control();
+gis.Baidu.PaneControl.prototype = new BMap.Control();
 
 gis.Baidu.PaneControl.prototype.initialize = function(map) {
     var ret = document.getElementById(this.id);
@@ -474,7 +474,7 @@ gis.Baidu.Toolbar = function(option) {
 /**
  * 继承于百度地图Control。
  */
-// gis.Baidu.Toolbar.prototype = new BMap.Control();
+gis.Baidu.Toolbar.prototype = new BMap.Control();
 
 /**
  * 初始化工具栏，渲染工具栏显示内容。
