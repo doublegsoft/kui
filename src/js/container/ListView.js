@@ -20,6 +20,7 @@ function ListView(opt) {
   // 懒加载标志，通常用于多级联动时的次级列表，不主动加载
   this.lazy = opt.lazy === true;
   this.hoverable = opt.hoverable !== false;
+  this.activateable = opt.activateable === true;
   this.itemClass = opt.itemClass || [];
 
   this.idField = opt.idField;
@@ -263,6 +264,15 @@ ListView.prototype.append = function(data) {
     let li = dom.create('li', 'list-group-item');
     if (this.hoverable !== false) {
       li.classList.add('list-group-item-action');
+    }
+    if (this.activateable === true) {
+      dom.bind(li, 'click', ev => {
+        for (let i = 0; i < li.parentElement.children.length; i++) {
+          let el = li.parentElement.children[i];
+          el.classList.remove('active');
+        }
+        li.classList.add('active');
+      });
     }
     for (let i = 0; i < this.itemClass.length; i++) {
       li.classList.add(this.itemClass[i]);

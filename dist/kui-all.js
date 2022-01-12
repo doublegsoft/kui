@@ -6907,6 +6907,7 @@ $.fn.searchselect = function (opts) {
   let select = opts.select;
   let onchange = opts.onchange;
   let validate = opts.validate || function(val) {};
+  let variables = opts.variables;
 
   let value;
   let text;
@@ -6918,18 +6919,30 @@ $.fn.searchselect = function (opts) {
     text = opts.fields.text;
   }
 
-
+  let self = $(this);
   if (opts.url) {
+    if (variables && utils.isEmpty(variables)) {
+      self.select2({
+        placeholder: opts.placeholder,
+        minimumResultsForSearch: searchable ? 0 : Infinity,
+        liveSearch: true,
+        allowClear: true,
+      });
+      return;
+    };
 
-    let self = $(this);
     let dotIndex = value.indexOf('.');
     let objname = value.substr(0, dotIndex);
     let attrname = value.substr(dotIndex + 1);
-
+    variables = variables || {};
+    let params = opts.data || opts.params || {};
+    for (let key in variables) {
+      params[key] = variables[key];
+    }
     xhr.post({
       url: opts.url,
       usecase: opts.usecase,
-      data: opts.data || {},
+      data: params,
       success: function (resp) {
         if (!resp.data) {
           resp.data = [];
@@ -7979,6 +7992,16 @@ utils.isEmpty = function(obj) {
   let ret = 0;
   for (let key in obj) {
     ret++;
+  }
+  return ret == 0;
+};
+
+utils.isBlank = function(obj) {
+  let ret = 0;
+  for (let key in obj) {
+    if (obj[key] != null && obj[key] !== '') {
+      ret++;
+    }
   }
   return ret == 0;
 };
@@ -9543,6 +9566,8 @@ function FormLayout(opts) {
     self.toast.classList.remove('show', 'in');
     self.toast.style.zIndex = -1;
   });
+
+  this.variableListeners = {};
 }
 
 /**
@@ -9720,6 +9745,15 @@ FormLayout.prototype.build = function(persisted) {
       }
       if (field.onInput) {
         opts.onchange = field.onInput;
+      }
+      if (field.variables) {
+        opts.variables = field.variables;
+        for (let key in opts.variables) {
+          this.variableListeners[key] = (val) => {
+            opts.variables[key] = val;
+            this.controls[field.name] = $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
+          }
+        }
       }
       this.controls[field.name] = $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
     } else if (field.input == 'cascade') {
@@ -10610,6 +10644,14 @@ FormLayout.prototype.formatGridCount = function(count) {
     return '0' + count;
   }
   return '' + count;
+};
+
+FormLayout.prototype.setVariables = function(vars){
+  for (let key in vars) {
+    if (this.variableListeners[key]) {
+      this.variableListeners[key](vars[key]);
+    }
+  }
 };
 /**
  * 
@@ -11608,6 +11650,7 @@ function ListView(opt) {
   // 懒加载标志，通常用于多级联动时的次级列表，不主动加载
   this.lazy = opt.lazy === true;
   this.hoverable = opt.hoverable !== false;
+  this.activateable = opt.activateable === true;
   this.itemClass = opt.itemClass || [];
 
   this.idField = opt.idField;
@@ -11851,6 +11894,15 @@ ListView.prototype.append = function(data) {
     let li = dom.create('li', 'list-group-item');
     if (this.hoverable !== false) {
       li.classList.add('list-group-item-action');
+    }
+    if (this.activateable === true) {
+      dom.bind(li, 'click', ev => {
+        for (let i = 0; i < li.parentElement.children.length; i++) {
+          let el = li.parentElement.children[i];
+          el.classList.remove('active');
+        }
+        li.classList.add('active');
+      });
     }
     for (let i = 0; i < this.itemClass.length; i++) {
       li.classList.add(this.itemClass[i]);

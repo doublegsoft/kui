@@ -13547,7 +13547,7 @@ hr.transparent {
 .bg-warning,
 .bg-danger,
 .bg-dark {
-  color: #fff;
+  /*color: #fff;*/
 }
 
 .bg-facebook {

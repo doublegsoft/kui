@@ -187,6 +187,16 @@ utils.isEmpty = function(obj) {
   return ret == 0;
 };
 
+utils.isBlank = function(obj) {
+  let ret = 0;
+  for (let key in obj) {
+    if (obj[key] != null && obj[key] !== '') {
+      ret++;
+    }
+  }
+  return ret == 0;
+};
+
 utils.getParameter = function(url, name) {
   name = name.replace(/[\[\]]/g, '\\$&');
   let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex.exec(url);

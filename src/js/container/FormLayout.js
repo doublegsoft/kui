@@ -32,6 +32,8 @@ function FormLayout(opts) {
     self.toast.classList.remove('show', 'in');
     self.toast.style.zIndex = -1;
   });
+
+  this.variableListeners = {};
 }
 
 /**
@@ -210,6 +212,15 @@ FormLayout.prototype.build = function(persisted) {
       if (field.onInput) {
         opts.onchange = field.onInput;
       }
+      if (field.variables) {
+        opts.variables = field.variables;
+        for (let key in opts.variables) {
+          this.variableListeners[key] = (val) => {
+            opts.variables[key] = val;
+            this.controls[field.name] = $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
+          }
+        }
+      }
       this.controls[field.name] = $(this.container).find('select[name=\'' + field.name + '\']').searchselect(opts);
     } else if (field.input == 'cascade') {
       let opts = field.options;
@@ -328,6 +339,7 @@ FormLayout.prototype.build = function(persisted) {
   });
 
   let rightBarBottom = dom.find('div[widget-id=right-bar-bottom]');
+  rightBarBottom.innerHTML = '';
   if (!this.readonly) {
     buttons.appendChild(buttonSave);
     buttons.append(' ');
@@ -1099,4 +1111,12 @@ FormLayout.prototype.formatGridCount = function(count) {
     return '0' + count;
   }
   return '' + count;
+};
+
+FormLayout.prototype.setVariables = function(vars){
+  for (let key in vars) {
+    if (this.variableListeners[key]) {
+      this.variableListeners[key](vars[key]);
+    }
+  }
 };

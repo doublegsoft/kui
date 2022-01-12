@@ -67,6 +67,7 @@ $.fn.searchselect = function (opts) {
   let select = opts.select;
   let onchange = opts.onchange;
   let validate = opts.validate || function(val) {};
+  let variables = opts.variables;
 
   let value;
   let text;
@@ -78,18 +79,30 @@ $.fn.searchselect = function (opts) {
     text = opts.fields.text;
   }
 
-
+  let self = $(this);
   if (opts.url) {
+    if (variables && utils.isEmpty(variables)) {
+      self.select2({
+        placeholder: opts.placeholder,
+        minimumResultsForSearch: searchable ? 0 : Infinity,
+        liveSearch: true,
+        allowClear: true,
+      });
+      return;
+    };
 
-    let self = $(this);
     let dotIndex = value.indexOf('.');
     let objname = value.substr(0, dotIndex);
     let attrname = value.substr(dotIndex + 1);
-
+    variables = variables || {};
+    let params = opts.data || opts.params || {};
+    for (let key in variables) {
+      params[key] = variables[key];
+    }
     xhr.post({
       url: opts.url,
       usecase: opts.usecase,
-      data: opts.data || {},
+      data: params,
       success: function (resp) {
         if (!resp.data) {
           resp.data = [];
