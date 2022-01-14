@@ -117,6 +117,13 @@ ListView.prototype.render = function(containerId, loading) {
         </div>
       </div>
     `);
+    let input = dom.find('input', topbar);
+    dom.bind(input, 'input', ev => {
+      clearTimeout(this.delayToSearch);
+      this.delayToSearch = setTimeout(() => {
+        this.onFilter(this, input.value);
+      }, 500);
+    });
     if (!this.required) {
       topbar.children[2].children[2].remove();
     }
@@ -351,7 +358,19 @@ ListView.prototype.replace = function(data) {
       break;
     }
   }
-}
+};
+
+ListView.prototype.search = function(query) {
+  let ul = this.container.querySelector('ul');
+  for (let i = 0; i < ul.children.length; i++) {
+    let li = ul.children[i];
+    if (li.innerText.indexOf(query) != -1) {
+      li.style.display = '';
+    } else {
+      li.style.display = 'none';
+    }
+  }
+};
 
 ListView.prototype.setReorderable = function(li) {
   let ul = dom.find('ul', this.container);
