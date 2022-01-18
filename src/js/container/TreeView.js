@@ -10,6 +10,9 @@ function TreeView(opts) {
   this.local = opts.local;
   // the level number
   this.levels = opts.levels || 1;
+  let params = opts.params || {};
+  this.rootParams = params.root || {};
+  this.childParams = params.child || {};
 
   this.fieldText = opts.fields.text;
   this.fieldValue = opts.fields.value;
@@ -19,6 +22,9 @@ function TreeView(opts) {
   this.onRemoveNode = opts.onRemoveNode;
   this.onSelectNode = opts.onSelectNode;
   this.onAddNode = opts.onAddNode;
+
+  this.isNodeEditable = opts.isNodeEditable;
+  this.isNodeRemovable = opts.isNodeRemovable;
 }
 
 TreeView.prototype.createNodeElement = function(data, level) {
@@ -59,12 +65,15 @@ TreeView.prototype.createNodeElement = function(data, level) {
       </div>
     </li>
   `, viewModel);
+  dom.model(ret, data);
   let buttonExpand = dom.find('[widget-id=buttonExpand]', ret);
   let buttonEdit = dom.find('[widget-id=buttonEdit]', ret);
   let buttonAdd = dom.find('[widget-id=buttonAdd]', ret);
   let buttonDelete = dom.find('[widget-id=buttonDelete]', ret);
-  if ((level + 1) == this.levels) buttonExpand.remove();
-  else {
+  if ((level + 1) == this.levels) {
+    buttonExpand.style.visibility = 'hidden';
+    // buttonExpand.remove();
+  } else {
     let model = {};
     model[this.fieldParent] = data[this.fieldValue];
     dom.model(buttonExpand, model);
@@ -80,7 +89,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
         icon.classList.add('fa-minus-square');
         ul.style.display = '';
         if (ul.children.length == 0)
-          this.fetchChildren(ret, dom.model(a));
+          this.fetchChildren(ret, dom.model(a), level + 1);
       } else {
         icon.classList.remove('fa-minus-square');
         icon.classList.add('fa-plus-square');
@@ -89,10 +98,14 @@ TreeView.prototype.createNodeElement = function(data, level) {
     });
   }
 
+  let model = {};
+  model[this.fieldValue] = data[this.fieldValue];
+  model[this.fieldText] = data[this.fieldText];
+  if (data[this.fieldParent])
+    model[this.fieldParent] = data[this.fieldParent];
+
   let widthActions = 0;
   if (this.onEditNode) {
-    let model = {};
-    model[this.fieldValue] = data[this.fieldValue];
     dom.model(buttonEdit, model);
     dom.bind(buttonEdit, 'click', ev => {
       ev.preventDefault();
@@ -104,9 +117,9 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonEdit.remove();
   }
+  if (!this.isNodeEditable || !this.isNodeEditable(model))
+    buttonEdit.remove();
   if (this.onRemoveNode) {
-    let model = {};
-    model[this.fieldValue] = data[this.fieldValue];
     dom.model(buttonDelete, model);
     dom.bind(buttonDelete, 'click', ev => {
       ev.preventDefault();
@@ -118,12 +131,12 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonDelete.remove();
   }
+  if (!this.isNodeEditable || !this.isNodeEditable(model))
+    buttonDelete.remove();
 
   if (this.onAddNode) {
     if ((level + 1) == this.levels) buttonAdd.remove();
     else {
-      let model = {};
-      model[this.fieldParent] = data[this.fieldParent];
       dom.model(buttonAdd, model);
       dom.bind(buttonAdd, 'click', ev => {
         let a = dom.ancestor(ev.target, 'a');
@@ -172,16 +185,34 @@ TreeView.prototype.appendNode = function(parentElement, data, level) {
   }
 };
 
-TreeView.prototype.fetchChildren = async function(parentElement, params) {
+TreeView.prototype.fetchChildren = async function(parentElement, params, level) {
   if (!this.childUrl) return;
   let url = this.childUrl;
+  let fixedParams = level > 0 ? this.childParams : this.rootParams;
   let data = await xhr.promise({
     url: url,
-    params: params,
+    params: {
+      ...fixedParams,
+      ...params,
+    },
   });
   for (let i = 0; i < data.length; i++) {
-    this.appendNode(parentElement, data[i], 1);
+    this.appendNode(parentElement, data[i], level);
   }
+};
+
+TreeView.prototype.update = function (nodeData) {
+  let ul = this.container.querySelector('ul');
+  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
+  if (li != null) {
+    // update
+    li.querySelector('strong').innerText = nodeData[this.fieldText];
+    dom.model(li, nodeData);
+    return;
+  }
+  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
+  let level = parseInt(li.getAttribute('widget-model-level'));
+  this.appendNode(li, nodeData, level + 1);
 };
 
 TreeView.prototype.render = async function(containerId, params) {

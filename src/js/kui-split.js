@@ -1,6 +1,7 @@
 if (typeof split === 'undefined') split = {};
 
 split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
+  const SPLITTER_WIDTH = 10;
   const splitterId = "__split_splitterId";
   leftDefaultSize = (leftDefaultSize || 300)
   let container = dom.find(containerId);
@@ -10,12 +11,13 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   // splitter.style.backgroundColor = '#cdcdcd';
   splitter.style.backgroundColor = 'var(--color-background)';
   splitter.style.position = 'absolute';
-  splitter.style.width = '10px';
+  splitter.style.width = SPLITTER_WIDTH + 'px';
   splitter.style.cursor = 'ew-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
   splitter.style.color = 'white';
   splitter.style.display = 'flex';
+  splitter.style.zIndex = '999';
   splitter.innerHTML = '<i class="fas fa-grip-lines-vertical m-auto"></i>';
 
   // disable scroll-y for container
@@ -28,8 +30,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
 
   left.style.width = leftDefaultSize + 'px';
   left.style.flex = leftDefaultSize + 'px';
-  right.style.width = container.clientWidth - leftDefaultSize + 'px';
-  right.style.flex = container.clientWidth - leftDefaultSize + 'px';
+  right.style.width = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
+  right.style.flex = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
 
   splitter.style.height = heightContainer + 'px';
   splitter.style.top = 0 + 'px';
@@ -73,8 +75,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         splitter.style.left = (offsetLeft/* + event.layerX*/) + 'px';
         left.style.width = (offsetLeft/* + event.layerX*/) + 'px';
         left.style.flex = (offsetLeft/* + event.layerX*/) + 'px';
-        right.style.width = (container.clientWidth - (offsetLeft/* + event.layerX*/)) + 'px';
-        right.style.flex = (container.clientWidth - (offsetLeft/* + event.layerX*/)) + 'px';
+        right.style.width = (container.clientWidth - SPLITTER_WIDTH - (offsetLeft/* + event.layerX*/)) + 'px';
+        right.style.flex = (container.clientWidth - SPLITTER_WIDTH - (offsetLeft/* + event.layerX*/)) + 'px';
         return;
       }
       let offset = 0;
@@ -82,19 +84,19 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         offset = parseInt(splitter.style.left) - 5;
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
-        right.style.width = (container.clientWidth - offset) + 'px';
+        right.style.width = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         left.style.flex = offset + 'px';
-        right.style.flex = (container.clientWidth - offset) + 'px';
+        right.style.flex = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         return;
       }
       if (isUnderContainer(target, right)) {
         offset = parseInt(splitter.style.left) + 5;
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
-        right.style.width = (container.clientWidth - offset) + 'px';
+        right.style.width = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         left.style.flex = offset + 'px';
-        right.style.flex = (container.clientWidth - offset) + 'px';
-        return
+        right.style.flex = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
+        return;
       }
     }
   });

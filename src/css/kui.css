@@ -1128,6 +1128,30 @@ h6, .h6 {
   padding: 0;
 }
 
+.line-height-24 {
+  line-height: 24px!important;
+}
+
+.line-height-28 {
+  line-height: 28px!important;
+}
+
+.line-height-32 {
+  line-height: 32px!important;
+}
+
+.line-height-36 {
+  line-height: 36px!important;
+}
+
+.font-6 {
+  font-size: 6px !important;
+}
+
+.font-8 {
+  font-size: 8px !important;
+}
+
 .font-10 {
   font-size: 10px !important;
 }
@@ -2710,4 +2734,38 @@ input.border-less:focus {
 a.disabled {
   pointer-events: none;
   opacity: 0.25;
+}
+
+.list-group-item.active {
+  z-index: 2;
+  /*color: #fff;*/
+  /*
+  background-color: #2A70FF;
+  border-color: #2A70FF;
+  */
+  background-color: #efefef;
+  border-color: #efefef;
+}
+
+.list-group-item-action.active {
+  z-index: 2;
+  /*color: #fff;*/
+  /*
+  background-color: #2A70FF;
+  border-color: #2A70FF;
+  */
+  background-color: #efefef;
+  border-color: #efefef;
+}
+
+.list-group-item-action.active a.action {
+  visibility: visible;
+}
+
+.list-group-item-action a.action {
+  visibility: hidden;
+}
+
+.list-group-item-action:hover a.action {
+  visibility: visible;
 }

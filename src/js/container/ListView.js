@@ -34,6 +34,8 @@ function ListView(opt) {
   this.create = opt.create || function(idx, row) {};
   this.complete = opt.complete;
 
+  this.draggable = opt.draggable === true;
+
   this.start = opt.start || 0;
   this.limit = opt.limit || -1;
 
@@ -97,7 +99,7 @@ ListView.prototype.render = function(containerId, loading) {
   // style="height: 120px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.125); border-top: none;"
   if (this.onFilter) {
     let topbar = dom.element(`
-      <div class="input-group">
+      <div class="input-group position-sticky" style="top: 0; left: 0; z-index: 10;">
         <div class="input-group-prepend">
           <span class="input-group-text" style="border-bottom-left-radius: unset;">
             <i class="fas fa-search"></i>
@@ -181,29 +183,6 @@ ListView.prototype.load = function() {
   this.start = this.local.length;
   this.fetch();
 };
-
-/**
- * Removes an item from a list.
- * <p>
- * And it is an event handler.
- */
-// ListView.prototype.remove = function(event) {
-//   event.preventDefault();
-//   event.stopPropagation();
-//   let self = this;
-//   let clicked = event.target;
-//   let found = clicked;
-//   while (found.tagName != 'LI') {
-//     found = found.parentElement;
-//   }
-//
-//   let model = dom.model(found);
-//   if (self.onRemove) {
-//     self.onRemove(model);
-//   }
-//   // remove dom element
-//   found.remove();
-// };
 
 ListView.prototype.remove = function(model) {
   if (this.idField) {
@@ -343,6 +322,15 @@ ListView.prototype.append = function(data) {
 
     if (this.onReorder)
       this.setReorderable(li);
+    else if (this.draggable) {
+      li.setAttribute("draggable", "true");
+      li.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+      li.addEventListener("dragstart", function(event) {
+
+      });
+    }
   }
 };
 

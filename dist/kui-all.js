@@ -7414,6 +7414,7 @@ $.fn.cascadeselect = function(opts) {
 if (typeof split === 'undefined') split = {};
 
 split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
+  const SPLITTER_WIDTH = 10;
   const splitterId = "__split_splitterId";
   leftDefaultSize = (leftDefaultSize || 300)
   let container = dom.find(containerId);
@@ -7423,12 +7424,13 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   // splitter.style.backgroundColor = '#cdcdcd';
   splitter.style.backgroundColor = 'var(--color-background)';
   splitter.style.position = 'absolute';
-  splitter.style.width = '10px';
+  splitter.style.width = SPLITTER_WIDTH + 'px';
   splitter.style.cursor = 'ew-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
   splitter.style.color = 'white';
   splitter.style.display = 'flex';
+  splitter.style.zIndex = '999';
   splitter.innerHTML = '<i class="fas fa-grip-lines-vertical m-auto"></i>';
 
   // disable scroll-y for container
@@ -7441,8 +7443,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
 
   left.style.width = leftDefaultSize + 'px';
   left.style.flex = leftDefaultSize + 'px';
-  right.style.width = container.clientWidth - leftDefaultSize + 'px';
-  right.style.flex = container.clientWidth - leftDefaultSize + 'px';
+  right.style.width = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
+  right.style.flex = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
 
   splitter.style.height = heightContainer + 'px';
   splitter.style.top = 0 + 'px';
@@ -7486,8 +7488,8 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         splitter.style.left = (offsetLeft/* + event.layerX*/) + 'px';
         left.style.width = (offsetLeft/* + event.layerX*/) + 'px';
         left.style.flex = (offsetLeft/* + event.layerX*/) + 'px';
-        right.style.width = (container.clientWidth - (offsetLeft/* + event.layerX*/)) + 'px';
-        right.style.flex = (container.clientWidth - (offsetLeft/* + event.layerX*/)) + 'px';
+        right.style.width = (container.clientWidth - SPLITTER_WIDTH - (offsetLeft/* + event.layerX*/)) + 'px';
+        right.style.flex = (container.clientWidth - SPLITTER_WIDTH - (offsetLeft/* + event.layerX*/)) + 'px';
         return;
       }
       let offset = 0;
@@ -7495,19 +7497,19 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         offset = parseInt(splitter.style.left) - 5;
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
-        right.style.width = (container.clientWidth - offset) + 'px';
+        right.style.width = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         left.style.flex = offset + 'px';
-        right.style.flex = (container.clientWidth - offset) + 'px';
+        right.style.flex = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         return;
       }
       if (isUnderContainer(target, right)) {
         offset = parseInt(splitter.style.left) + 5;
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
-        right.style.width = (container.clientWidth - offset) + 'px';
+        right.style.width = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         left.style.flex = offset + 'px';
-        right.style.flex = (container.clientWidth - offset) + 'px';
-        return
+        right.style.flex = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
+        return;
       }
     }
   });
@@ -9930,12 +9932,15 @@ FormLayout.prototype.fetch = function (params) {
   xhr.post({
     url: this.readOpt.url,
     data: params,
-    success: function(resp) {
+    success: async function(resp) {
       if (resp.error) {
         dialog.error(resp.error.message);
         return;
       }
       let data = resp.data;
+      if (self.readOpt.asyncConvert) {
+        data = await  self.readOpt.asyncConvert(data);
+      }
       if (self.readOpt.convert) {
         data = self.readOpt.convert(data);
       }
@@ -11665,6 +11670,8 @@ function ListView(opt) {
   this.create = opt.create || function(idx, row) {};
   this.complete = opt.complete;
 
+  this.draggable = opt.draggable === true;
+
   this.start = opt.start || 0;
   this.limit = opt.limit || -1;
 
@@ -11728,7 +11735,7 @@ ListView.prototype.render = function(containerId, loading) {
   // style="height: 120px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.125); border-top: none;"
   if (this.onFilter) {
     let topbar = dom.element(`
-      <div class="input-group">
+      <div class="input-group position-sticky" style="top: 0; left: 0; z-index: 10;">
         <div class="input-group-prepend">
           <span class="input-group-text" style="border-bottom-left-radius: unset;">
             <i class="fas fa-search"></i>
@@ -11812,29 +11819,6 @@ ListView.prototype.load = function() {
   this.start = this.local.length;
   this.fetch();
 };
-
-/**
- * Removes an item from a list.
- * <p>
- * And it is an event handler.
- */
-// ListView.prototype.remove = function(event) {
-//   event.preventDefault();
-//   event.stopPropagation();
-//   let self = this;
-//   let clicked = event.target;
-//   let found = clicked;
-//   while (found.tagName != 'LI') {
-//     found = found.parentElement;
-//   }
-//
-//   let model = dom.model(found);
-//   if (self.onRemove) {
-//     self.onRemove(model);
-//   }
-//   // remove dom element
-//   found.remove();
-// };
 
 ListView.prototype.remove = function(model) {
   if (this.idField) {
@@ -11974,6 +11958,15 @@ ListView.prototype.append = function(data) {
 
     if (this.onReorder)
       this.setReorderable(li);
+    else if (this.draggable) {
+      li.setAttribute("draggable", "true");
+      li.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+      li.addEventListener("dragstart", function(event) {
+
+      });
+    }
   }
 };
 
@@ -15456,6 +15449,9 @@ function TreeView(opts) {
   this.local = opts.local;
   // the level number
   this.levels = opts.levels || 1;
+  let params = opts.params || {};
+  this.rootParams = params.root || {};
+  this.childParams = params.child || {};
 
   this.fieldText = opts.fields.text;
   this.fieldValue = opts.fields.value;
@@ -15465,6 +15461,9 @@ function TreeView(opts) {
   this.onRemoveNode = opts.onRemoveNode;
   this.onSelectNode = opts.onSelectNode;
   this.onAddNode = opts.onAddNode;
+
+  this.isNodeEditable = opts.isNodeEditable;
+  this.isNodeRemovable = opts.isNodeRemovable;
 }
 
 TreeView.prototype.createNodeElement = function(data, level) {
@@ -15505,12 +15504,15 @@ TreeView.prototype.createNodeElement = function(data, level) {
       </div>
     </li>
   `, viewModel);
+  dom.model(ret, data);
   let buttonExpand = dom.find('[widget-id=buttonExpand]', ret);
   let buttonEdit = dom.find('[widget-id=buttonEdit]', ret);
   let buttonAdd = dom.find('[widget-id=buttonAdd]', ret);
   let buttonDelete = dom.find('[widget-id=buttonDelete]', ret);
-  if ((level + 1) == this.levels) buttonExpand.remove();
-  else {
+  if ((level + 1) == this.levels) {
+    buttonExpand.style.visibility = 'hidden';
+    // buttonExpand.remove();
+  } else {
     let model = {};
     model[this.fieldParent] = data[this.fieldValue];
     dom.model(buttonExpand, model);
@@ -15526,7 +15528,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
         icon.classList.add('fa-minus-square');
         ul.style.display = '';
         if (ul.children.length == 0)
-          this.fetchChildren(ret, dom.model(a));
+          this.fetchChildren(ret, dom.model(a), level + 1);
       } else {
         icon.classList.remove('fa-minus-square');
         icon.classList.add('fa-plus-square');
@@ -15535,10 +15537,14 @@ TreeView.prototype.createNodeElement = function(data, level) {
     });
   }
 
+  let model = {};
+  model[this.fieldValue] = data[this.fieldValue];
+  model[this.fieldText] = data[this.fieldText];
+  if (data[this.fieldParent])
+    model[this.fieldParent] = data[this.fieldParent];
+
   let widthActions = 0;
   if (this.onEditNode) {
-    let model = {};
-    model[this.fieldValue] = data[this.fieldValue];
     dom.model(buttonEdit, model);
     dom.bind(buttonEdit, 'click', ev => {
       ev.preventDefault();
@@ -15550,9 +15556,9 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonEdit.remove();
   }
+  if (!this.isNodeEditable || !this.isNodeEditable(model))
+    buttonEdit.remove();
   if (this.onRemoveNode) {
-    let model = {};
-    model[this.fieldValue] = data[this.fieldValue];
     dom.model(buttonDelete, model);
     dom.bind(buttonDelete, 'click', ev => {
       ev.preventDefault();
@@ -15564,12 +15570,12 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonDelete.remove();
   }
+  if (!this.isNodeEditable || !this.isNodeEditable(model))
+    buttonDelete.remove();
 
   if (this.onAddNode) {
     if ((level + 1) == this.levels) buttonAdd.remove();
     else {
-      let model = {};
-      model[this.fieldParent] = data[this.fieldParent];
       dom.model(buttonAdd, model);
       dom.bind(buttonAdd, 'click', ev => {
         let a = dom.ancestor(ev.target, 'a');
@@ -15618,16 +15624,34 @@ TreeView.prototype.appendNode = function(parentElement, data, level) {
   }
 };
 
-TreeView.prototype.fetchChildren = async function(parentElement, params) {
+TreeView.prototype.fetchChildren = async function(parentElement, params, level) {
   if (!this.childUrl) return;
   let url = this.childUrl;
+  let fixedParams = level > 0 ? this.childParams : this.rootParams;
   let data = await xhr.promise({
     url: url,
-    params: params,
+    params: {
+      ...fixedParams,
+      ...params,
+    },
   });
   for (let i = 0; i < data.length; i++) {
-    this.appendNode(parentElement, data[i], 1);
+    this.appendNode(parentElement, data[i], level);
   }
+};
+
+TreeView.prototype.update = function (nodeData) {
+  let ul = this.container.querySelector('ul');
+  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
+  if (li != null) {
+    // update
+    li.querySelector('strong').innerText = nodeData[this.fieldText];
+    dom.model(li, nodeData);
+    return;
+  }
+  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
+  let level = parseInt(li.getAttribute('widget-model-level'));
+  this.appendNode(li, nodeData, level + 1);
 };
 
 TreeView.prototype.render = async function(containerId, params) {

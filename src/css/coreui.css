@@ -5216,36 +5216,6 @@ input[type="button"].btn-block {
   background-color: #fff;
 }
 
-.list-group-item.active {
-  z-index: 2;
-  /*color: #fff;*/
-  /*
-  background-color: #2A70FF;
-  border-color: #2A70FF;
-  */
-  background-color: #efefef;
-  border-color: #efefef;
-}
-
-.list-group-item-action.active {
-  z-index: 2;
-  /*color: #fff;*/
-  /*
-  background-color: #2A70FF;
-  border-color: #2A70FF;
-  */
-  background-color: #efefef;
-  border-color: #efefef;
-}
-
-.list-group-item-action a.action {
-  visibility: hidden;
-}
-
-.list-group-item-action:hover a.action {
-  visibility: visible;
-}
-
 .list-group-flush .list-group-item {
   border-right: 0;
   border-left: 0;

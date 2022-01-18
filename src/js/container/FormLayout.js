@@ -396,12 +396,15 @@ FormLayout.prototype.fetch = function (params) {
   xhr.post({
     url: this.readOpt.url,
     data: params,
-    success: function(resp) {
+    success: async function(resp) {
       if (resp.error) {
         dialog.error(resp.error.message);
         return;
       }
       let data = resp.data;
+      if (self.readOpt.asyncConvert) {
+        data = await  self.readOpt.asyncConvert(data);
+      }
       if (self.readOpt.convert) {
         data = self.readOpt.convert(data);
       }
