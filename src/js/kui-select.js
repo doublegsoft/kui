@@ -420,6 +420,7 @@ $.fn.cascadeselect = function(opts) {
     let requestParams = {};
     if (data['_and_condition']) {
       requestParams['_and_condition'] = data['_and_condition'];
+      requestParams['_other_select'] = data['_other_select'];
     } else {
       requestParams = data;
     }
@@ -441,6 +442,7 @@ $.fn.cascadeselect = function(opts) {
           linkPopup.addEventListener('click', function(event) {
             let cascadeIndex = parseInt(link.getAttribute('data-cascade-index'));
             let cascadeName = link.getAttribute('data-cascade-name');
+            // let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
             let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
             let cascadeFieldText = link.getAttribute('data-cascade-field-text');
             let model = dom.model(this);
@@ -503,7 +505,7 @@ $.fn.cascadeselect = function(opts) {
 
     if (level.value && level.value[level.fields.text]) {
       link.innerText = level.value[level.fields.text];
-      link.setAttribute('data-cascade-value', level.value[level.fields.value]);
+      link.setAttribute('data-cascade-value', level.value[level.fields.value] || level.value[level.name]);
     } else {
       link.innerText = level.text;
     }

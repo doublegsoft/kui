@@ -7260,6 +7260,7 @@ $.fn.cascadeselect = function(opts) {
     let requestParams = {};
     if (data['_and_condition']) {
       requestParams['_and_condition'] = data['_and_condition'];
+      requestParams['_other_select'] = data['_other_select'];
     } else {
       requestParams = data;
     }
@@ -7281,6 +7282,7 @@ $.fn.cascadeselect = function(opts) {
           linkPopup.addEventListener('click', function(event) {
             let cascadeIndex = parseInt(link.getAttribute('data-cascade-index'));
             let cascadeName = link.getAttribute('data-cascade-name');
+            // let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
             let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
             let cascadeFieldText = link.getAttribute('data-cascade-field-text');
             let model = dom.model(this);
@@ -7288,7 +7290,11 @@ $.fn.cascadeselect = function(opts) {
             if (model[cascadeFieldText]) {
               link.innerText = model[cascadeFieldText];
             }
-            dom.find('input', link.parentElement).value = model[cascadeFieldValue];
+            if (model[cascadeFieldValue] != '') {
+              dom.find('input', link.parentElement).value = model[cascadeFieldValue];
+            } else {
+              dom.find('input', link.parentElement).value = model[cascadeName];
+            }
             dom.model(link, model);
             if (cascadeIndex < levelCount - 1) {
               let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
@@ -7343,7 +7349,7 @@ $.fn.cascadeselect = function(opts) {
 
     if (level.value && level.value[level.fields.text]) {
       link.innerText = level.value[level.fields.text];
-      link.setAttribute('data-cascade-value', level.value[level.fields.value]);
+      link.setAttribute('data-cascade-value', level.value[level.fields.value] || level.value[level.name]);
     } else {
       link.innerText = level.text;
     }
@@ -9766,6 +9772,7 @@ FormLayout.prototype.build = function(persisted) {
         let level = opts.levels[j];
         if (typeof persisted[level.name] !== "undefined") {
           level.value = persisted[level.name];
+          level.text = persisted[level.fields.text];
         }
       }
       opts.required = field.required || false;
