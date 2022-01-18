@@ -7290,11 +7290,7 @@ $.fn.cascadeselect = function(opts) {
             if (model[cascadeFieldText]) {
               link.innerText = model[cascadeFieldText];
             }
-            if (model[cascadeFieldValue] != '') {
-              dom.find('input', link.parentElement).value = model[cascadeFieldValue];
-            } else {
-              dom.find('input', link.parentElement).value = model[cascadeName];
-            }
+            dom.find('input', link.parentElement).value = model[cascadeFieldValue];
             dom.model(link, model);
             if (cascadeIndex < levelCount - 1) {
               let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
@@ -9772,7 +9768,6 @@ FormLayout.prototype.build = function(persisted) {
         let level = opts.levels[j];
         if (typeof persisted[level.name] !== "undefined") {
           level.value = persisted[level.name];
-          level.text = persisted[level.fields.text];
         }
       }
       opts.required = field.required || false;
