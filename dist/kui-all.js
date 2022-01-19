@@ -10144,13 +10144,48 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('placeholder', '请选择...');
   } else if (field.input == 'bool') {
     input = dom.element(`
-      <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1">
-        <input class="c-switch-input" value="T" name="" type="checkbox">
-        <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
-      </label>
+      <div class="d-flex full-width">
+        <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
+          <input class="c-switch-input" value="T" name="" type="checkbox">
+          <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
+        </label>
+        <select class="form-control ml-4">
+          <option value="-1">请选择</option>
+        </select>
+      </div>
     `);
-    if (field.value == true || field.value == 'true' || field.value == 'T') {
-      dom.find('input', input).setAttribute('checked', true);
+    let elInput = dom.find('input', input);
+    // default is checked
+    // dom.find('input', input).setAttribute('checked', true);
+    if (field.value === 'T' || field.value === true) {
+      dom.find('input', input).setAttribute('checked', false);
+    }
+    if (field.disabled === true) {
+      elInput.disabled = true;
+    }
+    let select = dom.find('select', input);
+
+    if (!field.options) {
+      select.remove();
+    } else {
+      select.name = field.name + '$';
+      for (let j = 0; j < field.options.values.length; j++) {
+        let value = field.options.values[j];
+        select.appendChild(dom.element('<option value="' + value.value + '" ' + (field.value === value.value ? 'selected' : '') + '>' + value.text + '</option>'));
+      }
+      if (!field.value || field.value === 'F') {
+        elInput.checked = false;
+        select.disabled = true;
+      } else {
+        elInput.checked = true;
+      }
+      elInput.addEventListener('change', ev => {
+        let select = dom.find('select', ev.target.parentElement.parentElement);
+        if (ev.target.checked)
+          select.disabled = false;
+        else
+          select.disabled = true;
+      });
     }
     dom.find('input', input).setAttribute('name', field.name);
   } else if (field.input == 'radiotext') {
@@ -10178,11 +10213,11 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       group.append(radio);
       radios.push(radio);
     }
-    for (let i = 0; i < field.values.length; i++) {
-      let val = field.values[i];
+    for (let j = 0; j < field.values.length; j++) {
+      let val = field.values[j];
       // 有输入框
       if (val.input) {
-        dom.bind(radios[i], 'click', (ev) => {
+        dom.bind(radios[j], 'click', (ev) => {
           let textInput = dom.find('input[type=text]', group);
           textInput.style.display = '';
         });
