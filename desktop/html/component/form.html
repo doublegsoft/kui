@@ -1,12 +1,12 @@
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：动态表单1</strong>
   </div>
   <div id="formDynamic1" class="card-body">
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：级联选择</strong>
   </div>
   <div class="card-body">
@@ -39,7 +39,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：必填项</strong>
   </div>
   <div class="card-body">
@@ -68,7 +68,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：特殊项</strong>
   </div>
   <div class="card-body">
@@ -104,7 +104,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：数字验证</strong>
   </div>
   <div class="card-body">
@@ -147,7 +147,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：区间值验证</strong>
   </div>
   <div class="card-body">
@@ -184,7 +184,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：字符串</strong>
   </div>
   <div class="card-body">
@@ -219,7 +219,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：日期</strong>
   </div>
   <div class="card-body">
@@ -261,7 +261,7 @@
   </div>
 </div>
 <div class="card">
-  <div class="card-header">
+  <div class="card-header pl-3 pr-3">
     <strong>示例：其他（有BUG）</strong>
   </div>
   <div class="card-body">
@@ -463,8 +463,8 @@ $('#selectDistrict').cascadeselect({
   levels: [{
     name: 'provinceId',
     fields: {
-      id: 'id',
-      name: 'name'
+      value: 'id',
+      text: 'name'
     },
     text: '省份',
     width: 'calc(31% - 3px)',
@@ -472,8 +472,8 @@ $('#selectDistrict').cascadeselect({
   }, {
     name: 'cityId',
     fields: {
-      id: 'id',
-      name: 'name'
+      value: 'id',
+      text: 'name'
     },
     text: '城市',
     width: 'calc(31% - 3px)',
@@ -481,8 +481,8 @@ $('#selectDistrict').cascadeselect({
   }, {
     name: 'countyId',
     fields: {
-      id: 'id',
-      name: 'name'
+      value: 'id',
+      text: 'name'
     },
     text: '区县',
     width: 'calc(31% - 3px)',
@@ -494,24 +494,26 @@ $('#selectEmployee').cascadeselect({
   fields: {
     name: 'name'
   },
+  values: [
+    {id: 'AAA', name: 'AAA', children: [{id: 'AAABBB', name: 'AAABBB'},{id: 'AAACCC', name: 'AAACCC'}]},
+    {id: 'BBB', name: 'BBB', children: [{id: 'BBBCCC', name: 'BBBCCC'},{id: 'BBBDDD', name: 'BBBDDD'}]},
+  ],
   levels: [{
     name: 'departmentId',
     fields: {
-      id: 'id',
-      name: 'name'
+      value: 'id',
+      text: 'name'
     },
     text: '部门',
     width: 'calc(49% - 3px)',
-    url: 'data/component/form/department.json'
   }, {
     name: 'employeeId',
     fields: {
-      id: 'id',
-      name: 'name'
+      value: 'id',
+      text: 'name'
     },
     text: '员工',
     width: 'calc(49% - 3px)',
-    url: 'data/component/form/employee.json'
   }]
 });
 

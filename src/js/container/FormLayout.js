@@ -339,28 +339,30 @@ FormLayout.prototype.build = function(persisted) {
   });
 
   let rightBarBottom = dom.find('div[widget-id=right-bar-bottom]');
-  rightBarBottom.innerHTML = '';
-  if (!this.readonly) {
-    buttons.appendChild(buttonSave);
-    buttons.append(' ');
-  }
-  // if (this.actions.length > 0) {
-  let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
-  let rightbar = dom.find('.right-bar');
-  if (rightbar != null) {
-    if (rightBarBottom.parentElement.style.display !== 'none') {
-      rightBarBottom.appendChild(buttonSave);
-      rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
-      rightBarBottom.appendChild(buttonClose);
-    } else {
-      containerButtons.appendChild(buttons);
-      row.appendChild(containerButtons);
-      this.container.appendChild(row);
+  if (rightBarBottom != null) {
+    rightBarBottom.innerHTML = '';
+    if (!this.readonly) {
+      buttons.appendChild(buttonSave);
+      buttons.append(' ');
     }
-  }else{
-    // FIXME: WHY DO THIS?
-		// this.container.appendChild(buttons);
-	}
+    // if (this.actions.length > 0) {
+    let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
+    let rightbar = dom.find('.right-bar');
+    if (rightbar != null) {
+      if (rightBarBottom.parentElement.style.display !== 'none') {
+        rightBarBottom.appendChild(buttonSave);
+        rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+        rightBarBottom.appendChild(buttonClose);
+      } else {
+        containerButtons.appendChild(buttons);
+        row.appendChild(containerButtons);
+        this.container.appendChild(row);
+      }
+    } else {
+      // FIXME: WHY DO THIS?
+      // this.container.appendChild(buttons);
+    }
+  }
 
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;

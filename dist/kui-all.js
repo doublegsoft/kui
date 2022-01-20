@@ -7227,6 +7227,7 @@ $.fn.tiledmultiselect = function(opts) {
  */
 $.fn.cascadeselect = function(opts) {
   let levels = opts.levels;
+  let values = opts.values;
   let readonly = opts.readonly;
   let container = $(this).get(0);
   let rectContainer = container.getBoundingClientRect();
@@ -7234,16 +7235,16 @@ $.fn.cascadeselect = function(opts) {
   let levelCount = opts.levels.length;
   let validate = opts.validate;
 
-  function displayPopup(link, data) {
+  async function displayPopup(link, params, values) {
     // 【选中下划线】渲染
     document.querySelectorAll('.cascadeselect-link').forEach(function(elm, idx) {
       elm.style.borderBottom = 'none';
     });
     link.style.borderBottom = '2px solid #1976D2';
-    dom.model(link, data);
+    dom.model(link, params);
     let url = link.getAttribute('data-url');
-    data = data || {};
-    data.cascadeIndex = link.getAttribute('data-cascade-index');
+    params = params || {};
+    params.cascadeIndex = link.getAttribute('data-cascade-index');
     let container = link.parentElement.parentElement;
     let popup = dom.find('.cascadeselect-popup');
     if (popup == null) {
@@ -7258,67 +7259,83 @@ $.fn.cascadeselect = function(opts) {
     popup.style.display = '';
     popup.innerHTML = '';
     let requestParams = {};
-    if (data['_and_condition']) {
-      requestParams['_and_condition'] = data['_and_condition'];
-      requestParams['_other_select'] = data['_other_select'];
+    if (params['_and_condition']) {
+      requestParams['_and_condition'] = params['_and_condition'];
+      requestParams['_other_select'] = params['_other_select'];
     } else {
-      requestParams = data;
+      requestParams = params;
     }
     requestParams[link.getAttribute('data-cascade-field-value')] = '';
-    xhr.post({
-      url: url,
-      data: requestParams,
-      success: function(resp) {
-        let data = resp.data;
-        for (let i = 0; i < data.length; i++) {
-          let dataItem = data[i];
-          let linkPopup = dom.create('a', 'btn', 'btn-link');
-          if (dataItem[link.getAttribute('data-cascade-field-text')]) {
-            linkPopup.innerText = dataItem[link.getAttribute('data-cascade-field-text')];
-          }
-          // set data-model-*
-          dom.model(linkPopup, dataItem);
-          // 选中点击事件
-          linkPopup.addEventListener('click', function(event) {
-            let cascadeIndex = parseInt(link.getAttribute('data-cascade-index'));
-            let cascadeName = link.getAttribute('data-cascade-name');
-            // let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
-            let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
-            let cascadeFieldText = link.getAttribute('data-cascade-field-text');
-            let model = dom.model(this);
-            link.setAttribute('data-cascade-value', model[cascadeFieldValue]);
-            if (model[cascadeFieldText]) {
-              link.innerText = model[cascadeFieldText];
-            }
-            dom.find('input', link.parentElement).value = model[cascadeFieldValue];
-            dom.model(link, model);
-            if (cascadeIndex < levelCount - 1) {
-              let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
-							//清空下一级的数据
-							next.setAttribute('data-cascade-value', '');
-							next.innerText='请选择';
-							dom.find('input', next.parentElement).value = '';
-
-              let data = {};
-              data[cascadeName] = model[cascadeFieldValue];
-              let params = {};
-              for (let key in levels[cascadeIndex + 1].params) {
-                let tpl = Handlebars.compile(levels[cascadeIndex + 1].params[key]);
-                params[key] = tpl(data);
-              }
-              displayPopup(next, params);
-              // 阻止繁殖的click事件
-              event.stopImmediatePropagation();
-              event.stopPropagation();
-              event.preventDefault();
-            }
-            if (validate)
-              validate(link.parentElement.parentElement);
-          });
-          popup.appendChild(linkPopup);
+    let data = [];
+    if (url) {
+      data = await xhr.promise({
+        url: url,
+        params: requestParams,
+      });
+    } else {
+      let cascadeIndex = parseInt(link.getAttribute('data-cascade-index'));
+      if (cascadeIndex === 0) {
+        data = values;
+      } else {
+        let selectOptions = link.getAttribute('data-cascade-options');
+        if (selectOptions) {
+          data = JSON.parse(selectOptions);
+        } else {
+          data = values;
+          link.setAttribute('data-cascade-options', JSON.stringify(values));
         }
       }
-    });
+
+    }
+    for (let i = 0; i < data.length; i++) {
+      let dataItem = data[i];
+      let linkPopup = dom.create('a', 'btn', 'btn-link');
+      if (dataItem[link.getAttribute('data-cascade-field-text')]) {
+        linkPopup.innerText = dataItem[link.getAttribute('data-cascade-field-text')];
+      }
+      // set data-model-*
+      dom.model(linkPopup, dataItem);
+      // 选中点击事件
+      linkPopup.addEventListener('click', function(event) {
+        let cascadeIndex = parseInt(link.getAttribute('data-cascade-index'));
+        let cascadeName = link.getAttribute('data-cascade-name');
+        // let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
+        let cascadeFieldValue = link.getAttribute('data-cascade-field-value');
+        let cascadeFieldText = link.getAttribute('data-cascade-field-text');
+        let model = dom.model(this);
+        link.setAttribute('data-cascade-value', model[cascadeFieldValue]);
+        if (model[cascadeFieldText]) {
+          link.innerText = model[cascadeFieldText];
+        }
+        dom.find('input', link.parentElement).value = model[cascadeFieldValue];
+        dom.model(link, model);
+        if (cascadeIndex < levelCount - 1) {
+          let next = dom.find('a[data-cascade-index="' + (cascadeIndex + 1) + '"]', container);
+          //清空下一级的数据
+          next.setAttribute('data-cascade-value', '');
+          next.innerText='请选择';
+          dom.find('input', next.parentElement).value = '';
+
+          let data = {};
+          data[cascadeName] = model[cascadeFieldValue];
+          let params = {};
+          for (let key in levels[cascadeIndex + 1].params) {
+            let tpl = Handlebars.compile(levels[cascadeIndex + 1].params[key]);
+            params[key] = tpl(data);
+          }
+          next.removeAttribute('data-cascade-options');
+          displayPopup(next, params, JSON.parse(model.children));
+          // 阻止繁殖的click事件
+          event.stopImmediatePropagation();
+          event.stopPropagation();
+          event.preventDefault();
+        }
+        if (validate)
+          validate(link.parentElement.parentElement);
+      });
+      popup.appendChild(linkPopup);
+    }
+
     container.appendChild(popup);
   }
 
@@ -7334,7 +7351,9 @@ $.fn.cascadeselect = function(opts) {
 
     let link = dom.create('a', 'btn', 'pb-1', 'cascadeselect-link');
     link.style.paddingTop = '1px';
-    link.setAttribute('data-url', level.url);
+    if (level.url) {
+      link.setAttribute('data-url', level.url);
+    }
     // link.setAttribute('data-usecase', level.usecase);
     link.setAttribute('data-cascade-index', i);
     link.setAttribute('data-cascade-name', level.name);
@@ -7363,7 +7382,7 @@ $.fn.cascadeselect = function(opts) {
         //   // params[key] = tpl(data);
         // }
       }
-      displayPopup(this, params);
+      displayPopup(this, params, values);
     });
 
     if (i != levels.length - 1) {
@@ -9877,28 +9896,30 @@ FormLayout.prototype.build = function(persisted) {
   });
 
   let rightBarBottom = dom.find('div[widget-id=right-bar-bottom]');
-  rightBarBottom.innerHTML = '';
-  if (!this.readonly) {
-    buttons.appendChild(buttonSave);
-    buttons.append(' ');
-  }
-  // if (this.actions.length > 0) {
-  let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
-  let rightbar = dom.find('.right-bar');
-  if (rightbar != null) {
-    if (rightBarBottom.parentElement.style.display !== 'none') {
-      rightBarBottom.appendChild(buttonSave);
-      rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
-      rightBarBottom.appendChild(buttonClose);
-    } else {
-      containerButtons.appendChild(buttons);
-      row.appendChild(containerButtons);
-      this.container.appendChild(row);
+  if (rightBarBottom != null) {
+    rightBarBottom.innerHTML = '';
+    if (!this.readonly) {
+      buttons.appendChild(buttonSave);
+      buttons.append(' ');
     }
-  }else{
-    // FIXME: WHY DO THIS?
-		// this.container.appendChild(buttons);
-	}
+    // if (this.actions.length > 0) {
+    let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
+    let rightbar = dom.find('.right-bar');
+    if (rightbar != null) {
+      if (rightBarBottom.parentElement.style.display !== 'none') {
+        rightBarBottom.appendChild(buttonSave);
+        rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+        rightBarBottom.appendChild(buttonClose);
+      } else {
+        containerButtons.appendChild(buttons);
+        row.appendChild(containerButtons);
+        this.container.appendChild(row);
+      }
+    } else {
+      // FIXME: WHY DO THIS?
+      // this.container.appendChild(buttons);
+    }
+  }
 
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
