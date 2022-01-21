@@ -484,7 +484,11 @@ $.fn.cascadeselect = function(opts) {
             params[key] = tpl(data);
           }
           next.removeAttribute('data-cascade-options');
-          displayPopup(next, params, JSON.parse(model.children));
+          if (model.children) {
+            displayPopup(next, params, JSON.parse(model.children));
+          } else {
+            displayPopup(next, params);
+          }
           // 阻止繁殖的click事件
           event.stopImmediatePropagation();
           event.stopPropagation();
