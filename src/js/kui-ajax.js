@@ -201,7 +201,7 @@ ajax.view = function(opt) {
         if (callback)
           callback(title, fragment, params);
 
-        if (opt.optimistic === true)
+        if (opt.optimistic === true || !utils.isEmpty(params))
           window[fragment.id].show(params);
       }
     });
