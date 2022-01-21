@@ -902,7 +902,7 @@ ajax.view = function(opt) {
         if (callback)
           callback(title, fragment, params);
 
-        if (opt.pessimistic === true)
+        if (opt.optimistic === true)
           window[fragment.id].show(params);
       }
     });
@@ -5204,7 +5204,6 @@ dom.formdata = function(selector, data) {
         if (el.type == 'check') {
           // TODO
         } else {
-          console.log(val);
           el.value = val || '';
         }
       } else if (el.tagName == 'SELECT') {
@@ -9660,7 +9659,7 @@ FormLayout.prototype.build = function(persisted) {
         field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
       }
     } else {
-      field.value = '';
+      field.value = field.value || '';
     }
     if (field.input == 'hidden') {
       hiddenFields.push(field);

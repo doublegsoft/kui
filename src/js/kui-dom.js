@@ -555,7 +555,6 @@ dom.formdata = function(selector, data) {
         if (el.type == 'check') {
           // TODO
         } else {
-          console.log(val);
           el.value = val || '';
         }
       } else if (el.tagName == 'SELECT') {
