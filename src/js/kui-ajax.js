@@ -200,6 +200,9 @@ ajax.view = function(opt) {
         }
         if (callback)
           callback(title, fragment, params);
+
+        if (opt.pessimistic === true)
+          window[fragment.id].show(params);
       }
     });
   } else if (page) {
