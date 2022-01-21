@@ -798,9 +798,11 @@ ajax.save = function(opts) {
  * @param {function} callback - 回调函数
  */
 ajax.post = function(opts) {
+  let params = utils.getParameters(opts.url);
+  let data = {...params, ...opts.data};
   $.ajax({
     url : opts.url,
-    data : opts.data,
+    data : data,
     method : 'POST',
     dataType : 'json',
     success : function(resp) {
@@ -864,9 +866,11 @@ ajax.view = function(opt) {
     url = null;
   }
 
+  let params = utils.getParameters(opt.url);
+  let data = {...params, ...opt.params};
+
   let title = opt.title || '';
   let containerId = opt.containerId;
-  let data = opt.params;
   let callback = opt.success;
 
   let container = null;
@@ -896,7 +900,7 @@ ajax.view = function(opt) {
           fragment = utils.append(container, resp, empty);
         }
         if (callback)
-          callback(title, fragment);
+          callback(title, fragment, params);
       }
     });
   } else if (page) {
@@ -915,7 +919,7 @@ ajax.view = function(opt) {
           fragment = utils.append(container, script, empty);
         }
         if (callback)
-          callback(title, fragment);
+          callback(title, fragment, params);
       }
     });
   }
@@ -7268,7 +7272,7 @@ $.fn.cascadeselect = function(opts) {
     }
     requestParams[link.getAttribute('data-cascade-field-value')] = '';
     let data = [];
-    if (url) {
+    if (url && url !== 'undefined') {
       data = await xhr.promise({
         url: url,
         params: requestParams,
@@ -8682,6 +8686,9 @@ xhr.request = function (opts, method) {
   let type = opts.type || 'json';
   let success = opts.success;
   let error = opts.error;
+
+  let params = utils.getParameters(opts.url);
+  data = {...params, ...data};
 
   let usecase = opts.usecase || ''; 
 

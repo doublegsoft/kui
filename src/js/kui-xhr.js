@@ -17,6 +17,9 @@ xhr.request = function (opts, method) {
   let success = opts.success;
   let error = opts.error;
 
+  let params = utils.getParameters(opts.url);
+  data = {...params, ...data};
+
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
