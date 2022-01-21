@@ -427,7 +427,7 @@ $.fn.cascadeselect = function(opts) {
     }
     requestParams[link.getAttribute('data-cascade-field-value')] = '';
     let data = [];
-    if (url) {
+    if (url && url !== 'undefined') {
       data = await xhr.promise({
         url: url,
         params: requestParams,

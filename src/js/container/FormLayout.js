@@ -87,6 +87,8 @@ FormLayout.prototype.build = function(persisted) {
       } else {
         field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
       }
+    } else {
+      field.value = '';
     }
     if (field.input == 'hidden') {
       hiddenFields.push(field);

@@ -5197,7 +5197,8 @@ dom.formdata = function(selector, data) {
         if (el.type == 'check') {
           // TODO
         } else {
-          el.value = val;
+          console.log(val);
+          el.value = val || '';
         }
       } else if (el.tagName == 'SELECT') {
         $('select[name=\'' + name + '\']').val(val).trigger('change');
@@ -9644,6 +9645,8 @@ FormLayout.prototype.build = function(persisted) {
       } else {
         field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
       }
+    } else {
+      field.value = '';
     }
     if (field.input == 'hidden') {
       hiddenFields.push(field);

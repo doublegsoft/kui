@@ -989,6 +989,11 @@ h6, .h6 {
   color: var(--color-fatal)!important;
 }
 
+.icon-error {
+  font-size: 10px;
+  color: var(--color-danger)!important;
+}
+
 .icon-help {
   font-size: 10px;
   color: var(--color-info)!important;
