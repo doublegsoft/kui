@@ -29,7 +29,7 @@ PageSurveyDesign.prototype.initialize = async function(params) {
   dom.height(this.widgetSourceCode, 12, document.body);
   dom.height(this.widgetDesigner, 12, document.body);
 
-  this.designer = new SurveyDesigner({
+  this.designer = new QuestionnaireDesigner({
     mobileFramePath: '/mobile/index.html',
   });
   this.designer.render(this.widgetDesigner, {});

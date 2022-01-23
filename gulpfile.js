@@ -23,7 +23,7 @@ gulp.task('specs', function () {
 });
 
 gulp.task('dist', function() {
-  // uglify js
+  // desktop js
   gulp.src(['src/js/*.js', 'src/js/application/*.js', 'src/js/container/*.js', 'src/js/control/*.js',
     'src/js/editor/*.js', 'src/js/widget/*.js'])
     // .pipe(babel({presets: ['es2015']}))
@@ -35,12 +35,25 @@ gulp.task('dist', function() {
     'src/js/editor/*.js', 'src/js/widget/*.js'])
     .pipe(concat('./kui-all.js'))
     .pipe(gulp.dest('./dist/'));
-  
-  // uglify css
-  // gulp.src(['src/css/*.css'])
-  //     .pipe(concat('./kui-all.css'))
-  //     .pipe(gulp.dest('./dist/'));
-  
+
+  // mobile js
+  gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
+    'src/js/kui-utils.js'])
+    .pipe(concat('./kui-all.mobile.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist/'));
+
+  gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
+    'src/js/kui-utils.js'])
+    .pipe(concat('./kui-all.mobile.js'))
+    .pipe(gulp.dest('./dist/'));
+
+
+  // desktop css
+  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kui.css', 'src/css/kui-*.css'])
+    .pipe(concat('./kui-all.css'))
+    .pipe(gulp.dest('./dist/'));
+
   gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kui.css', 'src/css/kui-*.css'])
       .pipe(concat('./kui-all.min.css'))
       .pipe(uglifycss())
