@@ -108,6 +108,9 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
   topDefaultSize = (topDefaultSize || 300);
   let container = dom.find(containerId);
   let splitter = document.createElement('a');
+  let top = dom.find(topId);
+  let bot = dom.find(bottomId);
+
   splitter.setAttribute('id', splitterId);
   container.appendChild(splitter);
   // splitter.style.backgroundColor = '#cdcdcd';
@@ -115,7 +118,7 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
   splitter.style.position = 'absolute';
   splitter.style.width = '100%';
   splitter.style.height = '10px';
-  splitter.style.top = topDefaultSize + 'px';
+  splitter.style.top = (topDefaultSize) + 'px';
   splitter.style.cursor = 'ns-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
@@ -128,14 +131,11 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
 
   let heightContainer = container.clientHeight;
 
-  let top = dom.find(topId);
-  let bot = dom.find(bottomId);
-
   top.style.height = topDefaultSize + 'px';
   // top.style.flex = topDefaultSize + 'px';
   top.style.overflowY = 'auto';
 
-  bot.style.height = (container.clientHeight - topDefaultSize - 10) + 'px';
+  bot.style.height = (container.clientHeight - topDefaultSize) + 'px';
   // bot.style.flex = (container.clientHeight - topDefaultSize - 10) + 'px';
   bot.style.overflowY = 'auto';
 
@@ -181,8 +181,6 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
         splitter.style.top = offset + 'px';
         top.style.height = offset + 'px';
         bot.style.height = (container.clientHeight - offset) + 'px';
-        top.style.flex = offset + 'px';
-        bot.style.flex = (container.clientHeight - offset) + 'px';
         return;
       }
       if (isUnderContainer(target, bot)) {
@@ -190,8 +188,6 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
         splitter.style.top = offset + 'px';
         top.style.height = offset + 'px';
         bot.style.height = (container.clientHeight - offset) + 'px';
-        top.style.flex = offset + 'px';
-        bot.style.flex = (container.clientHeight - offset) + 'px';
         return;
       }
     }

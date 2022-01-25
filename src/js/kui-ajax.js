@@ -196,6 +196,7 @@ ajax.view = function(opt) {
       success: function (resp) {
         let fragment = null;
         if (container) {
+          container.innerHTML = '';
           fragment = utils.append(container, resp, empty);
         }
         if (callback)
@@ -218,6 +219,7 @@ ajax.view = function(opt) {
         }
         let fragment = null;
         if (container) {
+          container.innerHTML = '';
           fragment = utils.append(container, script, empty);
         }
         if (callback)

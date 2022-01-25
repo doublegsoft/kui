@@ -897,6 +897,7 @@ ajax.view = function(opt) {
       success: function (resp) {
         let fragment = null;
         if (container) {
+          container.innerHTML = '';
           fragment = utils.append(container, resp, empty);
         }
         if (callback)
@@ -919,6 +920,7 @@ ajax.view = function(opt) {
         }
         let fragment = null;
         if (container) {
+          container.innerHTML = '';
           fragment = utils.append(container, script, empty);
         }
         if (callback)
@@ -7553,6 +7555,9 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
   topDefaultSize = (topDefaultSize || 300);
   let container = dom.find(containerId);
   let splitter = document.createElement('a');
+  let top = dom.find(topId);
+  let bot = dom.find(bottomId);
+
   splitter.setAttribute('id', splitterId);
   container.appendChild(splitter);
   // splitter.style.backgroundColor = '#cdcdcd';
@@ -7560,7 +7565,7 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
   splitter.style.position = 'absolute';
   splitter.style.width = '100%';
   splitter.style.height = '10px';
-  splitter.style.top = topDefaultSize + 'px';
+  splitter.style.top = (topDefaultSize) + 'px';
   splitter.style.cursor = 'ns-resize';
   splitter.style.padding = '2px';
   splitter.style.zIndex = '3';
@@ -7573,14 +7578,11 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
 
   let heightContainer = container.clientHeight;
 
-  let top = dom.find(topId);
-  let bot = dom.find(bottomId);
-
   top.style.height = topDefaultSize + 'px';
   // top.style.flex = topDefaultSize + 'px';
   top.style.overflowY = 'auto';
 
-  bot.style.height = (container.clientHeight - topDefaultSize - 10) + 'px';
+  bot.style.height = (container.clientHeight - topDefaultSize) + 'px';
   // bot.style.flex = (container.clientHeight - topDefaultSize - 10) + 'px';
   bot.style.overflowY = 'auto';
 
@@ -7626,8 +7628,6 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
         splitter.style.top = offset + 'px';
         top.style.height = offset + 'px';
         bot.style.height = (container.clientHeight - offset) + 'px';
-        top.style.flex = offset + 'px';
-        bot.style.flex = (container.clientHeight - offset) + 'px';
         return;
       }
       if (isUnderContainer(target, bot)) {
@@ -7635,8 +7635,6 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
         splitter.style.top = offset + 'px';
         top.style.height = offset + 'px';
         bot.style.height = (container.clientHeight - offset) + 'px';
-        top.style.flex = offset + 'px';
-        bot.style.flex = (container.clientHeight - offset) + 'px';
         return;
       }
     }
@@ -21145,19 +21143,19 @@ QuestionnaireDesigner.prototype.canvas = function() {
       </div>
     </div>
   `);
-  let widgetQuestionnaireCanvas = dom.find('[widget-id=widgetQuestionnaireCanvas]', ret);
-  dom.height(widgetQuestionnaireCanvas, 16, this.container);
+  this.widgetQuestionnaireCanvas = dom.find('[widget-id=widgetQuestionnaireCanvas]', ret);
+  dom.height(this.widgetQuestionnaireCanvas, 16, this.container);
   this.questions.forEach((question, index) => {
     question.ordinalPosition = (index + 1);
-    this.renderQuestion(widgetQuestionnaireCanvas, question);
+    this.renderQuestion(this.widgetQuestionnaireCanvas, question);
   });
-  widgetQuestionnaireCanvas.addEventListener('dragover', (ev) => {
+  this.widgetQuestionnaireCanvas.addEventListener('dragover', (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
     let x = ev.clientX;
     let y = ev.clientY;
 
-    let existing = dom.find('[data-questionnaire-question-clone=true]', widgetQuestionnaireCanvas);
+    let existing = dom.find('[data-questionnaire-question-clone=true]', this.widgetQuestionnaireCanvas);
     if (existing != null) existing.remove();
     if (self.draggingTarget == null) return;
 
@@ -21167,25 +21165,25 @@ QuestionnaireDesigner.prototype.canvas = function() {
     self.draggingTarget.remove();
 
     let inserted = false;
-    for (let i = 0; i < widgetQuestionnaireCanvas.children.length; i++) {
-      let el = widgetQuestionnaireCanvas.children[i];
+    for (let i = 0; i < this.widgetQuestionnaireCanvas.children.length; i++) {
+      let el = this.widgetQuestionnaireCanvas.children[i];
       let rect = el.getBoundingClientRect();
       if (rect.bottom > y) {
-        widgetQuestionnaireCanvas.insertBefore(cloned, el);
+        this.widgetQuestionnaireCanvas.insertBefore(cloned, el);
         inserted = true;
         break;
       }
     }
     if (inserted === false) {
-      widgetQuestionnaireCanvas.appendChild(cloned);
+      this.widgetQuestionnaireCanvas.appendChild(cloned);
     }
-    self.resort(widgetQuestionnaireCanvas);
+    self.resort(this.widgetQuestionnaireCanvas);
   });
-  dnd.setDroppable(widgetQuestionnaireCanvas, (x, y, data) => {
+  dnd.setDroppable(this.widgetQuestionnaireCanvas, (x, y, data) => {
     if (self.draggingTarget != null) {
       self.draggingTarget.remove();
       self.draggingTarget = null;
-      let dragged = dom.find('[data-questionnaire-question-clone=true]', widgetQuestionnaireCanvas);
+      let dragged = dom.find('[data-questionnaire-question-clone=true]', this.widgetQuestionnaireCanvas);
       dragged.style.opacity = '';
       dragged.removeAttribute('data-questionnaire-question-clone');
       dom.bind(dragged, 'click', (ev) => {
@@ -21196,21 +21194,21 @@ QuestionnaireDesigner.prototype.canvas = function() {
       self.resort(dragged.parentElement);
       self.clearAndSelect(dragged, true);
     } else {
-      for (let i = 0; i < widgetQuestionnaireCanvas.children.length; i++) {
-        widgetQuestionnaireCanvas.children[i].style.borderColor = 'transparent';
-        let operations = dom.find('[widget-id=operations]', widgetQuestionnaireCanvas.children[i]);
+      for (let i = 0; i < this.widgetQuestionnaireCanvas.children.length; i++) {
+        this.widgetQuestionnaireCanvas.children[i].style.borderColor = 'transparent';
+        let operations = dom.find('[widget-id=operations]', this.widgetQuestionnaireCanvas.children[i]);
         if (operations != null) {
           operations.remove();
         }
       }
-      this.renderQuestion(widgetQuestionnaireCanvas, JSON.parse(data.model));
+      this.renderQuestion(this.widgetQuestionnaireCanvas, JSON.parse(data.model));
     }
     self.refresh();
   });
 
-  dom.bind(widgetQuestionnaireCanvas, 'click', ev => {
-    for (let i = 0; i < widgetQuestionnaireCanvas.children.length; i++) {
-      this.clearAndSelect(widgetQuestionnaireCanvas.children[i], true);
+  dom.bind(this.widgetQuestionnaireCanvas, 'click', ev => {
+    for (let i = 0; i < this.widgetQuestionnaireCanvas.children.length; i++) {
+      this.clearAndSelect(this.widgetQuestionnaireCanvas.children[i], true);
     }
   });
 
@@ -21264,7 +21262,10 @@ QuestionnaireDesigner.prototype.renderMultipleChoice = function(container, quest
     question.id = 'multiple_' + Date.now();
     existing = false;
   }
-  question.model = JSON.stringify(question);
+  let model = {...question};
+  delete model.id;
+  delete model.ordinalPosition;
+  question.model = JSON.stringify(model);
   let el = dom.templatize(`
     <div data-questionnaire-question-id="{{id}}" data-questionnaire-question-model="{{model}}" 
          class="questionnaire-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
@@ -21285,7 +21286,7 @@ QuestionnaireDesigner.prototype.renderMultipleChoice = function(container, quest
     this.clearAndSelect(el);
   });
   if (existing === true) {
-    let old = dom.find('[data-questionnaire-question-id=' + question.id + ']');
+    let old = dom.find('[data-questionnaire-question-id="' + question.id + '"]');
     container.replaceChild(el, old);
   } else {
     container.appendChild(el);
@@ -21302,9 +21303,18 @@ QuestionnaireDesigner.prototype.renderSingleChoice = function(container, questio
     question.id = 'single_' + Date.now();
     existing = false;
   }
-  question.model = JSON.stringify(question);
+  let model = {...question};
+  delete model.id;
+  delete model.ordinalPosition;
+  question.model = JSON.stringify(model);
+  if (existing === true && !question.ordinalPosition) {
+    let old = dom.find('[data-questionnaire-question-id="' + question.id + '"]');
+    let nodes = Array.prototype.slice.call(container.children);
+    question.ordinalPosition = nodes.indexOf(old) + 1;
+  }
   let el = dom.templatize(`
-    <div data-questionnaire-question-id="{{id}}" data-questionnaire-question-model="{{model}}" 
+    <div data-questionnaire-question-id="{{id}}" 
+         data-questionnaire-question-model="{{model}}" 
          data-switch=".questionnaire-answer+.checked"
          class="questionnaire-question" style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
       <div style="margin-bottom: 6px">
@@ -21324,7 +21334,7 @@ QuestionnaireDesigner.prototype.renderSingleChoice = function(container, questio
     this.clearAndSelect(el);
   });
   if (existing === true) {
-    let old = dom.find('[data-questionnaire-question-id=' + question.id + ']');
+    let old = dom.find('[data-questionnaire-question-id="' + question.id + '"]');
     if (old)
       container.replaceChild(el, old);
     else
@@ -21344,7 +21354,10 @@ QuestionnaireDesigner.prototype.renderShortAnswer = function(container, question
     question.id = 'answer_' + new Date().getMilliseconds();
     existing = false;
   }
-  question.model = JSON.stringify(question);
+  let model = {...question};
+  delete model.id;
+  delete model.ordinalPosition;
+  question.model = JSON.stringify(model);
   let el = dom.templatize(`
     <div data-questionnaire-question-id="{{id}}" data-questionnaire-question-model="{{model}}" class="questionnaire-question"  style="margin-bottom: 12px; padding: 6px; border: 6px solid transparent;">
       <div style="margin-bottom: 6px">
@@ -21361,7 +21374,7 @@ QuestionnaireDesigner.prototype.renderShortAnswer = function(container, question
     this.clearAndSelect(el);
   });
   if (existing === true) {
-    let old = dom.find('[data-questionnaire-question-id=' + question.id + ']');
+    let old = dom.find('[data-questionnaire-question-id="' + question.id + '"]');
     container.replaceChild(el, old);
   } else {
     container.appendChild(el);
@@ -21414,7 +21427,12 @@ QuestionnaireDesigner.prototype.clearAndSelect = function(element, clear) {
   let buttonEdit = dom.find('a[widget-id=buttonEdit]', operations);
   dom.bind(buttonEdit, 'click', ev => {
     let model = element.getAttribute(QuestionnaireDesigner.ATTRIBUTE_MODEL);
-    this.edit(JSON.parse(model));
+    model = JSON.parse(model);
+    let question = {
+      ...model,
+      id: element.getAttribute('data-questionnaire-question-id'),
+    };
+    this.edit(question);
   });
 
   let buttonDelete = dom.find('a[widget-id=buttonDelete]', operations);
@@ -21447,34 +21465,16 @@ QuestionnaireDesigner.prototype.renderQuestion = function(container, question) {
   }
 };
 
-/**
- * Gets the question models.
- *
- * @returns {[]}
- */
-QuestionnaireDesigner.prototype.getQuestions = function() {
-  let ret = [];
-  let index = 1;
-  this.questions.forEach(question => {
-    let itemQuestion = {};
-    itemQuestion.ordinalPosition = index++;
-    itemQuestion.title = question.title;
-    itemQuestion.type = question.type;
-    itemQuestion.values = question.values;
-    ret.push(itemQuestion);
-  });
-  return ret;
-};
-
 QuestionnaireDesigner.prototype.edit = function(question) {
   let self = this;
   Handlebars.registerHelper('ifne', function (a, b, options) {
     if (a != b) { return options.fn(this); }
     return options.inverse(this);
   });
+  let questionId = question.id;
   let el = dom.templatize(`
     <div>
-    <div widget-id="dialogFollowupEdit" class="card border-less">
+    <div widget-id="dialogQuestionEdit" class="card border-less">
       <div class="card-body">
         <div class="row">
           <div class="col-sm-12">
@@ -21517,13 +21517,18 @@ QuestionnaireDesigner.prototype.edit = function(question) {
         </div>  
         {{/ifne}}
       </div>
-    </div>
+      </div>
+      <div>
+        <span class="keyboard-key material-icons">arrow_upward</span>和
+        <span class="keyboard-key material-icons">arrow_downward</span>
+        可以用于切换输入框。
+      </div>
     </div>
   `, question);
   dialog.html({
     html: el.innerHTML,
     load: function() {
-      let dialog = dom.find('div[widget-id="dialogFollowupEdit"]');
+      let dialog = dom.find('div[widget-id="dialogQuestionEdit"]');
       let buttonAdd = dom.find('a[widget-id=buttonAdd]', dialog);
       dom.bind(buttonAdd, 'click', ev => {
         let el = dom.element(`
@@ -21540,11 +21545,10 @@ QuestionnaireDesigner.prototype.edit = function(question) {
           </li>
         `);
         dom.find('ul', dialog).appendChild(el);
-        self.initTableCells(el);
       });
     },
     success: function() {
-      let dialog = dom.find('div[widget-id="dialogFollowupEdit"]');
+      let dialog = dom.find('div[widget-id="dialogQuestionEdit"]');
       let inputs = dialog.querySelectorAll('input[name=values]');
       let question = dom.formdata(dialog);
       question.values = [];
@@ -21560,7 +21564,10 @@ QuestionnaireDesigner.prototype.edit = function(question) {
           question.scores.push(el.value);
         }
       });
-      self.renderQuestion(dom.find("[widget-id=widgetQuestionnaireCanvas]"), question);
+      self.renderQuestion(self.widgetQuestionnaireCanvas, {
+        ...question,
+        id: questionId,
+      });
       self.refresh();
     }
   });
@@ -21568,7 +21575,7 @@ QuestionnaireDesigner.prototype.edit = function(question) {
 
 QuestionnaireDesigner.prototype.refresh = function() {
   let ifbody = this.ifPreview.contentDocument.body || this.ifPreview.contentWindow.document.body;
-  ifbody.innerHTML = dom.find("[widget-id=widgetQuestionnaireCanvas]").innerHTML;
+  ifbody.innerHTML = this.widgetQuestionnaireCanvas.innerHTML;
 };
 
 QuestionnaireDesigner.prototype.onCellFocus = function(input) {
@@ -21590,15 +21597,36 @@ QuestionnaireDesigner.prototype.onCellKeyPress = function(ev) {
     // arrow-up
     if (index - 1 >= 0) {
       inputs[index - 1].focus();
-      inputs[index - 1].setSelectionRange(0, inputs[index - 1].value.length);
+      // inputs[index - 1].setSelectionRange(0, inputs[index - 1].value.length);
     }
   } else if (ev.keyCode == 40) {
     // arrow-down
     if (index + 1 < inputs.length) {
       inputs[index + 1].focus();
-      inputs[index + 1].setSelectionRange(0, inputs[index + 1].value.length);
+      // inputs[index + 1].setSelectionRange(0, inputs[index + 1].value.length);
     }
   }
+};
+
+QuestionnaireDesigner.prototype.getQuestions = function () {
+  let questions = [];
+  this.widgetQuestionnaireCanvas.querySelectorAll('.questionnaire-question').forEach((el, idx) => {
+    let model = JSON.parse(el.getAttribute('data-questionnaire-question-model'));
+    questions.push({
+      questionId: el.getAttribute('data-questionnaire-question-id'),
+      questionName: model.title,
+      questionType: model.type,
+      content: JSON.stringify(model),
+      ordinalPosition: idx,
+    });
+  });
+  return questions;
+};
+
+QuestionnaireDesigner.prototype.setQuestionIds = function (ids) {
+  this.widgetQuestionnaireCanvas.querySelectorAll('.questionnaire-question').forEach((el, idx) => {
+    el.setAttribute('data-questionnaire-question-id', ids[idx]);
+  });
 };
 
 QuestionnaireDesigner.prototype.selectText = function (el){

@@ -40,7 +40,8 @@ function initialize() {
   };
   x_spreadsheet.locale('zh-cn');
   let xs = x_spreadsheet('#spreadsheet', {showToolbar: true, showGrid: true}).loadData([{
-    // freeze: 'B3',
+    showToolbar: false,
+    showContextmenu: false,
     styles: [
       {
         bgcolor: '#f4f5f8',
