@@ -898,6 +898,7 @@ ajax.sidebar = function(opt) {
       url: opt.url,
       success: function (resp) {
         dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
+        dom.find('.modal-body', sidebar).innerHTML = '';
         if (!allowClose && !opt.close) {
           dom.find('button.close', sidebar).classList.add('hidden');
         }
@@ -924,6 +925,7 @@ ajax.sidebar = function(opt) {
       },
       success: function (resp) {
         let script = resp.data.script;
+        dom.find('.modal-body', sidebar).innerHTML = '';
         let fragment = utils.append(dom.find('.modal-body', sidebar), script);
         dom.find('.modal-title', sidebar).innerHTML = opt.title || '&nbsp;';
         if (!allowClose && !opt.close) {
