@@ -45,7 +45,7 @@ function FormLayout(opts) {
  * @param params
  *        the request parameters
  */
-FormLayout.prototype.render = function (containerId, params) {
+FormLayout.prototype.render = async function (containerId, params) {
   this.containerId = containerId;
   if (typeof containerId === 'string') {
     this.container = document.querySelector(containerId);
@@ -54,7 +54,7 @@ FormLayout.prototype.render = function (containerId, params) {
   }
   this.container.innerHTML = '';
 
-  this.fetch(params);
+  await this.fetch(params);
 };
 
 /**
@@ -325,7 +325,7 @@ FormLayout.prototype.build = function(persisted) {
       rightbar.children[0].classList.add('out');
       setTimeout(function () {
         rightbar.remove();
-      }, 1000);
+      }, 300);
     }
   });
   if (this.actionable && this.mode!='page') {
@@ -380,7 +380,7 @@ FormLayout.prototype.build = function(persisted) {
  * @param read
  *        the remote options
  */
-FormLayout.prototype.fetch = function (params) {
+FormLayout.prototype.fetch = async function (params) {
   let self = this;
   params = params || {};
   if (!this.readOpt) {
@@ -397,34 +397,26 @@ FormLayout.prototype.fetch = function (params) {
     this.build({});
     return;
   }
-  xhr.post({
+  let data = await xhr.promise({
     url: this.readOpt.url,
     data: params,
-    success: async function(resp) {
-      if (resp.error) {
-        dialog.error(resp.error.message);
-        return;
-      }
-      let data = resp.data;
-      if (self.readOpt.asyncConvert) {
-        data = await  self.readOpt.asyncConvert(data);
-      }
-      if (self.readOpt.convert) {
-        data = self.readOpt.convert(data);
-      }
-      if (utils.isEmpty(data)) {
-        self.build(params);
-      } else {
-        for (let keyParam in params) {
-          if (typeof data[keyParam] === 'undefined') {
-            data[keyParam] = params[keyParam];
-          }
-        }
-        self.build(data);
+  });
+  if (self.readOpt.asyncConvert) {
+    data = await  self.readOpt.asyncConvert(data);
+  }
+  if (self.readOpt.convert) {
+    data = self.readOpt.convert(data);
+  }
+  if (utils.isEmpty(data)) {
+    self.build(params);
+  } else {
+    for (let keyParam in params) {
+      if (typeof data[keyParam] === 'undefined') {
+        data[keyParam] = params[keyParam];
       }
     }
-  });
-  // this.params = params;
+    self.build(data);
+  }
 };
 
 FormLayout.prototype.read = function (params) {
@@ -538,7 +530,7 @@ FormLayout.prototype.save = async function () {
           rightbar.children[0].classList.add('out');
           setTimeout(function () {
             rightbar.remove();
-          }, 1000);
+          }, 300);
         }
       }
     }

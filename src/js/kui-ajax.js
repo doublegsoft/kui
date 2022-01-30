@@ -196,7 +196,6 @@ ajax.view = function(opt) {
       success: function (resp) {
         let fragment = null;
         if (container) {
-          container.innerHTML = '';
           fragment = utils.append(container, resp, empty);
         }
         if (callback)
@@ -219,7 +218,6 @@ ajax.view = function(opt) {
         }
         let fragment = null;
         if (container) {
-          container.innerHTML = '';
           fragment = utils.append(container, script, empty);
         }
         if (callback)
@@ -933,6 +931,9 @@ ajax.sidebar = function(opt) {
         }
         dom.find('button.close', sidebar).addEventListener('click', function () {
           dom.find('.right-bar').classList.add('out');
+          setTimeout(function () {
+            sidebar.remove();
+          }, 300);
           // 关闭回调
           if (opt.close)
             opt.close();
