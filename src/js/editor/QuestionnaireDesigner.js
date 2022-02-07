@@ -393,6 +393,9 @@ QuestionnaireDesigner.prototype.clearAndSelect = function(element, clear) {
   let buttonDelete = dom.find('a[widget-id=buttonDelete]', operations);
   dom.bind(buttonDelete, 'click', ev => {
     let model = JSON.parse(element.getAttribute('data-questionnaire-question-model'));
+    if (!model.questionnaireQuestionId) {
+      model.questionnaireQuestionId = element.getAttribute('data-questionnaire-question-id');
+    }
     this.onDelete(model, element)
   });
   element.appendChild(operations);

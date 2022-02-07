@@ -20682,6 +20682,10 @@ input[type=radio].radio.is-large {
 .input-group.mask input {
   pointer-events: none;
 }
+
+.input-group.mask select {
+  pointer-events: none;
+}
 .editor {
   display: block;
   border: 1px solid #d1d1d1;

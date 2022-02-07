@@ -9705,22 +9705,25 @@ FormLayout.prototype.build = function(persisted) {
     form.appendChild(hidden);
   }
 
+  let row = dom.create('div', 'row', 'mx-0');
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     if (group.title) {
       let el = dom.element('<div class="title-bordered" style="margin: 10px -10px;"><strong>' + group.title + '</strong></div>')
       form.appendChild(el);
     }
-    let row = dom.create('div', 'row');
+    let cols = 24 / columnCount;
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
+      let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0');
       if (pair.label != null) {
         pair.label.classList.add('pl-3');
         pair.input.classList.add('mb-2', 'pr-3');
-        row.appendChild(pair.label);
+        labelAndInput.appendChild(pair.label);
       }
-      row.appendChild(pair.input);
+      labelAndInput.appendChild(pair.input);
+      row.appendChild(labelAndInput);
     }
     form.appendChild(row);
   }
@@ -19635,8 +19638,21 @@ FormBuilder.prototype.decorate = function(formContainerId) {
   this.formContainer = dom.find(formContainerId);
   let inputGroups = this.formContainer.querySelectorAll('.input-group');
   for (let i = 0; i < inputGroups.length; i++) {
+    let mask = dom.create('div');
+    mask.style.background = 'transparent';
+    mask.style.width = '100%';
+    mask.style.height = '100%';
+    mask.style.zIndex = '9999';
+    mask.style.position = 'absolute';
+    mask.style.top = '0px';
+    mask.style.left = '0px';
+    mask.style.cursor = 'pointer';
     let ig = inputGroups[i];
-    ig.classList.add('mask');
+    ig.parentElement.style.position = 'relative';
+    ig.parentElement.appendChild(mask);
+    dom.bind(mask, 'click', ev => {
+
+    });
   }
 };
 /**
@@ -21446,6 +21462,9 @@ QuestionnaireDesigner.prototype.clearAndSelect = function(element, clear) {
   let buttonDelete = dom.find('a[widget-id=buttonDelete]', operations);
   dom.bind(buttonDelete, 'click', ev => {
     let model = JSON.parse(element.getAttribute('data-questionnaire-question-model'));
+    if (!model.questionnaireQuestionId) {
+      model.questionnaireQuestionId = element.getAttribute('data-questionnaire-question-id');
+    }
     this.onDelete(model, element)
   });
   element.appendChild(operations);

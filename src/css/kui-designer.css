@@ -8,3 +8,7 @@
 .input-group.mask input {
   pointer-events: none;
 }
+
+.input-group.mask select {
+  pointer-events: none;
+}

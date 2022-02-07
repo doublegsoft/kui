@@ -133,22 +133,25 @@ FormLayout.prototype.build = function(persisted) {
     form.appendChild(hidden);
   }
 
+  let row = dom.create('div', 'row', 'mx-0');
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     if (group.title) {
       let el = dom.element('<div class="title-bordered" style="margin: 10px -10px;"><strong>' + group.title + '</strong></div>')
       form.appendChild(el);
     }
-    let row = dom.create('div', 'row');
+    let cols = 24 / columnCount;
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
+      let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0');
       if (pair.label != null) {
         pair.label.classList.add('pl-3');
         pair.input.classList.add('mb-2', 'pr-3');
-        row.appendChild(pair.label);
+        labelAndInput.appendChild(pair.label);
       }
-      row.appendChild(pair.input);
+      labelAndInput.appendChild(pair.input);
+      row.appendChild(labelAndInput);
     }
     form.appendChild(row);
   }
