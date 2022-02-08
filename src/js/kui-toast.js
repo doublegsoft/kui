@@ -49,7 +49,7 @@ toast.info = function(selector, message) {
 
   toast.style.zIndex = 11000;
   dom.find('.toast-body', toast).innerHTML = message;
-  dom.find('strong', toast).innerText = '成功';
+  dom.find('strong', toast).innerText = '提示';
   toast.classList.add('bg-info', 'show', 'in');
 
   setTimeout(function() {

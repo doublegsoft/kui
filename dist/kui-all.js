@@ -7556,6 +7556,7 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
 };
 
 split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
+  const SPLITTER_WIDTH = 10;
   const splitterId = "__split_splitterId_" + topId.getAttribute('widget-id');
   topDefaultSize = (topDefaultSize || 300);
   let container = dom.find(containerId);
@@ -7587,7 +7588,8 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
   // top.style.flex = topDefaultSize + 'px';
   top.style.overflowY = 'auto';
 
-  bot.style.height = (container.clientHeight - topDefaultSize) + 'px';
+  bot.style.height = (container.clientHeight - topDefaultSize - SPLITTER_WIDTH) + 'px';
+  bot.style.marginTop = SPLITTER_WIDTH + 'px';
   // bot.style.flex = (container.clientHeight - topDefaultSize - 10) + 'px';
   bot.style.overflowY = 'auto';
 
@@ -7816,7 +7818,7 @@ toast.info = function(selector, message) {
 
   toast.style.zIndex = 11000;
   dom.find('.toast-body', toast).innerHTML = message;
-  dom.find('strong', toast).innerText = '成功';
+  dom.find('strong', toast).innerText = '提示';
   toast.classList.add('bg-info', 'show', 'in');
 
   setTimeout(function() {
@@ -11767,7 +11769,7 @@ function ListView(opt) {
 /**
  * Fetch data from remote data source.
  */
-ListView.prototype.fetch = function (params) {
+ListView.prototype.fetch = async function (params) {
   let requestParams = {};
   params = params || {};
   utils.clone(this.params, requestParams);
@@ -11778,17 +11780,15 @@ ListView.prototype.fetch = function (params) {
     this.data.start = this.start;
     this.data.limit = this.limit;
 
-    xhr.post({
+    let data = await xhr.promise({
       url: this.url,
       params: requestParams,
-      success: function (resp) {
-        Array.prototype.push.apply(self.local, resp.data);
-        self.append(resp.data);
-        if (self.complete) {
-          self.complete();
-        }
-      }
     });
+    Array.prototype.push.apply(self.local, data);
+    self.append(data);
+    if (self.complete) {
+      self.complete();
+    }
   } else {
     self.append(this.local);
   }
@@ -15662,6 +15662,8 @@ TreeView.prototype.createNodeElement = function(data, level) {
   }
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
       let li = dom.ancestor(ev.target, 'li');
       let actives = this.container.querySelectorAll('.list-group-item-action.active');
       actives.forEach((el, idx) => { el.classList.remove('active') });

@@ -105,6 +105,7 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
 };
 
 split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
+  const SPLITTER_WIDTH = 10;
   const splitterId = "__split_splitterId_" + topId.getAttribute('widget-id');
   topDefaultSize = (topDefaultSize || 300);
   let container = dom.find(containerId);
@@ -136,7 +137,8 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
   // top.style.flex = topDefaultSize + 'px';
   top.style.overflowY = 'auto';
 
-  bot.style.height = (container.clientHeight - topDefaultSize) + 'px';
+  bot.style.height = (container.clientHeight - topDefaultSize - SPLITTER_WIDTH) + 'px';
+  bot.style.marginTop = SPLITTER_WIDTH + 'px';
   // bot.style.flex = (container.clientHeight - topDefaultSize - 10) + 'px';
   bot.style.overflowY = 'auto';
 

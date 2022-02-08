@@ -150,6 +150,8 @@ TreeView.prototype.createNodeElement = function(data, level) {
   }
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
       let li = dom.ancestor(ev.target, 'li');
       let actives = this.container.querySelectorAll('.list-group-item-action.active');
       actives.forEach((el, idx) => { el.classList.remove('active') });

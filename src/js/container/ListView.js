@@ -59,7 +59,7 @@ function ListView(opt) {
 /**
  * Fetch data from remote data source.
  */
-ListView.prototype.fetch = function (params) {
+ListView.prototype.fetch = async function (params) {
   let requestParams = {};
   params = params || {};
   utils.clone(this.params, requestParams);
@@ -70,17 +70,15 @@ ListView.prototype.fetch = function (params) {
     this.data.start = this.start;
     this.data.limit = this.limit;
 
-    xhr.post({
+    let data = await xhr.promise({
       url: this.url,
       params: requestParams,
-      success: function (resp) {
-        Array.prototype.push.apply(self.local, resp.data);
-        self.append(resp.data);
-        if (self.complete) {
-          self.complete();
-        }
-      }
     });
+    Array.prototype.push.apply(self.local, data);
+    self.append(data);
+    if (self.complete) {
+      self.complete();
+    }
   } else {
     self.append(this.local);
   }
