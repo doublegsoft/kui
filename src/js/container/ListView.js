@@ -171,6 +171,7 @@ ListView.prototype.reload = function(params) {
   ul.innerHTML = '';
 
   this.start = 0;
+  // 如果指定了远程链接，则本地数据无效
   if (this.url)
     this.local = [];
   this.fetch(params);

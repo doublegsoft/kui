@@ -4835,7 +4835,8 @@ dom.bind = function (selector, event, handler) {
   }
   if (element == null)  return;
   if (element)
-  element.addEventListener(event, handler);
+    element['on' + event] = handler;
+  // element.addEventListener(event, handler);
 };
 
 /**
@@ -11878,6 +11879,7 @@ ListView.prototype.reload = function(params) {
   ul.innerHTML = '';
 
   this.start = 0;
+  // 如果指定了远程链接，则本地数据无效
   if (this.url)
     this.local = [];
   this.fetch(params);
@@ -15667,7 +15669,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
       if (div != null) {
         div.classList.add('active');
       }
-      this.onSelectNode(dom.model(li));
+      this.onSelectNode(li, dom.model(li));
     });
   }
 

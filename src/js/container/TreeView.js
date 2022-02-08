@@ -157,7 +157,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
       if (div != null) {
         div.classList.add('active');
       }
-      this.onSelectNode(dom.model(li));
+      this.onSelectNode(li, dom.model(li));
     });
   }
 
