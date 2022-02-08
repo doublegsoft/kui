@@ -7482,6 +7482,7 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   left.style.flex = leftDefaultSize + 'px';
   right.style.width = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
   right.style.flex = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
+  right.style.marginLeft = SPLITTER_WIDTH + 'px';
 
   splitter.style.height = heightContainer + 'px';
   splitter.style.top = 0 + 'px';
@@ -15597,8 +15598,9 @@ TreeView.prototype.createNodeElement = function(data, level) {
         icon.classList.remove('fa-plus-square');
         icon.classList.add('fa-minus-square');
         ul.style.display = '';
-        if (ul.children.length == 0)
-          this.fetchChildren(ret, dom.model(a), level + 1);
+        // if (ul.children.length == 0)
+        ul.innerHTML = '';
+        this.fetchChildren(ret, dom.model(a), level + 1);
       } else {
         icon.classList.remove('fa-minus-square');
         icon.classList.add('fa-plus-square');
@@ -15730,7 +15732,10 @@ TreeView.prototype.render = async function(containerId, params) {
   if (this.rootUrl) {
     data = await xhr.promise({
       url: this.rootUrl,
-      params: params,
+      params: {
+        ...this.rootParams,
+        ...params,
+      },
     });
   } else if (this.local) {
     data = this.local;
@@ -21311,7 +21316,10 @@ QuestionnaireDesigner.prototype.renderMultipleChoice = function(container, quest
   });
   if (existing === true) {
     let old = dom.find('[data-questionnaire-question-id="' + question.id + '"]');
-    container.replaceChild(el, old);
+    if (old)
+      container.replaceChild(el, old);
+    else
+      container.appendChild(el);
   } else {
     container.appendChild(el);
   }

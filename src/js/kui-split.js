@@ -32,6 +32,7 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   left.style.flex = leftDefaultSize + 'px';
   right.style.width = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
   right.style.flex = container.clientWidth - leftDefaultSize - SPLITTER_WIDTH + 'px';
+  right.style.marginLeft = SPLITTER_WIDTH + 'px';
 
   splitter.style.height = heightContainer + 'px';
   splitter.style.top = 0 + 'px';

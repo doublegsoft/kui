@@ -88,8 +88,9 @@ TreeView.prototype.createNodeElement = function(data, level) {
         icon.classList.remove('fa-plus-square');
         icon.classList.add('fa-minus-square');
         ul.style.display = '';
-        if (ul.children.length == 0)
-          this.fetchChildren(ret, dom.model(a), level + 1);
+        // if (ul.children.length == 0)
+        ul.innerHTML = '';
+        this.fetchChildren(ret, dom.model(a), level + 1);
       } else {
         icon.classList.remove('fa-minus-square');
         icon.classList.add('fa-plus-square');
@@ -221,7 +222,10 @@ TreeView.prototype.render = async function(containerId, params) {
   if (this.rootUrl) {
     data = await xhr.promise({
       url: this.rootUrl,
-      params: params,
+      params: {
+        ...this.rootParams,
+        ...params,
+      },
     });
   } else if (this.local) {
     data = this.local;

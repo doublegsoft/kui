@@ -242,7 +242,10 @@ QuestionnaireDesigner.prototype.renderMultipleChoice = function(container, quest
   });
   if (existing === true) {
     let old = dom.find('[data-questionnaire-question-id="' + question.id + '"]');
-    container.replaceChild(el, old);
+    if (old)
+      container.replaceChild(el, old);
+    else
+      container.appendChild(el);
   } else {
     container.appendChild(el);
   }
