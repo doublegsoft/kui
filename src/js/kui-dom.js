@@ -181,8 +181,8 @@ dom.bind = function (selector, event, handler) {
   }
   if (element == null)  return;
   if (element)
-    element['on' + event] = handler;
-  // element.addEventListener(event, handler);
+    // element['on' + event] = handler;
+    element.addEventListener(event, handler);
 };
 
 /**
