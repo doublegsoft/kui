@@ -14,7 +14,7 @@ function ReportDesigner(options) {
   this.elements = [];
   // 页面元素
   this.containerId = options.containerId;
-  this.container = document.getElementById(this.containerId);
+  this.container = dom.find(this.containerId);
   this.containerWidth = this.container.clientWidth;
 
   // 属性编辑器

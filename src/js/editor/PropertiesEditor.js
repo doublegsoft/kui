@@ -38,7 +38,7 @@ PropertiesEditor.prototype.onModelChanged = function (model) {
 };
 
 PropertiesEditor.prototype.clear = function (prop) {
-  let container = document.getElementById(this.containerId);
+  let container = dom.find(this.containerId);
   container.innerHTML = '';
 };
 
@@ -49,8 +49,11 @@ PropertiesEditor.prototype.clear = function (prop) {
  */
 PropertiesEditor.prototype.render = function(element) {
   let self = this;
-  let elementProperties = element.getProperties();
-  let container = document.getElementById(this.containerId);
+  let elementProperties = [];
+  if (element.getProperties) elementProperties = element.getProperties();
+  else elementProperties = element.groups;
+
+  let container = dom.find(this.containerId);
   container.innerHTML = '';
   for (let i = 0; i < elementProperties.length; i++) {
     let group = elementProperties[i];
@@ -84,7 +87,7 @@ PropertiesEditor.prototype.render = function(element) {
       divProp.classList.add('group-item');
       let labelProp = document.createElement('label');
       labelProp.classList.add('group-item-label');
-      labelProp.textContent = prop.label + '：';
+      labelProp.textContent = (prop.label || prop.title) + '：';
       divProp.append(labelProp);
 
       let divInput = document.createElement('div');
@@ -93,13 +96,13 @@ PropertiesEditor.prototype.render = function(element) {
         // 【文本】
         //
         let textarea = document.createElement('textarea');
-        textarea.setAttribute('data-id', prop.id);
+        textarea.setAttribute('property-model-name', prop.name);
         textarea.classList.add('group-item-input');
         textarea.textContent = prop.value || '';
 
         textarea.addEventListener('keyup', function (evt) {
           let changed = {};
-          changed[prop.id] = textarea.value;
+          changed[prop.name] = textarea.value;
           self.notifyPropertyChangedListeners(changed);
         });
 
@@ -109,7 +112,7 @@ PropertiesEditor.prototype.render = function(element) {
         // 【区域值】
         //
         let input = document.createElement('input');
-        input.setAttribute('data-id', prop.id);
+        input.setAttribute('property-model-name', prop.name);
         input.setAttribute('type', 'range');
         input.setAttribute('step', '1');
         input.setAttribute('min', prop.min);
@@ -124,13 +127,13 @@ PropertiesEditor.prototype.render = function(element) {
         input.addEventListener('change', function(evt) {
           labelProp.textContent = prop.label + '：' + input.valueAsNumber + prop.unit;
           let changed = {};
-          changed[prop.id] = input.valueAsNumber;
+          changed[prop.name] = input.valueAsNumber;
           self.notifyPropertyChangedListeners(changed);
         });
         input.addEventListener('input', function(evt) {
           labelProp.textContent = prop.label + '：' + input.valueAsNumber + prop.unit;
           let changed = {};
-          changed[prop.id] = input.valueAsNumber;
+          changed[prop.name] = input.valueAsNumber;
           self.notifyPropertyChangedListeners(changed);
         });
 
@@ -139,14 +142,14 @@ PropertiesEditor.prototype.render = function(element) {
         // 【下拉框】
         //
         let select = document.createElement('select');
-        select.setAttribute('data-id', prop.id);
+        select.setAttribute('property-model-name', prop.name);
         select.style.display = 'block';
         select.classList.add('group-item-input');
         for (let i = 0; i < prop.values.length; i++) {
           let option = document.createElement('option');
-          option.value = prop.values[i];
-          option.textContent = prop.values[i];
-          if (prop.values[i] == prop.value) {
+          option.value = prop.values[i].value;
+          option.textContent = prop.values[i].text;
+          if (prop.values[i].value == prop.value) {
             option.selected = true;
           }
           select.append(option);
@@ -155,7 +158,7 @@ PropertiesEditor.prototype.render = function(element) {
 
         select.addEventListener('change', function(evt) {
           let changed = {};
-          changed[prop.id] = select.value;
+          changed[prop.name] = select.value;
           self.notifyPropertyChangedListeners(changed);
         });
 
@@ -164,7 +167,7 @@ PropertiesEditor.prototype.render = function(element) {
         // 【数字】
         //
         let input = document.createElement('input');
-        input.setAttribute('data-id', prop.id);
+        input.setAttribute('property-model-name', prop.name);
         input.value = parseInt(prop.value);
         input.classList.add('group-item-input');
         divProp.append(input);
@@ -172,8 +175,7 @@ PropertiesEditor.prototype.render = function(element) {
         input.addEventListener('input', function(evt) {
           if (isNaN(parseFloat(this.value))) return;
           let changed = {};
-          changed[prop.id] = parseFloat(this.value);
-          console.log(changed);
+          changed[prop.name] = parseFloat(this.value);
           self.notifyPropertyChangedListeners(changed);
         });
       } else if (prop.input == 'color') {
@@ -182,14 +184,14 @@ PropertiesEditor.prototype.render = function(element) {
         //
         let input = document.createElement('input');
         input.setAttribute('type', 'color');
-        input.setAttribute('data-id', prop.id);
+        input.setAttribute('property-model-name', prop.name);
         input.value = prop.value;
         input.classList.add('group-item-input');
         divProp.append(input);
 
         input.addEventListener('input', function(evt) {
           let changed = {};
-          changed[prop.id] = input.value;
+          changed[prop.name] = input.value;
           self.notifyPropertyChangedListeners(changed);
         });
       } else if (prop.input == 'file') {
@@ -198,7 +200,7 @@ PropertiesEditor.prototype.render = function(element) {
         //
         let input = document.createElement('input');
         input.setAttribute('type', 'file');
-        input.setAttribute('data-id', prop.id);
+        input.setAttribute('property-model-name', prop.name);
         input.value = prop.value;
         input.classList.add('group-item-input');
         divProp.append(input);
@@ -207,17 +209,45 @@ PropertiesEditor.prototype.render = function(element) {
           let reader = new FileReader();
           reader.onloadend = function () {
             let changed = {};
-            changed[prop.id] = reader.result;
+            changed[prop.name] = reader.result;
             self.notifyPropertyChangedListeners(changed);
           };
           reader.readAsDataURL(this.files[0]);
 
         });
+      } else if (prop.input === 'bool') {
+        let input = dom.element(`
+          <div class="d-flex full-width">
+            <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
+              <input class="c-switch-input" value="T" name="result.lost" type="checkbox">
+              <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
+            </label>
+          </div>
+        `);
+        divProp.append(input);
       } else if (prop.display) {
         //
         // 【自定义】
         //
         divProp.append(prop.display(prop.value));
+      } else if (prop.input === 'readonly') {
+        let input = document.createElement('input');
+        input.setAttribute('readonly', true);
+        input.setAttribute('property-model-name', prop.name || prop.name);
+        input.value = prop.value || '';
+        input.classList.add('group-item-input');
+        divProp.append(input);
+      } else {
+        let input = document.createElement('input');
+        input.setAttribute('property-model-name', prop.name || prop.name);
+        input.value = prop.value || '';
+        input.classList.add('group-item-input');
+        divProp.append(input);
+        input.addEventListener('input', function(evt) {
+          let changed = {};
+          changed[prop.name] = input.value;
+          self.notifyPropertyChangedListeners(changed);
+        });
       }
       divProp.append(divInput);
 
@@ -241,26 +271,26 @@ PropertiesEditor.prototype.render = function(element) {
 };
 
 PropertiesEditor.prototype.getData = function () {
-  let container = document.getElementById(this.containerId);
+  let container = dom.find(this.containerId);
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
   let ret = {};
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i];
-    let dataId = input.getAttribute('data-id');
+    let dataId = input.getAttribute('property-model-name');
     let dataValue = input.value;
     ret[dataId] = dataValue;
   }
   for (let i = 0; i < selects.length; i++) {
     let select = selects[i];
-    let dataId = select.getAttribute('data-id');
+    let dataId = select.getAttribute('property-model-name');
     let dataValue = select.value;
     ret[dataId] = dataValue;
   }
   for (let i = 0; i < inputs.length; i++) {
     let textarea = textareas[i];
-    let dataId = textarea.getAttribute('data-id');
+    let dataId = textarea.getAttribute('property-model-name');
     let dataValue = textarea.textContent;
     ret[dataId] = dataValue;
   }
@@ -268,14 +298,14 @@ PropertiesEditor.prototype.getData = function () {
 };
 
 PropertiesEditor.prototype.setData = function (data) {
-  let container = document.getElementById(this.containerId);
+  let container = dom.find(this.containerId);
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
 
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i];
-    let dataId = input.getAttribute('data-id');
+    let dataId = input.getAttribute('property-model-name');
     if (data[dataId]) {
       // 特殊处理BUG
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
@@ -285,13 +315,13 @@ PropertiesEditor.prototype.setData = function (data) {
   }
   for (let i = 0; i < selects.length; i++) {
     let select = selects[i];
-    let dataId = select.getAttribute('data-id');
+    let dataId = select.getAttribute('property-model-name');
     if (data[dataId])
       select.value = data[dataId];
   }
   for (let i = 0; i < textareas.length; i++) {
     let textarea = textareas[i];
-    let dataId = textarea.getAttribute('data-id');
+    let dataId = textarea.getAttribute('property-model-name');
     if (data[dataId])
       textarea.textContent = data[dataId];
   }

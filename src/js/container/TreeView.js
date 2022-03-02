@@ -173,8 +173,11 @@ TreeView.prototype.createNodeElement = function(data, level) {
 
 /**
  * 递归添加、渲染数据到树节点。
+ *
+ * @public
  */
-TreeView.prototype.appendNode = function(parentElement, data, level) {
+TreeView.prototype.appendNode = function(data, level, parentElement) {
+  parentElement = parentElement || this.container;
   let ul = parentElement.querySelector('ul');
   let li = this.createNodeElement(data, level);
   ul.appendChild(li);
@@ -184,8 +187,52 @@ TreeView.prototype.appendNode = function(parentElement, data, level) {
     let childData = data.children[i];
     childData.level = data.level + 1;
     let childParentElement = li.querySelector('ul');
-    this.appendNode(childParentElement, childData, level + 1);
+    this.appendNode(childData, level + 1, childParentElement);
   }
+};
+
+/**
+ * 递归添加、渲染数据到树节点。
+ *
+ * @public
+ */
+TreeView.prototype.insertNode = function(data, parentElement) {
+  parentElement = parentElement || this.container;
+  let ul = parentElement.querySelector('ul');
+  let li = this.createNodeElement(data, level);
+  ul.appendChild(li);
+
+  data.children = data.children || [];
+  for (let i = 0; i < data.children.length; i++) {
+    let childData = data.children[i];
+    childData.level = data.level + 1;
+    let childParentElement = li.querySelector('ul');
+    this.appendNode(childData, level + 1, childParentElement);
+  }
+};
+
+/**
+ * 根据数据定位树视图中的元素。
+ *
+ * @private
+ */
+TreeView.prototype.locateElement = function(data, parentElement) {
+  parentElement = parentElement || this.container;
+  let ul = parentElement.querySelector('ul');
+  let lis = ul.querySelectorAll('li');
+
+  for (let i = 0; i < lis.length; i++) {
+    let li = lis[i];
+    let model = dom.model(li);
+    if (data[this.fieldValue] === model[this.fieldValue]) {
+      return li;
+    }
+    let ret = this.locateElement(data, li);
+    if (ret != null) {
+      return ret;
+    }
+  }
+  return null;
 };
 
 TreeView.prototype.fetchChildren = async function(parentElement, params, level) {
@@ -200,7 +247,7 @@ TreeView.prototype.fetchChildren = async function(parentElement, params, level) 
     },
   });
   for (let i = 0; i < data.length; i++) {
-    this.appendNode(parentElement, data[i], level);
+    this.appendNode(data[i], level, parentElement);
   }
 };
 
@@ -238,7 +285,7 @@ TreeView.prototype.render = async function(containerId, params) {
   this.container.appendChild(ul);
   for (let i = 0; i < data.length; i++) {
     let row = data[i];
-    this.appendNode(this.container, row, 0);
+    this.appendNode(row, 0, this.container);
   }
 
 };

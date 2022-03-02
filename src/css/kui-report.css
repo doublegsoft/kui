@@ -9,6 +9,7 @@
 .properties-container .group {
   padding: 0;
   margin-bottom: 1px;
+  margin-top: 8px;
 }
 
 .properties-container .group > .group-title {
@@ -21,6 +22,11 @@
   color: #9093b1;
   font-size: 14px;
   background: #424568;
+  margin-bottom: 0!important;
+}
+
+.properties-container .group:first-child {
+  margin-top: 0!important;
 }
 
 .properties-container .group > .group-body {
@@ -28,12 +34,13 @@
 }
 
 .properties-container .group > .group-body > .group-item {
-  padding-top: 5px;
+  padding-top: 8px;
   font-size: 14px;
 }
 
 .properties-container .group > .group-body > .group-item > .group-item-label {
   font-weight: bold;
+  margin-bottom: 4px!important;
 }
 
 .properties-container .group > .group-body > .group-item > .group-item-input {

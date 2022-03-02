@@ -769,10 +769,10 @@ dom.height = function(selector, offset, parent) {
   let borderBottomWidth = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
 
   element.style.marginBottom = '0px';
-  let ancestor = dom.ancestor(element, 'div', 'full');
-  if (ancestor == null) {
-    paddingBottom = 0;
-  }
+  // let ancestor = dom.ancestor(element, 'div', 'full');
+  // if (ancestor == null) {
+  //   paddingBottom = 0;
+  // }
 
   element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
   element.style.overflowY = 'auto';

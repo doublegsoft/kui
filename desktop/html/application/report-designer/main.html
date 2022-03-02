@@ -34,14 +34,14 @@ designerContainer.style.height = height + 'px';
 canvasContainer.style.height = height + 'px';
 
 var propertiesEditor = new PropertiesEditor({
-  containerId: 'properties_container',
+  containerId: '#properties_container',
   confirm: function () {
     designer.render();
   }
 });
 
 window.designer = new ReportDesigner({
-  containerId: 'canvas_container',
+  containerId: '#canvas_container',
   canvasHeight: height,
   propertiesEditor: propertiesEditor
 });

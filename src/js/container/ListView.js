@@ -220,7 +220,7 @@ ListView.prototype.reorder = function(event) {
  *
  * @private
  */
-ListView.prototype.append = function(data) {
+ListView.prototype.append = function(data, index) {
   let self = this;
   let ul = this.container.querySelector('ul');
   let len = ul.querySelectorAll('li').length;
@@ -302,7 +302,16 @@ ListView.prototype.append = function(data) {
     li.appendChild(div);
 
     dom.model(li, row);
-    ul.appendChild(li);
+
+    if (typeof index === 'number') {
+      if (index < 0) {
+        ul.insertBefore(li, ul.children[ul.children.length + index]);
+      } else {
+        ul.insertBefore(li, ul.children[index]);
+      }
+    } else {
+      ul.appendChild(li);
+    }
 
     if (this.onRemove) {
 
