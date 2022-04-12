@@ -124,7 +124,9 @@ function PaginationTable(opts) {
     this.widgetFilter = new QueryLayout(opts.filter);
     this.optsFilter = opts.filter;
   }
+  //
   // 最新的查询条件输入
+  //
   if (opts.filter2) {
     this.optsFilter2 = opts.filter2;
   }

@@ -315,7 +315,7 @@ main {
 
 .full-height {
   height: 100%;
-  overflow-y: hidden;
+  /*overflow-y: hidden;*/
 }
 
 .form-control-static {
@@ -2781,4 +2781,13 @@ a.disabled {
   color: rgba(0, 0, 0, 0.7);
   box-shadow: rgba(0, 0, 0, 0.3) 0px -2px 0px inset, rgba(0, 0, 0, 0.4) 0px 1px 1px;
   padding: 8px;
+}
+
+/**
+ *
+ */
+.nav-tabs.nav-tabs-equal > div {
+  flex-grow: 1;
+  flex-basis: 0;
+  text-align: center;
 }

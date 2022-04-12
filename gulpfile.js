@@ -58,6 +58,15 @@ gulp.task('dist', function() {
       .pipe(concat('./kui-all.min.css'))
       .pipe(uglifycss())
       .pipe(gulp.dest('./dist/'));
+
+  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuim.css'])
+    .pipe(concat('./kui-all.mobile.css'))
+    .pipe(gulp.dest('./dist/'));
+
+  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuim.css'])
+    .pipe(concat('./kui-all.mobile.min.css'))
+    .pipe(uglifycss())
+    .pipe(gulp.dest('./dist/'));
 });
 
 // Default Task

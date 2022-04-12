@@ -133,7 +133,6 @@ FormLayout.prototype.build = function(persisted) {
     form.appendChild(hidden);
   }
 
-  let row = dom.create('div', 'row', 'mx-0');
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     if (group.title) {
@@ -141,6 +140,7 @@ FormLayout.prototype.build = function(persisted) {
       form.appendChild(el);
     }
     let cols = 24 / columnCount;
+    let row = dom.create('div', 'row', 'mx-0');
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
@@ -566,8 +566,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     labelGridCount = 6;
     inputGridCount = 18;
   } else if (averageSpace === 12) {
-    labelGridCount = 4;
-    inputGridCount = 8;
+    labelGridCount = 6;
+    inputGridCount = 18;
   } else if (averageSpace === 8) {
     labelGridCount = 3;
     inputGridCount = 5;

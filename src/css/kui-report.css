@@ -29,25 +29,30 @@
   margin-top: 0!important;
 }
 
-.properties-container .group > .group-body {
+.group-body {
   padding: 0px 20px 0 30px;
 }
 
-.properties-container .group > .group-body > .group-item {
+.group-item {
   padding-top: 8px;
   font-size: 14px;
 }
 
-.properties-container .group > .group-body > .group-item > .group-item-label {
+.group-item-label {
   font-weight: bold;
   margin-bottom: 4px!important;
 }
 
-.properties-container .group > .group-body > .group-item > .group-item-input {
+.group-item-input {
   width: 100%;
 }
 
-.properties-container .group > .group-body > .group-item > .group-item-input:last-child {
+select.group-item-input {
+  width: 100%;
+  height: 27px;
+}
+
+.group-item-input:last-child {
   margin-bottom: 10px;
 }
 

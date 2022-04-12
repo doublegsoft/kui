@@ -134,16 +134,23 @@ Chat.prototype.getConversations = async function() {
 
 Chat.prototype.fetchMessages = async function(senderId, senderType, status) {
   let self = this;
+  let conversationId = '';
+  if (senderId > this.userId) {
+    conversationId = senderId + '&' + this.userId;
+  } else {
+    conversationId = this.userId + '&' + senderId;
+  }
   let messages = await xhr.promise({
     url: this.host + '/api/v3/common/script/stdbiz/pim/conversation_message/find',
     params: {
-      _and_condition: ' and (' +
-        '  (convomsg.rcvrid = \'' + senderId  + '\' and convomsg.rcvrtyp = \'' + senderType + '\' and ' +
-        '   convomsg.sndrid = \'' + this.userId  + '\' and convomsg.sndrtyp = \'' + this.userType + '\') or ' +
-        '  (convomsg.rcvrid = \'' + this.userId  + '\' and convomsg.rcvrtyp = \'' + this.userType + '\' and ' +
-        '   convomsg.sndrid = \'' + senderId  + '\' and convomsg.sndrtyp = \'' + senderType + '\') ' +
-        ') ',
-      _order_by: 'createTime asc',
+      // _and_condition: ' and (' +
+      //   '  (convomsg.rcvrid = \'' + senderId  + '\' and convomsg.rcvrtyp = \'' + senderType + '\' and ' +
+      //   '   convomsg.sndrid = \'' + this.userId  + '\' and convomsg.sndrtyp = \'' + this.userType + '\') or ' +
+      //   '  (convomsg.rcvrid = \'' + this.userId  + '\' and convomsg.rcvrtyp = \'' + this.userType + '\' and ' +
+      //   '   convomsg.sndrid = \'' + senderId  + '\' and convomsg.sndrtyp = \'' + senderType + '\') ' +
+      //   ') ',
+      conversationId: conversationId,
+      _order_by: 'messageTime asc',
     },
   });
   let timestampedMessages = [];

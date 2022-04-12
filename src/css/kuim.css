@@ -151,7 +151,7 @@ footer {
   display: -webkit-box;
   display: -ms-flexbox;
   display: -webkit-flex;
-  display: flex;
+  display: inline;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   -webkit-justify-content: center;
@@ -718,3 +718,133 @@ footer {
 .form-horizontal .input-group {
   align-items: center!important;
 }
+
+.marquee {
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-message {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  text-align: center;
+
+  -moz-transform:translateX(100%);
+  -webkit-transform:translateX(100%);
+  transform:translateX(100%);
+
+  -moz-animation: marquee 15s linear infinite;
+  -webkit-animation: marquee 15s linear infinite;
+  animation: marquee 15s linear infinite;
+}
+
+@-moz-keyframes marquee {
+  0%   { -moz-transform: translateX(100%); }
+  100% { -moz-transform: translateX(-100%); }
+}
+
+@-webkit-keyframes marquee {
+  0%   { -webkit-transform: translateX(100%); }
+  100% { -webkit-transform: translateX(-100%); }
+}
+
+@keyframes marquee {
+  0% {
+    -moz-transform: translateX(100%);
+    -webkit-transform: translateX(100%);
+    transform: translateX(100%);
+  }
+  100% {
+    -moz-transform: translateX(-100%);
+    -webkit-transform: translateX(-100%);
+    transform: translateX(-100%);
+  }
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 100px;
+  width: 100%;
+  background: #fff;
+  /*border-radius: 20px;*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+.bottom-bar ul {
+  position: relative;
+  display: flex;
+  flex-shrink: 1;
+  width: 100%;
+}
+.bottom-bar ul li{
+  position: relative;
+  list-style-type: none;
+  flex: 1;
+}
+.bottom-bar ul li a {
+  position: relative;
+  height: 120px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.bottom-bar ul li a i{
+  position: absolute;
+  font-size: 38px;
+  color: #7d2ae8;
+}
+
+ul li a i.activeIcon{
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.6s ease;
+  transition-delay: 0.2s;
+}
+
+.bottom-bar ul li.active a i{
+  opacity: 1;
+  pointer-events: auto;
+}
+.bottom-bar ul .indicator{
+  position: absolute;
+  bottom: -19px;
+  left: 34px;
+  height: 36px;
+  width: 25px;
+  background: #7d2ae8;
+  border-radius: 50%;
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+ul .indicator::before{
+  content: "";
+  position: absolute;
+  left: -15px;
+  bottom: 50%;
+  height: 22px;
+  width: 20px;
+  background: #fff;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 10px 0 #7d2ae8;
+}
+ul .indicator::after{
+  content: "";
+  position: absolute;
+  right: -15px;
+  bottom: 50%;
+  height: 22px;
+  width: 20px;
+  background: #fff;
+  border-bottom-left-radius: 20px;
+  box-shadow: 0 10px 0 #7d2ae8;
+}
+
+

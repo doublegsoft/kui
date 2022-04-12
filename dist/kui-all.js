@@ -9256,16 +9256,23 @@ Chat.prototype.getConversations = async function() {
 
 Chat.prototype.fetchMessages = async function(senderId, senderType, status) {
   let self = this;
+  let conversationId = '';
+  if (senderId > this.userId) {
+    conversationId = senderId + '&' + this.userId;
+  } else {
+    conversationId = this.userId + '&' + senderId;
+  }
   let messages = await xhr.promise({
     url: this.host + '/api/v3/common/script/stdbiz/pim/conversation_message/find',
     params: {
-      _and_condition: ' and (' +
-        '  (convomsg.rcvrid = \'' + senderId  + '\' and convomsg.rcvrtyp = \'' + senderType + '\' and ' +
-        '   convomsg.sndrid = \'' + this.userId  + '\' and convomsg.sndrtyp = \'' + this.userType + '\') or ' +
-        '  (convomsg.rcvrid = \'' + this.userId  + '\' and convomsg.rcvrtyp = \'' + this.userType + '\' and ' +
-        '   convomsg.sndrid = \'' + senderId  + '\' and convomsg.sndrtyp = \'' + senderType + '\') ' +
-        ') ',
-      _order_by: 'createTime asc',
+      // _and_condition: ' and (' +
+      //   '  (convomsg.rcvrid = \'' + senderId  + '\' and convomsg.rcvrtyp = \'' + senderType + '\' and ' +
+      //   '   convomsg.sndrid = \'' + this.userId  + '\' and convomsg.sndrtyp = \'' + this.userType + '\') or ' +
+      //   '  (convomsg.rcvrid = \'' + this.userId  + '\' and convomsg.rcvrtyp = \'' + this.userType + '\' and ' +
+      //   '   convomsg.sndrid = \'' + senderId  + '\' and convomsg.sndrtyp = \'' + senderType + '\') ' +
+      //   ') ',
+      conversationId: conversationId,
+      _order_by: 'messageTime asc',
     },
   });
   let timestampedMessages = [];
@@ -9709,7 +9716,6 @@ FormLayout.prototype.build = function(persisted) {
     form.appendChild(hidden);
   }
 
-  let row = dom.create('div', 'row', 'mx-0');
   for (let i = 0; i < groups.length; i++) {
     let group = groups[i];
     if (group.title) {
@@ -9717,6 +9723,7 @@ FormLayout.prototype.build = function(persisted) {
       form.appendChild(el);
     }
     let cols = 24 / columnCount;
+    let row = dom.create('div', 'row', 'mx-0');
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
@@ -10142,8 +10149,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     labelGridCount = 6;
     inputGridCount = 18;
   } else if (averageSpace === 12) {
-    labelGridCount = 4;
-    inputGridCount = 8;
+    labelGridCount = 6;
+    inputGridCount = 18;
   } else if (averageSpace === 8) {
     labelGridCount = 3;
     inputGridCount = 5;
@@ -13289,7 +13296,9 @@ function PaginationTable(opts) {
     this.widgetFilter = new QueryLayout(opts.filter);
     this.optsFilter = opts.filter;
   }
+  //
   // 最新的查询条件输入
+  //
   if (opts.filter2) {
     this.optsFilter2 = opts.filter2;
   }
@@ -20859,6 +20868,28 @@ function PropertiesEditor(options) {
   this.propertyChangedListeners = [];
 }
 
+PropertiesEditor.getPropertiesValues = function(model) {
+  let ret = {};
+  for (let i = 0; i < model.groups.length; i++) {
+    let group = model.groups[i];
+    for (let j = 0; j < group.properties.length; j++) {
+      let prop = group.properties[j];
+      if (Array.isArray(prop.value)) {
+        ret[prop.name] = [];
+        let item = {};
+        for (let m = 0; m < prop.value.length; m++) {
+          let itemProp = prop.value[m];
+          item[itemProp.name] = itemProp.value;
+          ret[prop.name].push(item);
+        }
+      } else {
+        ret[prop.name] = prop.value || '';
+      }
+    }
+  }
+  return ret;
+};
+
 PropertiesEditor.prototype.addPropertyChangedListener = function (listener) {
   this.propertyChangedListeners.push(listener);
 };
@@ -20870,7 +20901,7 @@ PropertiesEditor.prototype.notifyPropertyChangedListeners = function (prop) {
 };
 
 PropertiesEditor.prototype.onModelChanged = function (model) {
-  this.setData(model);
+  this.setPropertiesValues(model);
 };
 
 PropertiesEditor.prototype.clear = function (prop) {
@@ -20915,180 +20946,9 @@ PropertiesEditor.prototype.render = function(element) {
     let props = group.properties || [];
     let divProps = document.createElement('div');
     divProps.classList.add('group-body');
-
     divProps.style.display = '';
-    for (let j = 0; j < props.length; j++) {
-      let prop = props[j];
-      let divProp = document.createElement('div');
-      divProp.classList.add('group-item');
-      let labelProp = document.createElement('label');
-      labelProp.classList.add('group-item-label');
-      labelProp.textContent = (prop.label || prop.title) + '：';
-      divProp.append(labelProp);
 
-      let divInput = document.createElement('div');
-      if (prop.input == 'textarea') {
-        //
-        // 【文本】
-        //
-        let textarea = document.createElement('textarea');
-        textarea.setAttribute('property-model-name', prop.name);
-        textarea.classList.add('group-item-input');
-        textarea.textContent = prop.value || '';
-
-        textarea.addEventListener('keyup', function (evt) {
-          let changed = {};
-          changed[prop.name] = textarea.value;
-          self.notifyPropertyChangedListeners(changed);
-        });
-
-        divProp.append(textarea);
-      } else if (prop.input == 'range') {
-        //
-        // 【区域值】
-        //
-        let input = document.createElement('input');
-        input.setAttribute('property-model-name', prop.name);
-        input.setAttribute('type', 'range');
-        input.setAttribute('step', '1');
-        input.setAttribute('min', prop.min);
-        input.setAttribute('max', prop.max);
-        input.setAttribute('data-unit', prop.unit);
-        input.valueAsNumber = prop.value;
-        input.classList.add('group-item-input');
-        labelProp.textContent = prop.label + '：' + prop.value + prop.unit;
-        divProp.append(input);
-
-        // 事件绑定，随时变化显示值
-        input.addEventListener('change', function(evt) {
-          labelProp.textContent = prop.label + '：' + input.valueAsNumber + prop.unit;
-          let changed = {};
-          changed[prop.name] = input.valueAsNumber;
-          self.notifyPropertyChangedListeners(changed);
-        });
-        input.addEventListener('input', function(evt) {
-          labelProp.textContent = prop.label + '：' + input.valueAsNumber + prop.unit;
-          let changed = {};
-          changed[prop.name] = input.valueAsNumber;
-          self.notifyPropertyChangedListeners(changed);
-        });
-
-      } else if (prop.input == 'select') {
-        //
-        // 【下拉框】
-        //
-        let select = document.createElement('select');
-        select.setAttribute('property-model-name', prop.name);
-        select.style.display = 'block';
-        select.classList.add('group-item-input');
-        for (let i = 0; i < prop.values.length; i++) {
-          let option = document.createElement('option');
-          option.value = prop.values[i].value;
-          option.textContent = prop.values[i].text;
-          if (prop.values[i].value == prop.value) {
-            option.selected = true;
-          }
-          select.append(option);
-        }
-        divProp.append(select);
-
-        select.addEventListener('change', function(evt) {
-          let changed = {};
-          changed[prop.name] = select.value;
-          self.notifyPropertyChangedListeners(changed);
-        });
-
-      } else if (prop.input == 'number') {
-        //
-        // 【数字】
-        //
-        let input = document.createElement('input');
-        input.setAttribute('property-model-name', prop.name);
-        input.value = parseInt(prop.value);
-        input.classList.add('group-item-input');
-        divProp.append(input);
-
-        input.addEventListener('input', function(evt) {
-          if (isNaN(parseFloat(this.value))) return;
-          let changed = {};
-          changed[prop.name] = parseFloat(this.value);
-          self.notifyPropertyChangedListeners(changed);
-        });
-      } else if (prop.input == 'color') {
-        //
-        // 【颜色】
-        //
-        let input = document.createElement('input');
-        input.setAttribute('type', 'color');
-        input.setAttribute('property-model-name', prop.name);
-        input.value = prop.value;
-        input.classList.add('group-item-input');
-        divProp.append(input);
-
-        input.addEventListener('input', function(evt) {
-          let changed = {};
-          changed[prop.name] = input.value;
-          self.notifyPropertyChangedListeners(changed);
-        });
-      } else if (prop.input == 'file') {
-        //
-        // 【文件】
-        //
-        let input = document.createElement('input');
-        input.setAttribute('type', 'file');
-        input.setAttribute('property-model-name', prop.name);
-        input.value = prop.value;
-        input.classList.add('group-item-input');
-        divProp.append(input);
-
-        input.addEventListener('input', function(evt) {
-          let reader = new FileReader();
-          reader.onloadend = function () {
-            let changed = {};
-            changed[prop.name] = reader.result;
-            self.notifyPropertyChangedListeners(changed);
-          };
-          reader.readAsDataURL(this.files[0]);
-
-        });
-      } else if (prop.input === 'bool') {
-        let input = dom.element(`
-          <div class="d-flex full-width">
-            <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
-              <input class="c-switch-input" value="T" name="result.lost" type="checkbox">
-              <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
-            </label>
-          </div>
-        `);
-        divProp.append(input);
-      } else if (prop.display) {
-        //
-        // 【自定义】
-        //
-        divProp.append(prop.display(prop.value));
-      } else if (prop.input === 'readonly') {
-        let input = document.createElement('input');
-        input.setAttribute('readonly', true);
-        input.setAttribute('property-model-name', prop.name || prop.name);
-        input.value = prop.value || '';
-        input.classList.add('group-item-input');
-        divProp.append(input);
-      } else {
-        let input = document.createElement('input');
-        input.setAttribute('property-model-name', prop.name || prop.name);
-        input.value = prop.value || '';
-        input.classList.add('group-item-input');
-        divProp.append(input);
-        input.addEventListener('input', function(evt) {
-          let changed = {};
-          changed[prop.name] = input.value;
-          self.notifyPropertyChangedListeners(changed);
-        });
-      }
-      divProp.append(divInput);
-
-      divProps.append(divProp);
-    }
+    this.renderProperties(divProps, props);
     divGroup.append(divProps);
 
     linkGroup.addEventListener('click', function() {
@@ -21106,7 +20966,277 @@ PropertiesEditor.prototype.render = function(element) {
   }
 };
 
-PropertiesEditor.prototype.getData = function () {
+PropertiesEditor.prototype.renderProperties = function(container, properties) {
+  let self = this;
+  for (let j = 0; j < properties.length; j++) {
+    let prop = properties[j];
+    let divProp = document.createElement('div');
+    divProp.classList.add('group-item');
+    let labelProp = document.createElement('label');
+    labelProp.classList.add('group-item-label');
+    labelProp.textContent = (prop.label || prop.title) + '：';
+    divProp.append(labelProp);
+
+    let divInput = document.createElement('div');
+    if (prop.input == 'textarea' || prop.input == 'longtext') {
+      //
+      // 【文本】
+      //
+      let textarea = document.createElement('textarea');
+      textarea.setAttribute('property-model-name', prop.name);
+      textarea.classList.add('group-item-input');
+      textarea.textContent = prop.value || '';
+
+      textarea.addEventListener('keyup', function (evt) {
+        let changed = {};
+        changed[prop.name] = textarea.value;
+        self.notifyPropertyChangedListeners(changed);
+      });
+
+      divProp.append(textarea);
+    } else if (prop.input == 'range') {
+      //
+      // 【区域值】
+      //
+      let input = document.createElement('input');
+      input.setAttribute('property-model-name', prop.name);
+      input.setAttribute('type', 'range');
+      input.setAttribute('step', '1');
+      input.setAttribute('min', prop.min);
+      input.setAttribute('max', prop.max);
+      input.setAttribute('data-unit', prop.unit);
+      input.valueAsNumber = prop.value;
+      input.classList.add('group-item-input');
+      labelProp.textContent = (prop.label || prop.title) + '：' + prop.value + prop.unit;
+      divProp.append(input);
+
+      // 事件绑定，随时变化显示值
+      input.addEventListener('change', function(evt) {
+        labelProp.textContent = (prop.label || prop.title) + '：' + input.valueAsNumber + prop.unit;
+        let changed = {};
+        changed[prop.name] = input.valueAsNumber;
+        self.notifyPropertyChangedListeners(changed);
+      });
+      input.addEventListener('input', function(evt) {
+        labelProp.textContent = (prop.label || prop.title) + '：' + input.valueAsNumber + prop.unit;
+        let changed = {};
+        changed[prop.name] = input.valueAsNumber;
+        self.notifyPropertyChangedListeners(changed);
+      });
+
+    } else if (prop.input == 'select') {
+      //
+      // 【下拉框】
+      //
+      let select = document.createElement('select');
+      select.setAttribute('property-model-name', prop.name);
+      select.style.display = 'block';
+      select.classList.add('group-item-input');
+      for (let i = 0; i < prop.values.length; i++) {
+        let option = document.createElement('option');
+        option.value = prop.values[i].value;
+        option.textContent = prop.values[i].text;
+        if (prop.values[i].value == prop.value) {
+          option.selected = true;
+        }
+        select.append(option);
+      }
+      divProp.append(select);
+
+      select.addEventListener('change', function(evt) {
+        let changed = {};
+        changed[prop.name] = select.value;
+        self.notifyPropertyChangedListeners(changed);
+      });
+
+    } else if (prop.input == 'number') {
+      //
+      // 【数字】
+      //
+      let input = document.createElement('input');
+      input.setAttribute('property-model-name', prop.name);
+      input.value = parseInt(prop.value);
+      input.classList.add('group-item-input');
+      divProp.append(input);
+
+      input.addEventListener('input', function(evt) {
+        if (isNaN(parseFloat(this.value))) return;
+        let changed = {};
+        changed[prop.name] = parseFloat(this.value);
+        self.notifyPropertyChangedListeners(changed);
+      });
+    } else if (prop.input == 'color') {
+      //
+      // 【颜色】
+      //
+      let input = document.createElement('input');
+      input.setAttribute('type', 'color');
+      input.setAttribute('property-model-name', prop.name);
+      input.value = prop.value;
+      input.classList.add('group-item-input');
+      divProp.append(input);
+
+      input.addEventListener('input', function(evt) {
+        // let changed = {};
+        // changed[prop.name] = input.value;
+        // self.notifyPropertyChangedListeners(changed);
+        let input = evt.target;
+        let changed = {};
+        if (input.parentElement.parentElement.tagName === 'LI') {
+          let li = input.parentElement.parentElement;
+          let ul = li.parentElement;
+          let parentName = ul.getAttribute('property-model-name');
+          let nodes = Array.prototype.slice.call(ul.children);
+          changed._index = nodes.indexOf(li);
+          changed._name = parentName;
+          changed[parentName] = {};
+          changed[parentName][prop.name] = input.value;
+        } else {
+          changed[prop.name] = input.value;
+        };
+        self.notifyPropertyChangedListeners(changed);
+      });
+    } else if (prop.input == 'file') {
+      //
+      // 【文件】
+      //
+      let input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('property-model-name', prop.name);
+      input.value = prop.value;
+      input.classList.add('group-item-input');
+      divProp.append(input);
+
+      input.addEventListener('input', function(evt) {
+        let reader = new FileReader();
+        reader.onloadend = function () {
+          let changed = {};
+          changed[prop.name] = reader.result;
+          self.notifyPropertyChangedListeners(changed);
+        };
+        reader.readAsDataURL(this.files[0]);
+      });
+    } else if (prop.input === 'bool') {
+      let input = dom.element(`
+        <div class="d-flex full-width">
+          <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
+            <input class="c-switch-input" type="checkbox" checked>
+            <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
+          </label>
+        </div>
+      `);
+      dom.find('input', input).setAttribute('property-model-name', prop.name);
+      divProp.append(input);
+      input.addEventListener('click', function(evt) {
+        let div = dom.ancestor(evt.target, 'div');
+        let input = dom.find('input', div);
+        input.checked = !input.checked;
+        let changed = {};
+        changed[prop.name] = input.checked;
+        self.notifyPropertyChangedListeners(changed);
+      });
+    } else if (prop.display) {
+      //
+      // 【自定义】
+      //
+      divProp.append(prop.display(prop.value));
+    } else if (prop.input === 'readonly') {
+      let input = document.createElement('input');
+      input.setAttribute('readonly', true);
+      input.setAttribute('property-model-name', prop.name || prop.name);
+      input.value = prop.value || '';
+      input.classList.add('group-item-input');
+      divProp.append(input);
+    } else if (prop.input === 'array') {
+      let plus = dom.element(`
+        <span class="material-icons pointer position-relative font-16" style="float: right; top: 1px;">playlist_add</span>
+      `);
+      labelProp.appendChild(plus);
+      let ul = dom.element(`
+          <ul class="list-group properties-container">
+          </ul>
+        `);
+      ul.setAttribute('property-model-name', prop.name);
+      ul.setAttribute('properties-model', JSON.stringify(prop.properties));
+      divProp.append(ul);
+
+      dom.bind(plus, 'click', ev => {
+        let ul = dom.ancestor(ev.target, 'div', 'group-item').children[1];
+        let propertiesModel = JSON.parse(ul.getAttribute('properties-model'));
+        this.appendPropertyItem(ul, propertiesModel, {});
+
+        // 增加数组属性的一项
+        let appended = {
+          _index: -1,
+          _action: 'append',
+          _name: ul.getAttribute('property-model-name'),
+        };
+        this.notifyPropertyChangedListeners(appended);
+      });
+    } else {
+      // 文本框
+      let input = document.createElement('input');
+      input.setAttribute('property-model-name', prop.name || prop.name);
+      input.value = prop.value || '';
+      input.classList.add('group-item-input');
+      divProp.append(input);
+      input.addEventListener('input', function(evt) {
+        let input = evt.target;
+        let changed = {};
+        if (input.parentElement.parentElement.tagName === 'LI') {
+          let li = input.parentElement.parentElement;
+          let ul = li.parentElement;
+          let parentName = ul.getAttribute('property-model-name');
+          let nodes = Array.prototype.slice.call(ul.children);
+          changed._index = nodes.indexOf(li);
+          changed._name = parentName;
+          changed[parentName] = {};
+          changed[parentName][prop.name] = input.value;
+        } else {
+          changed[prop.name] = input.value;
+        };
+        self.notifyPropertyChangedListeners(changed);
+      });
+    }
+    divProp.append(divInput);
+    container.append(divProp);
+  }
+};
+
+PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, values) {
+  let li = dom.element(`
+        <li class="list-group-item p-0" style="background-color: #383b61;"></li>
+      `);
+  for (let m = 0; m < propertiesModel.length; m++) {
+    propertiesModel[m].value = values[propertiesModel[m].name] || '';
+  }
+  this.renderProperties(li, propertiesModel);
+  let buttons = dom.element(`
+    <div class="full-width d-flex mt-2">
+      <a class="pointer text-danger ml-auto font-18"><span class="material-icons">highlight_off</span></a>
+    </div>
+  `);
+  // 删除数组属性的某一项
+  dom.bind(buttons.children[0], 'click', ev => {
+    let a = dom.ancestor(ev.target, 'a');
+    if (a.parentElement.parentElement.tagName === 'LI') {
+      let li = a.parentElement.parentElement;
+      let ul = li.parentElement;
+      let nodes = Array.prototype.slice.call(ul.children);
+      let removed = {
+        _index: nodes.indexOf(li),
+        _action: 'remove',
+        _name: ul.getAttribute('property-model-name'),
+      };
+      this.notifyPropertyChangedListeners(removed);
+    }
+    a.parentElement.parentElement.remove();
+  });
+  li.appendChild(buttons);
+  ul.appendChild(li);
+};
+
+PropertiesEditor.prototype.getPropertiesValues = function () {
   let container = dom.find(this.containerId);
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
@@ -21133,16 +21263,19 @@ PropertiesEditor.prototype.getData = function () {
   return ret;
 };
 
-PropertiesEditor.prototype.setData = function (data) {
+PropertiesEditor.prototype.setPropertiesValues = function (data) {
   let container = dom.find(this.containerId);
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
+  let uls = container.querySelectorAll('ul[properties-model]');
 
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i];
     let dataId = input.getAttribute('property-model-name');
-    if (data[dataId]) {
+    if (input.type === 'checkbox') {
+      input.checked = data[dataId] !== false;
+    } else if (data[dataId]) {
       // 特殊处理BUG
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
       if (dataId != 'image')
@@ -21160,6 +21293,17 @@ PropertiesEditor.prototype.setData = function (data) {
     let dataId = textarea.getAttribute('property-model-name');
     if (data[dataId])
       textarea.textContent = data[dataId];
+  }
+
+  // 特殊列表显示
+  for (let i = 0; i < uls.length; i++) {
+    let ul = uls[i];
+    let propName = ul.getAttribute('property-model-name');
+    let propertiesModel = JSON.parse(ul.getAttribute("properties-model"));
+    let values = data[propName] || [];
+    for (let j = 0; j < values.length; j++) {
+      this.appendPropertyItem(ul, propertiesModel, values[j]);
+    }
   }
 };
 
