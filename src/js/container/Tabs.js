@@ -5,6 +5,7 @@ function Tabs(opts) {
   this.tabActiveClass = opts.tabActiveClass;
   this.tabs = opts.tabs;
   this.lazy = opts.lazy !== false;
+  this.autoClear = opts.autoClear === true;
 }
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
@@ -53,6 +54,10 @@ Tabs.prototype.render = function() {
 
       // 激活现在点击的页签及内容
       nav.classList.add(self.tabActiveClass);
+      if (this.autoClear === true) {
+        // 只有在懒加载情况下，设置自动清除内容才有效
+        this.content.innerHTML = '';
+      }
       let contentPage = dom.find('div[data-tab-content-id=' + nav.getAttribute('data-tab-id') + ']', self.content);
       if (contentPage != null) {
         contentPage.style.display = '';

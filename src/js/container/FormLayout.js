@@ -351,7 +351,7 @@ FormLayout.prototype.build = function(persisted) {
       buttons.append(' ');
     }
     // if (this.actions.length > 0) {
-    let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
+    let row = dom.create('div', 'full-width', 'b-a-0');
     let rightbar = dom.find('.right-bar');
     if (rightbar != null) {
       if (rightBarBottom.parentElement.style.display !== 'none') {
@@ -467,41 +467,41 @@ FormLayout.prototype.save = async function () {
   }
   if (this.saveOpt.convert) {
     if (awaitConvert) {
-      await this.saveOpt.convert(data).then(ret => {
-        if(ret.isReady){
-          xhr.post({
-            url: this.saveOpt.url,
-            usecase: this.saveOpt.usecase,
-            data: data,
-            success: function (resp) {
-              // enable all buttons
-              if (buttonSave != null)
-                buttonSave.innerHTML = '保存';
-              dom.enable('button', self.container);
-              if (resp.error) {
-                self.error(resp.error.message);
-                return;
-              }
-              let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
-              for (let i = 0; i < identifiables.length; i++) {
-                identifiables[i].value = resp.data[identifiables[i].name];
-              }
-              if (self.saveOpt.callback)
-                self.saveOpt.callback(resp.data);
-              if (self.saveOpt.success)
-                self.saveOpt.success(resp.data);
-              self.success("数据保存成功！");
-            }
-          });
-        }else{
-          if (buttonSave != null) {
-            buttonSave.innerHTML = '保存';
-            dom.enable('button', self.container);
-          }
-        	return;
-        }
-      });
-      return;
+      data = await this.saveOpt.convert(data)
+        // .then(ret => {
+        // if(ret.isReady){
+        //   xhr.post({
+        //     url: this.saveOpt.url,
+        //     usecase: this.saveOpt.usecase,
+        //     data: data,
+        //     success: function (resp) {
+        //       // enable all buttons
+        //       if (buttonSave != null)
+        //         buttonSave.innerHTML = '保存';
+        //       dom.enable('button', self.container);
+        //       if (resp.error) {
+        //         self.error(resp.error.message);
+        //         return;
+        //       }
+        //       let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
+        //       for (let i = 0; i < identifiables.length; i++) {
+        //         identifiables[i].value = resp.data[identifiables[i].name];
+        //       }
+        //       if (self.saveOpt.callback)
+        //         self.saveOpt.callback(resp.data);
+        //       if (self.saveOpt.success)
+        //         self.saveOpt.success(resp.data);
+        //       self.success("数据保存成功！");
+        //     }
+        //   });
+        // } else {
+        //   if (buttonSave != null) {
+        //     buttonSave.innerHTML = '保存';
+        //     dom.enable('button', self.container);
+        //   }
+        // 	return;
+        // }
+      // });
     } else {
       data = this.saveOpt.convert(data);
     }
@@ -660,7 +660,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           <label class="form-check-label" for=""></label>
         </div>
       `);
-      dom.find('input', radio).id = 'radio_' + val.value;
+      // dom.find('input', radio).id = 'radio_' + val.value;
       dom.find('input', radio).name = field.name;
       if (field.value == val.value) {
         dom.find('input', radio).checked = true;
@@ -669,7 +669,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
-      dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
+      // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
       group.append(radio);
       radios.push(radio);
@@ -704,7 +704,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           <label class="form-check-label" for=""></label>
         </div>
       `);
-      dom.find('input', radio).id = 'radio_' + val.value;
+      // dom.find('input', radio).id = 'radio_' + val.value;
       dom.find('input', radio).name = field.name;
       if (field.value == val.value) {
         dom.find('input', radio).checked = true;
@@ -713,7 +713,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
-      dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
+      // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
       group.append(radio);
     }

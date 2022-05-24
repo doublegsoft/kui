@@ -275,11 +275,14 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       let input = dom.element(`
         <div class="d-flex full-width">
           <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
-            <input class="c-switch-input" type="checkbox" checked>
+            <input class="c-switch-input" type="checkbox">
             <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
           </label>
         </div>
       `);
+      if (prop.value == 'T') {
+        input.children[0].children[0].checked = true;
+      }
       dom.find('input', input).setAttribute('property-model-name', prop.name);
       divProp.append(input);
       input.addEventListener('click', function(evt) {
@@ -429,7 +432,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     let input = inputs[i];
     let dataId = input.getAttribute('property-model-name');
     if (input.type === 'checkbox') {
-      input.checked = data[dataId] !== false;
+      input.checked = data[dataId] === true;
     } else if (data[dataId]) {
       // 特殊处理BUG
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);

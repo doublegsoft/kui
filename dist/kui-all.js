@@ -684,11 +684,9 @@ function Timer(option) {
     this.timer=null
     this.runFunction=option.runFunction
     this.timeOut=option.timeOut||(1000*60)*6
-    console.log(option)
 }
 
 Timer.prototype.start = function () {
-    console.log(this.runFunction)
     if( this.runFunction){
         this.timer=setInterval(this.runFunction,this.timeOut)
     }
@@ -7279,6 +7277,7 @@ $.fn.cascadeselect = function(opts) {
       requestParams = params;
     }
     requestParams[link.getAttribute('data-cascade-field-value')] = '';
+
     let data = [];
     if (url && url !== 'undefined') {
       data = await xhr.promise({
@@ -7338,9 +7337,9 @@ $.fn.cascadeselect = function(opts) {
           }
           next.removeAttribute('data-cascade-options');
           if (model.children) {
-            displayPopup(next, params, JSON.parse(model.children));
+            displayPopup(next, params, JSON.parse(model.children), cascadeIndex);
           } else {
-            displayPopup(next, params);
+            displayPopup(next, params, cascadeIndex);
           }
           // 阻止繁殖的click事件
           event.stopImmediatePropagation();
@@ -7398,6 +7397,13 @@ $.fn.cascadeselect = function(opts) {
         //   let tpl = Handlebars.compile(levels[i].params[key]);
         //   // params[key] = tpl(data);
         // }
+      }
+      // 去掉多余的参数
+      for (let key in params) {
+        if (key.indexOf('_') == 0) continue;
+        if (key != levels[i].fields.value) {
+          delete params[key];
+        }
       }
       displayPopup(this, params, values);
     });
@@ -9934,7 +9940,7 @@ FormLayout.prototype.build = function(persisted) {
       buttons.append(' ');
     }
     // if (this.actions.length > 0) {
-    let row = dom.create('div', 'full-width', 'card', 'card-body', 'b-a-0');
+    let row = dom.create('div', 'full-width', 'b-a-0');
     let rightbar = dom.find('.right-bar');
     if (rightbar != null) {
       if (rightBarBottom.parentElement.style.display !== 'none') {
@@ -10050,41 +10056,41 @@ FormLayout.prototype.save = async function () {
   }
   if (this.saveOpt.convert) {
     if (awaitConvert) {
-      await this.saveOpt.convert(data).then(ret => {
-        if(ret.isReady){
-          xhr.post({
-            url: this.saveOpt.url,
-            usecase: this.saveOpt.usecase,
-            data: data,
-            success: function (resp) {
-              // enable all buttons
-              if (buttonSave != null)
-                buttonSave.innerHTML = '保存';
-              dom.enable('button', self.container);
-              if (resp.error) {
-                self.error(resp.error.message);
-                return;
-              }
-              let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
-              for (let i = 0; i < identifiables.length; i++) {
-                identifiables[i].value = resp.data[identifiables[i].name];
-              }
-              if (self.saveOpt.callback)
-                self.saveOpt.callback(resp.data);
-              if (self.saveOpt.success)
-                self.saveOpt.success(resp.data);
-              self.success("数据保存成功！");
-            }
-          });
-        }else{
-          if (buttonSave != null) {
-            buttonSave.innerHTML = '保存';
-            dom.enable('button', self.container);
-          }
-        	return;
-        }
-      });
-      return;
+      data = await this.saveOpt.convert(data)
+        // .then(ret => {
+        // if(ret.isReady){
+        //   xhr.post({
+        //     url: this.saveOpt.url,
+        //     usecase: this.saveOpt.usecase,
+        //     data: data,
+        //     success: function (resp) {
+        //       // enable all buttons
+        //       if (buttonSave != null)
+        //         buttonSave.innerHTML = '保存';
+        //       dom.enable('button', self.container);
+        //       if (resp.error) {
+        //         self.error(resp.error.message);
+        //         return;
+        //       }
+        //       let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
+        //       for (let i = 0; i < identifiables.length; i++) {
+        //         identifiables[i].value = resp.data[identifiables[i].name];
+        //       }
+        //       if (self.saveOpt.callback)
+        //         self.saveOpt.callback(resp.data);
+        //       if (self.saveOpt.success)
+        //         self.saveOpt.success(resp.data);
+        //       self.success("数据保存成功！");
+        //     }
+        //   });
+        // } else {
+        //   if (buttonSave != null) {
+        //     buttonSave.innerHTML = '保存';
+        //     dom.enable('button', self.container);
+        //   }
+        // 	return;
+        // }
+      // });
     } else {
       data = this.saveOpt.convert(data);
     }
@@ -10243,7 +10249,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           <label class="form-check-label" for=""></label>
         </div>
       `);
-      dom.find('input', radio).id = 'radio_' + val.value;
+      // dom.find('input', radio).id = 'radio_' + val.value;
       dom.find('input', radio).name = field.name;
       if (field.value == val.value) {
         dom.find('input', radio).checked = true;
@@ -10252,7 +10258,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
-      dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
+      // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
       group.append(radio);
       radios.push(radio);
@@ -10287,7 +10293,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           <label class="form-check-label" for=""></label>
         </div>
       `);
-      dom.find('input', radio).id = 'radio_' + val.value;
+      // dom.find('input', radio).id = 'radio_' + val.value;
       dom.find('input', radio).name = field.name;
       if (field.value == val.value) {
         dom.find('input', radio).checked = true;
@@ -10296,7 +10302,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
-      dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
+      // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
       group.append(radio);
     }
@@ -13910,8 +13916,12 @@ PaginationTable.prototype.request = function (others) {
   if (this.widgetFilter) {
     let queryParams = this.widgetFilter.getQuery();
     for (let k in queryParams) {
-      if (params[k]) {
-        params[k] += ' ' + queryParams[k];
+      if (params[k] && params) {
+        if (k.indexOf('_') == 0) {
+          params[k] += ' ' + queryParams[k];
+        } else {
+          params[k] = queryParams[k];
+        }
       } else {
         params[k] = queryParams[k];
       }
@@ -13921,17 +13931,24 @@ PaginationTable.prototype.request = function (others) {
     let queryParams = this.queryFilter.getValues();
     for (let k in queryParams) {
       if (params[k]) {
-        params[k] += ' ' + queryParams[k];
+        if (k.indexOf('_') == 0) {
+          params[k] += ' ' + queryParams[k];
+        } else {
+          params[k] = queryParams[k];
+        }
       } else {
         params[k] = queryParams[k];
       }
     }
   }
-
   // the parameters defined in table options
   for (let k in this.filters) {
     if (params[k]) {
-      params[k] += ' ' + this.filters[k];
+      if (k.indexOf('_') == 0) {
+        params[k] += ' ' + this.filters[k];
+      } else {
+        params[k] = this.filters[k];
+      }
     } else {
       params[k] = this.filters[k];
     }
@@ -13946,7 +13963,8 @@ PaginationTable.prototype.request = function (others) {
         this.limit = parseInt(others[k]);
       } else {
         if (params[k]) {
-          params[k] += ' ' + others[k];
+          // params[k] += ' ' + others[k];
+          params[k] = others[k];
         } else {
           params[k] = others[k];
         }
@@ -15045,6 +15063,7 @@ function Tabs(opts) {
   this.tabActiveClass = opts.tabActiveClass;
   this.tabs = opts.tabs;
   this.lazy = opts.lazy !== false;
+  this.autoClear = opts.autoClear === true;
 }
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
@@ -15093,6 +15112,10 @@ Tabs.prototype.render = function() {
 
       // 激活现在点击的页签及内容
       nav.classList.add(self.tabActiveClass);
+      if (this.autoClear === true) {
+        // 只有在懒加载情况下，设置自动清除内容才有效
+        this.content.innerHTML = '';
+      }
       let contentPage = dom.find('div[data-tab-content-id=' + nav.getAttribute('data-tab-id') + ']', self.content);
       if (contentPage != null) {
         contentPage.style.display = '';
@@ -21120,11 +21143,14 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       let input = dom.element(`
         <div class="d-flex full-width">
           <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
-            <input class="c-switch-input" type="checkbox" checked>
+            <input class="c-switch-input" type="checkbox">
             <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
           </label>
         </div>
       `);
+      if (prop.value == 'T') {
+        input.children[0].children[0].checked = true;
+      }
       dom.find('input', input).setAttribute('property-model-name', prop.name);
       divProp.append(input);
       input.addEventListener('click', function(evt) {
@@ -21274,7 +21300,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     let input = inputs[i];
     let dataId = input.getAttribute('property-model-name');
     if (input.type === 'checkbox') {
-      input.checked = data[dataId] !== false;
+      input.checked = data[dataId] === true;
     } else if (data[dataId]) {
       // 特殊处理BUG
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
@@ -23576,6 +23602,154 @@ TestSheet.prototype.getValues = function() {
     }
   }
   return ret;
+};
+
+
+function WeeklyCalendar(opt) {
+  this.initialDate = opt.initialDate;
+  this.editable = opt.editable || false;
+  this.droppable = opt.droppable || false;
+  // 首列的标题
+  this.columnTitle = opt.columnTitle || '';
+  // 拖拽drop以后的回调函数，drop到的单元格和transferData
+  this.onRenderDropped = opt.onRenderDropped || function (td, data) {};
+  // 渲染单元格函数，
+  this.onRenderCell = opt.onRenderCell || function (td, data, rowIndex, cellIndex) {};
+  this.dateField = opt.dateField;
+  this.datedData = opt.datedData || [];
+  this.rowHeaders = opt.rowHeaders || [];
+  // 定位行索引函数
+  this.isMatchedCell = opt.isMatchedCell;
+  this.onAddedToCell = opt.onAddedToCell || function (container, date, rowIndex, initial) {};
+}
+
+/**
+ * 构造根元素。
+ */
+WeeklyCalendar.prototype.root = function () {
+  let ret = dom.templatize(`
+    <table class="table table-responsive-sm table-outline">
+      <thead class="thead-light">
+      <tr>
+        <th style="width: 12.5%; text-align: center; vertical-align: middle;">{{columnTitle}}</th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周一</div>
+          <div></div>
+        </th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周二</div>
+          <div></div>
+        </th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周三</div>
+          <div></div>
+        </th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周四</div>
+          <div></div>
+        </th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周五</div>
+          <div></div>
+        </th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周六</div>
+          <div></div>
+        </th>
+        <th style="width: 12.5%; text-align: center;">
+          <div>周日</div>
+          <div></div>
+        </th>
+      </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  `, this);
+  let thead = dom.find('thead', ret);
+  let dayOfWeek = this.initialDate.day();
+  if (dayOfWeek == 0) dayOfWeek = 7; // 星期日
+  let milliArray = [];
+  for (let i = 1; i < thead.children[0].children.length; i++) {
+    let th = thead.children[0].children[i];
+    let date = moment(this.initialDate).add(i - dayOfWeek, 'days');
+    th.children[1].innerHTML = date.format('MM月DD日');
+    th.setAttribute('data-date', date.format('YYYY-MM-DD'));
+    milliArray.push(date.format('YYYY-MM-DD'));
+  }
+  let tbody = dom.find('tbody', ret);
+  for (let i = 0; i < this.rowHeaders.length; i++) {
+    let rowHeader = this.rowHeaders[i];
+    let tr = dom.create('tr');
+    for (let j = 0; j < 8; j++) {
+      let td = dom.create('td');
+      if (rowHeader.data) {
+        dom.model(td, rowHeader.data);
+      }
+      td.style.height = '64px';
+      if (j == 0) {
+        td.style = 'text-align: center; vertical-align: center;';
+        td.innerHTML = rowHeader.title;
+      } else {
+        td.setAttribute('data-date', milliArray[j - 1]);
+        let buttonAdd = dom.element(`
+          <div class="d-flex full-width full-height">
+            <a class="btn-link m-auto plus" style="display: none;">
+              <i class="fas fa-plus-circle"></i>
+            </a>
+          </div>
+        `);
+        if (this.editable) {
+          td.appendChild(buttonAdd);
+          dom.bind(buttonAdd, 'mouseover', ev => {
+            let button = dom.ancestor(ev.target, 'div');
+            dom.find('a.plus', button).style.display = '';
+          });
+          dom.bind(buttonAdd, 'mouseout', ev => {
+            let button = dom.ancestor(ev.target, 'div');
+            dom.find('a.plus', button).style.display = 'none';
+          });
+          dom.bind(buttonAdd.children[0], 'click', ev => {
+            let button = dom.ancestor(ev.target, 'a');
+            let td = button.parentElement.parentElement;
+            let date = td.getAttribute('data-date');
+            let rowHeaderData = dom.model(td.parentElement.children[0]);
+            this.onAddedToCell(td.children[0], date, rowHeaderData);
+          });
+        }
+        let content = dom.element(`<div class="content"></div>`);
+        if (this.editable) {
+          td.insertBefore(content, buttonAdd);
+        } else {
+          td.appendChild(content);
+        }
+        //
+        for (let m = 0; m < this.datedData.length; m++) {
+          let row = this.datedData[m];
+          let rowHeaderData = dom.model(tr);
+          if (this.isMatchedCell(milliArray[j - 1], rowHeader.data, row)) {
+            this.onAddedToCell(content, milliArray[j - 1], rowHeader.data, row);
+            break;
+          }
+        }
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  return ret;
+};
+
+WeeklyCalendar.prototype.reload = function (initialDate, datedData) {
+  this.initialDate = initialDate;
+  this.datedData = datedData;
+  this.render(this.container);
+};
+
+WeeklyCalendar.prototype.render = function (containerId) {
+  this.container = dom.find(containerId);
+  this.container.innerHTML = '';
+  let root = this.root();
+  this.container.appendChild(root);
 };
 
 const JOINT_WIDTH = 6;

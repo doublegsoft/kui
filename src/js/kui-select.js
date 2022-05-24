@@ -426,6 +426,7 @@ $.fn.cascadeselect = function(opts) {
       requestParams = params;
     }
     requestParams[link.getAttribute('data-cascade-field-value')] = '';
+
     let data = [];
     if (url && url !== 'undefined') {
       data = await xhr.promise({
@@ -485,9 +486,9 @@ $.fn.cascadeselect = function(opts) {
           }
           next.removeAttribute('data-cascade-options');
           if (model.children) {
-            displayPopup(next, params, JSON.parse(model.children));
+            displayPopup(next, params, JSON.parse(model.children), cascadeIndex);
           } else {
-            displayPopup(next, params);
+            displayPopup(next, params, cascadeIndex);
           }
           // 阻止繁殖的click事件
           event.stopImmediatePropagation();
@@ -545,6 +546,13 @@ $.fn.cascadeselect = function(opts) {
         //   let tpl = Handlebars.compile(levels[i].params[key]);
         //   // params[key] = tpl(data);
         // }
+      }
+      // 去掉多余的参数
+      for (let key in params) {
+        if (key.indexOf('_') == 0) continue;
+        if (key != levels[i].fields.value) {
+          delete params[key];
+        }
       }
       displayPopup(this, params, values);
     });
