@@ -10038,7 +10038,7 @@ FormLayout.prototype.read = function (params) {
  */
 FormLayout.prototype.save = async function () {
   let self = this;
-  let awaitConvert = this.saveOpt.awaitConvert || false
+  let awaitConvert = this.saveOpt.awaitConvert || false;
   let errors = Validation.validate($(this.containerId));
   if (errors.length > 0) {
     self.error(utils.message(errors));
@@ -10094,6 +10094,8 @@ FormLayout.prototype.save = async function () {
     } else {
       data = this.saveOpt.convert(data);
     }
+  } else if (this.saveOpt.asyncConvert) {
+    data = await this.saveOpt.asyncConvert(data);
   }
   xhr.post({
     url: this.saveOpt.url,
@@ -17087,6 +17089,22 @@ Checklist.prototype.top = function() {
       icon.classList.remove('fa-square');
       icon.classList.add('fa-check-square');
     }
+  });
+  let input = dom.find('input', div);
+  dom.bind(input, 'input', ev => {
+    clearTimeout(this.delaySearch);
+    this.delaySearch = setTimeout(() => {
+      let ul = dom.find('ul', this.container);
+      let lis = ul.querySelectorAll('li');
+      for (let i = 0; i < lis.length; i++) {
+        let li = lis[i];
+        if (!li.innerText.includes(input.value)) {
+          li.style.display = 'none';
+        } else {
+          li.style.display = '';
+        }
+      }
+    }, 200);
   });
   return div;
 }

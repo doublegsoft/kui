@@ -449,7 +449,7 @@ FormLayout.prototype.read = function (params) {
  */
 FormLayout.prototype.save = async function () {
   let self = this;
-  let awaitConvert = this.saveOpt.awaitConvert || false
+  let awaitConvert = this.saveOpt.awaitConvert || false;
   let errors = Validation.validate($(this.containerId));
   if (errors.length > 0) {
     self.error(utils.message(errors));
@@ -505,6 +505,8 @@ FormLayout.prototype.save = async function () {
     } else {
       data = this.saveOpt.convert(data);
     }
+  } else if (this.saveOpt.asyncConvert) {
+    data = await this.saveOpt.asyncConvert(data);
   }
   xhr.post({
     url: this.saveOpt.url,
