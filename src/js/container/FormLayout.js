@@ -655,6 +655,14 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     dom.find('input', input).setAttribute('name', field.name);
   } else if (field.input == 'radiotext') {
     let radios = [];
+    let defaultValue = '';
+    for (let i = 0; i < field.values.length; i++) {
+      let val = field.values[i];
+      if (!val.input) {
+        defaultValue = val.value;
+        break;
+      }
+    }
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
       let radio = dom.element(`
@@ -664,12 +672,19 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           <label class="form-check-label" for=""></label>
         </div>
       `);
-      // dom.find('input', radio).id = 'radio_' + val.value;
       dom.find('input', radio).name = field.name;
-      if (field.value == val.value) {
-        dom.find('input', radio).checked = true;
-      } else if (val.checked && !field.value) {
-        dom.find('input', radio).checked = true;
+      if (!field.value) {
+        if (val.checked) {
+          dom.find('input', radio).checked = true;
+        }
+      } else {
+        if (field.value != val.value && val.value != defaultValue) {
+          // 自定义的输入框的值
+          dom.find('input', radio).checked = true;
+        } else if (field.value == defaultValue) {
+          // 初始的默认值
+          dom.find('input', radio).checked = true;
+        }
       }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
@@ -689,7 +704,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         let input = dom.element('<input type="text" class="form-control">');
         input.name = val.input.name;
         input.placeholder = val.input.placeholder || '';
-        input.style.display = 'none';
+        input.style.display = field.value != defaultValue ? '' : 'none';
+        if (val.value != field.value) {
+          input.value = field.value;
+          if (input.value == defaultValue) {
+            input.value = '';
+          }
+        }
         group.appendChild(input);
       } else {
         dom.bind(radios[j], 'click', (ev) => {
