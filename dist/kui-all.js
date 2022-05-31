@@ -10252,6 +10252,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         break;
       }
     }
+    let checked = false;
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
       let radio = dom.element(`
@@ -10267,12 +10268,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           dom.find('input', radio).checked = true;
         }
       } else {
-        if (field.value != val.value && val.value != defaultValue) {
+        if (field.value != val.value && val.value != defaultValue && !checked) {
           // 自定义的输入框的值
           dom.find('input', radio).checked = true;
-        } else if (field.value == defaultValue) {
+        } else if (field.value == val.value) {
           // 初始的默认值
           dom.find('input', radio).checked = true;
+          checked = true;
         }
       }
       dom.find('input', radio).value = val.value;
@@ -10293,7 +10295,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         let input = dom.element('<input type="text" class="form-control">');
         input.name = val.input.name;
         input.placeholder = val.input.placeholder || '';
-        input.style.display = field.value != defaultValue ? '' : 'none';
+        input.style.display = field.value && field.value != defaultValue ? '' : 'none';
         if (val.value != field.value) {
           input.value = field.value;
           if (input.value == defaultValue) {
