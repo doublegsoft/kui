@@ -9891,6 +9891,7 @@ FormLayout.prototype.build = function(persisted) {
       }).render(dom.find('div[data-logo-name=\'' + field.name + '\']', this.container), field.value);
     }
   }
+
   let containerButtons = dom.create('div');
   containerButtons.classList.add('buttons');
   let buttons = dom.create('div');
@@ -9920,6 +9921,7 @@ FormLayout.prototype.build = function(persisted) {
       }, 300);
     }
   });
+  if (this.actionable === false) return;
   if (this.actionable && this.mode!='page') {
     buttons.appendChild(buttonClose);
   }
@@ -10275,11 +10277,11 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         });
         let input = dom.element('<input type="text" class="form-control">');
         input.name = val.input.name;
-        input.placeholder = val.input.placeholder;
+        input.placeholder = val.input.placeholder || '';
         input.style.display = 'none';
         group.appendChild(input);
       } else {
-        dom.bind(radios[i], 'click', (ev) => {
+        dom.bind(radios[j], 'click', (ev) => {
           let textInput = dom.find('input[type=text]', group);
           textInput.style.display = 'none';
         });
@@ -14134,42 +14136,9 @@ PaginationTable.prototype.fill = function (result) {
       tbody.css('overflow-y', 'auto');
     }
     for (let i = 0; i < limit; ++i) {
-      let tr = $("<tr></tr>");
-      tr.css('height', this.columnHeight)
       if (i < resultNew.data.length) {
         let row = resultNew.data[i];
-        for (let j = 0; j < mappingColumns.length; ++j) {
-          let col = mappingColumns[j];
-          let td = $("<td></td>");
-          // 冻结列
-          if (j < this.frozenColumnCount) td.addClass('headcol');
-          if (col.style) {
-            td.attr("style", col.style);
-          } else {
-            td.attr("style", "text-align: center; vertical-align:middle;");
-          }
-          if (typeof col.width !== 'undefined') td.css('width', col.width);
-          if (this.frozenHeader === true) {
-            tbody.css('float', 'left');
-            td.css('float', 'left');
-          }
-          if (col.template) {
-            let html = col.template.toString();
-            for (k in row) {
-              row[k] = row[k] == null ? "-" : row[k];
-              html = this.replace(html, "\\{" + k + "\\}", row[k]);
-            }
-            if (html.indexOf('{') == 0 && html.indexOf('}') != -1) {
-              html = '-';
-            }
-            td.html(html);
-          }
-          if (col.display) {
-            col.display(row, td.get(0), j, i, this.start);
-          }
-          tr.append(td);
-        }
-        tbody.append(tr);
+        this.appendRow(row, i);
       } // if (i < result.data.length)  
     }
   } else {
@@ -14192,6 +14161,64 @@ PaginationTable.prototype.fill = function (result) {
         '</tr>');
     }
   }
+};
+
+PaginationTable.prototype.appendRow = function (row, rowIndex) {
+  let tbody = $(this.table.find('tbody'));
+  let nodata = dom.find('tr.no-hover', tbody.get(0));
+  if (nodata != null) {
+    nodata.remove();
+  }
+  let tr = $("<tr></tr>");
+  dom.model(tr.get(0), row);
+  tr.css('height', this.columnHeight);
+  for (let j = 0; j < this.mappingColumns.length; ++j) {
+    let col = this.mappingColumns[j];
+    let td = $("<td></td>");
+    // 冻结列
+    if (j < this.frozenColumnCount) td.addClass('headcol');
+    if (col.style) {
+      td.attr("style", col.style);
+    } else {
+      td.attr("style", "text-align: center; vertical-align:middle;");
+    }
+    if (typeof col.width !== 'undefined') td.css('width', col.width);
+    if (this.frozenHeader === true) {
+      tbody.css('float', 'left');
+      td.css('float', 'left');
+    }
+    if (col.template) {
+      let html = col.template.toString();
+      for (let k in row) {
+        row[k] = row[k] == null ? "-" : row[k];
+        html = this.replace(html, "\\{" + k + "\\}", row[k]);
+      }
+      if (html.indexOf('{') == 0 && html.indexOf('}') != -1) {
+        html = '-';
+      }
+      td.html(html);
+    }
+    if (col.display) {
+      col.display(row, td.get(0), j, (rowIndex || -1), this.start);
+    }
+    tr.append(td);
+  }
+  tbody.append(tr);
+};
+
+PaginationTable.prototype.getData = function () {
+  let ret = [];
+  let tbody = $(this.table.find('tbody')).get(0);
+  let trs = tbody.querySelectorAll('tr');
+  for (let i = 0; i < trs.length; i++) {
+    let tr = trs[i];
+    if (tr.classList.contains('no-hover')) {
+      continue;
+    }
+    let model = dom.model(tr);
+    ret.push(model);
+  }
+  return ret;
 };
 
 /**
@@ -23700,24 +23727,26 @@ WeeklyCalendar.prototype.root = function () {
     let tr = dom.create('tr');
     for (let j = 0; j < 8; j++) {
       let td = dom.create('td');
+      td.style.height = '100%';
       if (rowHeader.data) {
         dom.model(td, rowHeader.data);
       }
-      td.style.height = '64px';
+      let div = dom.element(`<div style="min-height: 72px;"></div>`);
+      dom.model(div, rowHeader.data);
       if (j == 0) {
         td.style = 'text-align: center; vertical-align: center;';
         td.innerHTML = rowHeader.title;
       } else {
         td.setAttribute('data-date', milliArray[j - 1]);
         let buttonAdd = dom.element(`
-          <div class="d-flex full-width full-height">
+          <div class="d-flex full-width height-32">
             <a class="btn-link m-auto plus" style="display: none;">
               <i class="fas fa-plus-circle"></i>
             </a>
           </div>
         `);
         if (this.editable) {
-          td.appendChild(buttonAdd);
+          div.appendChild(buttonAdd);
           dom.bind(buttonAdd, 'mouseover', ev => {
             let button = dom.ancestor(ev.target, 'div');
             dom.find('a.plus', button).style.display = '';
@@ -23728,18 +23757,19 @@ WeeklyCalendar.prototype.root = function () {
           });
           dom.bind(buttonAdd.children[0], 'click', ev => {
             let button = dom.ancestor(ev.target, 'a');
-            let td = button.parentElement.parentElement;
-            let date = td.getAttribute('data-date');
+            let tr = button.parentElement.parentElement.parentElement;
+            let date = tr.getAttribute('data-date');
             let rowHeaderData = dom.model(td.parentElement.children[0]);
             this.onAddedToCell(td.children[0], date, rowHeaderData);
           });
         }
         let content = dom.element(`<div class="content"></div>`);
         if (this.editable) {
-          td.insertBefore(content, buttonAdd);
+          div.insertBefore(content, buttonAdd);
         } else {
-          td.appendChild(content);
+          div.appendChild(content);
         }
+        td.appendChild(div);
         //
         for (let m = 0; m < this.datedData.length; m++) {
           let row = this.datedData[m];

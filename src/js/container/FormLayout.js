@@ -302,6 +302,7 @@ FormLayout.prototype.build = function(persisted) {
       }).render(dom.find('div[data-logo-name=\'' + field.name + '\']', this.container), field.value);
     }
   }
+
   let containerButtons = dom.create('div');
   containerButtons.classList.add('buttons');
   let buttons = dom.create('div');
@@ -331,6 +332,7 @@ FormLayout.prototype.build = function(persisted) {
       }, 300);
     }
   });
+  if (this.actionable === false) return;
   if (this.actionable && this.mode!='page') {
     buttons.appendChild(buttonClose);
   }
@@ -686,11 +688,11 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         });
         let input = dom.element('<input type="text" class="form-control">');
         input.name = val.input.name;
-        input.placeholder = val.input.placeholder;
+        input.placeholder = val.input.placeholder || '';
         input.style.display = 'none';
         group.appendChild(input);
       } else {
-        dom.bind(radios[i], 'click', (ev) => {
+        dom.bind(radios[j], 'click', (ev) => {
           let textInput = dom.find('input[type=text]', group);
           textInput.style.display = 'none';
         });

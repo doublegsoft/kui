@@ -77,24 +77,26 @@ WeeklyCalendar.prototype.root = function () {
     let tr = dom.create('tr');
     for (let j = 0; j < 8; j++) {
       let td = dom.create('td');
+      td.style.height = '100%';
       if (rowHeader.data) {
         dom.model(td, rowHeader.data);
       }
-      td.style.height = '64px';
+      let div = dom.element(`<div style="min-height: 72px;"></div>`);
+      dom.model(div, rowHeader.data);
       if (j == 0) {
         td.style = 'text-align: center; vertical-align: center;';
         td.innerHTML = rowHeader.title;
       } else {
         td.setAttribute('data-date', milliArray[j - 1]);
         let buttonAdd = dom.element(`
-          <div class="d-flex full-width full-height">
+          <div class="d-flex full-width height-32">
             <a class="btn-link m-auto plus" style="display: none;">
               <i class="fas fa-plus-circle"></i>
             </a>
           </div>
         `);
         if (this.editable) {
-          td.appendChild(buttonAdd);
+          div.appendChild(buttonAdd);
           dom.bind(buttonAdd, 'mouseover', ev => {
             let button = dom.ancestor(ev.target, 'div');
             dom.find('a.plus', button).style.display = '';
@@ -105,18 +107,19 @@ WeeklyCalendar.prototype.root = function () {
           });
           dom.bind(buttonAdd.children[0], 'click', ev => {
             let button = dom.ancestor(ev.target, 'a');
-            let td = button.parentElement.parentElement;
-            let date = td.getAttribute('data-date');
+            let tr = button.parentElement.parentElement.parentElement;
+            let date = tr.getAttribute('data-date');
             let rowHeaderData = dom.model(td.parentElement.children[0]);
             this.onAddedToCell(td.children[0], date, rowHeaderData);
           });
         }
         let content = dom.element(`<div class="content"></div>`);
         if (this.editable) {
-          td.insertBefore(content, buttonAdd);
+          div.insertBefore(content, buttonAdd);
         } else {
-          td.appendChild(content);
+          div.appendChild(content);
         }
+        td.appendChild(div);
         //
         for (let m = 0; m < this.datedData.length; m++) {
           let row = this.datedData[m];

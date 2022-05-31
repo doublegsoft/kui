@@ -954,42 +954,9 @@ PaginationTable.prototype.fill = function (result) {
       tbody.css('overflow-y', 'auto');
     }
     for (let i = 0; i < limit; ++i) {
-      let tr = $("<tr></tr>");
-      tr.css('height', this.columnHeight)
       if (i < resultNew.data.length) {
         let row = resultNew.data[i];
-        for (let j = 0; j < mappingColumns.length; ++j) {
-          let col = mappingColumns[j];
-          let td = $("<td></td>");
-          // 冻结列
-          if (j < this.frozenColumnCount) td.addClass('headcol');
-          if (col.style) {
-            td.attr("style", col.style);
-          } else {
-            td.attr("style", "text-align: center; vertical-align:middle;");
-          }
-          if (typeof col.width !== 'undefined') td.css('width', col.width);
-          if (this.frozenHeader === true) {
-            tbody.css('float', 'left');
-            td.css('float', 'left');
-          }
-          if (col.template) {
-            let html = col.template.toString();
-            for (k in row) {
-              row[k] = row[k] == null ? "-" : row[k];
-              html = this.replace(html, "\\{" + k + "\\}", row[k]);
-            }
-            if (html.indexOf('{') == 0 && html.indexOf('}') != -1) {
-              html = '-';
-            }
-            td.html(html);
-          }
-          if (col.display) {
-            col.display(row, td.get(0), j, i, this.start);
-          }
-          tr.append(td);
-        }
-        tbody.append(tr);
+        this.appendRow(row, i);
       } // if (i < result.data.length)  
     }
   } else {
@@ -1012,6 +979,64 @@ PaginationTable.prototype.fill = function (result) {
         '</tr>');
     }
   }
+};
+
+PaginationTable.prototype.appendRow = function (row, rowIndex) {
+  let tbody = $(this.table.find('tbody'));
+  let nodata = dom.find('tr.no-hover', tbody.get(0));
+  if (nodata != null) {
+    nodata.remove();
+  }
+  let tr = $("<tr></tr>");
+  dom.model(tr.get(0), row);
+  tr.css('height', this.columnHeight);
+  for (let j = 0; j < this.mappingColumns.length; ++j) {
+    let col = this.mappingColumns[j];
+    let td = $("<td></td>");
+    // 冻结列
+    if (j < this.frozenColumnCount) td.addClass('headcol');
+    if (col.style) {
+      td.attr("style", col.style);
+    } else {
+      td.attr("style", "text-align: center; vertical-align:middle;");
+    }
+    if (typeof col.width !== 'undefined') td.css('width', col.width);
+    if (this.frozenHeader === true) {
+      tbody.css('float', 'left');
+      td.css('float', 'left');
+    }
+    if (col.template) {
+      let html = col.template.toString();
+      for (let k in row) {
+        row[k] = row[k] == null ? "-" : row[k];
+        html = this.replace(html, "\\{" + k + "\\}", row[k]);
+      }
+      if (html.indexOf('{') == 0 && html.indexOf('}') != -1) {
+        html = '-';
+      }
+      td.html(html);
+    }
+    if (col.display) {
+      col.display(row, td.get(0), j, (rowIndex || -1), this.start);
+    }
+    tr.append(td);
+  }
+  tbody.append(tr);
+};
+
+PaginationTable.prototype.getData = function () {
+  let ret = [];
+  let tbody = $(this.table.find('tbody')).get(0);
+  let trs = tbody.querySelectorAll('tr');
+  for (let i = 0; i < trs.length; i++) {
+    let tr = trs[i];
+    if (tr.classList.contains('no-hover')) {
+      continue;
+    }
+    let model = dom.model(tr);
+    ret.push(model);
+  }
+  return ret;
 };
 
 /**
