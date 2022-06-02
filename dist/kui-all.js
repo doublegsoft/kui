@@ -23652,6 +23652,7 @@ TestSheet.prototype.root = function(data) {
     }
     this.tbody.appendChild(tr);
   }
+  this.totalize();
   return this.table;
 };
 
