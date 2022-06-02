@@ -10,6 +10,14 @@ function TestSheet(opt) {
   this.rowCount = opt.rowHeaders.length;
   // 是否只读模式
   this.readonly = opt.readonly === true ? true : false;
+
+  this.totalColumns = [];
+  for (let i = 0; i < this.columns.length; i++) {
+    let column = this.columns[i];
+    if (column.totalable) {
+      this.totalColumns.push(column);
+    }
+  }
 }
 
 /**
@@ -83,13 +91,25 @@ TestSheet.prototype.root = function(data) {
           if (rowIndex == self.rowCount - 1 /* 已经是最后一行，无法再向下移动 */) return;
           triggered = self.getCell(rowIndex + 1, columnIndex);
         }
-
+        self.totalize();
         if (triggered != null) {
           td.blur();
           triggered.focus();
           document.execCommand('selectAll',false,null)
         }
       });
+      tr.appendChild(td);
+    }
+    this.tbody.appendChild(tr);
+  }
+  if (this.totalColumns.length > 0) {
+    let tr = dom.create('tr');
+    let td = dom.create('td');
+    td.innerHTML = '合计';
+    td.style.fontWeight = 'bold';
+    tr.appendChild(td);
+    for (let j = 0; j < this.columnCount; j++) {
+      td = dom.create('td');
       tr.appendChild(td);
     }
     this.tbody.appendChild(tr);
@@ -132,4 +152,23 @@ TestSheet.prototype.getValues = function() {
     }
   }
   return ret;
+};
+
+TestSheet.prototype.totalize = function() {
+  if (this.totalColumns.length == 0) return;
+  let trTotal = this.tbody.children[this.tbody.children.length - 1];
+  for (let i = 0; i < this.columns.length; i++) {
+    let column = this.columns[i];
+    if (column.totalable !== true) continue;
+    let total = 0;
+    for (let j = 0; j < this.rowHeaders.length; j++) {
+      let val = parseFloat(this.tbody.rows[j].cells[i + 1].innerText.trim());
+      if (!isNaN(val)) {
+        total += val;
+      }
+    }
+    if (!isNaN(total)) {
+      trTotal.cells[i + 1].innerText = total;
+    }
+  }
 };
