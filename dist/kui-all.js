@@ -4594,7 +4594,7 @@ dnd.setDraggable = function (selector, payload, callback) {
     element = selector;
   }
   element.setAttribute("draggable", "true");
-  element.addEventListener("dragstart", function(ev) {
+  element.ondragstart = function(ev) {
     let li = element;// dom.ancestor(ev.target, 'li');
     let dragImage = li.getAttribute('widget-drag-image');
     let x = event.layerX;
@@ -4610,7 +4610,7 @@ dnd.setDraggable = function (selector, payload, callback) {
     if (callback) {
       callback(x, y, target);
     }
-  });
+  };
 };
 
 dnd.clearDraggable = function(selector) {
@@ -4631,10 +4631,10 @@ dnd.setDroppable = function (selector, callback) {
   } else {
     element = selector;
   }
-  element.addEventListener('dragover', function (event) {
+  element.ondragover = function (event) {
     event.preventDefault();
-  });
-  element.addEventListener('drop', function (event) {
+  };
+  element.ondrop = function (event) {
     event.preventDefault();
     let rect = element.getBoundingClientRect();
     let x = event.clientX - rect.left;
@@ -4647,7 +4647,7 @@ dnd.setDroppable = function (selector, callback) {
       }
       callback(parseInt(x), y, data);
     }
-  });
+  };
 };
 
 var dom = {};
@@ -7806,7 +7806,7 @@ toast.success = function(selector, message) {
 
   setTimeout(function() {
     toast.remove();
-  }, 2000);
+  }, 500);
 };
 
 toast.info = function(selector, message) {

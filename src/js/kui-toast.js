@@ -31,7 +31,7 @@ toast.success = function(selector, message) {
 
   setTimeout(function() {
     toast.remove();
-  }, 2000);
+  }, 500);
 };
 
 toast.info = function(selector, message) {
