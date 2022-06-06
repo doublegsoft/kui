@@ -14222,7 +14222,7 @@ PaginationTable.prototype.appendRow = function (row, rowIndex) {
       td.html(html);
     }
     if (col.display) {
-      col.display(row, td.get(0), j, (rowIndex || -1), this.start);
+      col.display(row, td.get(0), j, (typeof(rowIndex) === 'undefined' ? -1 : rowIndex), this.start);
     }
     tr.append(td);
   }
