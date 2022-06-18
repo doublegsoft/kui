@@ -378,69 +378,15 @@ ListView.prototype.setReorderable = function(li) {
     event.preventDefault();
   });
   ul.ondrop = event => {
-    // let y = parseInt(event.dataTransfer.getData('y'));
-    // let id = event.dataTransfer.getData('id');
-    // let li = dom.ancestor(event.target, 'li');
-    // let dragged = null;
-    // for (let i = 0; i < ul.children.length; i++) {
-    //   let li = ul.children[i];
-    //   if (li.getAttribute('data-list-item-id') == id) {
-    //     dragged = li;
-    //     break;
-    //   }
-    // }
-    // let parent = li.parentNode;
-    // parent.insertBefore(dragged, li);
-    //
-
-    // this.draggingElement = null;
-
     this.draggingElement.style.opacity = '';
     this.draggingElement = null;
     this.clonedDraggingElement = null;
   };
 
-  // ul.ondrag = event => {
-  //   if (!this.draggingElement) return;
-  //   let li = dom.ancestor(event.target, 'li');
-  //   let style = getComputedStyle(li);
-  //   let height = parseInt(style.height);
-  //   let layerY = event.layerY;
-  //   let clientY = event.clientY;
-  //   let ul = li.parentElement;
-  //   for (let i = 0; i < ul.children.length; i++) {
-  //     let liChild = ul.children[i];
-  //     if (liChild.offsetTop < (clientY + layerY) && (clientY + layerY) < (liChild.offsetTop + height)) {
-  //       liChild.style.background = 'lightgray';
-  //     }
-  //   }
-  // };
-
   li.setAttribute("draggable", "true");
   li.ondragover = event => {
-
     let li = dom.ancestor(event.target, 'li');
     let ul = li.parentElement;
-
-    let pageY = event.pageY;
-
-    let ulOffsetTop = parseInt(ul.offsetTop);
-    // for (let i = 0; i < ul.children.length; i++) {
-    //   let liChild = ul.children[i];
-    //   if (liChild == this.draggingElement) continue;
-    //   let rect = liChild.getBoundingClientRect();
-    //   if (rect == null) continue;
-    //   let style = getComputedStyle(liChild);
-    //   let height = parseInt(style.height);
-    //   if (rect.top < event.pageY && event.pageY < (rect.top + height)) {
-    //     if (li.nextElementSibling == null) {
-    //       ul.appendChild(this.clonedDraggingElement);
-    //     } else if (li.nextElementSibling != this.draggingElement) {
-    //       ul.insertBefore(this.clonedDraggingElement, li.nextElementSibling);
-    //     }
-    //     break;
-    //   }
-    // }
     if (li == this.draggingElement) {
       return;
     }
