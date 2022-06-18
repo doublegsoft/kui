@@ -52,6 +52,11 @@ xhr.request = function (opts, method) {
   if (typeof APPTOKEN !== 'undefined') {
     req.setRequestHeader("apptoken", APPTOKEN);
   }
+  if (window.user) {
+    req.setRequestHeader("_current_user", window.user.userId);
+  } else {
+    req.setRequestHeader("_current_user", "unauthorized user");
+  }
   if (data)
     req.send(JSON.stringify(data));
   else

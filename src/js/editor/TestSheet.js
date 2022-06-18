@@ -162,13 +162,15 @@ TestSheet.prototype.totalize = function() {
     let column = this.columns[i];
     if (column.totalable !== true) continue;
     let total = 0;
+    let calculated = false;
     for (let j = 0; j < this.rowHeaders.length; j++) {
       let val = parseFloat(this.tbody.rows[j].cells[i + 1].innerText.trim());
       if (!isNaN(val)) {
         total += val;
+        calculated = true;
       }
     }
-    if (!isNaN(total)) {
+    if (!isNaN(total) && calculated === true) {
       trTotal.cells[i + 1].innerText = total;
     }
   }

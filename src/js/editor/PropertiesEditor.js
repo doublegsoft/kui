@@ -363,8 +363,8 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
 
 PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, values) {
   let li = dom.element(`
-        <li class="list-group-item p-0" style="background-color: #383b61;"></li>
-      `);
+    <li class="list-group-item p-0" style="background-color: #383b61;"></li>
+  `);
   for (let m = 0; m < propertiesModel.length; m++) {
     propertiesModel[m].value = values[propertiesModel[m].name] || '';
   }
@@ -438,6 +438,11 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
       if (dataId != 'image')
         input.value = data[dataId];
+    }
+    if (input.type === 'range') {
+      // FIXME
+      let label = dom.find('label', input.parentElement);
+      label.textContent = label.textContent.replace('undefined', data[dataId])
     }
   }
   for (let i = 0; i < selects.length; i++) {

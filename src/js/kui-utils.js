@@ -163,6 +163,32 @@ utils.nameVar = function(name) {
   return ret;
 };
 
+utils.camelcase = function(name, sep) {
+  if (name.indexOf(sep) == -1) return name;
+  const names = name.split(sep);
+  let ret = '';
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    if (i == 0) {
+      ret += name;
+    } else {
+      ret += name.charAt(0).toUpperCase() + name.slice(1);
+    }
+  }
+  return ret;
+};
+
+utils.pascalcase = function(name, sep) {
+  if (name.indexOf(sep) == -1) return name.charAt(0).toUpperCase() + name.slice(1);
+  const names = name.split(sep);
+  let ret = '';
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    ret += name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  return ret;
+};
+
 utils.clone = function(source, target) {
   source = source || {};
   for (let k in source) {

@@ -8017,6 +8017,32 @@ utils.nameVar = function(name) {
   return ret;
 };
 
+utils.camelcase = function(name, sep) {
+  if (name.indexOf(sep) == -1) return name;
+  const names = name.split(sep);
+  let ret = '';
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    if (i == 0) {
+      ret += name;
+    } else {
+      ret += name.charAt(0).toUpperCase() + name.slice(1);
+    }
+  }
+  return ret;
+};
+
+utils.pascalcase = function(name, sep) {
+  if (name.indexOf(sep) == -1) return name.charAt(0).toUpperCase() + name.slice(1);
+  const names = name.split(sep);
+  let ret = '';
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    ret += name.charAt(0).toUpperCase() + name.slice(1);
+  }
+  return ret;
+};
+
 utils.clone = function(source, target) {
   source = source || {};
   for (let k in source) {
@@ -8738,6 +8764,11 @@ xhr.request = function (opts, method) {
   req.setRequestHeader("usecase", usecase);
   if (typeof APPTOKEN !== 'undefined') {
     req.setRequestHeader("apptoken", APPTOKEN);
+  }
+  if (window.user) {
+    req.setRequestHeader("_current_user", window.user.userId);
+  } else {
+    req.setRequestHeader("_current_user", "unauthorized user");
   }
   if (data)
     req.send(JSON.stringify(data));
@@ -12051,6 +12082,9 @@ ListView.prototype.append = function(data, index) {
     }
     li.appendChild(div);
 
+    if (this.idField) {
+      li.setAttribute("data-list-item-id", row[this.idField])
+    }
     dom.model(li, row);
 
     if (typeof index === 'number') {
@@ -12124,34 +12158,115 @@ ListView.prototype.setReorderable = function(li) {
   ul.addEventListener('dragover', function (event) {
     event.preventDefault();
   });
-  ul.addEventListener('drop', function (event) {
+  ul.ondrop = event => {
     // let y = parseInt(event.dataTransfer.getData('y'));
-    let id = event.dataTransfer.getData('id');
-    let dragged = null;
-    for (let i = 0; i < ul.children.length; i++) {
-      let li = ul.children[i];
-      if (li.getAttribute('data-model-id') == id) {
-        dragged = li;
-        break;
-      }
-    }
-    let parent = event.target.parentNode;
-    parent.insertBefore(dragged, event.target.nextSibling);
-  });
+    // let id = event.dataTransfer.getData('id');
+    // let li = dom.ancestor(event.target, 'li');
+    // let dragged = null;
+    // for (let i = 0; i < ul.children.length; i++) {
+    //   let li = ul.children[i];
+    //   if (li.getAttribute('data-list-item-id') == id) {
+    //     dragged = li;
+    //     break;
+    //   }
+    // }
+    // let parent = li.parentNode;
+    // parent.insertBefore(dragged, li);
+    //
+
+    // this.draggingElement = null;
+
+    this.draggingElement.style.opacity = '';
+    this.draggingElement = null;
+    this.clonedDraggingElement = null;
+  };
+
+  // ul.ondrag = event => {
+  //   if (!this.draggingElement) return;
+  //   let li = dom.ancestor(event.target, 'li');
+  //   let style = getComputedStyle(li);
+  //   let height = parseInt(style.height);
+  //   let layerY = event.layerY;
+  //   let clientY = event.clientY;
+  //   let ul = li.parentElement;
+  //   for (let i = 0; i < ul.children.length; i++) {
+  //     let liChild = ul.children[i];
+  //     if (liChild.offsetTop < (clientY + layerY) && (clientY + layerY) < (liChild.offsetTop + height)) {
+  //       liChild.style.background = 'lightgray';
+  //     }
+  //   }
+  // };
 
   li.setAttribute("draggable", "true");
-  li.addEventListener('dragover', function (event) {
+  li.ondragover = event => {
+
+    let li = dom.ancestor(event.target, 'li');
+    let ul = li.parentElement;
+
+    let pageY = event.pageY;
+
+    let ulOffsetTop = parseInt(ul.offsetTop);
+    // for (let i = 0; i < ul.children.length; i++) {
+    //   let liChild = ul.children[i];
+    //   if (liChild == this.draggingElement) continue;
+    //   let rect = liChild.getBoundingClientRect();
+    //   if (rect == null) continue;
+    //   let style = getComputedStyle(liChild);
+    //   let height = parseInt(style.height);
+    //   if (rect.top < event.pageY && event.pageY < (rect.top + height)) {
+    //     if (li.nextElementSibling == null) {
+    //       ul.appendChild(this.clonedDraggingElement);
+    //     } else if (li.nextElementSibling != this.draggingElement) {
+    //       ul.insertBefore(this.clonedDraggingElement, li.nextElementSibling);
+    //     }
+    //     break;
+    //   }
+    // }
+    if (li == this.draggingElement) {
+      return;
+    }
+
+    let liIndex = this.getItemIndex(li);
+    if (liIndex < this.draggingElementIndex) {
+      ul.insertBefore(this.draggingElement, li);
+    } else if (liIndex > this.draggingElementIndex) {
+      if (li.nextElementSibling == null) {
+        ul.appendChild(this.draggingElement);
+      } else {
+        ul.insertBefore(this.draggingElement, li.nextElementSibling);
+      }
+    }
+
+    this.draggingElementIndex = liIndex;
     event.preventDefault();
-  });
-  li.addEventListener("dragstart", function(event) {
+  };
+  li.ondragstart = event => {
+    let li = dom.ancestor(event.target, 'li');
+    let ul = li.parentElement;
     let x = event.layerX;
     let y = event.layerY;
     let target = event.target;
     y = target.offsetTop + y;
 
-    event.dataTransfer.setData("id", dom.model(event.target).id);
+    this.clonedDraggingElement = li.cloneNode(true);
+    console.log(this.clonedDraggingElement);
+
+    this.draggingElement = li;
+    this.draggingElement.style.opacity = "0.3";
+    this.draggingElementIndex = this.getItemIndex(li);
+
+    event.dataTransfer.setData("id", li.getAttribute('data-list-item-id'));
     event.dataTransfer.setData("y", y);
-  });
+  };
+};
+
+ListView.prototype.getItemIndex = function(li) {
+  let ul = li.parentElement;
+  for (let i = 0; i < ul.children.length; i++) {
+    if (li == ul.children[i]) {
+      return i;
+    }
+  }
 };
 
 ListView.prototype.setHeight = function(height) {
@@ -12165,7 +12280,7 @@ ListView.prototype.activate = function(li) {
     ul.children[i].classList.remove('active');
   }
   li.classList.add('active');
-}
+};
 
 ListView.prototype.subscribe = function(name, callback) {
 
@@ -13613,8 +13728,8 @@ PaginationTable.prototype.root = function (initParams) {
  */
 PaginationTable.prototype.pagination = function () {
   let self = this;
-  let div = $('<div class="table-pagination"></div>');
-  let ul = $('<ul class="pagination mb-0 mt-2" style="float: right;"></ul>');
+  let div = $('<div class="table-pagination d-flex"></div>');
+  let ul = $('<ul class="pagination mb-0 mt-2 ml-auto"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
   let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
@@ -14043,6 +14158,12 @@ PaginationTable.prototype.request = function (others) {
  * 加载本地数据分页显示。
  */
 PaginationTable.prototype.loadLocal = function () {
+  if (!this.local) {
+    this.local = {
+      total: 0,
+      data: [],
+    }
+  }
   this.total = this.local.total;
   let result = {};
   result.total = this.local.total;
@@ -21299,8 +21420,8 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
 
 PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, values) {
   let li = dom.element(`
-        <li class="list-group-item p-0" style="background-color: #383b61;"></li>
-      `);
+    <li class="list-group-item p-0" style="background-color: #383b61;"></li>
+  `);
   for (let m = 0; m < propertiesModel.length; m++) {
     propertiesModel[m].value = values[propertiesModel[m].name] || '';
   }
@@ -21374,6 +21495,11 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
       if (dataId != 'image')
         input.value = data[dataId];
+    }
+    if (input.type === 'range') {
+      // FIXME
+      let label = dom.find('label', input.parentElement);
+      label.textContent = label.textContent.replace('undefined', data[dataId])
     }
   }
   for (let i = 0; i < selects.length; i++) {
@@ -23700,13 +23826,15 @@ TestSheet.prototype.totalize = function() {
     let column = this.columns[i];
     if (column.totalable !== true) continue;
     let total = 0;
+    let calculated = false;
     for (let j = 0; j < this.rowHeaders.length; j++) {
       let val = parseFloat(this.tbody.rows[j].cells[i + 1].innerText.trim());
       if (!isNaN(val)) {
         total += val;
+        calculated = true;
       }
     }
-    if (!isNaN(total)) {
+    if (!isNaN(total) && calculated === true) {
       trTotal.cells[i + 1].innerText = total;
     }
   }

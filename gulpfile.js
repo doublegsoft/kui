@@ -86,13 +86,13 @@ gulp.task('dist', function() {
 
   // mobile js
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
-    'src/js/kui-utils.js'])
+    'src/js/kui-utils.js', 'src/js/application/Chat.js'])
     .pipe(concat('./kui-all.mobile.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
-    'src/js/kui-utils.js'])
+    'src/js/kui-utils.js', 'src/js/application/Chat.js'])
     .pipe(concat('./kui-all.mobile.js'))
     .pipe(gulp.dest('./dist/'));
 

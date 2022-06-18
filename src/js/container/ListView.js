@@ -301,6 +301,9 @@ ListView.prototype.append = function(data, index) {
     }
     li.appendChild(div);
 
+    if (this.idField) {
+      li.setAttribute("data-list-item-id", row[this.idField])
+    }
     dom.model(li, row);
 
     if (typeof index === 'number') {
@@ -374,34 +377,115 @@ ListView.prototype.setReorderable = function(li) {
   ul.addEventListener('dragover', function (event) {
     event.preventDefault();
   });
-  ul.addEventListener('drop', function (event) {
+  ul.ondrop = event => {
     // let y = parseInt(event.dataTransfer.getData('y'));
-    let id = event.dataTransfer.getData('id');
-    let dragged = null;
-    for (let i = 0; i < ul.children.length; i++) {
-      let li = ul.children[i];
-      if (li.getAttribute('data-model-id') == id) {
-        dragged = li;
-        break;
-      }
-    }
-    let parent = event.target.parentNode;
-    parent.insertBefore(dragged, event.target.nextSibling);
-  });
+    // let id = event.dataTransfer.getData('id');
+    // let li = dom.ancestor(event.target, 'li');
+    // let dragged = null;
+    // for (let i = 0; i < ul.children.length; i++) {
+    //   let li = ul.children[i];
+    //   if (li.getAttribute('data-list-item-id') == id) {
+    //     dragged = li;
+    //     break;
+    //   }
+    // }
+    // let parent = li.parentNode;
+    // parent.insertBefore(dragged, li);
+    //
+
+    // this.draggingElement = null;
+
+    this.draggingElement.style.opacity = '';
+    this.draggingElement = null;
+    this.clonedDraggingElement = null;
+  };
+
+  // ul.ondrag = event => {
+  //   if (!this.draggingElement) return;
+  //   let li = dom.ancestor(event.target, 'li');
+  //   let style = getComputedStyle(li);
+  //   let height = parseInt(style.height);
+  //   let layerY = event.layerY;
+  //   let clientY = event.clientY;
+  //   let ul = li.parentElement;
+  //   for (let i = 0; i < ul.children.length; i++) {
+  //     let liChild = ul.children[i];
+  //     if (liChild.offsetTop < (clientY + layerY) && (clientY + layerY) < (liChild.offsetTop + height)) {
+  //       liChild.style.background = 'lightgray';
+  //     }
+  //   }
+  // };
 
   li.setAttribute("draggable", "true");
-  li.addEventListener('dragover', function (event) {
+  li.ondragover = event => {
+
+    let li = dom.ancestor(event.target, 'li');
+    let ul = li.parentElement;
+
+    let pageY = event.pageY;
+
+    let ulOffsetTop = parseInt(ul.offsetTop);
+    // for (let i = 0; i < ul.children.length; i++) {
+    //   let liChild = ul.children[i];
+    //   if (liChild == this.draggingElement) continue;
+    //   let rect = liChild.getBoundingClientRect();
+    //   if (rect == null) continue;
+    //   let style = getComputedStyle(liChild);
+    //   let height = parseInt(style.height);
+    //   if (rect.top < event.pageY && event.pageY < (rect.top + height)) {
+    //     if (li.nextElementSibling == null) {
+    //       ul.appendChild(this.clonedDraggingElement);
+    //     } else if (li.nextElementSibling != this.draggingElement) {
+    //       ul.insertBefore(this.clonedDraggingElement, li.nextElementSibling);
+    //     }
+    //     break;
+    //   }
+    // }
+    if (li == this.draggingElement) {
+      return;
+    }
+
+    let liIndex = this.getItemIndex(li);
+    if (liIndex < this.draggingElementIndex) {
+      ul.insertBefore(this.draggingElement, li);
+    } else if (liIndex > this.draggingElementIndex) {
+      if (li.nextElementSibling == null) {
+        ul.appendChild(this.draggingElement);
+      } else {
+        ul.insertBefore(this.draggingElement, li.nextElementSibling);
+      }
+    }
+
+    this.draggingElementIndex = liIndex;
     event.preventDefault();
-  });
-  li.addEventListener("dragstart", function(event) {
+  };
+  li.ondragstart = event => {
+    let li = dom.ancestor(event.target, 'li');
+    let ul = li.parentElement;
     let x = event.layerX;
     let y = event.layerY;
     let target = event.target;
     y = target.offsetTop + y;
 
-    event.dataTransfer.setData("id", dom.model(event.target).id);
+    this.clonedDraggingElement = li.cloneNode(true);
+    console.log(this.clonedDraggingElement);
+
+    this.draggingElement = li;
+    this.draggingElement.style.opacity = "0.3";
+    this.draggingElementIndex = this.getItemIndex(li);
+
+    event.dataTransfer.setData("id", li.getAttribute('data-list-item-id'));
     event.dataTransfer.setData("y", y);
-  });
+  };
+};
+
+ListView.prototype.getItemIndex = function(li) {
+  let ul = li.parentElement;
+  for (let i = 0; i < ul.children.length; i++) {
+    if (li == ul.children[i]) {
+      return i;
+    }
+  }
 };
 
 ListView.prototype.setHeight = function(height) {
@@ -415,7 +499,7 @@ ListView.prototype.activate = function(li) {
     ul.children[i].classList.remove('active');
   }
   li.classList.add('active');
-}
+};
 
 ListView.prototype.subscribe = function(name, callback) {
 

@@ -408,8 +408,8 @@ PaginationTable.prototype.root = function (initParams) {
  */
 PaginationTable.prototype.pagination = function () {
   let self = this;
-  let div = $('<div class="table-pagination"></div>');
-  let ul = $('<ul class="pagination mb-0 mt-2" style="float: right;"></ul>');
+  let div = $('<div class="table-pagination d-flex"></div>');
+  let ul = $('<ul class="pagination mb-0 mt-2 ml-auto"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
   let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
@@ -838,6 +838,12 @@ PaginationTable.prototype.request = function (others) {
  * 加载本地数据分页显示。
  */
 PaginationTable.prototype.loadLocal = function () {
+  if (!this.local) {
+    this.local = {
+      total: 0,
+      data: [],
+    }
+  }
   this.total = this.local.total;
   let result = {};
   result.total = this.local.total;
