@@ -433,6 +433,13 @@ QuestionnaireDesigner.prototype.edit = function(question) {
     return options.inverse(this);
   });
   let questionId = question.id;
+  question.options = [];
+  for (let i = 0; i < question.values.length; i++) {
+    question.options.push({
+      value: question.values[i],
+      score: question.scores ? question.scores[i] : '0',
+    })
+  }
   let el = dom.templatize(`
     <div>
     <div widget-id="dialogQuestionEdit" class="card border-less">
@@ -459,14 +466,14 @@ QuestionnaireDesigner.prototype.edit = function(question) {
                 </a>
               </label>
               <ul class="list-group">
-                {{#each values}}
+                {{#each options}}
                 <li class="list-group-item d-flex pt-0 pb-0">
                   <input onfocus="QuestionnaireDesigner.instance.onCellFocus(this);" 
                          onkeydown="QuestionnaireDesigner.instance.onCellKeyPress(event);"
-                         name="values" style="border: none; height=100%; width: 100%" value="{{this}}">
+                         name="values" style="border: none; height=100%; width: 100%" value="{{value}}">
                   <input onfocus="QuestionnaireDesigner.instance.onCellFocus(this);" 
                          onkeydown="QuestionnaireDesigner.instance.onCellKeyPress(event);"
-                         name="scores" style="border: none; width: 50px" value="0">
+                         name="scores" style="border: none; width: 50px" value="{{score}}">
                   <a class="btn text-danger line-height-32" onclick="this.parentElement.remove();">
                     <span class="material-icons">highlight_off</span>
                   </a>

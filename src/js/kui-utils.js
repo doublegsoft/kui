@@ -249,4 +249,4 @@ utils.isExisting = (array, obj, idField) => {
       return true;
   }
   return false;
-}
+};

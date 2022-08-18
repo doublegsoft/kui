@@ -203,7 +203,6 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         changed[prop.name] = select.value;
         self.notifyPropertyChangedListeners(changed);
       });
-
     } else if (prop.input == 'number') {
       //
       // 【数字】
@@ -293,6 +292,91 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         changed[prop.name] = input.checked;
         self.notifyPropertyChangedListeners(changed);
       });
+    } else if (prop.input == 'tileselect') {
+      let templateData = {
+        tileStyle: 'position: relative; left: 40px; width: 360px; -moz-transform: scale(0.6); zoom: 0.6;'
+      };
+      let input = dom.templatize(`
+        <div class="dropdown show" style="display: unset;">
+          <a class="btn-link text-white dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择瓦片</a>
+          <div class="dropdown-menu" style="width: 360px;">
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center" style="padding: 8px 16px;">      
+                <img class="avatar" src="/img/placeholder/64.png">      
+                <div class="pl-2">        
+                  <strong>主要文本</strong>        
+                  <div class="small text-muted">次要文本</div>      
+                </div>      
+                <div class="font-13 tag-success pointer position-relative ml-auto" style="top: 4px;">        
+                  <span>当前状态</span>        
+                  <div class="tag-success-after"></div>      
+                </div>    
+              </div>
+            </a>
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center" style="padding: 8px 16px;">
+                <img class="avatar circle-64" src="img/user.png">
+                <div class="pl-2 full-width">
+                  <div>
+                    <strong>蒂安娜</strong>
+                    <span class="float-right">1999-12-12</span>
+                  </div>
+                  <div class="small text-muted">安娜乐队贝斯手，毕业于伯克利音乐学院。出生在南加州的一个中产家庭，自幼跟随父亲学习古典音乐，尤其对低音乐器十分痴迷。</div>
+                  <div class="d-flex">
+                    <div>
+                      <i class="fas fa-fan mr-1"></i>1024
+                    </div>
+                    <div class="ml-auto">
+                      <i class="fas fa-credit-card mr-1"></i>1024
+                    </div>
+                    <div class="ml-auto">
+                      <i class="fas fa-user-friends mr-1"></i>1024
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center"
+                   style="padding: 8px 16px;">
+                <div class="pl-2">
+                  <strong>主要文本</strong>
+                  <div class="small text-muted">次要文本</div>
+                </div>
+                <img class="avatar ml-auto" src="img/user.png">
+              </div>
+            </a>
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center">        
+                <div class="bg-gradient-primary mr-2">          
+                  <img src="/img/placeholder/64.png" style="width:56px; height: 56px">        
+                </div>        
+                <div>          
+                  <div class="text-value text-primary font-16">标题</div>          
+                  <div class="text-muted font-weight-bold small">这里是简介</div>        
+                </div>      
+              </div>
+            </a>
+          </div>
+        </div>
+      `, templateData);
+      labelProp.append(input);
+      let tile = dom.templatize(`
+        <div style="position: relative; left: -100px; min-height: 64px; width: 400px; 
+                    -moz-transform: scale(0.6);  zoom: 0.6; margin-top: 12px;"
+             property-model-name="{{name}}">
+        </div>
+      `, prop);
+      divProp.appendChild(tile);
+      let links = input.querySelectorAll('a.dropdown-item');
+      for (let i = 0; i < links.length; i++) {
+        links[i].onclick = ev => {
+          tile.innerHTML = links[i].innerHTML;
+          let emit = {};
+          emit[prop.name] = tile.innerHTML;
+          this.notifyPropertyChangedListeners(emit);
+        };
+      }
     } else if (prop.display) {
       //
       // 【自定义】
@@ -311,9 +395,9 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       `);
       labelProp.appendChild(plus);
       let ul = dom.element(`
-          <ul class="list-group properties-container">
-          </ul>
-        `);
+        <ul class="list-group properties-container">
+        </ul>
+      `);
       ul.setAttribute('property-model-name', prop.name);
       ul.setAttribute('properties-model', JSON.stringify(prop.properties));
       divProp.append(ul);
@@ -371,7 +455,9 @@ PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, v
   this.renderProperties(li, propertiesModel);
   let buttons = dom.element(`
     <div class="full-width d-flex mt-2">
-      <a class="pointer text-danger ml-auto font-18"><span class="material-icons">highlight_off</span></a>
+      <a class="pointer text-danger ml-auto font-18">
+        <span class="material-icons">highlight_off</span>
+      </a>
     </div>
   `);
   // 删除数组属性的某一项
@@ -399,6 +485,7 @@ PropertiesEditor.prototype.getPropertiesValues = function () {
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
+  let divs = container.querySelectorAll('div[property-model-name]')
   let ret = {};
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i];
@@ -412,10 +499,16 @@ PropertiesEditor.prototype.getPropertiesValues = function () {
     let dataValue = select.value;
     ret[dataId] = dataValue;
   }
-  for (let i = 0; i < inputs.length; i++) {
+  for (let i = 0; i < textareas.length; i++) {
     let textarea = textareas[i];
     let dataId = textarea.getAttribute('property-model-name');
     let dataValue = textarea.textContent;
+    ret[dataId] = dataValue;
+  }
+  for (let i = 0; i < divs.length; i++) {
+    let div = divs[i];
+    let dataId = div.getAttribute('property-model-name');
+    let dataValue = div.innerHTML;
     ret[dataId] = dataValue;
   }
   return ret;
@@ -426,6 +519,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
+  let divs = container.querySelectorAll('div[property-model-name]');
   let uls = container.querySelectorAll('ul[properties-model]');
 
   for (let i = 0; i < inputs.length; i++) {
@@ -456,6 +550,12 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     let dataId = textarea.getAttribute('property-model-name');
     if (data[dataId])
       textarea.textContent = data[dataId];
+  }
+  for (let i = 0; i < divs.length; i++) {
+    let div = divs[i];
+    let dataId = div.getAttribute('property-model-name');
+    if (data[dataId])
+      div.innerHTML = data[dataId];
   }
 
   // 特殊列表显示

@@ -171,7 +171,7 @@ TestSheet.prototype.totalize = function() {
       }
     }
     if (!isNaN(total) && calculated === true) {
-      trTotal.cells[i + 1].innerText = total;
+      trTotal.cells[i + 1].innerText = total.toFixed(2);
     }
   }
 };

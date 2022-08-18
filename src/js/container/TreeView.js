@@ -25,6 +25,7 @@ function TreeView(opts) {
 
   this.isNodeEditable = opts.isNodeEditable;
   this.isNodeRemovable = opts.isNodeRemovable;
+  this.isNodeAppendable = opts.isNodeAppendable;
 }
 
 TreeView.prototype.createNodeElement = function(data, level) {
@@ -118,7 +119,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonEdit.remove();
   }
-  if (!this.isNodeEditable || !this.isNodeEditable(model))
+  if (!this.isNodeEditable || !this.isNodeEditable(ret, model))
     buttonEdit.remove();
   if (this.onRemoveNode) {
     dom.model(buttonDelete, model);
@@ -132,7 +133,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonDelete.remove();
   }
-  if (!this.isNodeEditable || !this.isNodeEditable(model))
+  if (!this.isNodeRemovable || !this.isNodeRemovable(ret, model))
     buttonDelete.remove();
 
   if (this.onAddNode) {
@@ -148,6 +149,8 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonAdd.remove();
   }
+  if (!this.isNodeAppendable || !this.isNodeAppendable(ret, model))
+    buttonAdd.remove();
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
       ev.preventDefault();
@@ -214,7 +217,7 @@ TreeView.prototype.insertNode = function(data, parentElement) {
 /**
  * 根据数据定位树视图中的元素。
  *
- * @private
+ * @deprecated
  */
 TreeView.prototype.locateElement = function(data, parentElement) {
   parentElement = parentElement || this.container;
@@ -228,6 +231,25 @@ TreeView.prototype.locateElement = function(data, parentElement) {
       return li;
     }
     let ret = this.locateElement(data, li);
+    if (ret != null) {
+      return ret;
+    }
+  }
+  return null;
+};
+
+TreeView.prototype.locateNode = function(data, parentElement) {
+  parentElement = parentElement || this.container;
+  let ul = parentElement.querySelector('ul');
+  let lis = ul.querySelectorAll('li');
+
+  for (let i = 0; i < lis.length; i++) {
+    let li = lis[i];
+    let model = dom.model(li);
+    if (data[this.fieldValue] === model[this.fieldValue]) {
+      return li;
+    }
+    let ret = this.locateNode(data, li);
     if (ret != null) {
       return ret;
     }
@@ -251,6 +273,9 @@ TreeView.prototype.fetchChildren = async function(parentElement, params, level) 
   }
 };
 
+/**
+ * @deprecated
+ */
 TreeView.prototype.update = function (nodeData) {
   let ul = this.container.querySelector('ul');
   let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
@@ -265,8 +290,42 @@ TreeView.prototype.update = function (nodeData) {
   this.appendNode(li, nodeData, level + 1);
 };
 
+TreeView.prototype.updateNode = function (nodeData) {
+  let ul = this.container.querySelector('ul');
+  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
+  if (li != null) {
+    // update
+    li.querySelector('strong').innerText = nodeData[this.fieldText];
+    dom.model(li, nodeData);
+    return;
+  }
+  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
+  let level = parseInt(li.getAttribute('widget-model-level'));
+  this.appendNode(li, nodeData, level + 1);
+};
+
+TreeView.prototype.appendOrUpdateNode = function (nodeData) {
+  let node = this.locateNode(nodeData);
+  let ul = this.container.querySelector('ul');
+  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
+  if (li != null) {
+    // update
+    li.querySelector('strong').innerText = nodeData[this.fieldText];
+    dom.model(li, nodeData);
+    return;
+  }
+  li = this.container.querySelector('li[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
+  if (li == null) {
+    this.appendNode(nodeData, 0);
+    return;
+  }
+  let level = parseInt(li.getAttribute('widget-model-level'));
+  this.appendNode(nodeData, level + 1, li);
+};
+
 TreeView.prototype.render = async function(containerId, params) {
   this.container = dom.find(containerId);
+  this.container.innerHTML = '';
   let data = [];
   if (this.rootUrl) {
     data = await xhr.promise({

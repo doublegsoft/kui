@@ -196,22 +196,6 @@ ListView.prototype.remove = function(model) {
   }
 };
 
-ListView.prototype.reorder = function(event) {
-  let self = this;
-  let clicked = event.target;
-  let found = clicked;
-  while (found.tagName != 'LI') {
-    found = found.parentElement;
-  }
-
-  let model = dom.model(found);
-  if (self.onReorder) {
-    self.onReorder(model);
-  }
-  // remove dom element
-  found.remove();
-};
-
 /**
  * Appends list item dom element(s) with the given data to list view.
  *
@@ -378,6 +362,10 @@ ListView.prototype.setReorderable = function(li) {
     event.preventDefault();
   });
   ul.ondrop = event => {
+    if (this.onReorder) {
+      this.onReorder(dom.model(this.draggingElement), this.getItemIndex(this.draggingElement),
+        this.draggingElementOriginalIndex);
+    }
     this.draggingElement.style.opacity = '';
     this.draggingElement = null;
     this.clonedDraggingElement = null;
@@ -419,6 +407,7 @@ ListView.prototype.setReorderable = function(li) {
     this.draggingElement = li;
     this.draggingElement.style.opacity = "0.3";
     this.draggingElementIndex = this.getItemIndex(li);
+    this.draggingElementOriginalIndex = this.draggingElementIndex;
 
     event.dataTransfer.setData("id", li.getAttribute('data-list-item-id'));
     event.dataTransfer.setData("y", y);

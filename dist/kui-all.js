@@ -4385,6 +4385,7 @@ dialog.info2 = function (message) {
 };
 
 dialog.error = function (message) {
+  message = message.replaceAll('\n', '<br>');
   layer.open({
     type: 0,
     icon: 2,
@@ -8103,7 +8104,8 @@ utils.isExisting = (array, obj, idField) => {
       return true;
   }
   return false;
-}
+};
+
 var NO_ERRORS = 0;
 var REQUIRED_ERROR = 1;
 var FORMAT_ERROR = 2;
@@ -11977,22 +11979,6 @@ ListView.prototype.remove = function(model) {
   }
 };
 
-ListView.prototype.reorder = function(event) {
-  let self = this;
-  let clicked = event.target;
-  let found = clicked;
-  while (found.tagName != 'LI') {
-    found = found.parentElement;
-  }
-
-  let model = dom.model(found);
-  if (self.onReorder) {
-    self.onReorder(model);
-  }
-  // remove dom element
-  found.remove();
-};
-
 /**
  * Appends list item dom element(s) with the given data to list view.
  *
@@ -12159,69 +12145,19 @@ ListView.prototype.setReorderable = function(li) {
     event.preventDefault();
   });
   ul.ondrop = event => {
-    // let y = parseInt(event.dataTransfer.getData('y'));
-    // let id = event.dataTransfer.getData('id');
-    // let li = dom.ancestor(event.target, 'li');
-    // let dragged = null;
-    // for (let i = 0; i < ul.children.length; i++) {
-    //   let li = ul.children[i];
-    //   if (li.getAttribute('data-list-item-id') == id) {
-    //     dragged = li;
-    //     break;
-    //   }
-    // }
-    // let parent = li.parentNode;
-    // parent.insertBefore(dragged, li);
-    //
-
-    // this.draggingElement = null;
-
+    if (this.onReorder) {
+      this.onReorder(dom.model(this.draggingElement), this.getItemIndex(this.draggingElement),
+        this.draggingElementOriginalIndex);
+    }
     this.draggingElement.style.opacity = '';
     this.draggingElement = null;
     this.clonedDraggingElement = null;
   };
 
-  // ul.ondrag = event => {
-  //   if (!this.draggingElement) return;
-  //   let li = dom.ancestor(event.target, 'li');
-  //   let style = getComputedStyle(li);
-  //   let height = parseInt(style.height);
-  //   let layerY = event.layerY;
-  //   let clientY = event.clientY;
-  //   let ul = li.parentElement;
-  //   for (let i = 0; i < ul.children.length; i++) {
-  //     let liChild = ul.children[i];
-  //     if (liChild.offsetTop < (clientY + layerY) && (clientY + layerY) < (liChild.offsetTop + height)) {
-  //       liChild.style.background = 'lightgray';
-  //     }
-  //   }
-  // };
-
   li.setAttribute("draggable", "true");
   li.ondragover = event => {
-
     let li = dom.ancestor(event.target, 'li');
     let ul = li.parentElement;
-
-    let pageY = event.pageY;
-
-    let ulOffsetTop = parseInt(ul.offsetTop);
-    // for (let i = 0; i < ul.children.length; i++) {
-    //   let liChild = ul.children[i];
-    //   if (liChild == this.draggingElement) continue;
-    //   let rect = liChild.getBoundingClientRect();
-    //   if (rect == null) continue;
-    //   let style = getComputedStyle(liChild);
-    //   let height = parseInt(style.height);
-    //   if (rect.top < event.pageY && event.pageY < (rect.top + height)) {
-    //     if (li.nextElementSibling == null) {
-    //       ul.appendChild(this.clonedDraggingElement);
-    //     } else if (li.nextElementSibling != this.draggingElement) {
-    //       ul.insertBefore(this.clonedDraggingElement, li.nextElementSibling);
-    //     }
-    //     break;
-    //   }
-    // }
     if (li == this.draggingElement) {
       return;
     }
@@ -12254,6 +12190,7 @@ ListView.prototype.setReorderable = function(li) {
     this.draggingElement = li;
     this.draggingElement.style.opacity = "0.3";
     this.draggingElementIndex = this.getItemIndex(li);
+    this.draggingElementOriginalIndex = this.draggingElementIndex;
 
     event.dataTransfer.setData("id", li.getAttribute('data-list-item-id'));
     event.dataTransfer.setData("y", y);
@@ -13732,7 +13669,7 @@ PaginationTable.prototype.pagination = function () {
   let ul = $('<ul class="pagination mb-0 mt-2 ml-auto"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
-  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
+  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('首页');
   a.html('<i class="material-icons">first_page</i>');
@@ -13746,7 +13683,7 @@ PaginationTable.prototype.pagination = function () {
   }
 
   this.prevPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('上一页');
   a.html('<i class="material-icons">chevron_left</i>');
@@ -13766,7 +13703,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(li);
 
   this.nextPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('下一页');
   a.html('<i class="material-icons">chevron_right</i>');
@@ -13777,7 +13714,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(this.nextPage);
 
   this.lastPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14"  style="padding-bottom: 2px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14"  style="padding-bottom: 2px; line-height: 34px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('末页');
   a.html('<i class="material-icons">last_page</i>');
@@ -15751,6 +15688,7 @@ function TreeView(opts) {
 
   this.isNodeEditable = opts.isNodeEditable;
   this.isNodeRemovable = opts.isNodeRemovable;
+  this.isNodeAppendable = opts.isNodeAppendable;
 }
 
 TreeView.prototype.createNodeElement = function(data, level) {
@@ -15844,7 +15782,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonEdit.remove();
   }
-  if (!this.isNodeEditable || !this.isNodeEditable(model))
+  if (!this.isNodeEditable || !this.isNodeEditable(ret, model))
     buttonEdit.remove();
   if (this.onRemoveNode) {
     dom.model(buttonDelete, model);
@@ -15858,7 +15796,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonDelete.remove();
   }
-  if (!this.isNodeEditable || !this.isNodeEditable(model))
+  if (!this.isNodeRemovable || !this.isNodeRemovable(ret, model))
     buttonDelete.remove();
 
   if (this.onAddNode) {
@@ -15874,6 +15812,8 @@ TreeView.prototype.createNodeElement = function(data, level) {
   } else {
     buttonAdd.remove();
   }
+  if (!this.isNodeAppendable || !this.isNodeAppendable(ret, model))
+    buttonAdd.remove();
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
       ev.preventDefault();
@@ -15940,7 +15880,7 @@ TreeView.prototype.insertNode = function(data, parentElement) {
 /**
  * 根据数据定位树视图中的元素。
  *
- * @private
+ * @deprecated
  */
 TreeView.prototype.locateElement = function(data, parentElement) {
   parentElement = parentElement || this.container;
@@ -15954,6 +15894,25 @@ TreeView.prototype.locateElement = function(data, parentElement) {
       return li;
     }
     let ret = this.locateElement(data, li);
+    if (ret != null) {
+      return ret;
+    }
+  }
+  return null;
+};
+
+TreeView.prototype.locateNode = function(data, parentElement) {
+  parentElement = parentElement || this.container;
+  let ul = parentElement.querySelector('ul');
+  let lis = ul.querySelectorAll('li');
+
+  for (let i = 0; i < lis.length; i++) {
+    let li = lis[i];
+    let model = dom.model(li);
+    if (data[this.fieldValue] === model[this.fieldValue]) {
+      return li;
+    }
+    let ret = this.locateNode(data, li);
     if (ret != null) {
       return ret;
     }
@@ -15977,6 +15936,9 @@ TreeView.prototype.fetchChildren = async function(parentElement, params, level) 
   }
 };
 
+/**
+ * @deprecated
+ */
 TreeView.prototype.update = function (nodeData) {
   let ul = this.container.querySelector('ul');
   let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
@@ -15991,8 +15953,42 @@ TreeView.prototype.update = function (nodeData) {
   this.appendNode(li, nodeData, level + 1);
 };
 
+TreeView.prototype.updateNode = function (nodeData) {
+  let ul = this.container.querySelector('ul');
+  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
+  if (li != null) {
+    // update
+    li.querySelector('strong').innerText = nodeData[this.fieldText];
+    dom.model(li, nodeData);
+    return;
+  }
+  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
+  let level = parseInt(li.getAttribute('widget-model-level'));
+  this.appendNode(li, nodeData, level + 1);
+};
+
+TreeView.prototype.appendOrUpdateNode = function (nodeData) {
+  let node = this.locateNode(nodeData);
+  let ul = this.container.querySelector('ul');
+  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
+  if (li != null) {
+    // update
+    li.querySelector('strong').innerText = nodeData[this.fieldText];
+    dom.model(li, nodeData);
+    return;
+  }
+  li = this.container.querySelector('li[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
+  if (li == null) {
+    this.appendNode(nodeData, 0);
+    return;
+  }
+  let level = parseInt(li.getAttribute('widget-model-level'));
+  this.appendNode(nodeData, level + 1, li);
+};
+
 TreeView.prototype.render = async function(containerId, params) {
   this.container = dom.find(containerId);
+  this.container.innerHTML = '';
   let data = [];
   if (this.rootUrl) {
     data = await xhr.promise({
@@ -21260,7 +21256,6 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         changed[prop.name] = select.value;
         self.notifyPropertyChangedListeners(changed);
       });
-
     } else if (prop.input == 'number') {
       //
       // 【数字】
@@ -21350,6 +21345,91 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         changed[prop.name] = input.checked;
         self.notifyPropertyChangedListeners(changed);
       });
+    } else if (prop.input == 'tileselect') {
+      let templateData = {
+        tileStyle: 'position: relative; left: 40px; width: 360px; -moz-transform: scale(0.6); zoom: 0.6;'
+      };
+      let input = dom.templatize(`
+        <div class="dropdown show" style="display: unset;">
+          <a class="btn-link text-white dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择瓦片</a>
+          <div class="dropdown-menu" style="width: 360px;">
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center" style="padding: 8px 16px;">      
+                <img class="avatar" src="/img/placeholder/64.png">      
+                <div class="pl-2">        
+                  <strong>主要文本</strong>        
+                  <div class="small text-muted">次要文本</div>      
+                </div>      
+                <div class="font-13 tag-success pointer position-relative ml-auto" style="top: 4px;">        
+                  <span>当前状态</span>        
+                  <div class="tag-success-after"></div>      
+                </div>    
+              </div>
+            </a>
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center" style="padding: 8px 16px;">
+                <img class="avatar circle-64" src="img/user.png">
+                <div class="pl-2 full-width">
+                  <div>
+                    <strong>蒂安娜</strong>
+                    <span class="float-right">1999-12-12</span>
+                  </div>
+                  <div class="small text-muted">安娜乐队贝斯手，毕业于伯克利音乐学院。出生在南加州的一个中产家庭，自幼跟随父亲学习古典音乐，尤其对低音乐器十分痴迷。</div>
+                  <div class="d-flex">
+                    <div>
+                      <i class="fas fa-fan mr-1"></i>1024
+                    </div>
+                    <div class="ml-auto">
+                      <i class="fas fa-credit-card mr-1"></i>1024
+                    </div>
+                    <div class="ml-auto">
+                      <i class="fas fa-user-friends mr-1"></i>1024
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center"
+                   style="padding: 8px 16px;">
+                <div class="pl-2">
+                  <strong>主要文本</strong>
+                  <div class="small text-muted">次要文本</div>
+                </div>
+                <img class="avatar ml-auto" src="img/user.png">
+              </div>
+            </a>
+            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
+              <div class="d-flex align-items-center">        
+                <div class="bg-gradient-primary mr-2">          
+                  <img src="/img/placeholder/64.png" style="width:56px; height: 56px">        
+                </div>        
+                <div>          
+                  <div class="text-value text-primary font-16">标题</div>          
+                  <div class="text-muted font-weight-bold small">这里是简介</div>        
+                </div>      
+              </div>
+            </a>
+          </div>
+        </div>
+      `, templateData);
+      labelProp.append(input);
+      let tile = dom.templatize(`
+        <div style="position: relative; left: -100px; min-height: 64px; width: 400px; 
+                    -moz-transform: scale(0.6);  zoom: 0.6; margin-top: 12px;"
+             property-model-name="{{name}}">
+        </div>
+      `, prop);
+      divProp.appendChild(tile);
+      let links = input.querySelectorAll('a.dropdown-item');
+      for (let i = 0; i < links.length; i++) {
+        links[i].onclick = ev => {
+          tile.innerHTML = links[i].innerHTML;
+          let emit = {};
+          emit[prop.name] = tile.innerHTML;
+          this.notifyPropertyChangedListeners(emit);
+        };
+      }
     } else if (prop.display) {
       //
       // 【自定义】
@@ -21368,9 +21448,9 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       `);
       labelProp.appendChild(plus);
       let ul = dom.element(`
-          <ul class="list-group properties-container">
-          </ul>
-        `);
+        <ul class="list-group properties-container">
+        </ul>
+      `);
       ul.setAttribute('property-model-name', prop.name);
       ul.setAttribute('properties-model', JSON.stringify(prop.properties));
       divProp.append(ul);
@@ -21428,7 +21508,9 @@ PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, v
   this.renderProperties(li, propertiesModel);
   let buttons = dom.element(`
     <div class="full-width d-flex mt-2">
-      <a class="pointer text-danger ml-auto font-18"><span class="material-icons">highlight_off</span></a>
+      <a class="pointer text-danger ml-auto font-18">
+        <span class="material-icons">highlight_off</span>
+      </a>
     </div>
   `);
   // 删除数组属性的某一项
@@ -21456,6 +21538,7 @@ PropertiesEditor.prototype.getPropertiesValues = function () {
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
+  let divs = container.querySelectorAll('div[property-model-name]')
   let ret = {};
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i];
@@ -21469,10 +21552,16 @@ PropertiesEditor.prototype.getPropertiesValues = function () {
     let dataValue = select.value;
     ret[dataId] = dataValue;
   }
-  for (let i = 0; i < inputs.length; i++) {
+  for (let i = 0; i < textareas.length; i++) {
     let textarea = textareas[i];
     let dataId = textarea.getAttribute('property-model-name');
     let dataValue = textarea.textContent;
+    ret[dataId] = dataValue;
+  }
+  for (let i = 0; i < divs.length; i++) {
+    let div = divs[i];
+    let dataId = div.getAttribute('property-model-name');
+    let dataValue = div.innerHTML;
     ret[dataId] = dataValue;
   }
   return ret;
@@ -21483,6 +21572,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
+  let divs = container.querySelectorAll('div[property-model-name]');
   let uls = container.querySelectorAll('ul[properties-model]');
 
   for (let i = 0; i < inputs.length; i++) {
@@ -21513,6 +21603,12 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     let dataId = textarea.getAttribute('property-model-name');
     if (data[dataId])
       textarea.textContent = data[dataId];
+  }
+  for (let i = 0; i < divs.length; i++) {
+    let div = divs[i];
+    let dataId = div.getAttribute('property-model-name');
+    if (data[dataId])
+      div.innerHTML = data[dataId];
   }
 
   // 特殊列表显示
@@ -21961,6 +22057,13 @@ QuestionnaireDesigner.prototype.edit = function(question) {
     return options.inverse(this);
   });
   let questionId = question.id;
+  question.options = [];
+  for (let i = 0; i < question.values.length; i++) {
+    question.options.push({
+      value: question.values[i],
+      score: question.scores ? question.scores[i] : '0',
+    })
+  }
   let el = dom.templatize(`
     <div>
     <div widget-id="dialogQuestionEdit" class="card border-less">
@@ -21987,14 +22090,14 @@ QuestionnaireDesigner.prototype.edit = function(question) {
                 </a>
               </label>
               <ul class="list-group">
-                {{#each values}}
+                {{#each options}}
                 <li class="list-group-item d-flex pt-0 pb-0">
                   <input onfocus="QuestionnaireDesigner.instance.onCellFocus(this);" 
                          onkeydown="QuestionnaireDesigner.instance.onCellKeyPress(event);"
-                         name="values" style="border: none; height=100%; width: 100%" value="{{this}}">
+                         name="values" style="border: none; height=100%; width: 100%" value="{{value}}">
                   <input onfocus="QuestionnaireDesigner.instance.onCellFocus(this);" 
                          onkeydown="QuestionnaireDesigner.instance.onCellKeyPress(event);"
-                         name="scores" style="border: none; width: 50px" value="0">
+                         name="scores" style="border: none; width: 50px" value="{{score}}">
                   <a class="btn text-danger line-height-32" onclick="this.parentElement.remove();">
                     <span class="material-icons">highlight_off</span>
                   </a>
@@ -23835,7 +23938,7 @@ TestSheet.prototype.totalize = function() {
       }
     }
     if (!isNaN(total) && calculated === true) {
-      trTotal.cells[i + 1].innerText = total;
+      trTotal.cells[i + 1].innerText = total.toFixed(2);
     }
   }
 };

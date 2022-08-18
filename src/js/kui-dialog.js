@@ -39,6 +39,7 @@ dialog.info2 = function (message) {
 };
 
 dialog.error = function (message) {
+  message = message.replaceAll('\n', '<br>');
   layer.open({
     type: 0,
     icon: 2,
