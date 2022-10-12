@@ -1,0 +1,45 @@
+<div id="pagePersonalMain" class="page">
+  <div widget-id="widgetAvatar" class="widget">
+    <div class="d-flex full-width height-200">
+      <img class="avatar avatar-128 m-auto" src="img/user.png">
+    </div>
+  </div>
+  <div widget-id="widgetNavigator" class="widget">
+    <ul class="list-group">
+      <li class="list-group-item list-group-item-action d-flex">
+        <strong class="font-20">实名认证</strong>
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+      </li>
+      <li class="list-group-item list-group-item-action d-flex">
+        <strong class="font-20">个人信息</strong>
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+      </li>
+      <li class="list-group-item list-group-item-action d-flex">
+        <strong class="font-20 text-danger">退出登录</strong>
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+function PagePersonalMain() {
+  this.page = dom.find('#pagePersonalMain');
+  this.widgetAvatar = dom.find('[widget-id=widgetAvatar]', this.page);
+  this.widgetNavigator = dom.find('[widget-id=widgetNavigator]', this.page);
+}
+
+PagePersonalMain.prototype.initialize = async function (params) {
+  stdbiz.init(this);
+};
+
+PagePersonalMain.prototype.destroy = function () {
+  delete pagePersonalMain;
+};
+
+PagePersonalMain.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pagePersonalMain = new PagePersonalMain();
+</script>

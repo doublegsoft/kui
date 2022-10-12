@@ -1,5 +1,107 @@
 if (typeof kuim === 'undefined') kuim = {};
 
+kuim = {
+  routedPages: [],
+  presentPageObj: null,
+};
+
+kuim.navigateTo = async function (url, opt, clear) {
+  if (typeof clear === "undefined") clear = false;
+  let main = document.querySelector('main');
+
+  if (kuim.presentPageObj) {
+    kuim.presentPageObj.page.classList.remove('in');
+    kuim.presentPageObj.page.classList.add('out');
+  }
+
+  setTimeout(async () => {
+    if (kuim.presentPageObj) {
+      kuim.presentPageObj.page.parentElement.style.display = 'none';
+    }
+    if (kuim.presentPageObj && clear !== false) {
+      kuim.presentPageObj.page.parentElement.remove();
+      if (kuim.presentPageObj.destroy) {
+        kuim.presentPageObj.destroy();
+      }
+      delete kuim.presentPageObj;
+    }
+    let html = await xhr.asyncGet({
+      url: url,
+    }, 'GET');
+    kuim.reload(main, url, html, opt);
+  }, 500);
+};
+
+kuim.navigateBack = function (opt) {
+  let main = document.querySelector('main');
+  let latest = main.children[main.children.length - 2];
+
+  kuim.presentPageObj.page.classList.remove('in');
+  kuim.presentPageObj.page.classList.add('out');
+
+  setTimeout(() => {
+    kuim.presentPageObj.page.parentElement.remove();
+    if (kuim.presentPageObj.destroy) {
+      kuim.presentPageObj.destroy();
+    }
+    delete kuim.presentPageObj;
+
+    latest.style.display = '';
+    kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
+    kuim.presentPageObj.page.classList.remove('out');
+    kuim.presentPageObj.page.classList.add('in');
+
+    kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
+      latest.getAttribute('kuim-page-icon'));
+  }, 500 /*同CSS中的动画效果配置时间一致*/);
+};
+
+kuim.reload = function (main, url, html, opt) {
+  let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
+  let range = document.createRange();
+  let fragment = range.createContextualFragment(html);
+  let prev = dom.find('[id^=page]', main);
+  fragmentContainer.appendChild(fragment);
+  let page = dom.find('[id^=page]', fragmentContainer);
+  let pageId = page.getAttribute('id');
+
+  main.appendChild(fragmentContainer);
+
+  fragmentContainer.setAttribute('kuim-page-id', pageId);
+  fragmentContainer.setAttribute('kuim-page-url', url);
+  fragmentContainer.setAttribute('kuim-page-title', opt.title);
+  fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+
+  kuim.presentPageObj = window[pageId];
+  kuim.presentPageObj.page.classList.add('in');
+
+  let params = utils.getParameters(url);
+  kuim.presentPageObj.show(params);
+
+  kuim.setTitleAndIcon(opt.title, opt.icon);
+  if (opt.success) {
+    opt.success();
+  }
+};
+
+kuim.setTitleAndIcon = function(title, icon) {
+  let bottomDiv = dom.find('.bottom-bar');
+  let titleDiv = dom.find('header h1.title');
+  titleDiv.innerText = title;
+  let iconDiv = dom.find('header div.left');
+  if (icon) {
+    iconDiv.innerHTML = icon;
+    bottomDiv.style.display = '';
+    iconDiv.onclick = (ev) => {}
+  } else {
+    iconDiv.innerHTML = '<i class="fas fa-arrow-left text-white button icon"></i>';
+    bottomDiv.style.display = 'none';
+    iconDiv.onclick = (ev) => {
+      kuim.navigateBack()
+    }
+  }
+};
+
 kuim.select = async function(opt) {
   let rows = await xhr.promise({
     url: opt.url,

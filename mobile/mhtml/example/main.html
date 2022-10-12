@@ -1,0 +1,36 @@
+<div id="pageExampleMain" class="mobile page" role="nav">
+  <ul class="list-group">
+    <li widget-id="buttonFormLayout" class="list-group-item list-group-item-action d-flex">
+      <strong class="font-20">编辑表单</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    </li>
+    <li class="list-group-item list-group-item-action d-flex">
+      <strong class="font-20">只读表单</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    </li>
+    <li class="list-group-item list-group-item-action d-flex">
+      <strong class="font-20">待分配</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    </li>
+  </ul>
+</div>
+<script>
+function PageExampleMain() {
+  this.page = dom.find('#pageExampleMain');
+  this.buttonFormLayout = dom.find('[widget-id=buttonFormLayout]', this.page);
+}
+
+PageExampleMain.prototype.initialize = async function (params) {
+  dom.bind(this.buttonFormLayout, 'click', ev => {
+    kuim.navigateTo('mhtml/example/formlayout.html', {
+      title: '编辑表单',
+    });
+  });
+};
+
+PageExampleMain.prototype.show = function (params) {
+  this.initialize(params)
+};
+
+pageExampleMain = new PageExampleMain();
+</script>

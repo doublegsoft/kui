@@ -1,0 +1,19 @@
+{
+  "home": {
+    "text": "首页",
+    "icon": "nav-icon icon-speedometer",
+    "url": "javascript:ajax.view('dashboard.html', 'container');"
+  },
+  "groups": [{
+    "title": "应用示例",
+    "menus": [{
+      "text": "在院患者",
+      "icon": "nav-icon icon-note",
+      "url": "javascript:kuit.view({url: 'thtml/application/patient/list.html', containerId: 'container', title: '在院患者'});"
+    },{
+      "text": "营养量表",
+      "icon": "nav-icon icon-note",
+      "url": "javascript:kuit.view({url: 'thtml/component/data-sheet.html', containerId: 'container', title: '营养量表'});"
+    }]
+  }]
+}

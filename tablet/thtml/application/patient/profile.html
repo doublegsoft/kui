@@ -1,0 +1,86 @@
+<div id="pagePatientProfile" class="page">
+  <div class="card">
+    <div widget-id="widgetMain" class="card-body">
+      <div class="row">
+        <div widget-id="widgetPatientProfile" class="col-md-3 full-height p-0">
+          <div widget-id="widgetPatientPortrait" class="container mt-2 d-flex justify-content-center">
+            <div class="card p-3 mb-0" style="background: var(--color-primary); color: var(--color-white);">
+              <div class=" image d-flex flex-column justify-content-center align-items-center">
+                <button class="btn btn-secondary"><img src="https://i.imgur.com/wvxPV9S.png" height="100" width="100"/>
+                </button>
+                <span class="name mt-3">Eleanor Pena</span> <span class="idd">@eleanorpena</span>
+                <div class="d-flex flex-row justify-content-center align-items-center gap-2"><span class="idd1">Oxc4c16a645_b21a</span>
+                  <span><i class="fa fa-copy"></i></span></div>
+                <div class="d-flex flex-row justify-content-center align-items-center mt-3"><span
+                    class="number">1069 <span class="follow">Followers</span></span></div>
+                <div class=" d-flex mt-2">
+                  <button class="btn1 btn-dark">Edit Profile</button>
+                </div>
+                <div class="text mt-3"><span>Eleanor Pena is a creator of minimalistic x bold graphics and digital artwork.<br><br> Artist/ Creative Director by Day #NFT minting@ with FND night. </span>
+                </div>
+                <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center"><span><i
+                    class="fa fa-twitter"></i></span> <span><i class="fa fa-facebook-f"></i></span> <span><i
+                    class="fa fa-instagram"></i></span> <span><i class="fa fa-linkedin"></i></span></div>
+                <div class=" px-2 rounded mt-4 date "><span class="join">Joined May,2021</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div widget-id="widgetPatientDetails" class="col-md-9 full-height">
+          <div widget-id="widgetNavigatorDetail" class="nav nav-tabs position-relative"></div>
+          <div widget-id="widgetContentDetail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PagePatientProfile() {
+  this.page = dom.find('#pagePatientProfile');
+  this.widgetMain = dom.find('[widget-id=widgetMain]', this.page);
+  this.widgetPatientProfile = dom.find('[widget-id=widgetPatientProfile]', this.page);
+  this.widgetPatientDetails = dom.find('[widget-id=widgetPatientDetails]', this.page);
+  this.widgetPatientPortrait = dom.find('[widget-id=widgetPatientPortrait]', this.page);
+}
+
+PagePatientProfile.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PagePatientProfile.prototype.initialize = async function (params) {
+  dom.height2(this.widgetPatientProfile, 20);
+  dom.height2(this.widgetPatientDetails, 20);
+
+  dom.height2(this.widgetPatientPortrait, 28);
+
+  this.tabDetails = new Tabs({
+    navigatorId: '[widget-id=widgetNavigatorDetail]',
+    contentId: '[widget-id=widgetContentDetail]',
+    tabActiveClass: 'active',
+    tabs: [{
+      id: 'tabIndicator',
+      text: '综合指标',
+      url: 'todo',
+    },{
+      id: 'tabBase',
+      text: '基础资料',
+      url: 'todo',
+    },{
+      id: 'tabOutpatient',
+      text: '就诊记录',
+      url: 'todo',
+    },{
+      id: 'tabReport',
+      text: '检查报告',
+      url: 'todo',
+    }],
+  });
+  this.tabDetails.render();
+};
+
+PagePatientProfile.prototype.destroy = async function (params) {
+  console.log('destroy pagePatientProfile');
+};
+
+pagePatientProfile = new PagePatientProfile();
+</script>

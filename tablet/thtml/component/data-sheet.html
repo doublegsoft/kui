@@ -1,0 +1,78 @@
+<div id="pageComponentDataSheet" class="page">
+  <div class="card">
+    <div class="card-header px-3">
+      <i class="position-relative fas fa-table" style="top: 0px;"></i>
+      <strong>营养量表</strong>
+      <div class="card-header-actions">
+      </div>
+    </div>
+    <div class="card-body">
+      <div widget-id="widgetComponentDataSheet" class="col-md-12 pl-0 pr-0" style="height: calc(100% - 20px)"></div>
+    </div>
+  </div>
+</div>
+<script>
+function PageComponentDataSheet() {
+  this.page = dom.find('#pageComponentDataSheet');
+  this.widgetComponentDataSheet = dom.find('[widget-id=widgetComponentDataSheet]', this.page);
+}
+
+PageComponentDataSheet.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PageComponentDataSheet.prototype.initialize = async function (params) {
+  this.dataSheet = new DataSheet({
+    columns: [{
+      title: 'A',
+      children: [{
+        title: 'A1'
+      },{
+        title: 'A2'
+      },{
+        title: 'A3'
+      }]
+    },{
+      title: 'B',
+      children: [{
+        title: 'B1',
+      },{
+        title: 'B2'
+      }]
+    }],
+    rowHeaders: [{
+      title: '1',
+      children: [{
+        title: '11'
+      },{
+        title: '12'
+      },{
+        title: '13'
+      }]
+    },{
+      title: '2',
+      children: [{
+        title: '21'
+      },{
+        title: '22'
+      },{
+        title: '23'
+      }]
+    },{
+      title: '3',
+      children: [{
+        title: '31'
+      },{
+        title: '32'
+      }]
+    }]
+  });
+  this.dataSheet.render(this.widgetComponentDataSheet);
+};
+
+PageComponentDataSheet.prototype.destroy = async function (params) {
+  console.log('destroy pageComponentDataSheet');
+};
+
+pageComponentDataSheet = new PageComponentDataSheet();
+</script>

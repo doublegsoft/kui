@@ -1,0 +1,175 @@
+<header class="app-header navbar">
+  <a class="navbar-brand" href="#">
+    <img widget-id="imageLogo" class="navbar-brand-full" src="" width="200" height="45">
+  </a>
+  <button widget-id="buttonToggleMenu" class="navbar-toggler" type="button">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <ol widget-id="navPage" class="breadcrumb p-0 mb-0 ml-5">
+  </ol>
+  <ul class="nav navbar-nav ml-auto">
+    <li class="nav-item d-md-down-none">
+      <a class="nav-link" href="#">
+        <i id="alarm_notification" class="icon-bell"></i>
+      </a>
+      <div class="demo">
+      </div>
+    </li>
+    <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-list"></i></a> </li>
+    <li class="nav-item d-md-down-none"> <a class="nav-link" href="#"><i class="icon-location-pin"></i></a> </li>
+    <li class="nav-item dropdown mr-3">
+      <a class="nav-link dropdown-toggle nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+        <img id="avatar" src="/img/avatars/2.jpg" class="img-avatar">所罗门
+      </a>
+      <div class="dropdown-menu dropdown-menu-right">
+        <div class="dropdown-header text-center">
+          <strong>账户信息</strong>
+        </div>
+        <a class="dropdown-item" href="#">
+          <i class="fa fa-bell-o"></i>新消息<span class="badge badge-info">42</span>
+        </a>
+        <a class="dropdown-item" href="#">
+          <i class="fa fa-tasks"></i>工作任务
+          <span class="badge badge-danger">42</span>
+        </a>
+        <div class="dropdown-header text-center">
+          <strong>设置</strong>
+        </div>
+        <a class="dropdown-item" href="javascript:gotoPersonalInformation();">
+          <i class="fa fa-user"></i>个人信息
+        </a>
+        <a class="dropdown-item" href="javascript:changePassword();">
+          <i class="fa fa-file"></i>修改密码
+        </a>
+        <div class="divider"></div>
+        <a class="dropdown-item" href="javascript:logout()">
+          <i class="fa fa-lock"></i>退出
+        </a>
+      </div>
+    </li>
+  </ul>
+</header>
+<main class="d-flex">
+  <div id="container" style="overflow-y: auto; overflow-x: hidden;"></div>
+  <div id="sidebar" class="sidebar">
+    <nav id="sidemenu" class="sidebar-nav ps ps--active-y"></nav>
+  </div>
+  <div id="overlay" class="background-shade" style="display: none;"></div>
+  <div class="rightbar">hello, this is right bar!</div>
+</main>
+
+<script id="sidemenu-template" type="text/x-handlebars-template">
+  <ul class="nav">
+    {{#each groups}}
+    <!--    <li class="nav-title">{{title}}</li>-->
+    {{#each children}}
+    {{#if entryPoint}}
+    <li class="nav-item">
+      <a class="nav-link" href="{{entryPoint}}">
+        <span style="padding-left: 16px"></span>
+        <i class="{{icon}}"></i>{{functionName}}
+      </a>
+    </li>
+    {{else}}
+    <li class="nav-item nav-dropdown">
+      <a class="nav-link nav-dropdown-toggle" href="#">
+        <i class="{{icon}}"></i>{{text}}
+      </a>
+      <ul class="nav-dropdown-items">
+        {{#each items}}
+        <li class="nav-item">
+          <a class="nav-link" href="{{url}}">
+            <span style="padding-left: 16px"></span>
+            <i class="{{icon}}"></i>{{text}}
+          </a>
+        </li>
+        {{/each}}
+      </ul>
+    </li>
+    {{/if}}
+    {{/each}}
+    {{/each}}
+  </ul>
+</script>
+
+
+<script>
+function PageMain() {
+
+}
+
+PageMain.prototype.initialize = async function (params) {
+  let main = document.querySelector('main');
+  let sidebar = dom.find('#sidebar');
+  let rightbar = dom.find('.rightbar');
+  let overlay = dom.find('#overlay');
+  let container = dom.find('#container');
+  let logo = dom.find('[widget-id=imageLogo]');
+  let buttonToggleMenu = dom.find('[widget-id=buttonToggleMenu]');
+  this.navPage = dom.find('[widget-id=navPage]');
+
+  logo.setAttribute('src', '/img/logo.png');
+
+  dom.height(container, 0, document.body);
+  container.style.overflow = 'hidden';
+
+  buttonToggleMenu.ontouchend =  ev => {
+    sidebar.classList.remove('out');
+    sidebar.classList.add('in');
+    overlay.style.display = '';
+
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+
+  overlay.ontouchend = ev => {
+    if (sidebar.classList.contains('in')) {
+      sidebar.classList.remove('in');
+      sidebar.classList.add('out');
+      overlay.style.display = 'none';
+    }
+    if (rightbar.classList.contains('in')) {
+      rightbar.classList.remove('in');
+      rightbar.classList.add('out');
+      overlay.style.display = 'none';
+    }
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+
+  rightbar.onclick = ev => {
+    ev.preventDefault();
+    ev.stopPropagation();
+  };
+
+  main.style.height = (window.innerHeight - 0) + 'px';
+
+  let resp = await xhr.asyncRequest({
+    url: 'thtml/menu.json',
+    data: {
+      device: 'TABLET',
+    }
+  }, 'GET');
+  let source = document.getElementById('sidemenu-template').innerHTML;
+  let template = Handlebars.compile(source);
+  let html = template(resp);
+  $('#sidemenu').append(html);
+  $('#sidemenu .nav-link').on('click', function(e) {
+    sidebar.classList.remove('in');
+    sidebar.classList.add('out');
+    overlay.style.display = 'none';
+  });
+
+  // 用户头像
+  if (window.user && window.user.avatar) {
+    dom.find('#header [widget-id=avatar]').src = window.user.avatar;
+  }
+};
+
+PageMain.prototype.show = async function (params) {
+  this.initialize(params);
+};
+
+pageMain = new PageMain();
+
+</script>

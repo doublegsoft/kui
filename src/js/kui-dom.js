@@ -773,8 +773,44 @@ dom.height = function(selector, offset, parent) {
   // if (ancestor == null) {
   //   paddingBottom = 0;
   // }
-
   element.style.height = (parent.clientHeight - offsetTop - offset - paddingBottom) + 'px';
+  element.style.overflowY = 'auto';
+};
+
+dom.height2 = function(selector, offset, parent) {
+  offset = offset || 0;
+  if (typeof parent === 'undefined') {
+    parent = dom.find('#container');
+  }
+  parent = parent || document.body;
+  let element = null;
+  if (typeof selector === 'string') {
+    element = document.querySelector(selector);
+  } else {
+    element = selector;
+  }
+  let offsetTop = dom.top(element);
+  let computedStyle = getComputedStyle(parent,null);
+
+  let paddingTop = parseInt(computedStyle.getPropertyValue('padding-top'));
+  let paddingBottom = parseInt(computedStyle.getPropertyValue('padding-bottom'));
+
+  computedStyle = getComputedStyle(element,null);
+  let borderTopWidth = parseInt(computedStyle.getPropertyValue('border-top-width'));
+  let borderBottomWidth = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
+  let marginTop = parseInt(computedStyle.getPropertyValue('border-top-width'));
+  let marginBottom = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
+  element.style.marginBottom = '0px';
+  // let ancestor = dom.ancestor(element, 'div', 'full');
+  // if (ancestor == null) {
+  //   paddingBottom = 0;
+  // }
+  element.style.height = (parent.clientHeight
+    - paddingTop - paddingBottom
+    - borderTopWidth - borderBottomWidth
+    - marginTop - marginBottom
+    - offset
+  ) + 'px';
   element.style.overflowY = 'auto';
 };
 

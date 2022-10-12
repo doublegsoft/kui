@@ -164,6 +164,16 @@ xhr.chain = function(opts) {
   xhr.promise(xhrOpts, then);
 };
 
+xhr.asyncGet = function(xhrOpt, error) {
+  return new Promise(function(resolve, reject) {
+    xhrOpt.success = function (resp) {
+      resolve(resp);
+    };
+    xhrOpt.error = error;
+    xhr.get(xhrOpt);
+  });
+};
+
 xhr.promise = function(xhrOpt, error) {
   return new Promise(function(resolve, reject) {
     xhrOpt.success = function (resp) {
@@ -172,6 +182,40 @@ xhr.promise = function(xhrOpt, error) {
         if (error) error(resp.error);
         return;
       }
+      resolve(resp.data);
+    };
+    xhrOpt.error = error;
+    xhr.post(xhrOpt);
+  });
+};
+
+xhr.longpromise = function(xhrOpt, error) {
+  let container = xhrOpt.container || dom.find('#container');
+  let tooltip = xhrOpt.tooltip || '操作处理中...';
+  let pageLoading = dom.element(`
+    <div class="page-loading hide">
+      <div class="ring">${tooltip}
+        <span></span>
+      </div>
+    </div>
+  `);
+  container.appendChild(pageLoading);
+  pageLoading.classList.remove('hide');
+  return new Promise(function(resolve, reject) {
+    xhrOpt.success = function (resp) {
+      if (resp.error) {
+        setTimeout(() => {
+          pageLoading.classList.add('hide');
+          pageLoading.remove();
+        }, 600);
+        dialog.error(resp.error.message);
+        if (error) error(resp.error);
+        return;
+      }
+      setTimeout(() => {
+        pageLoading.classList.add('hide');
+        pageLoading.remove();
+      }, 1200);
       resolve(resp.data);
     };
     xhrOpt.error = error;

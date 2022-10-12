@@ -1,0 +1,8 @@
+{
+  "groups": [{
+    "children": [{
+      "entryPoint": "javascript:kuit.view({url: 'thtml/juno/mn/patient/list.html', containerId: 'container', title: '在院患者'});",
+      "functionName": "在院患者"
+    }]
+  }]
+}

@@ -27,6 +27,9 @@ Tabs.prototype.render = function() {
   this.content.innerHTML = '';
   this.navigator.innerHTML = '';
 
+  this.slider = dom.element('<div class="slider"></div>');
+  this.navigator.appendChild(this.slider);
+
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
     let nav = dom.templatize(`
@@ -53,7 +56,8 @@ Tabs.prototype.render = function() {
       }
 
       // 激活现在点击的页签及内容
-      nav.classList.add(self.tabActiveClass);
+      self.activate(nav);
+
       if (this.autoClear === true) {
         // 只有在懒加载情况下，设置自动清除内容才有效
         this.content.innerHTML = '';
@@ -75,7 +79,7 @@ Tabs.prototype.render = function() {
     // 激活默认页签及内容
     if (self.lazy === true) {
       if (idx == 0) {
-        nav.classList.add(this.tabActiveClass);
+        self.activate(nav);
         if (tab.onClicked) {
           tab.onClicked(ev);
         } else {
@@ -84,7 +88,7 @@ Tabs.prototype.render = function() {
       }
     } else {
       if (idx == 0) {
-        nav.classList.add(this.tabActiveClass);
+        self.activate(nav);
         if (tab.onClicked) {
           tab.onClicked(ev);
         } else {
@@ -97,7 +101,12 @@ Tabs.prototype.render = function() {
           self.loadPage(tab.id, tab.url, true, tab.success);
         }
       }
-
     }
   });
+};
+
+Tabs.prototype.activate = function (nav) {
+  nav.classList.add(this.tabActiveClass);
+  this.slider.style.width = nav.clientWidth + 'px';
+  this.slider.style.left = nav.offsetLeft + 'px';
 };

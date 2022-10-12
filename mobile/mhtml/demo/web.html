@@ -1,0 +1,18 @@
+<div id="pageDemoWeb" class="mobile page">
+  <iframe src="https://www.baidu.com" frameborder="0" width="100%" height="100%"></iframe>
+</div>
+<script>
+function PageDemoWeb() {
+  this.page = dom.find('#pageDemoWeb');
+}
+
+PageDemoWeb.prototype.initialize = async function (params) {
+
+};
+
+PageDemoWeb.prototype.show = function (params) {
+  this.initialize(params)
+};
+
+pageDemoWeb = new PageDemoWeb();
+</script>

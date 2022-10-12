@@ -10,7 +10,7 @@ utils.append = function (container, html, empty) {
   empty = empty || false;
   let range = document.createRange();
   let fragment = range.createContextualFragment(html);
-  if (empty)
+  if (empty !== false)
     container.innerHTML = '';
   container.appendChild(fragmentContainer);
   fragmentContainer.appendChild(fragment);

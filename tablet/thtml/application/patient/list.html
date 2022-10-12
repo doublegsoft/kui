@@ -1,0 +1,44 @@
+<div id="pagePatientList" class="page">
+  <div class="card">
+    <div class="card-header px-3">
+      <i class="position-relative fas fa-table" style="top: 0px;"></i>
+      <strong>在院患者</strong>
+      <div class="card-header-actions">
+      </div>
+    </div>
+    <div class="card-body">
+      <div widget-id="widgetPatientList" class="col-md-12 pl-0 pr-0" style="height: calc(100% - 20px)">
+        <button widget-id="buttonProfile" class="btn btn-primary">某某</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PagePatientList() {
+  this.page = dom.find('#pagePatientList');
+  this.buttonProfile = dom.find('[widget-id=buttonProfile]');
+}
+
+PagePatientList.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PagePatientList.prototype.initialize = async function (params) {
+  dom.bind(this.buttonProfile, 'click', ev => {
+    kuit.stack({
+      containerId: '#container',
+      url: 'thtml/application/patient/profile.html',
+      title: '某某',
+    });
+  });
+  this.tablePatient = new PaginationBox({
+
+  });
+};
+
+PagePatientList.prototype.destroy = async function (params) {
+  console.log('destroy pagePatientList');
+};
+
+pagePatientList = new PagePatientList();
+</script>

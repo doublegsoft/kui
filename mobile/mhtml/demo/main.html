@@ -1,0 +1,48 @@
+<div id="pageDemoMain" class="mobile page" role="nav">
+  <ul class="list-group">
+    <li widget-id="buttonChat" class="list-group-item list-group-item-action d-flex">
+      <strong class="font-20">聊天页面</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonVideo" class="list-group-item list-group-item-action d-flex">
+      <strong class="font-20">视频页面</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonWeb" class="list-group-item list-group-item-action d-flex">
+      <strong class="font-20">三方网页</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    </li>
+  </ul>
+</div>
+<script>
+function PageDemoMain() {
+  this.page = dom.find('#pageDemoMain');
+  this.buttonChat = dom.find('[widget-id=buttonChat]', this.page);
+  this.buttonVideo = dom.find('[widget-id=buttonVideo]', this.page);
+  this.buttonWeb = dom.find('[widget-id=buttonWeb]', this.page);
+}
+
+PageDemoMain.prototype.initialize = async function (params) {
+  dom.bind(this.buttonChat, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/chat.html', {
+      title: '聊天',
+    });
+  });
+  dom.bind(this.buttonVideo, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/video.html', {
+      title: '视频',
+    });
+  });
+  dom.bind(this.buttonWeb, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/web.html', {
+      title: '网页',
+    });
+  });
+};
+
+PageDemoMain.prototype.show = function (params) {
+  this.initialize(params)
+};
+
+pageDemoMain = new PageDemoMain();
+</script>

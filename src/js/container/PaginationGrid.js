@@ -337,8 +337,8 @@ PaginationGrid.prototype.pagination = function () {
   let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
-  a.style.lineHeight = '30px';
-  a.style.height = '30px';
+  a.style.lineHeight = '32px';
+  a.style.height = '32px';
   // a.innerText = '首页';
   a.innerHTML = '<i class="material-icons">first_page</i>';
   dom.bind(a, 'click', function() {
@@ -352,6 +352,8 @@ PaginationGrid.prototype.pagination = function () {
   a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.lineHeight = '32px';
+  a.style.height = '32px';
   // a.innerText = '上一页';
   a.innerHTML = '<i class="material-icons">chevron_left</i>';
   dom.bind(a, 'click', function() {
@@ -375,6 +377,8 @@ PaginationGrid.prototype.pagination = function () {
   a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.lineHeight = '32px';
+  a.style.height = '32px';
   // a.innerText = '下一页';
   a.innerHTML = '<i class="material-icons">chevron_right</i>';
   dom.bind(a, 'click', function () {
@@ -387,6 +391,8 @@ PaginationGrid.prototype.pagination = function () {
   a = dom.create('a', 'page-link', 'b-a-0', 'pt-0', 'font-14');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.lineHeight = '32px';
+  a.style.height = '32px';
   // a.innerText = '末页';
   a.innerHTML = '<i class="material-icons">last_page</i>';
   dom.bind(a, 'click', function () {

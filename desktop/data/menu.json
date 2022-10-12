@@ -61,6 +61,10 @@
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/component/list.html', containerId: 'container'});"
       }, {
+        "text": "DataSheet",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/component/datasheet.html', containerId: 'container'});"
+      }, {
         "text": "广义表A",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/component/spreadsheet.html', containerId: 'container'});"

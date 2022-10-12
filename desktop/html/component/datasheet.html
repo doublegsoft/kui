@@ -1,0 +1,58 @@
+<div class="card mb-0">
+  <div widget-id="widgetDataSheet" class="card-body">
+  </div>
+</div>
+
+<script>
+function initialize() {
+  let widgetDataSheet = dom.find('[widget-id=widgetDataSheet]');
+  let dataSheet = new DataSheet({
+    columns: [{
+      title: 'A',
+      children: [{
+        title: 'A1'
+      },{
+        title: 'A2'
+      },{
+        title: 'A3'
+      }]
+    },{
+      title: 'B',
+      children: [{
+        title: 'B1',
+      },{
+        title: 'B2'
+      }]
+    }],
+    rowHeaders: [{
+      title: '1',
+      children: [{
+        title: '11'
+      },{
+        title: '12'
+      },{
+        title: '13'
+      }]
+    },{
+      title: '2',
+      children: [{
+        title: '21'
+      },{
+        title: '22'
+      },{
+        title: '23'
+      }]
+    },{
+      title: '3',
+      children: [{
+        title: '31'
+      },{
+        title: '32'
+      }]
+    }]
+  });
+  dataSheet.render(widgetDataSheet);
+}
+
+initialize();
+</script>

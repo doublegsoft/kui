@@ -198,11 +198,11 @@ ajax.view = function(opt) {
         if (container) {
           fragment = utils.append(container, resp, empty);
         }
+        if (fragment.id) {
+          window[fragment.id].show(params);
+        }
         if (callback)
           callback(title, fragment, params);
-
-        if (opt.initiative === true || !utils.isEmpty(params))
-          window[fragment.id].show(params);
       }
     });
   } else if (page) {
@@ -423,8 +423,11 @@ ajax.append = function(opts) {
     xhr.get({
       url: url,
       success: function (resp) {
-        utils.append(container, resp, false)
-
+        let params = utils.getParameters(url);
+        let fragment = utils.append(container, resp, false)
+        if (fragment.id) {
+          window[fragment.id].show(params);
+        }
         for (let i = container.children.length - 1; i >= 0; i--) {
           let div = container.children[i];
           if (div.tagName == 'DIV') {
