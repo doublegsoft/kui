@@ -238,6 +238,7 @@ utils.getParameters = function(url) {
   let strs = url.split('&');
   for (let i = 0; i < strs.length; i++) {
     let pair = strs[i].split('=');
+    if (pair.length == 1) return {};
     ret[pair[0].trim()] = decodeURIComponent(pair[1].trim());
   }
   return ret;

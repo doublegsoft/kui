@@ -8129,6 +8129,7 @@ utils.getParameters = function(url) {
   let strs = url.split('&');
   for (let i = 0; i < strs.length; i++) {
     let pair = strs[i].split('=');
+    if (pair.length == 1) return {};
     ret[pair[0].trim()] = decodeURIComponent(pair[1].trim());
   }
   return ret;
@@ -9494,6 +9495,12 @@ kuit.rightbar = opt => {
   rightbar.classList.remove('out');
   rightbar.classList.add('in');
   overlay.style.display = '';
+
+  overlay.onclick = ev => {
+    rightbar.classList.remove('in');
+    rightbar.classList.add('out');
+    overlay.style.display = 'none';
+  };
 
   let url = opt.url;
   ajax.view({

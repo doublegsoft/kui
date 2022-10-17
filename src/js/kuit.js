@@ -152,6 +152,12 @@ kuit.rightbar = opt => {
   rightbar.classList.add('in');
   overlay.style.display = '';
 
+  overlay.onclick = ev => {
+    rightbar.classList.remove('in');
+    rightbar.classList.add('out');
+    overlay.style.display = 'none';
+  };
+
   let url = opt.url;
   ajax.view({
     url: url,
