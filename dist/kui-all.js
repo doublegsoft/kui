@@ -5457,11 +5457,8 @@ dom.height2 = function(selector, offset, parent) {
   let marginTop = parseInt(computedStyle.getPropertyValue('border-top-width'));
   let marginBottom = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
   element.style.marginBottom = '0px';
-  // let ancestor = dom.ancestor(element, 'div', 'full');
-  // if (ancestor == null) {
-  //   paddingBottom = 0;
-  // }
-  element.style.height = (parent.clientHeight
+  let rect = parent.getBoundingClientRect();
+  element.style.height = (rect.height
     - paddingTop - paddingBottom
     - borderTopWidth - borderBottomWidth
     - marginTop - marginBottom
@@ -9498,7 +9495,16 @@ kuit.rightbar = opt => {
   rightbar.classList.add('in');
   overlay.style.display = '';
 
-  opt.render(rightbar);
+  let url = opt.url;
+  ajax.view({
+    url: url,
+    containerId: rightbar,
+    success: () => {
+      if (opt.success) {
+        opt.success();
+      }
+    }
+  });
 };
 /**
  * 聊天客户端SDK集成。
@@ -20201,7 +20207,8 @@ DataSheet.prototype.render = function(containerId, data) {
       td.style.padding = '6px 12px';
       // td.setAttribute('contenteditable', 'true');
       td.onclick = ev => {
-        this.onCellClicked(td);
+        let tds = Array.prototype.slice.call(td.parentElement.children);
+        this.onCellClicked(td, tds.indexOf(td));
       };
       tr.appendChild(td);
     }

@@ -204,7 +204,8 @@ DataSheet.prototype.render = function(containerId, data) {
       td.style.padding = '6px 12px';
       // td.setAttribute('contenteditable', 'true');
       td.onclick = ev => {
-        this.onCellClicked(td);
+        let tds = Array.prototype.slice.call(td.parentElement.children);
+        this.onCellClicked(td, tds.indexOf(td));
       };
       tr.appendChild(td);
     }

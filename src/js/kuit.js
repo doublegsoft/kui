@@ -152,5 +152,14 @@ kuit.rightbar = opt => {
   rightbar.classList.add('in');
   overlay.style.display = '';
 
-  opt.render(rightbar);
+  let url = opt.url;
+  ajax.view({
+    url: url,
+    containerId: rightbar,
+    success: () => {
+      if (opt.success) {
+        opt.success();
+      }
+    }
+  });
 };

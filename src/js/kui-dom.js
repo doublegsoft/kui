@@ -801,11 +801,8 @@ dom.height2 = function(selector, offset, parent) {
   let marginTop = parseInt(computedStyle.getPropertyValue('border-top-width'));
   let marginBottom = parseInt(computedStyle.getPropertyValue('border-bottom-width'));
   element.style.marginBottom = '0px';
-  // let ancestor = dom.ancestor(element, 'div', 'full');
-  // if (ancestor == null) {
-  //   paddingBottom = 0;
-  // }
-  element.style.height = (parent.clientHeight
+  let rect = parent.getBoundingClientRect();
+  element.style.height = (rect.height
     - paddingTop - paddingBottom
     - borderTopWidth - borderBottomWidth
     - marginTop - marginBottom
