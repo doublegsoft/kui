@@ -145,10 +145,12 @@ kuit.switch = ev => {
   container.children[index].style.display = '';
 };
 
-kuit.rightbar = ev => {
+kuit.rightbar = opt => {
   let rightbar = dom.find('.rightbar');
   let overlay = dom.find('#overlay');
   rightbar.classList.remove('out');
   rightbar.classList.add('in');
   overlay.style.display = '';
+
+  opt.render(rightbar);
 };

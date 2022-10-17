@@ -18,6 +18,7 @@ function DataSheet(opt) {
       this.totalColumns.push(column);
     }
   }
+  this.onCellClicked = opt.onCellClicked;
 
   // 计算获得各项数据
   this.rowHeaderColumnCount = this.getRowHeaderColumnCount(this.rowHeaders);
@@ -203,7 +204,7 @@ DataSheet.prototype.render = function(containerId, data) {
       td.style.padding = '6px 12px';
       // td.setAttribute('contenteditable', 'true');
       td.onclick = ev => {
-        kuit.rightbar({});
+        this.onCellClicked(td);
       };
       tr.appendChild(td);
     }

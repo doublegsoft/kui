@@ -9491,12 +9491,14 @@ kuit.switch = ev => {
   container.children[index].style.display = '';
 };
 
-kuit.rightbar = ev => {
+kuit.rightbar = opt => {
   let rightbar = dom.find('.rightbar');
   let overlay = dom.find('#overlay');
   rightbar.classList.remove('out');
   rightbar.classList.add('in');
   overlay.style.display = '';
+
+  opt.render(rightbar);
 };
 /**
  * 聊天客户端SDK集成。
@@ -20013,6 +20015,7 @@ function DataSheet(opt) {
       this.totalColumns.push(column);
     }
   }
+  this.onCellClicked = opt.onCellClicked;
 
   // 计算获得各项数据
   this.rowHeaderColumnCount = this.getRowHeaderColumnCount(this.rowHeaders);
@@ -20198,7 +20201,7 @@ DataSheet.prototype.render = function(containerId, data) {
       td.style.padding = '6px 12px';
       // td.setAttribute('contenteditable', 'true');
       td.onclick = ev => {
-        kuit.rightbar({});
+        this.onCellClicked(td);
       };
       tr.appendChild(td);
     }

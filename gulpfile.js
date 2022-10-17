@@ -88,7 +88,7 @@ gulp.task('dist', function() {
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
     'src/js/kui-validation.js', 'src/js/kui-formdata.js', 'src/js/kui-utils.js',
     'src/js/editor/DataSheet.js', 'src/js/container/Tabs.js', 'src/js/container/PaginationGrid.js',
-    'src/js/container/Timeline.js',
+    'src/js/container/Timeline.js', 'src/js/container/ListView.js',
     'src/js/application/Chat.js', 'src/js/kuit.js'])
     .pipe(concat('./kui-all.tablet.min.js'))
     .pipe(uglify())
@@ -97,7 +97,7 @@ gulp.task('dist', function() {
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
     'src/js/kui-validation.js', 'src/js/kui-formdata.js', 'src/js/kui-utils.js',
     'src/js/editor/DataSheet.js', 'src/js/container/Tabs.js', 'src/js/container/PaginationGrid.js',
-    'src/js/container/Timeline.js',
+    'src/js/container/Timeline.js', 'src/js/container/ListView.js',
     'src/js/application/Chat.js', 'src/js/kuit.js'])
     .pipe(concat('./kui-all.tablet.js'))
     .pipe(gulp.dest('./dist/'));
@@ -153,12 +153,12 @@ gulp.task('dist', function() {
       .pipe(gulp.dest('./dist/'));
 
   // tablet css
-  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuit.css',
+  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kui.css', 'src/css/kuit.css',
     'src/css/kui-chat.css', 'src/css/kui-timeline.css'])
     .pipe(concat('./kui-all.tablet.css'))
     .pipe(gulp.dest('./dist/'));
 
-  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuit.css',
+  gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kui.css', 'src/css/kuit.css',
     'src/css/kui-chat.css', 'src/css/kui-timeline.css'])
     .pipe(concat('./kui-all.tablet.min.css'))
     .pipe(uglifycss())
