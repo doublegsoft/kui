@@ -1,3 +1,7 @@
+Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
 if (typeof kuim === 'undefined') kuim = {};
 
 kuim = {
@@ -6,54 +10,60 @@ kuim = {
 };
 
 kuim.navigateTo = async function (url, opt, clear) {
-  if (typeof clear === "undefined") clear = false;
-  let main = document.querySelector('main');
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    if (typeof clear === "undefined") clear = false;
+    let main = document.querySelector('main');
 
-  if (kuim.presentPageObj) {
+    if (kuim.presentPageObj) {
+      kuim.presentPageObj.page.classList.remove('in');
+      kuim.presentPageObj.page.classList.add('out');
+    }
+    setTimeout(async () => {
+      if (kuim.presentPageObj) {
+        kuim.presentPageObj.page.parentElement.style.display = 'none';
+      }
+      if (kuim.presentPageObj && clear !== false) {
+        kuim.presentPageObj.page.parentElement.remove();
+        if (kuim.presentPageObj.destroy) {
+          kuim.presentPageObj.destroy();
+        }
+        delete kuim.presentPageObj;
+      }
+      let html = await xhr.asyncGet({
+        url: url,
+      }, 'GET');
+      kuim.reload(main, url, html, opt);
+    }, 400);
+  }, 200);
+
+};
+
+kuim.navigateBack = function (opt) {
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    let main = document.querySelector('main');
+    let latest = main.children[main.children.length - 2];
+
     kuim.presentPageObj.page.classList.remove('in');
     kuim.presentPageObj.page.classList.add('out');
-  }
 
-  setTimeout(async () => {
-    if (kuim.presentPageObj) {
-      kuim.presentPageObj.page.parentElement.style.display = 'none';
-    }
-    if (kuim.presentPageObj && clear !== false) {
+    setTimeout(() => {
       kuim.presentPageObj.page.parentElement.remove();
       if (kuim.presentPageObj.destroy) {
         kuim.presentPageObj.destroy();
       }
       delete kuim.presentPageObj;
-    }
-    let html = await xhr.asyncGet({
-      url: url,
-    }, 'GET');
-    kuim.reload(main, url, html, opt);
-  }, 500);
-};
 
-kuim.navigateBack = function (opt) {
-  let main = document.querySelector('main');
-  let latest = main.children[main.children.length - 2];
+      latest.style.display = '';
+      kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
+      kuim.presentPageObj.page.classList.remove('out');
+      kuim.presentPageObj.page.classList.add('in');
 
-  kuim.presentPageObj.page.classList.remove('in');
-  kuim.presentPageObj.page.classList.add('out');
-
-  setTimeout(() => {
-    kuim.presentPageObj.page.parentElement.remove();
-    if (kuim.presentPageObj.destroy) {
-      kuim.presentPageObj.destroy();
-    }
-    delete kuim.presentPageObj;
-
-    latest.style.display = '';
-    kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
-    kuim.presentPageObj.page.classList.remove('out');
-    kuim.presentPageObj.page.classList.add('in');
-
-    kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
-      latest.getAttribute('kuim-page-icon'));
-  }, 500 /*同CSS中的动画效果配置时间一致*/);
+      kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
+        latest.getAttribute('kuim-page-icon'));
+    }, 400 /*同CSS中的动画效果配置时间一致*/);
+  }, 200);
 };
 
 kuim.reload = function (main, url, html, opt) {

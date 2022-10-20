@@ -37,8 +37,8 @@
   content: '';
   width: 34px;
   height: 34px;
-  background: white;
-  border: 2px solid #ffffff;
+  /*background: white;*/
+  /*border: 2px solid #ffffff;*/
   border-radius: 50%;
   position: absolute;
   left: -19px;
@@ -258,8 +258,8 @@
    content: '';
    width: 34px;
    height: 34px;
-   background: white;
-   border: 2px solid #ffffff;
+   /*background: white;*/
+   /*border: 2px solid #ffffff;*/
    border-radius: 50%;
    position: absolute;
    left: -19px;

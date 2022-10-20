@@ -4,10 +4,10 @@ function Wizard(opt) {
   this.topic = opt.topic;
   this.steps = opt.steps || [];
   this.root = dom.element(`
-    <div>
-      <div class="ui ordered steps m-b-0">
+    <div style="width: 100%">
+      <div class="wizard">
       </div>
-      <div class="tab-content">
+      <div class="wizard-content">
       </div>
     </div>
   `);
@@ -15,12 +15,12 @@ function Wizard(opt) {
 
 Wizard.prototype.render = function(containerId, params) {
   this.container = dom.find(containerId);
-  this.body = dom.find('div.tab-content', this.root);
-  let elSteps = dom.find('div.steps', this.root);
+  this.body = dom.find('div.wizard-content', this.root);
+  let elSteps = dom.find('div.wizard', this.root);
   for (let i = 0; i < this.steps.length; i++) {
     let step = this.steps[i];
     let elStep = dom.element(`
-      <div class="step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
+      <div class="wizard-step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
         <div class="content">
           <div class="title"></div>
           <div class="description"></div>

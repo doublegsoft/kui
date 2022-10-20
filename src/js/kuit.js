@@ -1,3 +1,6 @@
+Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
 
 kuit = {
 
@@ -146,6 +149,7 @@ kuit.switch = ev => {
 };
 
 kuit.rightbar = opt => {
+  
   let rightbar = dom.find('.rightbar');
   let overlay = dom.find('#overlay');
   rightbar.classList.remove('out');

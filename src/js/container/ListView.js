@@ -76,9 +76,6 @@ ListView.prototype.fetch = async function (params) {
     });
     Array.prototype.push.apply(self.local, data);
     self.append(data);
-    if (self.complete) {
-      self.complete();
-    }
   } else {
     self.append(this.local);
   }
@@ -215,7 +212,7 @@ ListView.prototype.append = function(data, index) {
       this.append(rows[i]);
     }
     if (self.complete) {
-      self.complete();
+      self.complete(data);
     }
   } else {
     let row = data;

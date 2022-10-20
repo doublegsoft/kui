@@ -2662,9 +2662,6 @@ ListView.prototype.fetch = async function (params) {
     });
     Array.prototype.push.apply(self.local, data);
     self.append(data);
-    if (self.complete) {
-      self.complete();
-    }
   } else {
     self.append(this.local);
   }
@@ -2801,7 +2798,7 @@ ListView.prototype.append = function(data, index) {
       this.append(rows[i]);
     }
     if (self.complete) {
-      self.complete();
+      self.complete(data);
     }
   } else {
     let row = data;
@@ -3103,6 +3100,7 @@ Timeline.prototype.render = function(container, params) {
       success: function (resp) {
         if (!resp.data) return;
         let data = resp.data;
+        console.log(data);
         for (let i = 0; i < data.length; i++) {
           ul.appendChild(self.createTile(data[i], i));
         }
@@ -3116,6 +3114,99 @@ Timeline.prototype.render = function(container, params) {
   if (self.onComplete) {
     self.onComplete();
   }
+};
+
+function Wizard(opt) {
+  let self = this;
+  this.topic = opt.topic;
+  this.steps = opt.steps || [];
+  this.root = dom.element(`
+    <div style="width: 100%">
+      <div class="wizard">
+      </div>
+      <div class="wizard-content">
+      </div>
+    </div>
+  `);
+}
+
+Wizard.prototype.render = function(containerId, params) {
+  this.container = dom.find(containerId);
+  this.body = dom.find('div.wizard-content', this.root);
+  let elSteps = dom.find('div.wizard', this.root);
+  for (let i = 0; i < this.steps.length; i++) {
+    let step = this.steps[i];
+    let elStep = dom.element(`
+      <div class="wizard-step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
+        <div class="content">
+          <div class="title"></div>
+          <div class="description"></div>
+        </div>
+      </div>
+    `);
+    step.index = i;
+    if (step.active) {
+      this.current = step;
+    }
+    if (this.current == null) {
+      elStep.classList.add('completed');
+    }
+    dom.find('div.title', elStep).innerHTML = step.title;
+    dom.find('div.description', elStep).innerHTML = step.description;
+    elSteps.appendChild(elStep);
+  }
+  this.container.appendChild(this.root);
+
+  this.display(this.current);
+};
+
+Wizard.prototype.display = function(current) {
+  let self = this;
+  let elStep = dom.find('div.step[data-step="' + current.index + '"]', this.root);
+  elStep.classList.remove('completed');
+  elStep.classList.add('active');
+
+  let existing = false;
+  for (let i = 0; i < this.body.children.length; i++) {
+    let child = this.body.children[i];
+    if (child.getAttribute('data-page-url') == current.url) {
+      existing = true;
+      child.classList.add('active');
+    } else {
+      child.classList.remove('active');
+    }
+  }
+
+  if (existing) return;
+
+  let tab = dom.create('div', 'tab-pane', 'active');
+  this.body.appendChild(tab)
+  ajax.view({
+    url: current.url,
+    page: current.page,
+    containerId: tab,
+    success: function(resp) {
+      self.body.children[self.body.children.length - 1].setAttribute('data-page-url', current.url);
+    }
+  });
+};
+
+/**
+ * Completes the current step.
+ */
+Wizard.prototype.commit = function () {
+  let elStep = dom.find('div.step.active', this.root);
+  let index = parseInt(elStep.getAttribute('data-step'));
+  elStep.classList.remove('active');
+  elStep.classList.add('completed');
+  this.display(this.steps[index + 1]);
+};
+
+Wizard.prototype.rollback = function () {
+  let elStep = dom.find('div.step.active', this.container);
+  let index = parseInt(elStep.getAttribute('data-step'));
+  elStep.classList.remove('active');
+  this.display(this.steps[index - 1]);
 };
 let utils = {};
 
@@ -3733,6 +3824,10 @@ Chat.prototype.stop = function() {
 if (typeof module !== 'undefined') {
   module.exports = { Chat };
 }
+Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
 if (typeof kuim === 'undefined') kuim = {};
 
 kuim = {
@@ -3741,54 +3836,60 @@ kuim = {
 };
 
 kuim.navigateTo = async function (url, opt, clear) {
-  if (typeof clear === "undefined") clear = false;
-  let main = document.querySelector('main');
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    if (typeof clear === "undefined") clear = false;
+    let main = document.querySelector('main');
 
-  if (kuim.presentPageObj) {
+    if (kuim.presentPageObj) {
+      kuim.presentPageObj.page.classList.remove('in');
+      kuim.presentPageObj.page.classList.add('out');
+    }
+    setTimeout(async () => {
+      if (kuim.presentPageObj) {
+        kuim.presentPageObj.page.parentElement.style.display = 'none';
+      }
+      if (kuim.presentPageObj && clear !== false) {
+        kuim.presentPageObj.page.parentElement.remove();
+        if (kuim.presentPageObj.destroy) {
+          kuim.presentPageObj.destroy();
+        }
+        delete kuim.presentPageObj;
+      }
+      let html = await xhr.asyncGet({
+        url: url,
+      }, 'GET');
+      kuim.reload(main, url, html, opt);
+    }, 400);
+  }, 200);
+
+};
+
+kuim.navigateBack = function (opt) {
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    let main = document.querySelector('main');
+    let latest = main.children[main.children.length - 2];
+
     kuim.presentPageObj.page.classList.remove('in');
     kuim.presentPageObj.page.classList.add('out');
-  }
 
-  setTimeout(async () => {
-    if (kuim.presentPageObj) {
-      kuim.presentPageObj.page.parentElement.style.display = 'none';
-    }
-    if (kuim.presentPageObj && clear !== false) {
+    setTimeout(() => {
       kuim.presentPageObj.page.parentElement.remove();
       if (kuim.presentPageObj.destroy) {
         kuim.presentPageObj.destroy();
       }
       delete kuim.presentPageObj;
-    }
-    let html = await xhr.asyncGet({
-      url: url,
-    }, 'GET');
-    kuim.reload(main, url, html, opt);
-  }, 500);
-};
 
-kuim.navigateBack = function (opt) {
-  let main = document.querySelector('main');
-  let latest = main.children[main.children.length - 2];
+      latest.style.display = '';
+      kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
+      kuim.presentPageObj.page.classList.remove('out');
+      kuim.presentPageObj.page.classList.add('in');
 
-  kuim.presentPageObj.page.classList.remove('in');
-  kuim.presentPageObj.page.classList.add('out');
-
-  setTimeout(() => {
-    kuim.presentPageObj.page.parentElement.remove();
-    if (kuim.presentPageObj.destroy) {
-      kuim.presentPageObj.destroy();
-    }
-    delete kuim.presentPageObj;
-
-    latest.style.display = '';
-    kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
-    kuim.presentPageObj.page.classList.remove('out');
-    kuim.presentPageObj.page.classList.add('in');
-
-    kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
-      latest.getAttribute('kuim-page-icon'));
-  }, 500 /*同CSS中的动画效果配置时间一致*/);
+      kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
+        latest.getAttribute('kuim-page-icon'));
+    }, 400 /*同CSS中的动画效果配置时间一致*/);
+  }, 200);
 };
 
 kuim.reload = function (main, url, html, opt) {

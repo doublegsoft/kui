@@ -18,7 +18,9 @@ function DataSheet(opt) {
       this.totalColumns.push(column);
     }
   }
+  // 时间回调
   this.onCellClicked = opt.onCellClicked;
+  this.onRowHeaderClicked = opt.onRowHeaderClicked;
 
   // 计算获得各项数据
   this.rowHeaderColumnCount = this.getRowHeaderColumnCount(this.rowHeaders);
@@ -29,7 +31,6 @@ function DataSheet(opt) {
   this.matrixRowHeader = [];
   this.buildColumnMatrix(this.columns, this.matrixColumn, 0);
   this.buildRowHeaderMatrix(this.rowHeaders, this.matrixRowHeader, 0);
-  console.log(this.matrixRowHeader);
 }
 
 /**
@@ -46,11 +47,10 @@ DataSheet.prototype.root = function(data) {
   th.style.borderBottomWidth = '0';
   th.style.width = this.rowHeaderWidth + 'px';
 
-  tr.appendChild(th);
+  // tr.appendChild(th);
   thead.appendChild(tr);
   this.table.appendChild(thead);
   this.table.appendChild(this.tbody);
-
 
   for (let i = 0; i < this.columns.length; i++) {
     let column = this.columns[i];
@@ -168,12 +168,12 @@ DataSheet.prototype.render = function(containerId, data) {
     trs.push(tr);
     thead.appendChild(tr);
   }
-  for (let i = 0; i < this.rowHeaderColumnCount; i++) {
-    let th = dom.create('th', 'text-center');
-    th.style = 'border-bottom-width: 1px;';
-    th.setAttribute('rowspan', this.colHeaderRowCount);
-    trs[0].appendChild(th);
-  }
+  // for (let i = 0; i < this.rowHeaderColumnCount; i++) {
+  //   let th = dom.create('th', 'text-center');
+  //   th.style = 'border-bottom-width: 1px;';
+  //   th.setAttribute('rowspan', this.colHeaderRowCount);
+  //   trs[0].appendChild(th);
+  // }
   for (let i = 0; i < this.colHeaderRowCount; i++) {
     let tr = trs[i];
     for (let j = 0; j < this.colHeaderColumnCount; j++) {
@@ -195,18 +195,26 @@ DataSheet.prototype.render = function(containerId, data) {
       td.style = 'vertical-align: middle;';
       td.setAttribute('rowspan', this.getSpanRowCount(rowHeader));
       td.innerHTML = '<strong>' + rowHeader.title + '</strong>';
+      if (this.onRowHeaderClicked) {
+        td.onclick = ev => {
+          let tds = Array.prototype.slice.call(td.parentElement.children);
+          this.onRowHeaderClicked(td, tds.indexOf(td));
+        };
+      }
       tr.appendChild(td);
     }
     // 补齐其余的单元格
-    for (let j = 0; j < this.colHeaderColumnCount; j++) {
+    for (let j = 0; j < this.colHeaderColumnCount - this.rowHeaderColumnCount; j++) {
       let td = dom.create('td');
       td.style.textAlign = 'right';
       td.style.padding = '6px 12px';
       // td.setAttribute('contenteditable', 'true');
-      td.onclick = ev => {
-        let tds = Array.prototype.slice.call(td.parentElement.children);
-        this.onCellClicked(td, tds.indexOf(td));
-      };
+      if (this.onCellClicked) {
+        td.onclick = ev => {
+          let tds = Array.prototype.slice.call(td.parentElement.children);
+          this.onCellClicked(td, tds.indexOf(td));
+        };
+      }
       tr.appendChild(td);
     }
     tbody.appendChild(tr);

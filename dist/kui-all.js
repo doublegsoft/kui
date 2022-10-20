@@ -9093,6 +9093,10 @@ xhr.asyncPost = function (opts) {
 if (typeof module !== 'undefined') {
   module.exports = { xhr };
 }
+Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
+
 if (typeof kuim === 'undefined') kuim = {};
 
 kuim = {
@@ -9101,54 +9105,60 @@ kuim = {
 };
 
 kuim.navigateTo = async function (url, opt, clear) {
-  if (typeof clear === "undefined") clear = false;
-  let main = document.querySelector('main');
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    if (typeof clear === "undefined") clear = false;
+    let main = document.querySelector('main');
 
-  if (kuim.presentPageObj) {
+    if (kuim.presentPageObj) {
+      kuim.presentPageObj.page.classList.remove('in');
+      kuim.presentPageObj.page.classList.add('out');
+    }
+    setTimeout(async () => {
+      if (kuim.presentPageObj) {
+        kuim.presentPageObj.page.parentElement.style.display = 'none';
+      }
+      if (kuim.presentPageObj && clear !== false) {
+        kuim.presentPageObj.page.parentElement.remove();
+        if (kuim.presentPageObj.destroy) {
+          kuim.presentPageObj.destroy();
+        }
+        delete kuim.presentPageObj;
+      }
+      let html = await xhr.asyncGet({
+        url: url,
+      }, 'GET');
+      kuim.reload(main, url, html, opt);
+    }, 400);
+  }, 200);
+
+};
+
+kuim.navigateBack = function (opt) {
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    let main = document.querySelector('main');
+    let latest = main.children[main.children.length - 2];
+
     kuim.presentPageObj.page.classList.remove('in');
     kuim.presentPageObj.page.classList.add('out');
-  }
 
-  setTimeout(async () => {
-    if (kuim.presentPageObj) {
-      kuim.presentPageObj.page.parentElement.style.display = 'none';
-    }
-    if (kuim.presentPageObj && clear !== false) {
+    setTimeout(() => {
       kuim.presentPageObj.page.parentElement.remove();
       if (kuim.presentPageObj.destroy) {
         kuim.presentPageObj.destroy();
       }
       delete kuim.presentPageObj;
-    }
-    let html = await xhr.asyncGet({
-      url: url,
-    }, 'GET');
-    kuim.reload(main, url, html, opt);
-  }, 500);
-};
 
-kuim.navigateBack = function (opt) {
-  let main = document.querySelector('main');
-  let latest = main.children[main.children.length - 2];
+      latest.style.display = '';
+      kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
+      kuim.presentPageObj.page.classList.remove('out');
+      kuim.presentPageObj.page.classList.add('in');
 
-  kuim.presentPageObj.page.classList.remove('in');
-  kuim.presentPageObj.page.classList.add('out');
-
-  setTimeout(() => {
-    kuim.presentPageObj.page.parentElement.remove();
-    if (kuim.presentPageObj.destroy) {
-      kuim.presentPageObj.destroy();
-    }
-    delete kuim.presentPageObj;
-
-    latest.style.display = '';
-    kuim.presentPageObj = window[latest.getAttribute('kuim-page-id')];
-    kuim.presentPageObj.page.classList.remove('out');
-    kuim.presentPageObj.page.classList.add('in');
-
-    kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
-      latest.getAttribute('kuim-page-icon'));
-  }, 500 /*同CSS中的动画效果配置时间一致*/);
+      kuim.setTitleAndIcon(latest.getAttribute('kuim-page-title'),
+        latest.getAttribute('kuim-page-icon'));
+    }, 400 /*同CSS中的动画效果配置时间一致*/);
+  }, 200);
 };
 
 kuim.reload = function (main, url, html, opt) {
@@ -9342,6 +9352,9 @@ kuim.wizard = function(opt) {
 kuim.overlay = function() {
 
 };
+Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
+  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+});
 
 kuit = {
 
@@ -9490,6 +9503,7 @@ kuit.switch = ev => {
 };
 
 kuit.rightbar = opt => {
+  
   let rightbar = dom.find('.rightbar');
   let overlay = dom.find('#overlay');
   rightbar.classList.remove('out');
@@ -12213,9 +12227,6 @@ ListView.prototype.fetch = async function (params) {
     });
     Array.prototype.push.apply(self.local, data);
     self.append(data);
-    if (self.complete) {
-      self.complete();
-    }
   } else {
     self.append(this.local);
   }
@@ -12352,7 +12363,7 @@ ListView.prototype.append = function(data, index) {
       this.append(rows[i]);
     }
     if (self.complete) {
-      self.complete();
+      self.complete(data);
     }
   } else {
     let row = data;
@@ -15790,6 +15801,7 @@ Timeline.prototype.render = function(container, params) {
       success: function (resp) {
         if (!resp.data) return;
         let data = resp.data;
+        console.log(data);
         for (let i = 0; i < data.length; i++) {
           ul.appendChild(self.createTile(data[i], i));
         }
@@ -17428,10 +17440,10 @@ function Wizard(opt) {
   this.topic = opt.topic;
   this.steps = opt.steps || [];
   this.root = dom.element(`
-    <div>
-      <div class="ui ordered steps m-b-0">
+    <div style="width: 100%">
+      <div class="wizard">
       </div>
-      <div class="tab-content">
+      <div class="wizard-content">
       </div>
     </div>
   `);
@@ -17439,12 +17451,12 @@ function Wizard(opt) {
 
 Wizard.prototype.render = function(containerId, params) {
   this.container = dom.find(containerId);
-  this.body = dom.find('div.tab-content', this.root);
-  let elSteps = dom.find('div.steps', this.root);
+  this.body = dom.find('div.wizard-content', this.root);
+  let elSteps = dom.find('div.wizard', this.root);
   for (let i = 0; i < this.steps.length; i++) {
     let step = this.steps[i];
     let elStep = dom.element(`
-      <div class="step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
+      <div class="wizard-step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
         <div class="content">
           <div class="title"></div>
           <div class="description"></div>
@@ -20028,7 +20040,9 @@ function DataSheet(opt) {
       this.totalColumns.push(column);
     }
   }
+  // 时间回调
   this.onCellClicked = opt.onCellClicked;
+  this.onRowHeaderClicked = opt.onRowHeaderClicked;
 
   // 计算获得各项数据
   this.rowHeaderColumnCount = this.getRowHeaderColumnCount(this.rowHeaders);
@@ -20039,7 +20053,6 @@ function DataSheet(opt) {
   this.matrixRowHeader = [];
   this.buildColumnMatrix(this.columns, this.matrixColumn, 0);
   this.buildRowHeaderMatrix(this.rowHeaders, this.matrixRowHeader, 0);
-  console.log(this.matrixRowHeader);
 }
 
 /**
@@ -20056,11 +20069,10 @@ DataSheet.prototype.root = function(data) {
   th.style.borderBottomWidth = '0';
   th.style.width = this.rowHeaderWidth + 'px';
 
-  tr.appendChild(th);
+  // tr.appendChild(th);
   thead.appendChild(tr);
   this.table.appendChild(thead);
   this.table.appendChild(this.tbody);
-
 
   for (let i = 0; i < this.columns.length; i++) {
     let column = this.columns[i];
@@ -20178,12 +20190,12 @@ DataSheet.prototype.render = function(containerId, data) {
     trs.push(tr);
     thead.appendChild(tr);
   }
-  for (let i = 0; i < this.rowHeaderColumnCount; i++) {
-    let th = dom.create('th', 'text-center');
-    th.style = 'border-bottom-width: 1px;';
-    th.setAttribute('rowspan', this.colHeaderRowCount);
-    trs[0].appendChild(th);
-  }
+  // for (let i = 0; i < this.rowHeaderColumnCount; i++) {
+  //   let th = dom.create('th', 'text-center');
+  //   th.style = 'border-bottom-width: 1px;';
+  //   th.setAttribute('rowspan', this.colHeaderRowCount);
+  //   trs[0].appendChild(th);
+  // }
   for (let i = 0; i < this.colHeaderRowCount; i++) {
     let tr = trs[i];
     for (let j = 0; j < this.colHeaderColumnCount; j++) {
@@ -20205,18 +20217,26 @@ DataSheet.prototype.render = function(containerId, data) {
       td.style = 'vertical-align: middle;';
       td.setAttribute('rowspan', this.getSpanRowCount(rowHeader));
       td.innerHTML = '<strong>' + rowHeader.title + '</strong>';
+      if (this.onRowHeaderClicked) {
+        td.onclick = ev => {
+          let tds = Array.prototype.slice.call(td.parentElement.children);
+          this.onRowHeaderClicked(td, tds.indexOf(td));
+        };
+      }
       tr.appendChild(td);
     }
     // 补齐其余的单元格
-    for (let j = 0; j < this.colHeaderColumnCount; j++) {
+    for (let j = 0; j < this.colHeaderColumnCount - this.rowHeaderColumnCount; j++) {
       let td = dom.create('td');
       td.style.textAlign = 'right';
       td.style.padding = '6px 12px';
       // td.setAttribute('contenteditable', 'true');
-      td.onclick = ev => {
-        let tds = Array.prototype.slice.call(td.parentElement.children);
-        this.onCellClicked(td, tds.indexOf(td));
-      };
+      if (this.onCellClicked) {
+        td.onclick = ev => {
+          let tds = Array.prototype.slice.call(td.parentElement.children);
+          this.onCellClicked(td, tds.indexOf(td));
+        };
+      }
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
