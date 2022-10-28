@@ -36,7 +36,23 @@ kuim.navigateTo = async function (url, opt, clear) {
       kuim.reload(main, url, html, opt);
     }, 400);
   }, 200);
+};
 
+kuim.navigateWidget = function (url, container, opt) {
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    if (container.children[0]) {
+      container.children[0].classList.remove('in');
+      container.children[0].classList.add('out');
+    }
+    setTimeout(async () => {
+      container.innerHTML = '';
+      let html = await xhr.asyncGet({
+        url: url,
+      }, 'GET');
+      kuim.replace(container, url, html, opt);
+    }, 400);
+  }, 200);
 };
 
 kuim.navigateBack = function (opt) {
@@ -67,10 +83,10 @@ kuim.navigateBack = function (opt) {
 };
 
 kuim.reload = function (main, url, html, opt) {
+  opt = opt || {};
   let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
   let range = document.createRange();
   let fragment = range.createContextualFragment(html);
-  let prev = dom.find('[id^=page]', main);
   fragmentContainer.appendChild(fragment);
   let page = dom.find('[id^=page]', fragmentContainer);
   let pageId = page.getAttribute('id');
@@ -79,8 +95,11 @@ kuim.reload = function (main, url, html, opt) {
 
   fragmentContainer.setAttribute('kuim-page-id', pageId);
   fragmentContainer.setAttribute('kuim-page-url', url);
-  fragmentContainer.setAttribute('kuim-page-title', opt.title);
-  fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+
+  if (opt.title) {
+    fragmentContainer.setAttribute('kuim-page-title', opt.title);
+    fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+  }
 
   kuim.presentPageObj = window[pageId];
   kuim.presentPageObj.page.classList.add('in');
@@ -89,6 +108,34 @@ kuim.reload = function (main, url, html, opt) {
   kuim.presentPageObj.show(params);
 
   kuim.setTitleAndIcon(opt.title, opt.icon);
+  if (opt.success) {
+    opt.success();
+  }
+};
+
+kuim.replace = function (container, url, html, opt) {
+  opt = opt || {};
+  let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
+  let range = document.createRange();
+  let fragment = range.createContextualFragment(html);
+  container.appendChild(fragment);
+
+  let page = dom.find('[id^=page]', container);
+  let pageId = page.getAttribute('id');
+
+  if (opt.title) {
+    fragmentContainer.setAttribute('kuim-page-title', opt.title);
+    fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+  }page.classList.add('in');
+
+  let params = utils.getParameters(url);
+  window[pageId].show(params);
+
+  // pass options to page object
+  for (let key in opt) {
+    window[pageId][key] = opt[key];
+  }
+
   if (opt.success) {
     opt.success();
   }

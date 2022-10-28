@@ -132,7 +132,7 @@
           cancel: null,
           minStep: 1,
           trigger: 'tap',
-          lang: { title: '选择日期', cancel: '取消', confirm: '确认', year: '年', month: '月', day: '日', hour: '时', min: '分', sec: '秒' },
+          lang: { title: '选择', cancel: '取消', confirm: '确认', year: '年', month: '月', day: '日', hour: '时', min: '分', sec: '秒' },
           values: [],
         }
       };

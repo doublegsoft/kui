@@ -14822,14 +14822,43 @@ html:not([dir=rtl]) .mfe-3 {
   --color-dark: #636f83;
   --color-border: #d8dbe0;
   --color-white: #fff;
-
   --color-orange: rgb(240,108,53);
+
+  --color-text-primary: rgba(0, 0, 0, 0.87);
+  --color-text-secondary: rgba(153, 153, 153, 1);
+  --color-text-disabled: rgba(0, 0, 0, 0.38);
+
+  --color-background: rgba(248,248,249,1);
+  --color-background-card: rgb(255, 255, 255);
+  --color-background-tag: #f8f8f8;
+
+  --color-divider: rgba(0, 0, 0, 0.12);
+
+  --color-primary-light: #42a5f5;
+  --color-secondary-light: #ba68c8;
+  --color-success-light: #4caf50;
+  --color-error-light: #ef5350;
+  --color-warning-light: #ff9800;
+  --color-info-light: #03a9f4;
+
+  --color-primary-dark: #1565c0;
+  --color-secondary-dark: #7b1fa2;
+  --color-success-dark: #1b5e20;
+  --color-error-dark: #c62828;
+  --color-warning-dark: #e65100;
+  --color-info-dark: #01579b;
+
+  --color-light: #ebedef;
+  --color-text-primary-dark: #fff;
+  --color-text-secondary-dark: rgba(255, 255, 255, 0.7);
+  --color-text-disabled-dark: rgba(255, 255, 255, 0.5);
+  --color-background-dark: #121212;
+  --color-divider-dark: rgba(255, 255, 255, 0.12);
 }
 
 :root .c-dark-theme {
   --color-background: #20202a;
   --color-primary: #4638BF;
-  /*--color-success: red; IT'S WORKING*/
 }
 
 .theme-blue {
@@ -22395,6 +22424,22 @@ span.tag-removable.danger > i:hover {
   color: #FFF;
   background-color: #f56c6c;
 }
+
+.tags-general {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag-general {
+  padding: 2px 8px;
+  border-radius: 30px;
+  margin-right: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  background: var(--color-background-tag);
+}
 ul.thread {
   list-style-type: none;
   position: relative;
@@ -22844,52 +22889,240 @@ ul.thread > li:before {
 	background-color: transparent;
 }
 .wizard {
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  margin: 1em 0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  line-height: 1.14285714em;
+  border-radius: .28571429rem;
+  border: 1px solid rgba(34,36,38,.15);
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+}
+
+.wizard .step {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  padding-bottom: 6px;
-  padding-top: 6px;
-}
-
-.wizard-step {
-  flex: 1;
-}
-
-.wizard-dot {
+  -webkit-box-flex: 1;
+  -ms-flex: 1 0 auto;
+  flex: 1 0 auto;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  vertical-align: middle;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
-  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
   justify-content: center;
+  margin: 0 0;
+  padding: 1.14285714em 2em;
+  background: #fff;
+  color: rgba(0,0,0,.87);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 0;
+  border: none;
+  border-right: 1px solid rgba(34,36,38,.15);
+  -webkit-transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
+  transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
+  transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease;
+  transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease,-webkit-box-shadow .1s ease;
 }
 
-.wizard-connector-left, .wizard-connector-right {
-  flex: 1;
+.wizard .step:first-child {
+  padding-left: 2em;
+  border-radius: .28571429rem 0 0 .28571429rem;
+}
+
+.wizard .step:after {
+  display: none;
+  position: absolute;
+  z-index: 2;
+  content: '';
+  top: 50%;
+  right: 0;
+  border: medium none;
+  background-color: #fff;
+  width: 1.14285714em;
+  height: 1.14285714em;
+  border-style: solid;
+  border-color: rgba(34,36,38,.15);
+  border-width: 0 1px 1px 0;
+  -webkit-transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
+  transition: background-color .1s ease,opacity .1s ease,color .1s ease,-webkit-box-shadow .1s ease;
+  transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease;
+  transition: background-color .1s ease,opacity .1s ease,color .1s ease,box-shadow .1s ease,-webkit-box-shadow .1s ease;
+  -webkit-transform: translateY(-50%) translateX(50%) rotate(-45deg);
+  transform: translateY(-50%) translateX(50%) rotate(-45deg);
+}
+
+.step-wrapper {
+  padding: 20px 0;
+  display: none;
+}
+.step-wrapper.active {
+  display: block;
+}
+
+.step-indicator {
+  border-collapse: separate;
+  display: table;
+  margin-left: 0px;
+  position: relative;
+  table-layout: fixed;
+  text-align: center;
+  vertical-align: middle;
+  padding-left: 0;
+  padding-top: 20px;
+}
+
+.step-indicator li {
+  display: table-cell;
+  position: relative;
+  float: none;
+  padding: 0;
+  width: 1%;
+}
+.step-indicator li:after {
+  background-color: #ccc;
+  content: "";
+  display: block;
   height: 1px;
-  background-color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  width: 100%;
+  top: 32px;
+}
+.step-indicator li:after {
+  left: 50%;
+}
+.step-indicator li:last-child:after {
+  display: none;
+}
+.step-indicator li.active .step {
+  border-color: #4183d7;
+  color: #4183d7;
+}
+.step-indicator li.active .caption {
+  color: #4183d7;
+}
+.step-indicator li.complete:after {
+  background-color: #87d37c;
+}
+.step-indicator li.complete .step {
+  border-color: #87d37c;
+  color: #87d37c;
+}
+.step-indicator li.complete .caption {
+  color: #87d37c;
+}
+.step-indicator .step {
+  background-color: #fff;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  color: #ccc;
+  font-size: 24px;
+  height: 64px;
+  line-height: 64px;
+  margin: 0 auto;
+  position: relative;
+  width: 64px;
+  z-index: 1;
+}
+.step-indicator .step:hover {
+  cursor: pointer;
+}
+.step-indicator .caption {
+  color: #ccc;
+  padding: 11px 16px;
 }
 
-.wizard-step:first-child .wizard-connector-left,
-.wizard-step:last-child .wizard-connector-right {
-  background-color: transparent;
+/*!
+** MOBILE
+*/
+
+.wizard-progress {
+  overflow: hidden;
+  position: sticky;
+  width: 100%;
+  background: var(--color-background);
+  padding: 6px 0;
+  z-index: 9999;
+  top: 0;
 }
 
-.wizard-number {
-  /* Center the content */
-  align-items: center;
-  display: flex;
-  justify-content: center;
+.wizard-progress .step-1:before {
+  content: "1";
+  background: var(--color-info);
+  text-align: center;
+}
 
-  font-size: 16px;
-  font-weight: bold;
-  background-color: var(--color-info);
-  color: var(--color-light);
-  border-radius: 9999px;
-  height: 36px;
+.wizard-progress .step-2:before {
+  content: "2";
+  background: var(--color-info);
+  text-align: center;
+}
+
+.wizard-progress .step-3:before {
+  content: "3";
+  background: var(--color-info);
+  text-align: center;
+}
+
+.wizard-progress .step-4:before {
+  content: "4";
+  background: var(--color-info);
+  text-align: center;
+}
+
+.wizard-progress div {
+  list-style-type: none;
+  font-size: 12px;
+  float: left;
+  position: relative;
+  text-align: center;
+  z-index: 0;
+}
+
+.wizard-progress div:before {
   width: 36px;
-
-  /* OPTIONAL: Spacing between it and connectors */
-  margin-left: 4px;
-  margin-right: 4px;
+  height: 36px;
+  line-height: 36px;
+  display: block;
+  font-size: 20px;
+  color: #ffffff;
+  background: var(--color-info);
+  border-radius: 50%;
+  margin: 0 auto 5px auto;
 }
 
-.wizard-step-completed .wizard-number {
-  background-color: var(--color-success);
-  color: var(--color-light);
+.wizard-progress div:after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  background: var(--color-info);
+  position: absolute;
+  left: 0;
+  top: 18px;
+  z-index: -1;
+}
+
+.wizard-progress div.active:before, .wizard-progress div.active:after {
+  background: var(--color-primary);
+}
+
+.wizard-progress div.completed:before, .wizard-progress div.completed:after {
+  background: var(--color-success);
 }

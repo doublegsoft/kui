@@ -75,6 +75,10 @@ PropertiesEditor.prototype.render = function(element) {
   if (element.getProperties) elementProperties = element.getProperties();
   else elementProperties = element.groups;
 
+  if (!elementProperties) {
+    elementProperties = [];
+  }
+
   let container = dom.find(this.containerId);
   container.innerHTML = '';
   for (let i = 0; i < elementProperties.length; i++) {

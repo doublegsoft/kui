@@ -1441,246 +1441,6 @@ ajax.tabs = function(opts) {
   container.appendChild(ul);
   container.appendChild(div);
 };
-if (typeof dialog === 'undefined') dialog = {};
-
-dialog.alert = function (message) {
-  layer.open({
-    type: 0,
-    icon: 0,
-    offset: '150px',
-    shade: 0,
-    shadeClose: true,
-    title: '警告',
-    content: message,
-  });
-};
-
-
-dialog.info = function (message) {
-  layer.open({
-    type: 0,
-    offset: '150px',
-    shade: 0,
-    shadeClose: true,
-    title: '信息',
-    content: message,
-  });
-};
-
-/**
- * 支持shadeClose
- */
-dialog.info2 = function (message) {
-  layer.open({
-    type: 0,
-    offset: '100px',
-    shade: 0.3,
-    shadeClose: true,
-    title: '信息',
-    content: message,
-  });
-};
-
-dialog.error = function (message) {
-  message = message.replaceAll('\n', '<br>');
-  layer.open({
-    type: 0,
-    icon: 2,
-    offset: '150px',
-    shade: 0,
-    shadeClose: true,
-    title: '错误',
-    content: message,
-  });
-};
-
-dialog.success = function (message, callback) {
-  if (callback) {
-    layer.open({
-      type: 0,
-      icon: 1,
-      offset: '150px',
-      shade: 0,
-      shadeClose: true,
-      title: '成功',
-      content: message,
-      btn: ['确定', '确定并返回'],
-      yes: function (index, layero) {
-        layer.close(index);
-      },
-      btn2: function (index, layero) {
-        layer.close(index);
-        callback();
-      }
-    });
-  } else {
-    layer.open({
-      type: 0,
-      icon: 1,
-      offset: '150px',
-      shade: 0,
-      shadeClose: true,
-      title: '成功',
-      content: message
-    });
-  }
-};
-
-dialog.confirm = function (message, callback) {
-  layer.confirm(message, {
-    title: '确认',
-    btn: ['确定', '取消'] //按钮
-  }, function (index) {
-    layer.close(index);
-    callback();
-  }, function () {
-
-  });
-};
-
-dialog.view = function (opts) {
-  let dialogTemplate = '' +
-    '<div class="modal fade" id="dialogApplication">' +
-    '  <div class="modal-dialog modal-dialog-centered">' +
-    '    <div class="modal-content">' +
-    '      <div class="modal-header">' +
-    '        <h4 class="modal-title">{{title}}</h4>' +
-    '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
-    '      </div>' +
-    '      <div id="dialogApplicationBody" class="modal-body">{{body}}</div>' +
-    '      <div class="modal-footer">' +
-    '        {{#each buttons}}' +
-    '        <button type="button" class="btn {{class}}" data-dismiss="modal">{{text}}</button>' +
-    '        {{/each}}' +
-    '        <button type="button" class="btn btn-close" data-dismiss="modal">关闭</button>' +
-    '      </div>' +
-    '    </div>' +
-    '  </div>' +
-    '</div>';
-  let title = opts.title;
-  let url = opts.url;
-  let body = $(document.body);
-
-  if ($('#dialogApplication').length)
-    $('#dialogApplication').remove();
-
-  let buttons = [];
-  if (opts.save) {
-    buttons.push({
-      text: '保存',
-      class: 'btn-save',
-      success: opts.save
-    })
-  }
-  $.ajax({
-    url: url,
-    success: function (resp) {
-      let template = Handlebars.compile(dialogTemplate);
-      let html = template({
-        title: title,
-        body: resp,
-        buttons: buttons
-      });
-      $(document.body).append(html);
-      $('#dialogApplication').modal('show');
-    }
-  });
-};
-
-dialog.select = function(opts) {
-  ajax.view({
-    url: opts.url,
-    success: function(resp) {
-      layer.open({
-        type: 0,
-        icon: 1,
-        offset: '150px',
-        shade: 0.5,
-        shadeClose: true,
-        title: opts.title,
-        content: resp
-      });
-    }
-  });
-};
-
-dialog.simplelist = async function(opt) {
-  let data = await xhr.promise({
-    url: opt.url,
-    params: opt.params || {},
-  });
-  let holder = dom.element(`
-    <div>
-      <ul class="list-group"></ul>
-    </div>
-  `);
-  let ul = dom.find('ul', holder);
-  for (let i = 0; i < data.length; i++) {
-    let item = data[i];
-    let li = dom.create('li', 'list-group-item', 'list-group-item-action');
-    dom.model(li, item);
-    li.innerText = item[opt.fields.text];
-    ul.appendChild(li);
-
-  }
-  layer.open({
-    type: 0,
-    closeBtn: 1,
-    btn: [],
-    shade: 0.5,
-    shadeClose: true,
-    title: '',
-    content: holder.innerHTML,
-    success: function(layro, index) {
-      layro.get(0).querySelectorAll('li').forEach((el, idx) => {
-        dom.bind(el, 'click', (ev) => {
-          layer.close(layer.index);
-          let model = dom.model(ev.target);
-          opt.onAccept(model);
-        });
-      })
-    }
-  });
-};
-
-dialog.html = function(opt) {
-  layer.open({
-    type: 0,
-    closeBtn: 1,
-    offset: '150px',
-    shade: 0.5,
-    area : ['50%', ''],
-    shadeClose: true,
-    title: opt.title || '&nbsp;',
-    content: opt.html,
-    btn: ['确定', '关闭'],
-    success: function(layero, index) {
-      if (opt.load) opt.load(layero, index);
-    },
-    yes: function (index) {
-      layer.close(index);
-      opt.success();
-    },
-    btn1: function () {
-
-    }
-  });
-};
-
-dialog.iframe = function(opt) {
-  layer.open({
-    title: opt.title,
-    type: 2,
-    area: [opt.width, opt.height],
-    // fixed: false, //不固定
-    // maxmin: true,
-    content: opt.url,
-    resize: false,
-    maxmin: true,
-    shade: false,
-    success: opt.success || function(layro, index) {},
-  });
-}
 var dom = {};
 
 dom.value = function(selector, val) {
@@ -2583,630 +2343,21 @@ dom.html = function(element) {
   let div = dom.element('<div></div>');
   div.appendChild(element);
   return div.innerHTML;
-}
-/**
- * Encapsulates all functions of list view container.
- * <p>
- * And the functions are listed below:
- *
- * 1. RELOAD a list
- * 2. ADD an item to a list
- * 3. REMOVE an item from a list
- * 4. CHANGE an item in a list
- * 5. REORDER items in a list
- * 6. LOAD more items into a list
- * 7. CHECK an item in a list
- * 8. SELECT an item in a list
- */
-function ListView(opt) {
-  // the remote data source
-  this.url = opt.url;
-  this.usecase = opt.usecase;
-  this.params = opt.params || {};
-  // 懒加载标志，通常用于多级联动时的次级列表，不主动加载
-  this.lazy = opt.lazy === true;
-  this.hoverable = opt.hoverable !== false;
-  this.activateable = opt.activateable === true;
-  this.itemClass = opt.itemClass || [];
-
-  this.idField = opt.idField;
-
-  /*!
-  ** 用于比较用的标识字段。
-  */
-  this.compare = opt.compare || function(selection, row) {return false;};
-  this.selections = opt.selections || [];
-  this.local = opt.local || [];
-  this.create = opt.create || function(idx, row) {};
-  this.complete = opt.complete;
-
-  this.draggable = opt.draggable === true;
-
-  this.start = opt.start || 0;
-  this.limit = opt.limit || -1;
-
-  this.borderless = opt.borderless || false;
-  this.height = opt.height;
-  this.tooltip = opt.tooltip;
-  this.required = opt.required || false;
-  // event callback
-  this.onRemove = opt.onRemove;
-  this.onReorder = opt.onReorder;
-  this.onCheck = opt.onCheck;
-  this.onSelect = opt.onSelect;
-  this.onFilter = opt.onFilter;
-  this.onAdd = opt.onAdd;
-  this.onSearch = opt.onSearch;
-  this.onClick = opt.onClick;
-
-  this.observableItems = new rxjs.Observable();
 };
 
-/**
- * Fetch data from remote data source.
- */
-ListView.prototype.fetch = async function (params) {
-  let requestParams = {};
-  params = params || {};
-  utils.clone(this.params, requestParams);
-  utils.clone(params, requestParams);
-  let self = this;
-  if (this.url) {
-    this.data = this.data || {};
-    this.data.start = this.start;
-    this.data.limit = this.limit;
-
-    let data = await xhr.promise({
-      url: this.url,
-      params: requestParams,
-    });
-    Array.prototype.push.apply(self.local, data);
-    self.append(data);
-  } else {
-    self.append(this.local);
+dom.init = function (owner, element) {
+  if (!element) return;
+  if (element.children.length == 0) {
+    let name = element.getAttribute('name');
+    if (!name || name == '') {
+      name = element.getAttribute('widget-id');
+    }
+    if (!name || name == '') return;
   }
-};
-
-/**
- * Renders a list view under its container.
- */
-ListView.prototype.render = function(containerId, loading) {
-  if (typeof containerId === 'string')
-    this.container = document.querySelector(containerId);
-  else
-    this.container = containerId;
-  this.container.innerHTML = '';
-  let ulHeight = this.height - 37;
-  // style="height: 120px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.125); border-top: none;"
-  if (this.onFilter) {
-    let topbar = dom.element(`
-      <div class="input-group position-sticky" style="top: 0; left: 0; z-index: 10;">
-        <div class="input-group-prepend">
-          <span class="input-group-text" style="border-bottom-left-radius: unset;">
-            <i class="fas fa-search"></i>
-          </span>
-        </div>
-        <input class="form-control" placeholder="搜索..."  style="border-bottom-right-radius: unset;">
-        <div class="input-group-append">
-          <span class="input-group-text pointer text-primary" style="border-bottom-right-radius: unset;">
-            <i class="fas fa-plus"></i>
-          </span>
-          <span class="input-group-text" style="border-bottom-right-radius: unset;">
-            <i class="fas fa-question icon-general"></i>
-          </span>
-          <span class="input-group-text" style="border-bottom-right-radius: unset;">
-            <i class="fas fa-asterisk icon-required"></i>
-          </span>
-        </div>
-      </div>
-    `);
-    let input = dom.find('input', topbar);
-    dom.bind(input, 'input', ev => {
-      clearTimeout(this.delayToSearch);
-      this.delayToSearch = setTimeout(() => {
-        this.onFilter(this, input.value);
-      }, 500);
-    });
-    if (!this.required) {
-      topbar.children[2].children[2].remove();
-    }
-    if (!this.tooltip) {
-      topbar.children[2].children[1].remove();
-    }
-    if (!this.onAdd) {
-      topbar.children[2].children[0].remove();
-    }
-    if (topbar.children[2].children.length == 0) {
-      topbar.children[2].remove();
-    }
-    this.container.appendChild(topbar);
+  for (let i = 0; i < element.children.length; i++) {
+    let child = element.children[i];
+    dom.init(child);
   }
-
-  let ul = dom.create('ul', 'list-group', 'full-width');
-  if (this.borderless) {
-    ul.classList.add('b-a-0');
-  }
-  if (this.onFilter) {
-    let ulContainer = dom.create('div');
-    ulContainer.style.height = ulHeight + 'px';
-    ulContainer.style.overflowY = 'auto';
-    ulContainer.style.border = '1px solid rgba(0, 0, 0, 0.125)';
-    ulContainer.style.borderTop = '';
-
-    ulContainer.appendChild(ul);
-    this.container.appendChild(ulContainer);
-  } else {
-    this.container.appendChild(ul);
-  }
-
-  if (loading !== false && this.lazy !== true)
-    this.reload();
-};
-
-/**
- * Reloads list items into a list.
- */
-ListView.prototype.reload = function(params) {
-  params = params || {};
-  let ul = dom.find('ul', this.container);
-  ul.innerHTML = '';
-
-  this.start = 0;
-  // 如果指定了远程链接，则本地数据无效
-  if (this.url)
-    this.local = [];
-  this.fetch(params);
-};
-
-/**
- * Loads more list items into a list.
- */
-ListView.prototype.load = function() {
-  this.start = this.local.length;
-  this.fetch();
-};
-
-ListView.prototype.remove = function(model) {
-  if (this.idField) {
-    let ul = dom.find('ul', this.container);
-    for (let i = 0; i < ul.children.length; i++) {
-      let child = ul.children[i];
-      let childModel = dom.model(child);
-      if (childModel[this.idField] === model[this.idField]) {
-        child.remove();
-      }
-    }
-  }
-};
-
-/**
- * Appends list item dom element(s) with the given data to list view.
- *
- * @param {any} data
- *        an array or object
- *
- * @private
- */
-ListView.prototype.append = function(data, index) {
-  let self = this;
-  let ul = this.container.querySelector('ul');
-  let len = ul.querySelectorAll('li').length;
-
-  if (Array.isArray(data)) {
-    let rows = data;
-    for (let i = 0; i < rows.length; i++) {
-      this.append(rows[i]);
-    }
-    if (self.complete) {
-      self.complete(data);
-    }
-  } else {
-    let row = data;
-    // check duplicated
-    if (this.idField) {
-      for (let i = 0; i < ul.children.length; i++) {
-        let child = ul.children[i];
-        let childModel = dom.model(child);
-        if (childModel[this.idField] === row[this.idField]) {
-          return;
-        }
-      }
-    }
-
-    let li = dom.create('li', 'list-group-item');
-    if (this.hoverable !== false) {
-      li.classList.add('list-group-item-action');
-    }
-    if (this.activateable === true) {
-      dom.bind(li, 'click', ev => {
-        for (let i = 0; i < li.parentElement.children.length; i++) {
-          let el = li.parentElement.children[i];
-          el.classList.remove('active');
-        }
-        li.classList.add('active');
-      });
-    }
-    for (let i = 0; i < this.itemClass.length; i++) {
-      li.classList.add(this.itemClass[i]);
-    }
-    if (this.borderless) {
-      li.classList.add('b-a-0');
-    }
-    if (this.onClick) {
-      dom.bind(li, 'click', this.onClick);
-    }
-    li.style.paddingLeft = '16px';
-    li.style.paddingRight = '16px';
-    li.style.paddingTop = '8px';
-    li.style.paddingBottom = '8px';
-    li.style.display = 'flex';
-    li.style.alignItems = 'center';
-
-    if (this.onFilter) {
-      li.style.borderLeftWidth = '0';
-      li.style.borderRightWidth = '0';
-      li.style.borderBottomWidth = '0';
-    }
-
-    let div = this.create(len, row, li);
-
-    if (this.onCheck) {
-      let input = dom.element(`
-        <input class="pointer checkbox color-info is-outline mr-2" type="checkbox">
-      `);
-      for (let i = 0; i < this.selections.length; i++) {
-        if (this.compare(this.selections[i], row)) {
-          input.setAttribute('checked', true);
-          break;
-        }
-      }
-      dom.bind(input, 'change', function() {
-        self.onCheck(this.checked, dom.model(this), this);
-      });
-      dom.model(input, row);
-      li.appendChild(input);
-    }
-    li.appendChild(div);
-
-    if (this.idField) {
-      li.setAttribute("data-list-item-id", row[this.idField])
-    }
-    dom.model(li, row);
-
-    if (typeof index === 'number') {
-      if (index < 0) {
-        ul.insertBefore(li, ul.children[ul.children.length + index]);
-      } else {
-        ul.insertBefore(li, ul.children[index]);
-      }
-    } else {
-      ul.appendChild(li);
-    }
-
-    if (this.onRemove) {
-
-      let link = dom.element(`
-        <a class="btn text-danger float-right font-18" style="padding: 0; margin-left: auto;">
-          <i class="fas fa-times" style=""></i>
-        </a>
-      `);
-      dom.bind(link, 'click', function(ev) {
-        ev.stopPropagation();
-        self.onRemove(this.parentElement, dom.model(this.parentElement));
-      });
-      dom.model(link, row);
-      li.appendChild(link);
-    }
-
-    if (this.onReorder)
-      this.setReorderable(li);
-    else if (this.draggable) {
-      li.setAttribute("draggable", "true");
-      li.addEventListener('dragover', function (event) {
-        event.preventDefault();
-      });
-      li.addEventListener("dragstart", function(event) {
-
-      });
-    }
-  }
-};
-
-ListView.prototype.replace = function(data) {
-  let ul = this.container.querySelector('ul');
-  for (let i = 0; i < ul.children.length; i++) {
-    let li = ul.children[i];
-    let model = dom.model(li);
-    if (model[this.idField] === data[this.idField]) {
-      dom.model(li, data);
-      li.innerHTML = '';
-      li.appendChild(this.create(i, data));
-      break;
-    }
-  }
-};
-
-ListView.prototype.search = function(query) {
-  let ul = this.container.querySelector('ul');
-  for (let i = 0; i < ul.children.length; i++) {
-    let li = ul.children[i];
-    if (li.innerText.indexOf(query) != -1) {
-      li.style.display = '';
-    } else {
-      li.style.display = 'none';
-    }
-  }
-};
-
-ListView.prototype.setReorderable = function(li) {
-  let ul = dom.find('ul', this.container);
-
-  ul.addEventListener('dragover', function (event) {
-    event.preventDefault();
-  });
-  ul.ondrop = event => {
-    if (this.onReorder) {
-      this.onReorder(dom.model(this.draggingElement), this.getItemIndex(this.draggingElement),
-        this.draggingElementOriginalIndex);
-    }
-    this.draggingElement.style.opacity = '';
-    this.draggingElement = null;
-    this.clonedDraggingElement = null;
-  };
-
-  li.setAttribute("draggable", "true");
-  li.ondragover = event => {
-    let li = dom.ancestor(event.target, 'li');
-    let ul = li.parentElement;
-    if (li == this.draggingElement) {
-      return;
-    }
-
-    let liIndex = this.getItemIndex(li);
-    if (liIndex < this.draggingElementIndex) {
-      ul.insertBefore(this.draggingElement, li);
-    } else if (liIndex > this.draggingElementIndex) {
-      if (li.nextElementSibling == null) {
-        ul.appendChild(this.draggingElement);
-      } else {
-        ul.insertBefore(this.draggingElement, li.nextElementSibling);
-      }
-    }
-
-    this.draggingElementIndex = liIndex;
-    event.preventDefault();
-  };
-  li.ondragstart = event => {
-    let li = dom.ancestor(event.target, 'li');
-    let ul = li.parentElement;
-    let x = event.layerX;
-    let y = event.layerY;
-    let target = event.target;
-    y = target.offsetTop + y;
-
-    this.clonedDraggingElement = li.cloneNode(true);
-    console.log(this.clonedDraggingElement);
-
-    this.draggingElement = li;
-    this.draggingElement.style.opacity = "0.3";
-    this.draggingElementIndex = this.getItemIndex(li);
-    this.draggingElementOriginalIndex = this.draggingElementIndex;
-
-    event.dataTransfer.setData("id", li.getAttribute('data-list-item-id'));
-    event.dataTransfer.setData("y", y);
-  };
-};
-
-ListView.prototype.getItemIndex = function(li) {
-  let ul = li.parentElement;
-  for (let i = 0; i < ul.children.length; i++) {
-    if (li == ul.children[i]) {
-      return i;
-    }
-  }
-};
-
-ListView.prototype.setHeight = function(height) {
-  let ul = this.container.querySelector('ul');
-  ul.style.height = height + 'px';
-};
-
-ListView.prototype.activate = function(li) {
-  let ul = this.container.querySelector('ul');
-  for (let i = 0; i < ul.children.length; i++) {
-    ul.children[i].classList.remove('active');
-  }
-  li.classList.add('active');
-};
-
-ListView.prototype.subscribe = function(name, callback) {
-
-};
-
-function Timeline(opt) {
-  this.url = opt.url;
-  this.params = opt.params || {};
-
-  this.data = opt.data || [];
-
-  this.fnTitle = opt.title || function(row, index) { return ''; };
-  this.fnSubtitle = opt.subtitle || function(row, index) { return ''; };
-  this.fnContent = opt.content || function(row, index) { return ''; };
-
-  this.onComplete = opt.onComplete;
-}
-
-Timeline.prototype.createTile = function(row, index) {
-  let ret = dom.element(`
-    <li class="timeline-item">
-      <div class="time"></div>
-      <div class="small text-muted"></div>
-      <p></p>
-    </li>
-  `);
-  let title = ret.children[0];
-  let subtitle = ret.children[1];
-  let content = ret.children[2];
-  if (this.fnTitle) {
-    let el = this.fnTitle(row, index);
-    if (typeof el === 'undefined')
-      title.innerHTML = '';
-    else if (typeof el === 'string' || typeof el === 'number')
-      title.innerHTML = el;
-    else
-      title.appendChild(el);
-  }
-  if (this.fnSubtitle) {
-    let el = this.fnSubtitle(row, index);
-    if (typeof el === 'undefined')
-      subtitle.innerHTML = '';
-    else if (typeof el === 'string' || typeof el === 'number')
-      subtitle.innerHTML = el;
-    else
-      subtitle.appendChild(el);
-  }
-  if (this.fnContent) {
-    let el = this.fnContent(row, index);
-    if (typeof el === 'undefined')
-      content.innerHTML = '';
-    else if (typeof el === 'string' || typeof el === 'number')
-      content.innerHTML = el;
-    else
-      content.appendChild(el);
-  }
-  return ret;
-};
-
-Timeline.prototype.render = function(container, params) {
-  let self = this;
-  if (typeof container === 'string') {
-    this.container = document.querySelector(container);
-  } else {
-    this.container = container;
-  }
-  this.container.innerHTML = '';
-
-  params = params || {};
-  let ul = dom.create('ul', 'timeline-simple');
-  this.container.appendChild(ul);
-
-  let requestParams = {};
-  utils.clone(this.params, requestParams);
-  utils.clone(params, requestParams);
-  if (this.url) {
-    xhr.post({
-      url: this.url,
-      params: requestParams,
-      success: function (resp) {
-        if (!resp.data) return;
-        let data = resp.data;
-        console.log(data);
-        for (let i = 0; i < data.length; i++) {
-          ul.appendChild(self.createTile(data[i], i));
-        }
-      }
-    });
-  } else {
-    for (let i = 0; i < self.data.length; i++) {
-      ul.appendChild(self.createTile(self.data[i], i));
-    }
-  }
-  if (self.onComplete) {
-    self.onComplete();
-  }
-};
-
-function Wizard(opt) {
-  let self = this;
-  this.topic = opt.topic;
-  this.steps = opt.steps || [];
-  this.root = dom.element(`
-    <div style="width: 100%">
-      <div class="wizard">
-      </div>
-      <div class="wizard-content">
-      </div>
-    </div>
-  `);
-}
-
-Wizard.prototype.render = function(containerId, params) {
-  this.container = dom.find(containerId);
-  this.body = dom.find('div.wizard-content', this.root);
-  let elSteps = dom.find('div.wizard', this.root);
-  for (let i = 0; i < this.steps.length; i++) {
-    let step = this.steps[i];
-    let elStep = dom.element(`
-      <div class="wizard-step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
-        <div class="content">
-          <div class="title"></div>
-          <div class="description"></div>
-        </div>
-      </div>
-    `);
-    step.index = i;
-    if (step.active) {
-      this.current = step;
-    }
-    if (this.current == null) {
-      elStep.classList.add('completed');
-    }
-    dom.find('div.title', elStep).innerHTML = step.title;
-    dom.find('div.description', elStep).innerHTML = step.description;
-    elSteps.appendChild(elStep);
-  }
-  this.container.appendChild(this.root);
-
-  this.display(this.current);
-};
-
-Wizard.prototype.display = function(current) {
-  let self = this;
-  let elStep = dom.find('div.step[data-step="' + current.index + '"]', this.root);
-  elStep.classList.remove('completed');
-  elStep.classList.add('active');
-
-  let existing = false;
-  for (let i = 0; i < this.body.children.length; i++) {
-    let child = this.body.children[i];
-    if (child.getAttribute('data-page-url') == current.url) {
-      existing = true;
-      child.classList.add('active');
-    } else {
-      child.classList.remove('active');
-    }
-  }
-
-  if (existing) return;
-
-  let tab = dom.create('div', 'tab-pane', 'active');
-  this.body.appendChild(tab)
-  ajax.view({
-    url: current.url,
-    page: current.page,
-    containerId: tab,
-    success: function(resp) {
-      self.body.children[self.body.children.length - 1].setAttribute('data-page-url', current.url);
-    }
-  });
-};
-
-/**
- * Completes the current step.
- */
-Wizard.prototype.commit = function () {
-  let elStep = dom.find('div.step.active', this.root);
-  let index = parseInt(elStep.getAttribute('data-step'));
-  elStep.classList.remove('active');
-  elStep.classList.add('completed');
-  this.display(this.steps[index + 1]);
-};
-
-Wizard.prototype.rollback = function () {
-  let elStep = dom.find('div.step.active', this.container);
-  let index = parseInt(elStep.getAttribute('data-step'));
-  elStep.classList.remove('active');
-  this.display(this.steps[index - 1]);
 };
 let utils = {};
 
@@ -3462,6 +2613,893 @@ utils.isExisting = (array, obj, idField) => {
   return false;
 };
 
+if (typeof dialog === 'undefined') dialog = {};
+
+dialog.alert = function (message) {
+  layer.open({
+    type: 0,
+    icon: 0,
+    offset: '150px',
+    shade: 0,
+    shadeClose: true,
+    title: '警告',
+    content: message,
+  });
+};
+
+
+dialog.info = function (message) {
+  layer.open({
+    type: 0,
+    offset: '150px',
+    shade: 0,
+    shadeClose: true,
+    title: '信息',
+    content: message,
+  });
+};
+
+/**
+ * 支持shadeClose
+ */
+dialog.info2 = function (message) {
+  layer.open({
+    type: 0,
+    offset: '100px',
+    shade: 0.3,
+    shadeClose: true,
+    title: '信息',
+    content: message,
+  });
+};
+
+dialog.error = function (message) {
+  message = message.replaceAll('\n', '<br>');
+  layer.open({
+    type: 0,
+    icon: 2,
+    offset: '150px',
+    shade: 0,
+    shadeClose: true,
+    title: '错误',
+    content: message,
+  });
+};
+
+dialog.success = function (message, callback) {
+  if (callback) {
+    layer.open({
+      type: 0,
+      icon: 1,
+      offset: '150px',
+      shade: 0,
+      shadeClose: true,
+      title: '成功',
+      content: message,
+      btn: ['确定', '确定并返回'],
+      yes: function (index, layero) {
+        layer.close(index);
+      },
+      btn2: function (index, layero) {
+        layer.close(index);
+        callback();
+      }
+    });
+  } else {
+    layer.open({
+      type: 0,
+      icon: 1,
+      offset: '150px',
+      shade: 0,
+      shadeClose: true,
+      title: '成功',
+      content: message
+    });
+  }
+};
+
+dialog.confirm = function (message, callback) {
+  layer.confirm(message, {
+    title: '确认',
+    btn: ['确定', '取消'] //按钮
+  }, function (index) {
+    layer.close(index);
+    callback();
+  }, function () {
+
+  });
+};
+
+dialog.view = function (opts) {
+  let dialogTemplate = '' +
+    '<div class="modal fade" id="dialogApplication">' +
+    '  <div class="modal-dialog modal-dialog-centered">' +
+    '    <div class="modal-content">' +
+    '      <div class="modal-header">' +
+    '        <h4 class="modal-title">{{title}}</h4>' +
+    '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
+    '      </div>' +
+    '      <div id="dialogApplicationBody" class="modal-body">{{body}}</div>' +
+    '      <div class="modal-footer">' +
+    '        {{#each buttons}}' +
+    '        <button type="button" class="btn {{class}}" data-dismiss="modal">{{text}}</button>' +
+    '        {{/each}}' +
+    '        <button type="button" class="btn btn-close" data-dismiss="modal">关闭</button>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  let title = opts.title;
+  let url = opts.url;
+  let body = $(document.body);
+
+  if ($('#dialogApplication').length)
+    $('#dialogApplication').remove();
+
+  let buttons = [];
+  if (opts.save) {
+    buttons.push({
+      text: '保存',
+      class: 'btn-save',
+      success: opts.save
+    })
+  }
+  $.ajax({
+    url: url,
+    success: function (resp) {
+      let template = Handlebars.compile(dialogTemplate);
+      let html = template({
+        title: title,
+        body: resp,
+        buttons: buttons
+      });
+      $(document.body).append(html);
+      $('#dialogApplication').modal('show');
+    }
+  });
+};
+
+dialog.select = function(opts) {
+  ajax.view({
+    url: opts.url,
+    success: function(resp) {
+      layer.open({
+        type: 0,
+        icon: 1,
+        offset: '150px',
+        shade: 0.5,
+        shadeClose: true,
+        title: opts.title,
+        content: resp
+      });
+    }
+  });
+};
+
+dialog.simplelist = async function(opt) {
+  let data = await xhr.promise({
+    url: opt.url,
+    params: opt.params || {},
+  });
+  let holder = dom.element(`
+    <div>
+      <ul class="list-group"></ul>
+    </div>
+  `);
+  let ul = dom.find('ul', holder);
+  for (let i = 0; i < data.length; i++) {
+    let item = data[i];
+    let li = dom.create('li', 'list-group-item', 'list-group-item-action');
+    dom.model(li, item);
+    li.innerText = item[opt.fields.text];
+    ul.appendChild(li);
+
+  }
+  layer.open({
+    type: 0,
+    closeBtn: 1,
+    btn: [],
+    shade: 0.5,
+    shadeClose: true,
+    title: '',
+    content: holder.innerHTML,
+    success: function(layro, index) {
+      layro.get(0).querySelectorAll('li').forEach((el, idx) => {
+        dom.bind(el, 'click', (ev) => {
+          layer.close(layer.index);
+          let model = dom.model(ev.target);
+          opt.onAccept(model);
+        });
+      })
+    }
+  });
+};
+
+dialog.html = function(opt) {
+  layer.open({
+    type: 0,
+    closeBtn: 1,
+    offset: '150px',
+    shade: 0.5,
+    area : ['50%', ''],
+    shadeClose: true,
+    title: opt.title || '&nbsp;',
+    content: opt.html,
+    btn: ['确定', '关闭'],
+    success: function(layero, index) {
+      if (opt.load) opt.load(layero, index);
+    },
+    yes: function (index) {
+      layer.close(index);
+      opt.success();
+    },
+    btn1: function () {
+
+    }
+  });
+};
+
+dialog.iframe = function(opt) {
+  layer.open({
+    title: opt.title,
+    type: 2,
+    area: [opt.width, opt.height],
+    // fixed: false, //不固定
+    // maxmin: true,
+    content: opt.url,
+    resize: false,
+    maxmin: true,
+    shade: false,
+    success: opt.success || function(layro, index) {},
+  });
+}
+/**
+ * Encapsulates all functions of list view container.
+ * <p>
+ * And the functions are listed below:
+ *
+ * 1. RELOAD a list
+ * 2. ADD an item to a list
+ * 3. REMOVE an item from a list
+ * 4. CHANGE an item in a list
+ * 5. REORDER items in a list
+ * 6. LOAD more items into a list
+ * 7. CHECK an item in a list
+ * 8. SELECT an item in a list
+ */
+function ListView(opt) {
+  // the remote data source
+  this.url = opt.url;
+  this.usecase = opt.usecase;
+  this.params = opt.params || {};
+  // 懒加载标志，通常用于多级联动时的次级列表，不主动加载
+  this.lazy = opt.lazy === true;
+  this.hoverable = opt.hoverable !== false;
+  this.activateable = opt.activateable === true;
+  this.itemClass = opt.itemClass || [];
+
+  this.emptyHtml = opt.emptyHtml;
+  this.idField = opt.idField;
+
+  /*!
+  ** 用于比较用的标识字段。
+  */
+  this.compare = opt.compare || function(selection, row) {return false;};
+  this.selections = opt.selections || [];
+  this.local = opt.local || [];
+  this.create = opt.create || function(idx, row) {};
+  this.complete = opt.complete;
+
+  this.draggable = opt.draggable === true;
+
+  this.start = opt.start || 0;
+  this.limit = opt.limit || -1;
+
+  this.borderless = opt.borderless || false;
+  this.height = opt.height;
+  this.tooltip = opt.tooltip;
+  this.required = opt.required || false;
+  // event callback
+  this.onRemove = opt.onRemove;
+  this.onReorder = opt.onReorder;
+  this.onCheck = opt.onCheck;
+  this.onSelect = opt.onSelect;
+  this.onFilter = opt.onFilter;
+  this.onAdd = opt.onAdd;
+  this.onSearch = opt.onSearch;
+  this.onClick = opt.onClick;
+
+  this.observableItems = new rxjs.Observable();
+};
+
+/**
+ * Fetch data from remote data source.
+ */
+ListView.prototype.fetch = async function (params) {
+  let requestParams = {};
+  params = params || {};
+  utils.clone(this.params, requestParams);
+  utils.clone(params, requestParams);
+  let self = this;
+  if (this.url) {
+    this.data = this.data || {};
+    this.data.start = this.start;
+    this.data.limit = this.limit;
+
+    let data = await xhr.promise({
+      url: this.url,
+      params: requestParams,
+    });
+    Array.prototype.push.apply(self.local, data);
+  }
+  if (self.local.length == 0) {
+    if (this.emptyHtml) {
+      this.container.innerHTML = this.emptyHtml;
+    }
+  } else {
+    self.append(this.local);
+  }
+};
+
+/**
+ * Renders a list view under its container.
+ */
+ListView.prototype.render = function(containerId, loading) {
+  if (typeof containerId === 'string')
+    this.container = document.querySelector(containerId);
+  else
+    this.container = containerId;
+  this.container.innerHTML = '';
+  let ulHeight = this.height - 37;
+  // style="height: 120px; overflow-y: auto; border: 1px solid rgba(0, 0, 0, 0.125); border-top: none;"
+  if (this.onFilter) {
+    let topbar = dom.element(`
+      <div class="input-group position-sticky" style="top: 0; left: 0; z-index: 10;">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="border-bottom-left-radius: unset;">
+            <i class="fas fa-search"></i>
+          </span>
+        </div>
+        <input class="form-control" placeholder="搜索..."  style="border-bottom-right-radius: unset;">
+        <div class="input-group-append">
+          <span class="input-group-text pointer text-primary" style="border-bottom-right-radius: unset;">
+            <i class="fas fa-plus"></i>
+          </span>
+          <span class="input-group-text" style="border-bottom-right-radius: unset;">
+            <i class="fas fa-question icon-general"></i>
+          </span>
+          <span class="input-group-text" style="border-bottom-right-radius: unset;">
+            <i class="fas fa-asterisk icon-required"></i>
+          </span>
+        </div>
+      </div>
+    `);
+    let input = dom.find('input', topbar);
+    dom.bind(input, 'input', ev => {
+      clearTimeout(this.delayToSearch);
+      this.delayToSearch = setTimeout(() => {
+        this.onFilter(this, input.value);
+      }, 500);
+    });
+    if (!this.required) {
+      topbar.children[2].children[2].remove();
+    }
+    if (!this.tooltip) {
+      topbar.children[2].children[1].remove();
+    }
+    if (!this.onAdd) {
+      topbar.children[2].children[0].remove();
+    }
+    if (topbar.children[2].children.length == 0) {
+      topbar.children[2].remove();
+    }
+    this.container.appendChild(topbar);
+  }
+
+  let ul = dom.create('ul', 'list-group', 'full-width');
+  if (this.borderless) {
+    ul.classList.add('b-a-0');
+  }
+  if (this.onFilter) {
+    let ulContainer = dom.create('div');
+    ulContainer.style.height = ulHeight + 'px';
+    ulContainer.style.overflowY = 'auto';
+    ulContainer.style.border = '1px solid rgba(0, 0, 0, 0.125)';
+    ulContainer.style.borderTop = '';
+
+    ulContainer.appendChild(ul);
+    this.container.appendChild(ulContainer);
+  } else {
+    this.container.appendChild(ul);
+  }
+
+  if (loading !== false && this.lazy !== true)
+    this.reload();
+};
+
+/**
+ * Reloads list items into a list.
+ */
+ListView.prototype.reload = function(params) {
+  params = params || {};
+  let ul = dom.find('ul', this.container);
+  ul.innerHTML = '';
+
+  this.start = 0;
+  // 如果指定了远程链接，则本地数据无效
+  if (this.url)
+    this.local = [];
+  this.fetch(params);
+};
+
+/**
+ * Loads more list items into a list.
+ */
+ListView.prototype.load = function() {
+  this.start = this.local.length;
+  this.fetch();
+};
+
+ListView.prototype.remove = function(model) {
+  if (this.idField) {
+    let ul = dom.find('ul', this.container);
+    for (let i = 0; i < ul.children.length; i++) {
+      let child = ul.children[i];
+      let childModel = dom.model(child);
+      if (childModel[this.idField] === model[this.idField]) {
+        child.remove();
+      }
+    }
+  }
+};
+
+/**
+ * Appends list item dom element(s) with the given data to list view.
+ *
+ * @param {any} data
+ *        an array or object
+ *
+ * @private
+ */
+ListView.prototype.append = function(data, index) {
+  let self = this;
+  let ul = this.container.querySelector('ul');
+  let len = ul.querySelectorAll('li').length;
+
+  if (Array.isArray(data)) {
+    let rows = data;
+    for (let i = 0; i < rows.length; i++) {
+      this.append(rows[i]);
+    }
+    if (self.complete) {
+      self.complete(data);
+    }
+  } else {
+    let row = data;
+    // check duplicated
+    if (this.idField) {
+      for (let i = 0; i < ul.children.length; i++) {
+        let child = ul.children[i];
+        let childModel = dom.model(child);
+        if (childModel[this.idField] === row[this.idField]) {
+          return;
+        }
+      }
+    }
+
+    let li = dom.create('li', 'list-group-item');
+    if (this.hoverable !== false) {
+      li.classList.add('list-group-item-action');
+    }
+    if (this.activateable === true) {
+      dom.bind(li, 'click', ev => {
+        for (let i = 0; i < li.parentElement.children.length; i++) {
+          let el = li.parentElement.children[i];
+          el.classList.remove('active');
+        }
+        li.classList.add('active');
+      });
+    }
+    for (let i = 0; i < this.itemClass.length; i++) {
+      li.classList.add(this.itemClass[i]);
+    }
+    if (this.borderless) {
+      li.classList.add('b-a-0');
+    }
+    if (this.onClick) {
+      dom.bind(li, 'click', this.onClick);
+    }
+    li.style.paddingLeft = '16px';
+    li.style.paddingRight = '16px';
+    li.style.paddingTop = '8px';
+    li.style.paddingBottom = '8px';
+    li.style.display = 'flex';
+    li.style.alignItems = 'center';
+
+    if (this.onFilter) {
+      li.style.borderLeftWidth = '0';
+      li.style.borderRightWidth = '0';
+      li.style.borderBottomWidth = '0';
+    }
+
+    let div = this.create(len, row, li);
+
+    if (this.onCheck) {
+      let input = dom.element(`
+        <input class="pointer checkbox color-info is-outline mr-2" type="checkbox">
+      `);
+      for (let i = 0; i < this.selections.length; i++) {
+        if (this.compare(this.selections[i], row)) {
+          input.setAttribute('checked', true);
+          break;
+        }
+      }
+      dom.bind(input, 'change', function() {
+        self.onCheck(this.checked, dom.model(this), this);
+      });
+      dom.model(input, row);
+      li.appendChild(input);
+    }
+    li.appendChild(div);
+
+    if (this.idField) {
+      li.setAttribute("data-list-item-id", row[this.idField])
+    }
+    dom.model(li, row);
+
+    if (typeof index === 'number') {
+      if (index < 0) {
+        ul.insertBefore(li, ul.children[ul.children.length + index]);
+      } else {
+        ul.insertBefore(li, ul.children[index]);
+      }
+    } else {
+      ul.appendChild(li);
+    }
+
+    if (this.onRemove) {
+      let link = dom.element(`
+        <a class="btn text-danger float-right font-18" style="padding: 0; margin-left: auto;">
+          <i class="fas fa-times" style=""></i>
+        </a>
+      `);
+      dom.bind(link, 'click', function(ev) {
+        ev.stopPropagation();
+        self.onRemove(this.parentElement, dom.model(this.parentElement));
+      });
+      dom.model(link, row);
+      li.appendChild(link);
+    }
+
+    if (this.onReorder)
+      this.setReorderable(li);
+    else if (this.draggable) {
+      li.setAttribute("draggable", "true");
+      li.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+      li.addEventListener("dragstart", function(event) {
+
+      });
+    }
+  }
+};
+
+ListView.prototype.replace = function(data) {
+  let ul = this.container.querySelector('ul');
+  for (let i = 0; i < ul.children.length; i++) {
+    let li = ul.children[i];
+    let model = dom.model(li);
+    if (model[this.idField] === data[this.idField]) {
+      dom.model(li, data);
+      li.innerHTML = '';
+      li.appendChild(this.create(i, data));
+      break;
+    }
+  }
+};
+
+ListView.prototype.search = function(query) {
+  let ul = this.container.querySelector('ul');
+  for (let i = 0; i < ul.children.length; i++) {
+    let li = ul.children[i];
+    if (li.innerText.indexOf(query) != -1) {
+      li.style.display = '';
+    } else {
+      li.style.display = 'none';
+    }
+  }
+};
+
+ListView.prototype.setReorderable = function(li) {
+  let ul = dom.find('ul', this.container);
+
+  ul.addEventListener('dragover', function (event) {
+    event.preventDefault();
+  });
+  ul.ondrop = event => {
+    if (this.onReorder) {
+      this.onReorder(dom.model(this.draggingElement), this.getItemIndex(this.draggingElement),
+        this.draggingElementOriginalIndex);
+    }
+    this.draggingElement.style.opacity = '';
+    this.draggingElement = null;
+    this.clonedDraggingElement = null;
+  };
+
+  li.setAttribute("draggable", "true");
+  li.ondragover = event => {
+    let li = dom.ancestor(event.target, 'li');
+    let ul = li.parentElement;
+    if (li == this.draggingElement) {
+      return;
+    }
+
+    let liIndex = this.getItemIndex(li);
+    if (liIndex < this.draggingElementIndex) {
+      ul.insertBefore(this.draggingElement, li);
+    } else if (liIndex > this.draggingElementIndex) {
+      if (li.nextElementSibling == null) {
+        ul.appendChild(this.draggingElement);
+      } else {
+        ul.insertBefore(this.draggingElement, li.nextElementSibling);
+      }
+    }
+
+    this.draggingElementIndex = liIndex;
+    event.preventDefault();
+  };
+  li.ondragstart = event => {
+    let li = dom.ancestor(event.target, 'li');
+    let ul = li.parentElement;
+    let x = event.layerX;
+    let y = event.layerY;
+    let target = event.target;
+    y = target.offsetTop + y;
+
+    this.clonedDraggingElement = li.cloneNode(true);
+    console.log(this.clonedDraggingElement);
+
+    this.draggingElement = li;
+    this.draggingElement.style.opacity = "0.3";
+    this.draggingElementIndex = this.getItemIndex(li);
+    this.draggingElementOriginalIndex = this.draggingElementIndex;
+
+    event.dataTransfer.setData("id", li.getAttribute('data-list-item-id'));
+    event.dataTransfer.setData("y", y);
+  };
+};
+
+ListView.prototype.getItemIndex = function(li) {
+  let ul = li.parentElement;
+  for (let i = 0; i < ul.children.length; i++) {
+    if (li == ul.children[i]) {
+      return i;
+    }
+  }
+};
+
+ListView.prototype.setHeight = function(height) {
+  let ul = this.container.querySelector('ul');
+  ul.style.height = height + 'px';
+};
+
+ListView.prototype.activate = function(li) {
+  let ul = this.container.querySelector('ul');
+  for (let i = 0; i < ul.children.length; i++) {
+    ul.children[i].classList.remove('active');
+  }
+  li.classList.add('active');
+};
+
+ListView.prototype.subscribe = function(name, callback) {
+
+};
+
+function Timeline(opt) {
+  this.url = opt.url;
+  this.params = opt.params || {};
+
+  this.data = opt.data || [];
+
+  this.fnTitle = opt.title || function(row, index) { return ''; };
+  this.fnSubtitle = opt.subtitle || function(row, index) { return ''; };
+  this.fnContent = opt.content || function(row, index) { return ''; };
+
+  this.onComplete = opt.onComplete;
+}
+
+Timeline.prototype.createTile = function(row, index) {
+  let ret = dom.element(`
+    <li class="timeline-item">
+      <div class="time"></div>
+      <div class="small text-muted"></div>
+      <p></p>
+    </li>
+  `);
+  let title = ret.children[0];
+  let subtitle = ret.children[1];
+  let content = ret.children[2];
+  if (this.fnTitle) {
+    let el = this.fnTitle(row, index);
+    if (typeof el === 'undefined')
+      title.innerHTML = '';
+    else if (typeof el === 'string' || typeof el === 'number')
+      title.innerHTML = el;
+    else
+      title.appendChild(el);
+  }
+  if (this.fnSubtitle) {
+    let el = this.fnSubtitle(row, index);
+    if (typeof el === 'undefined')
+      subtitle.innerHTML = '';
+    else if (typeof el === 'string' || typeof el === 'number')
+      subtitle.innerHTML = el;
+    else
+      subtitle.appendChild(el);
+  }
+  if (this.fnContent) {
+    let el = this.fnContent(row, index);
+    if (typeof el === 'undefined')
+      content.innerHTML = '';
+    else if (typeof el === 'string' || typeof el === 'number')
+      content.innerHTML = el;
+    else
+      content.appendChild(el);
+  }
+  return ret;
+};
+
+Timeline.prototype.render = function(container, params) {
+  let self = this;
+  if (typeof container === 'string') {
+    this.container = document.querySelector(container);
+  } else {
+    this.container = container;
+  }
+  this.container.innerHTML = '';
+
+  params = params || {};
+  let ul = dom.create('ul', 'timeline-simple');
+  this.container.appendChild(ul);
+
+  let requestParams = {};
+  utils.clone(this.params, requestParams);
+  utils.clone(params, requestParams);
+  if (this.url) {
+    xhr.post({
+      url: this.url,
+      params: requestParams,
+      success: function (resp) {
+        if (!resp.data) return;
+        let data = resp.data;
+        console.log(data);
+        for (let i = 0; i < data.length; i++) {
+          ul.appendChild(self.createTile(data[i], i));
+        }
+      }
+    });
+  } else {
+    for (let i = 0; i < self.data.length; i++) {
+      ul.appendChild(self.createTile(self.data[i], i));
+    }
+  }
+  if (self.onComplete) {
+    self.onComplete();
+  }
+};
+
+function Tabs(opts) {
+  this.navigator = dom.find(opts.navigatorId);
+  this.content = dom.find(opts.contentId);
+  this.tabActiveClass = opts.tabActiveClass;
+  this.tabs = opts.tabs;
+  this.lazy = opts.lazy !== false;
+  this.autoClear = opts.autoClear === true;
+}
+
+Tabs.prototype.loadPage = function(id, url, hidden, success) {
+  let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  ajax.view({
+    url: url,
+    containerId: contentPage,
+    success: success || function() {}
+  });
+  if (hidden === true) {
+    contentPage.style.display = 'none';
+  }
+  this.content.appendChild(contentPage);
+};
+
+Tabs.prototype.render = function() {
+  let self = this;
+
+  this.content.innerHTML = '';
+  this.navigator.innerHTML = '';
+
+  this.slider = dom.element('<div class="slider"></div>');
+  this.navigator.appendChild(this.slider);
+
+  this.tabs.forEach((tab, idx) => {
+    tab.style = tab.style || 'padding: 0 16px;';
+    let nav = dom.templatize(`
+      <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
+           data-tab-url="{{{url}}}"
+           data-tab-id="{{{id}}}" >{{{text}}}</div>
+    `, tab);
+    self.navigator.appendChild(nav);
+
+    // 绑定Tab点击事件
+    dom.bind(nav, 'click', (ev) => {
+      if (nav.classList.contains(self.tabActiveClass)) {
+        return;
+      }
+
+      // 处理以前激活的页签及内容
+      for (let i = 0; i < self.navigator.children.length; i++) {
+        let _nav = self.navigator.children[i];
+        _nav.classList.remove(self.tabActiveClass);
+      }
+
+      for (let i = 0; i < self.content.children.length; i++) {
+        self.content.children[i].style.display = 'none';
+      }
+
+      // 激活现在点击的页签及内容
+      self.activate(nav);
+
+      if (this.autoClear === true) {
+        // 只有在懒加载情况下，设置自动清除内容才有效
+        this.content.innerHTML = '';
+      }
+      let contentPage = dom.find('div[data-tab-content-id=' + nav.getAttribute('data-tab-id') + ']', self.content);
+      if (contentPage != null) {
+        contentPage.style.display = '';
+      } else {
+        let id = nav.getAttribute('data-tab-id');
+        let url = nav.getAttribute('data-tab-url');
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(id, url, false, tab.success);
+        }
+      }
+    });
+
+    // 激活默认页签及内容
+    if (self.lazy === true) {
+      if (idx == 0) {
+        self.activate(nav);
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(tab.id, tab.url, false, tab.success);
+        }
+      }
+    } else {
+      if (idx == 0) {
+        self.activate(nav);
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(tab.id, tab.url, false, tab.success);
+        }
+      } else {
+        if (tab.onClicked) {
+          tab.onClicked(ev);
+        } else {
+          self.loadPage(tab.id, tab.url, true, tab.success);
+        }
+      }
+    }
+  });
+};
+
+Tabs.prototype.activate = function (nav) {
+  nav.classList.add(this.tabActiveClass);
+  this.slider.style.width = nav.clientWidth + 'px';
+  this.slider.style.left = nav.offsetLeft + 'px';
+};
 /**
  * 聊天客户端SDK集成。
  *
@@ -3824,6 +3862,178 @@ Chat.prototype.stop = function() {
 if (typeof module !== 'undefined') {
   module.exports = { Chat };
 }
+
+function MobileWizard(opt) {
+  let self = this;
+  this.topic = opt.topic;
+  this.steps = opt.steps || [];
+  this.root = dom.element(`
+    <div style="width: 100%">
+      <div class="wizard-progress">
+      </div>
+      <div class="wizard-content">
+      </div>
+    </div>
+  `);
+}
+
+MobileWizard.prototype.render = function(containerId, params) {
+  this.container = dom.find(containerId);
+  this.content = dom.find('div.wizard-content', this.root);
+  let elSteps = dom.find('div.wizard-progress', this.root);
+  for (let i = 0; i < this.steps.length; i++) {
+    let step = this.steps[i];
+    let stepIndex = i + 1;
+    let elStep = dom.element(`
+      <div class="step-${stepIndex}" widget-on-render="" data-step="${i}" style="cursor: pointer;">
+        <strong class="title"></strong>
+      </div>
+    `);
+    step.index = i;
+    elStep.style.width = (100 / this.steps.length) + '%';
+    if (step.active === true) {
+      this.current = step;
+    }
+    dom.find('strong.title', elStep).innerHTML = step.title;
+    elSteps.appendChild(elStep);
+  }
+  this.container.appendChild(this.root);
+
+  this.display(this.current);
+};
+
+MobileWizard.prototype.display = function(current) {
+  let self = this;
+  let elStep = dom.find('div[data-step="' + current.index + '"]', this.root);
+  elStep.classList.remove('completed');
+  elStep.classList.add('active');
+  kuim.navigateWidget(current.url, this.content, {
+    wizard: this,
+  });
+};
+
+/**
+ * Completes the current step.
+ */
+MobileWizard.prototype.commit = function (params) {
+  let elStep = dom.find('div.active', this.root);
+  let index = parseInt(elStep.getAttribute('data-step'));
+  elStep.classList.remove('active');
+  elStep.classList.add('completed');
+  this.display(this.steps[index + 1]);
+};
+
+MobileWizard.prototype.rollback = function () {
+  let elStep = dom.find('div.step.active', this.container);
+  let index = parseInt(elStep.getAttribute('data-step'));
+  elStep.classList.remove('active');
+  this.display(this.steps[index - 1]);
+};
+
+function MobileForm(opts) {
+  let self = this;
+  this.fields = opts.fields;
+  this.readonly = opts.readonly || false;
+  this.saveOpt = opts.save;
+  this.readOpt = opts.read;
+}
+
+MobileForm.prototype.render = async function (container) {
+  let root = await this.root();
+  container.appendChild(root);
+};
+
+MobileForm.prototype.root = async function() {
+  let ret = dom.element(`
+    <div class="form form-horizontal"></div>
+  `);
+  for (let i = 0; i < this.fields.length; i++) {
+    let field = this.fields[i];
+    let el = null;
+    if (field.input === 'date') {
+      el = this.buildDate(field);
+    } else if (field.input === 'select') {
+      el = await this.buildSelect(field);
+    } else if (field.input === 'hidden') {
+      el = dom.templatize(`
+        <input type="hidden" name="{{name}}">
+      `, field);
+    } else {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18">
+            <input type="text" name="{{name}}" class="form-control">
+          </div>
+        </div>
+      `, field);
+    }
+    ret.appendChild(el);
+  }
+  return ret;
+};
+
+MobileForm.prototype.buildDate = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <label class="col-form-label"></label>
+        <input type="hidden" name="{{name}}">
+        <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">calendar_today</span>
+      </div>
+    </div>
+  `, field);
+  dom.bind(ret, 'click', ev => {
+    let rd = new Rolldate({
+      confirm: date => {
+        dom.find('label', ev.target).innerHTML = moment(date).format('YYYY年MM月DD日');
+        dom.find('input', ev.target).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
+      },
+    });
+    rd.show();
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildSelect = async function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <label class="col-form-label"></label>
+        <input type="hidden" name="{{name}}">
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
+      </div>
+    </div>
+  `, field);
+  let values = field.values;
+  if (!values && field.url) {
+    let data = await xhr.promise({
+      url: field.url,
+      params: {},
+    });
+    values = [];
+    for (let i = 0; i < data.length; i++) {
+      values.push({
+        text: data[i][field.textField],
+        value: data[i][field.valueField],
+      });
+    }
+  }
+  dom.bind(ret, 'click', ev => {
+    let rd = new Rolldate({
+      format: 'oo',
+      values: values,
+      confirm: data => {
+        dom.find('label', ev.target).innerHTML = data.text;
+        dom.find('input', ev.target).value = data.value;
+      },
+    });
+    rd.show();
+  });
+  return ret;
+};
 Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
   return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
@@ -3862,7 +4072,23 @@ kuim.navigateTo = async function (url, opt, clear) {
       kuim.reload(main, url, html, opt);
     }, 400);
   }, 200);
+};
 
+kuim.navigateWidget = function (url, container, opt) {
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    if (container.children[0]) {
+      container.children[0].classList.remove('in');
+      container.children[0].classList.add('out');
+    }
+    setTimeout(async () => {
+      container.innerHTML = '';
+      let html = await xhr.asyncGet({
+        url: url,
+      }, 'GET');
+      kuim.replace(container, url, html, opt);
+    }, 400);
+  }, 200);
 };
 
 kuim.navigateBack = function (opt) {
@@ -3893,10 +4119,10 @@ kuim.navigateBack = function (opt) {
 };
 
 kuim.reload = function (main, url, html, opt) {
+  opt = opt || {};
   let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
   let range = document.createRange();
   let fragment = range.createContextualFragment(html);
-  let prev = dom.find('[id^=page]', main);
   fragmentContainer.appendChild(fragment);
   let page = dom.find('[id^=page]', fragmentContainer);
   let pageId = page.getAttribute('id');
@@ -3905,8 +4131,11 @@ kuim.reload = function (main, url, html, opt) {
 
   fragmentContainer.setAttribute('kuim-page-id', pageId);
   fragmentContainer.setAttribute('kuim-page-url', url);
-  fragmentContainer.setAttribute('kuim-page-title', opt.title);
-  fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+
+  if (opt.title) {
+    fragmentContainer.setAttribute('kuim-page-title', opt.title);
+    fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+  }
 
   kuim.presentPageObj = window[pageId];
   kuim.presentPageObj.page.classList.add('in');
@@ -3915,6 +4144,34 @@ kuim.reload = function (main, url, html, opt) {
   kuim.presentPageObj.show(params);
 
   kuim.setTitleAndIcon(opt.title, opt.icon);
+  if (opt.success) {
+    opt.success();
+  }
+};
+
+kuim.replace = function (container, url, html, opt) {
+  opt = opt || {};
+  let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
+  let range = document.createRange();
+  let fragment = range.createContextualFragment(html);
+  container.appendChild(fragment);
+
+  let page = dom.find('[id^=page]', container);
+  let pageId = page.getAttribute('id');
+
+  if (opt.title) {
+    fragmentContainer.setAttribute('kuim-page-title', opt.title);
+    fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+  }page.classList.add('in');
+
+  let params = utils.getParameters(url);
+  window[pageId].show(params);
+
+  // pass options to page object
+  for (let key in opt) {
+    window[pageId][key] = opt[key];
+  }
+
   if (opt.success) {
     opt.success();
   }

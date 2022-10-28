@@ -7,7 +7,7 @@ var gulp = require('gulp');
 var jasmine = require('gulp-jasmine');
 // var jasmineBrowser = require('gulp-jasmine-browser');
 
-var uglify = require('gulp-uglifyes');
+var uglify = require('gulp-uglify');
 var babel = require('gulp-babel');
 var uglifycss = require('gulp-uglifycss');
 var concat = require('gulp-concat');
@@ -76,7 +76,7 @@ gulp.task('dist', function() {
     'src/js/editor/*.js', 'src/js/widget/*.js'])
     // .pipe(babel({presets: ['es2015']}))
     .pipe(concat('./kui-all.min.js'))
-    .pipe(uglify())
+    .pipe(uglify({}))
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/js/*.js', 'src/js/application/*.js', 'src/js/container/*.js', 'src/js/control/*.js',
@@ -89,30 +89,36 @@ gulp.task('dist', function() {
     'src/js/kui-validation.js', 'src/js/kui-formdata.js', 'src/js/kui-utils.js',
     'src/js/editor/DataSheet.js', 'src/js/container/Tabs.js', 'src/js/container/PaginationGrid.js',
     'src/js/container/Timeline.js', 'src/js/container/ListView.js', 'src/js/container/Wizard.js',
-    'src/js/application/Chat.js', 'src/js/kuit.js'])
+    'src/js/application/Chat.js',
+    'src/js/kuit.js'])
     .pipe(concat('./kui-all.tablet.min.js'))
-    .pipe(uglify())
+    .pipe(uglify({}))
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
     'src/js/kui-validation.js', 'src/js/kui-formdata.js', 'src/js/kui-utils.js',
     'src/js/editor/DataSheet.js', 'src/js/container/Tabs.js', 'src/js/container/PaginationGrid.js',
     'src/js/container/Timeline.js', 'src/js/container/ListView.js', 'src/js/container/Wizard.js',
-    'src/js/application/Chat.js', 'src/js/kuit.js'])
+    'src/js/application/Chat.js',
+    'src/js/kuit.js'])
     .pipe(concat('./kui-all.tablet.js'))
     .pipe(gulp.dest('./dist/'));
 
   // mobile js
-  gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
-    'src/js/container/ListView.js', 'src/js/container/Timeline.js', 'src/js/container/Wizard.js',
-    'src/js/kui-utils.js', 'src/js/application/Chat.js', 'src/js/kuim.js'])
+  gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dom.js', 'src/js/kui-utils.js',
+    'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/Timeline.js',
+    'src/js/container/Tabs.js', 'src/js/application/Chat.js',
+    'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
+    'src/js/kuim.js'])
     .pipe(concat('./kui-all.mobile.min.js'))
-    .pipe(uglify())
+    .pipe(uglify({}))
     .pipe(gulp.dest('./dist/'));
 
-  gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dialog.js', 'src/js/kui-dom.js',
-    'src/js/container/ListView.js', 'src/js/container/Timeline.js', 'src/js/container/Wizard.js',
-    'src/js/kui-utils.js', 'src/js/application/Chat.js', 'src/js/kuim.js'])
+  gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dom.js', 'src/js/kui-utils.js',
+    'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/Timeline.js',
+    'src/js/container/Tabs.js', 'src/js/application/Chat.js',
+    'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
+    'src/js/kuim.js'])
     .pipe(concat('./kui-all.mobile.js'))
     .pipe(gulp.dest('./dist/'));
 
@@ -179,11 +185,6 @@ gulp.task('dist', function() {
     .pipe(concat('./kui-all.mobile.min.css'))
     .pipe(uglifycss())
     .pipe(gulp.dest('./dist/'));
-});
-
-// Default Task
-gulp.task('default', function() {
-    
 });
 
 // gulp.task('default', ['compress', 'specs']);

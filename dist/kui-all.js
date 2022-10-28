@@ -5556,7 +5556,22 @@ dom.html = function(element) {
   let div = dom.element('<div></div>');
   div.appendChild(element);
   return div.innerHTML;
-}
+};
+
+dom.init = function (owner, element) {
+  if (!element) return;
+  if (element.children.length == 0) {
+    let name = element.getAttribute('name');
+    if (!name || name == '') {
+      name = element.getAttribute('widget-id');
+    }
+    if (!name || name == '') return;
+  }
+  for (let i = 0; i < element.children.length; i++) {
+    let child = element.children[i];
+    dom.init(child);
+  }
+};
 
 format = {};
 
@@ -9131,7 +9146,23 @@ kuim.navigateTo = async function (url, opt, clear) {
       kuim.reload(main, url, html, opt);
     }, 400);
   }, 200);
+};
 
+kuim.navigateWidget = function (url, container, opt) {
+  clearTimeout(kuim.delayToLoad);
+  kuim.delayToLoad = setTimeout(() => {
+    if (container.children[0]) {
+      container.children[0].classList.remove('in');
+      container.children[0].classList.add('out');
+    }
+    setTimeout(async () => {
+      container.innerHTML = '';
+      let html = await xhr.asyncGet({
+        url: url,
+      }, 'GET');
+      kuim.replace(container, url, html, opt);
+    }, 400);
+  }, 200);
 };
 
 kuim.navigateBack = function (opt) {
@@ -9162,10 +9193,10 @@ kuim.navigateBack = function (opt) {
 };
 
 kuim.reload = function (main, url, html, opt) {
+  opt = opt || {};
   let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
   let range = document.createRange();
   let fragment = range.createContextualFragment(html);
-  let prev = dom.find('[id^=page]', main);
   fragmentContainer.appendChild(fragment);
   let page = dom.find('[id^=page]', fragmentContainer);
   let pageId = page.getAttribute('id');
@@ -9174,8 +9205,11 @@ kuim.reload = function (main, url, html, opt) {
 
   fragmentContainer.setAttribute('kuim-page-id', pageId);
   fragmentContainer.setAttribute('kuim-page-url', url);
-  fragmentContainer.setAttribute('kuim-page-title', opt.title);
-  fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+
+  if (opt.title) {
+    fragmentContainer.setAttribute('kuim-page-title', opt.title);
+    fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+  }
 
   kuim.presentPageObj = window[pageId];
   kuim.presentPageObj.page.classList.add('in');
@@ -9184,6 +9218,34 @@ kuim.reload = function (main, url, html, opt) {
   kuim.presentPageObj.show(params);
 
   kuim.setTitleAndIcon(opt.title, opt.icon);
+  if (opt.success) {
+    opt.success();
+  }
+};
+
+kuim.replace = function (container, url, html, opt) {
+  opt = opt || {};
+  let fragmentContainer = dom.element(`<div style="height: 100%; width: 100%;"></div>`);
+  let range = document.createRange();
+  let fragment = range.createContextualFragment(html);
+  container.appendChild(fragment);
+
+  let page = dom.find('[id^=page]', container);
+  let pageId = page.getAttribute('id');
+
+  if (opt.title) {
+    fragmentContainer.setAttribute('kuim-page-title', opt.title);
+    fragmentContainer.setAttribute('kuim-page-icon', opt.icon || '');
+  }page.classList.add('in');
+
+  let params = utils.getParameters(url);
+  window[pageId].show(params);
+
+  // pass options to page object
+  for (let key in opt) {
+    window[pageId][key] = opt[key];
+  }
+
   if (opt.success) {
     opt.success();
   }
@@ -12174,6 +12236,7 @@ function ListView(opt) {
   this.activateable = opt.activateable === true;
   this.itemClass = opt.itemClass || [];
 
+  this.emptyHtml = opt.emptyHtml;
   this.idField = opt.idField;
 
   /*!
@@ -12226,7 +12289,11 @@ ListView.prototype.fetch = async function (params) {
       params: requestParams,
     });
     Array.prototype.push.apply(self.local, data);
-    self.append(data);
+  }
+  if (self.local.length == 0) {
+    if (this.emptyHtml) {
+      this.container.innerHTML = this.emptyHtml;
+    }
   } else {
     self.append(this.local);
   }
@@ -12449,7 +12516,6 @@ ListView.prototype.append = function(data, index) {
     }
 
     if (this.onRemove) {
-
       let link = dom.element(`
         <a class="btn text-danger float-right font-18" style="padding: 0; margin-left: auto;">
           <i class="fas fa-times" style=""></i>
@@ -12586,6 +12652,178 @@ ListView.prototype.activate = function(li) {
 
 ListView.prototype.subscribe = function(name, callback) {
 
+};
+
+function MobileForm(opts) {
+  let self = this;
+  this.fields = opts.fields;
+  this.readonly = opts.readonly || false;
+  this.saveOpt = opts.save;
+  this.readOpt = opts.read;
+}
+
+MobileForm.prototype.render = async function (container) {
+  let root = await this.root();
+  container.appendChild(root);
+};
+
+MobileForm.prototype.root = async function() {
+  let ret = dom.element(`
+    <div class="form form-horizontal"></div>
+  `);
+  for (let i = 0; i < this.fields.length; i++) {
+    let field = this.fields[i];
+    let el = null;
+    if (field.input === 'date') {
+      el = this.buildDate(field);
+    } else if (field.input === 'select') {
+      el = await this.buildSelect(field);
+    } else if (field.input === 'hidden') {
+      el = dom.templatize(`
+        <input type="hidden" name="{{name}}">
+      `, field);
+    } else {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18">
+            <input type="text" name="{{name}}" class="form-control">
+          </div>
+        </div>
+      `, field);
+    }
+    ret.appendChild(el);
+  }
+  return ret;
+};
+
+MobileForm.prototype.buildDate = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <label class="col-form-label"></label>
+        <input type="hidden" name="{{name}}">
+        <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">calendar_today</span>
+      </div>
+    </div>
+  `, field);
+  dom.bind(ret, 'click', ev => {
+    let rd = new Rolldate({
+      confirm: date => {
+        dom.find('label', ev.target).innerHTML = moment(date).format('YYYY年MM月DD日');
+        dom.find('input', ev.target).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
+      },
+    });
+    rd.show();
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildSelect = async function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <label class="col-form-label"></label>
+        <input type="hidden" name="{{name}}">
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
+      </div>
+    </div>
+  `, field);
+  let values = field.values;
+  if (!values && field.url) {
+    let data = await xhr.promise({
+      url: field.url,
+      params: {},
+    });
+    values = [];
+    for (let i = 0; i < data.length; i++) {
+      values.push({
+        text: data[i][field.textField],
+        value: data[i][field.valueField],
+      });
+    }
+  }
+  dom.bind(ret, 'click', ev => {
+    let rd = new Rolldate({
+      format: 'oo',
+      values: values,
+      confirm: data => {
+        dom.find('label', ev.target).innerHTML = data.text;
+        dom.find('input', ev.target).value = data.value;
+      },
+    });
+    rd.show();
+  });
+  return ret;
+};
+
+function MobileWizard(opt) {
+  let self = this;
+  this.topic = opt.topic;
+  this.steps = opt.steps || [];
+  this.root = dom.element(`
+    <div style="width: 100%">
+      <div class="wizard-progress">
+      </div>
+      <div class="wizard-content">
+      </div>
+    </div>
+  `);
+}
+
+MobileWizard.prototype.render = function(containerId, params) {
+  this.container = dom.find(containerId);
+  this.content = dom.find('div.wizard-content', this.root);
+  let elSteps = dom.find('div.wizard-progress', this.root);
+  for (let i = 0; i < this.steps.length; i++) {
+    let step = this.steps[i];
+    let stepIndex = i + 1;
+    let elStep = dom.element(`
+      <div class="step-${stepIndex}" widget-on-render="" data-step="${i}" style="cursor: pointer;">
+        <strong class="title"></strong>
+      </div>
+    `);
+    step.index = i;
+    elStep.style.width = (100 / this.steps.length) + '%';
+    if (step.active === true) {
+      this.current = step;
+    }
+    dom.find('strong.title', elStep).innerHTML = step.title;
+    elSteps.appendChild(elStep);
+  }
+  this.container.appendChild(this.root);
+
+  this.display(this.current);
+};
+
+MobileWizard.prototype.display = function(current) {
+  let self = this;
+  let elStep = dom.find('div[data-step="' + current.index + '"]', this.root);
+  elStep.classList.remove('completed');
+  elStep.classList.add('active');
+  kuim.navigateWidget(current.url, this.content, {
+    wizard: this,
+  });
+};
+
+/**
+ * Completes the current step.
+ */
+MobileWizard.prototype.commit = function (params) {
+  let elStep = dom.find('div.active', this.root);
+  let index = parseInt(elStep.getAttribute('data-step'));
+  elStep.classList.remove('active');
+  elStep.classList.add('completed');
+  this.display(this.steps[index + 1]);
+};
+
+MobileWizard.prototype.rollback = function () {
+  let elStep = dom.find('div.step.active', this.container);
+  let index = parseInt(elStep.getAttribute('data-step'));
+  elStep.classList.remove('active');
+  this.display(this.steps[index - 1]);
 };
 
 function OfficialForm(opt) {
@@ -17440,10 +17678,10 @@ function Wizard(opt) {
   this.topic = opt.topic;
   this.steps = opt.steps || [];
   this.root = dom.element(`
-    <div style="width: 100%">
-      <div class="wizard">
+    <div>
+      <div class="ui ordered steps m-b-0">
       </div>
-      <div class="wizard-content">
+      <div class="tab-content">
       </div>
     </div>
   `);
@@ -17451,12 +17689,12 @@ function Wizard(opt) {
 
 Wizard.prototype.render = function(containerId, params) {
   this.container = dom.find(containerId);
-  this.body = dom.find('div.wizard-content', this.root);
-  let elSteps = dom.find('div.wizard', this.root);
+  this.body = dom.find('div.tab-content', this.root);
+  let elSteps = dom.find('div.steps', this.root);
   for (let i = 0; i < this.steps.length; i++) {
     let step = this.steps[i];
     let elStep = dom.element(`
-      <div class="wizard-step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
+      <div class="step" widget-on-render="" data-step="${i}" style="cursor: pointer;">
         <div class="content">
           <div class="title"></div>
           <div class="description"></div>
@@ -21901,6 +22139,10 @@ PropertiesEditor.prototype.render = function(element) {
   let elementProperties = [];
   if (element.getProperties) elementProperties = element.getProperties();
   else elementProperties = element.groups;
+
+  if (!elementProperties) {
+    elementProperties = [];
+  }
 
   let container = dom.find(this.containerId);
   container.innerHTML = '';

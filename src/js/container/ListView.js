@@ -23,6 +23,7 @@ function ListView(opt) {
   this.activateable = opt.activateable === true;
   this.itemClass = opt.itemClass || [];
 
+  this.emptyHtml = opt.emptyHtml;
   this.idField = opt.idField;
 
   /*!
@@ -75,7 +76,11 @@ ListView.prototype.fetch = async function (params) {
       params: requestParams,
     });
     Array.prototype.push.apply(self.local, data);
-    self.append(data);
+  }
+  if (self.local.length == 0) {
+    if (this.emptyHtml) {
+      this.container.innerHTML = this.emptyHtml;
+    }
   } else {
     self.append(this.local);
   }
@@ -298,7 +303,6 @@ ListView.prototype.append = function(data, index) {
     }
 
     if (this.onRemove) {
-
       let link = dom.element(`
         <a class="btn text-danger float-right font-18" style="padding: 0; margin-left: auto;">
           <i class="fas fa-times" style=""></i>

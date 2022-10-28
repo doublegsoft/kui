@@ -183,3 +183,19 @@ span.tag-removable.danger > i:hover {
   color: #FFF;
   background-color: #f56c6c;
 }
+
+.tags-general {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tag-general {
+  padding: 2px 8px;
+  border-radius: 30px;
+  margin-right: 6px;
+  margin-top: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  background: var(--color-background-tag);
+}

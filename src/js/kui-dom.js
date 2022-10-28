@@ -900,4 +900,19 @@ dom.html = function(element) {
   let div = dom.element('<div></div>');
   div.appendChild(element);
   return div.innerHTML;
-}
+};
+
+dom.init = function (owner, element) {
+  if (!element) return;
+  if (element.children.length == 0) {
+    let name = element.getAttribute('name');
+    if (!name || name == '') {
+      name = element.getAttribute('widget-id');
+    }
+    if (!name || name == '') return;
+  }
+  for (let i = 0; i < element.children.length; i++) {
+    let child = element.children[i];
+    dom.init(child);
+  }
+};
