@@ -14806,7 +14806,10 @@ html:not([dir=rtl]) .mfe-3 {
   --color-background-card: rgb(255, 255, 255);
   --color-background-tag: #f8f8f8;
 
+  --color-background-toast: #616161;
+
   --color-divider: rgba(0, 0, 0, 0.12);
+  --color-mask: rgba(0, 0, 0, 0.3);
 
   --color-primary-light: #42a5f5;
   --color-secondary-light: #ba68c8;
@@ -14908,6 +14911,33 @@ footer {
 
 .color-primary {
   color: var(--color-primary);
+}
+
+.bg-primary {
+  background: var(--color-primary) !important;
+}
+
+.bg-error {
+  background: var(--color-error) !important;
+}
+
+.bg-success {
+  background: var(--color-success) !important;
+}
+
+.border-left-3 {
+  border-left: 3px solid!important;
+  border-top: none;
+  border-bottom: none;
+  border-right: none;
+}
+
+.border-left-2 {
+  border-left: 2px solid!important;
+}
+
+.border-primary {
+  border-color: var(--color-primary) !important;
 }
 
 .light .color-primary {
@@ -16036,6 +16066,11 @@ ul .indicator::after{
   box-shadow: 0 10px 0 var(--color-success-light);
 }
 
+a:hover, a:visited, a:link, a:active
+{
+  text-decoration: none;
+}
+
 .header-bar {
   position: fixed;
   right: 0;
@@ -16166,8 +16201,8 @@ ul .indicator::after{
 */
 .list-group-item {
   border-radius: unset!important;
-  border-left: unset!important;
-  border-right: unset!important;
+  border-left: none;
+  border-right: none;
 }
 
 .btn {
@@ -16181,6 +16216,7 @@ ul .indicator::after{
 
 .btn-primary {
   background: var(--color-primary);
+  border: none;
   color: var(--color-text-primary-dark);
 }
 
@@ -16188,6 +16224,210 @@ ul .indicator::after{
   background: var(--color-text-primary-dark);
   color: var(--color-text-disabled-dark);
   border: 1px solid #eee;
+}
+
+/*!
+** 底部弹出的操作面板
+*/
+.popup-container {
+
+}
+
+.popup-mask {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  background-color: var(--color-mask);
+}
+
+.popup-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: var(--color-white);
+  padding-bottom: 20px;
+  -webkit-transition: all .3s ease-in-out;
+  -o-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out;
+}
+
+.popup-title {
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.popup-title .value {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.popup-title .unit {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.popup-title button.cancel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0 15px;
+  color: var(--color-error);
+  background: var(--color-white);
+  font-size: 16px;
+  font-weight: bold;
+  border: unset;
+  height: 56px;
+}
+
+.popup-title button.confirm {
+  left: auto;
+  position: absolute;
+  right: 0;
+  padding: 0 15px;
+  font-size: 16px;
+  color: var(--color-primary);
+  background: var(--color-white);
+  font-weight: bold;
+  border: unset;
+  height: 56px;
+}
+
+.popup-bottom.in {
+  bottom: 0;
+  animation-name: popup-bottom-in;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+}
+
+.popup-bottom.out {
+  bottom: -100%;
+  animation-name: popup-bottom-out;
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes popup-bottom-in {
+  from {bottom: -100%;}
+  to {bottom: 0;}
+}
+
+@keyframes popup-bottom-out {
+  from {bottom: 0;}
+  to {bottom: -100%;}
+}
+
+.numpad {
+  overflow: hidden;
+}
+
+.numpad button.number {
+  height: 100%;
+  width: 100%;
+  border: unset;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.numpad button.number:active {
+  height: 120%;
+  width: 110%;
+}
+
+.action-sheet {
+  position: relative;
+  left: 10%;
+  width: 80%;
+  text-align: center;
+}
+
+.action-sheet .title {
+  font-size: 18px;
+  font-weight: bold;
+  height: 48px;
+  line-height: 48px;
+  background-color: var(--color-white);
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.action-sheet .action {
+  height: 48px;
+  line-height: 48px;
+  color: var(--color-primary);
+  background-color: var(--color-white);
+  font-size: 18px;
+  font-weight: bold;
+  border-top: 1px solid var(--color-divider);
+}
+
+.action-sheet .action.last {
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.action-sheet .cancel {
+  height: 48px;
+  line-height: 48px;
+  color: var(--color-error);
+  background-color: var(--color-white);
+  font-size: 18px;
+  font-weight: bold;
+  border: solid 1px var(--color-white);
+  margin-top: 10px;
+  border-radius: 15px;
+}
+
+/*!
+** 消息提示
+*/
+/* The snackbar - position it at the bottom and in the middle of the screen */
+.toast {
+  visibility: hidden;
+  width: 180px;
+  background-color: var(--color-background-toast);
+  color: var(--color-white);
+  text-align: center;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index:9999;
+  left: calc(50% - 90px);
+  top: 50%;
+}
+
+.toast.show {
+  visibility: visible; /* Show the snackbar */
+  -webkit-animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
+  animation: toast-fadein 0.5s, toast-fadeout 0.5s 2.5s;
+}
+
+/* Animations to fade the snackbar in and out */
+@-webkit-keyframes toast-fadein {
+  from {top: 0; opacity: 0;}
+  to {top: 50%; opacity: 1;}
+}
+
+@keyframes toast-fadein {
+  from {top: 0; opacity: 0;}
+  to {top: 50%; opacity: 1;}
+}
+
+@-webkit-keyframes toast-fadeout {
+  from {top: 50%; opacity: 1;}
+  to {top: 0; opacity: 0;}
+}
+
+@keyframes toast-fadeout {
+  from {top: 50%; opacity: 1;}
+  to {top: 0; opacity: 0;}
 }
 
 /*!
@@ -16289,6 +16529,19 @@ ul .indicator::after{
 
 .list-group-item:first-child {
   border-top: unset;
+}
+
+.float {
+  position:fixed;
+  width:60px;
+  height:60px;
+  bottom:40px;
+  right:40px;
+  background-color: var(--color-primary);
+  color: var(--color-text-primary-dark);
+  border-radius:50px;
+  text-align:center;
+  box-shadow: 2px 2px 3px #999;
 }
 
 
@@ -17012,6 +17265,41 @@ span.tag-removable.danger > i:hover {
   cursor: pointer;
   color: var(--color-text-secondary);
   background: var(--color-background-tag);
+}
+
+.calendar {
+	width: 100%;
+	height: 100%;
+}
+
+.calendar .title {
+	font-size: 16px;
+	font-weight: bold;
+}
+
+.calendar .weekdays {
+	display: flex;
+	justify-content: space-between;
+}
+
+.calendar .weekday {
+	background: var(--color-divider);
+	height: 48px;
+	width: calc(100% / 7);
+	line-height: 48px;
+	text-align: center;
+}
+
+.calendar .dates {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.calendar .dates .date {
+	height: 48px;
+	line-height: 48px;
+	width: calc(100% / 7);
+	text-align: center;
 }
 .ab-chat {
   width: 100%;

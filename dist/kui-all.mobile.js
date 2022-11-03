@@ -2347,16 +2347,16 @@ dom.html = function(element) {
 
 dom.init = function (owner, element) {
   if (!element) return;
-  if (element.children.length == 0) {
-    let name = element.getAttribute('name');
-    if (!name || name == '') {
-      name = element.getAttribute('widget-id');
-    }
-    if (!name || name == '') return;
+  let name = element.getAttribute('name');
+  if (!name || name == '') {
+    name = element.getAttribute('widget-id');
+  }
+  if (name && name != '') {
+    owner[name] = element;
   }
   for (let i = 0; i < element.children.length; i++) {
     let child = element.children[i];
-    dom.init(child);
+    dom.init(owner, child);
   }
 };
 let utils = {};
@@ -3500,6 +3500,399 @@ Tabs.prototype.activate = function (nav) {
   this.slider.style.width = nav.clientWidth + 'px';
   this.slider.style.left = nav.offsetLeft + 'px';
 };
+
+function DataSheet(opt) {
+  // 输入的数据列
+  // 每一列包括列标题、数据类型、默认值、占位符
+  this.columns = opt.columns;
+  this.columnCount = this.getColumnCount(this.columns);
+  // 第一列的行标题
+  this.rowHeaderWidth = opt.rowHeaderWidth || 150;
+  this.rowHeaders = opt.rowHeaders;
+  this.rowCount = this.getRowCount(this.rowHeaders);
+  // 是否只读模式
+  this.readonly = opt.readonly === true ? true : false;
+
+  this.totalColumns = [];
+  for (let i = 0; i < this.columns.length; i++) {
+    let column = this.columns[i];
+    if (column.totalable) {
+      this.totalColumns.push(column);
+    }
+  }
+  // 时间回调
+  this.onCellClicked = opt.onCellClicked;
+  this.onRowHeaderClicked = opt.onRowHeaderClicked;
+
+  // 计算获得各项数据
+  this.rowHeaderColumnCount = this.getRowHeaderColumnCount(this.rowHeaders);
+  this.colHeaderColumnCount = this.getColumnHeaderColumnCount(this.columns);
+  this.rowHeaderRowCount = this.getRowHeaderRowCount(this.rowHeaders);
+  this.colHeaderRowCount = this.getColumnHeaderRowCount(this.columns);
+  this.matrixColumn = [];
+  this.matrixRowHeader = [];
+  this.buildColumnMatrix(this.columns, this.matrixColumn, 0);
+  this.buildRowHeaderMatrix(this.rowHeaders, this.matrixRowHeader, 0);
+}
+
+/**
+ * 渲染基础的表格DOM。
+ */
+DataSheet.prototype.root = function(data) {
+  data = data || {};
+  let self = this;
+  this.table = dom.create('table', 'table', 'table-bordered');
+  let thead = dom.create('thead');
+  this.tbody = dom.create('tbody');
+  let tr = dom.create('tr');
+  let th = dom.create('th');
+  th.style.borderBottomWidth = '0';
+  th.style.width = this.rowHeaderWidth + 'px';
+
+  // tr.appendChild(th);
+  thead.appendChild(tr);
+  this.table.appendChild(thead);
+  this.table.appendChild(this.tbody);
+
+  for (let i = 0; i < this.columns.length; i++) {
+    let column = this.columns[i];
+    th = dom.create('th', 'text-center');
+    th.style.borderBottomWidth = '0';
+    th.innerHTML = column.title;
+    tr.appendChild(th);
+  }
+
+  for (let i = 0; i < this.rowCount; i++) {
+    let rowHeader = this.rowHeaders[i];
+    let tr = dom.create('tr');
+    let td = dom.create('td');
+    td.innerHTML = rowHeader.title;
+    td.style.fontWeight = 'bold';
+    tr.appendChild(td);
+    for (let j = 0; j < this.columnCount; j++) {
+      let column = this.columns[j];
+      td = dom.create('td');
+      td.style.textAlign = 'right';
+      td.style.padding = '6px 12px';
+      // td.setAttribute('contenteditable', 'true');
+      td.setAttribute('data-ds-format', column.format || '');
+      td.setAttribute('data-ds-row', i);
+      td.setAttribute('data-ds-column', j);
+      td.addEventListener('focus', function() {
+
+      });
+      if (data[rowHeader.title] && data[rowHeader.title][column.title]) {
+        td.innerHTML = data[rowHeader.title][column.title];
+      } else {
+        td.innerHTML = '';
+      }
+      td.addEventListener('keyup', function(ev) {
+        let td = this;
+        let rowIndex = parseInt(td.getAttribute('data-ds-row'));
+        let columnIndex = parseInt(td.getAttribute('data-ds-column'));
+        let triggered = null;
+        if (ev.keyCode == 13 /* ENTER */) {
+          triggered = td;
+        } else if (ev.keyCode == 37 /* ARROW LEFT */) {
+          if (columnIndex == 0 /* 已经是第一列了，无法再向左移动 */) return;
+          triggered = self.getCell(rowIndex, columnIndex - 1);
+        } else if (ev.keyCode == 38 /* ARROW UP */) {
+          if (rowIndex == 0 /* 已经是第一行了，无法再向上移动 */) return;
+          triggered = self.getCell(rowIndex - 1, columnIndex);
+        } else if (ev.keyCode == 39 /* ARROW RIGHT */) {
+          if (columnIndex == self.columnCount - 1 /* 已经是最后一列，无法再向右移动 */) return;
+          triggered = self.getCell(rowIndex, columnIndex + 1);
+        } else if (ev.keyCode == 40 /* ARROW DOWN */) {
+          if (rowIndex == self.rowCount - 1 /* 已经是最后一行，无法再向下移动 */) return;
+          triggered = self.getCell(rowIndex + 1, columnIndex);
+        }
+        self.totalize();
+        if (triggered != null) {
+          td.blur();
+          triggered.focus();
+          document.execCommand('selectAll',false,null)
+        }
+      });
+      tr.appendChild(td);
+    }
+    this.tbody.appendChild(tr);
+  }
+  if (this.totalColumns.length > 0) {
+    let tr = dom.create('tr');
+    let td = dom.create('td');
+    td.innerHTML = '合计';
+    td.style.fontWeight = 'bold';
+    tr.appendChild(td);
+    for (let j = 0; j < this.columnCount; j++) {
+      td = dom.create('td');
+      tr.appendChild(td);
+    }
+    this.tbody.appendChild(tr);
+  }
+  this.totalize();
+  return this.table;
+};
+
+DataSheet.prototype.getCell = function(rowIndex, columnIndex) {
+  let tbody = dom.find('tbody', this.table);
+  let ret = null;
+  for (let i = 0; i < tbody.children.length; i++) {
+    let tr = tbody.children[i];
+    if (i == rowIndex) {
+      for (let j = 1 /*行头去掉*/; j < tr.children.length; j++) {
+        if (j - 1 == columnIndex) {
+          ret = tr.children[j];
+          break;
+        }
+      }
+      break;
+    }
+  }
+  return ret;
+};
+
+DataSheet.prototype.render = function(containerId, data) {
+  this.container = dom.find(containerId);
+  this.container.innerHTML = '';
+  // this.container.appendChild(this.root(data));
+  let table = dom.element(`
+    <table class="table table-bordered">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  `);
+  let thead = dom.find('thead', table);
+  let tbody = dom.find('tbody', table);
+  let totalRowCount = this.rowHeaderRowCount + this.colHeaderRowCount;
+  let trs = [];
+  for (let i = 0; i < this.colHeaderRowCount; i++) {
+    let tr = dom.create('tr');
+    trs.push(tr);
+    thead.appendChild(tr);
+  }
+  // for (let i = 0; i < this.rowHeaderColumnCount; i++) {
+  //   let th = dom.create('th', 'text-center');
+  //   th.style = 'border-bottom-width: 1px;';
+  //   th.setAttribute('rowspan', this.colHeaderRowCount);
+  //   trs[0].appendChild(th);
+  // }
+  for (let i = 0; i < this.colHeaderRowCount; i++) {
+    let tr = trs[i];
+    for (let j = 0; j < this.colHeaderColumnCount; j++) {
+      let column = this.matrixColumn[i][j];
+      if (column == null) continue;
+      let th = dom.create('th', 'text-center');
+      th.style = 'border-bottom-width: 1px;';
+      th.setAttribute('colspan', this.getSpanColumnCount(column));
+      th.innerHTML = column.title;
+      tr.appendChild(th);
+    }
+  }
+  for (let i = 0; i < this.rowHeaderRowCount; i++) {
+    let tr = dom.create('tr');
+    for (let j = 0; j < this.rowHeaderColumnCount; j++) {
+      let rowHeader = this.matrixRowHeader[j][i];
+      if (rowHeader == null) continue;
+      let td = dom.create('td');
+      td.style = 'vertical-align: middle;';
+      td.setAttribute('rowspan', this.getSpanRowCount(rowHeader));
+      td.innerHTML = '<strong>' + rowHeader.title + '</strong>';
+      if (this.onRowHeaderClicked) {
+        td.onclick = ev => {
+          let tds = Array.prototype.slice.call(td.parentElement.children);
+          this.onRowHeaderClicked(td, tds.indexOf(td));
+        };
+      }
+      tr.appendChild(td);
+    }
+    // 补齐其余的单元格
+    for (let j = 0; j < this.colHeaderColumnCount - this.rowHeaderColumnCount; j++) {
+      let td = dom.create('td');
+      td.style.textAlign = 'right';
+      td.style.padding = '6px 12px';
+      // td.setAttribute('contenteditable', 'true');
+      if (this.onCellClicked) {
+        td.onclick = ev => {
+          let tds = Array.prototype.slice.call(td.parentElement.children);
+          this.onCellClicked(td, tds.indexOf(td));
+        };
+      }
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  this.container.appendChild(table);
+};
+
+DataSheet.prototype.getValues = function() {
+  let ret = {};
+  for (let i = 0; i < this.rowHeaders.length; i++) {
+    let rowHeader = this.rowHeaders[i];
+    ret[rowHeader.title] = {};
+    for (let j = 0; j < this.columns.length; j++) {
+      let col = this.columns[j];
+      ret[rowHeader.title][col.title]  = this.tbody.rows[i].cells[j + 1].innerText.trim();
+    }
+  }
+  return ret;
+};
+
+DataSheet.prototype.totalize = function() {
+  if (this.totalColumns.length == 0) return;
+  let trTotal = this.tbody.children[this.tbody.children.length - 1];
+  for (let i = 0; i < this.columns.length; i++) {
+    let column = this.columns[i];
+    if (column.totalable !== true) continue;
+    let total = 0;
+    let calculated = false;
+    for (let j = 0; j < this.rowHeaders.length; j++) {
+      let val = parseFloat(this.tbody.rows[j].cells[i + 1].innerText.trim());
+      if (!isNaN(val)) {
+        total += val;
+        calculated = true;
+      }
+    }
+    if (!isNaN(total) && calculated === true) {
+      trTotal.cells[i + 1].innerText = total.toFixed(2);
+    }
+  }
+};
+
+DataSheet.prototype.buildColumnMatrix = function (columns, matrix, rowIndex) {
+  if (!columns) return;
+  let row;
+  if (matrix[rowIndex]) {
+    row = matrix[rowIndex];
+  } else {
+    row = [];
+    matrix.push(row);
+  }
+  for (let i = 0; i < columns.length; i++) {
+    let column = columns[i];
+    row.push(column);
+    let span = this.getSpanColumnCount(column);
+    for (let j = 1; j < span; j++) {
+      row.push(null);
+    }
+    this.buildColumnMatrix(column.children, matrix, rowIndex + 1);
+  }
+};
+
+DataSheet.prototype.buildRowHeaderMatrix = function (rowHeaders, matrix, colIndex) {
+  if (!rowHeaders) return;
+  let row;
+  if (matrix[colIndex]) {
+    row = matrix[colIndex];
+  } else {
+    row = [];
+    matrix.push(row);
+  }
+  for (let i = 0; i < rowHeaders.length; i++) {
+    let rowHeader = rowHeaders[i];
+    row.push(rowHeader);
+    let span = this.getSpanRowCount(rowHeader);
+    for (let j = 1; j < span; j++) {
+      row.push(null);
+    }
+    this.buildRowHeaderMatrix(rowHeader.children, matrix, colIndex + 1);
+  }
+};
+
+DataSheet.prototype.getSpanColumnCount = function (column) {
+  let ret = 0;
+  if (!column.children || column.children.length == 0) {
+    return 1;
+  }
+  for (let i = 0; i < column.children.length; i++) {
+    ret += this.getSpanColumnCount(column.children[i]);
+  }
+  return ret;
+};
+
+DataSheet.prototype.getSpanRowCount = function (rowHeader) {
+  if (!rowHeader.children || rowHeader.children.length == 0) {
+    return 1;
+  }
+  return rowHeader.children.length;
+};
+
+DataSheet.prototype.getRowCount = function(rowHeaders) {
+  let ret = 0;
+  for (let i = 0; i < rowHeaders.length; i++) {
+    let rowHeader = rowHeaders[i];
+    ret += 1;
+    if (rowHeader.children) {
+      ret += this.getRowCount(rowHeader.children);
+    }
+  }
+  return ret;
+};
+
+DataSheet.prototype.getColumnCount = function(columns) {
+  let ret = 0;
+  for (let i = 0; i < columns.length; i++) {
+    let column = columns[i];
+    ret += 1;
+    if (column.children) {
+      ret += this.getColumnCount(column.children);
+    }
+  }
+  return ret;
+};
+
+DataSheet.prototype.getColumnHeaderRowCount = function(columns) {
+  let ret = 1;
+  for (let i = 0; i < columns.length; i++) {
+    let level = 1;
+    let column = columns[i];
+    if (column.children) {
+      level += this.getColumnHeaderRowCount(column.children);
+    }
+    if (level > ret)
+      ret = level;
+  }
+  return ret;
+};
+
+DataSheet.prototype.getRowHeaderRowCount = function(rowHeaders) {
+  let ret = 0;
+  for (let i = 0; i < rowHeaders.length; i++) {
+    let rowHeader = rowHeaders[i];
+    if (rowHeader.children) {
+      ret += this.getRowHeaderRowCount(rowHeader.children);
+    } else {
+      ret += 1;
+    }
+  }
+  return ret;
+};
+
+DataSheet.prototype.getColumnHeaderColumnCount = function(columns) {
+  let ret = 0;
+  for (let i = 0; i < columns.length; i++) {
+    let column = columns[i];
+    if (column.children) {
+      ret += this.getColumnHeaderColumnCount(column.children);
+    } else {
+      ret += 1;
+    }
+  }
+  return ret;
+};
+
+DataSheet.prototype.getRowHeaderColumnCount = function(rowHeaders) {
+  let ret = 1;
+  for (let i = 0; i < rowHeaders.length; i++) {
+    let level = 1;
+    let rowHeader = rowHeaders[i];
+    if (rowHeader.children) {
+      level += this.getRowHeaderColumnCount(rowHeader.children);
+    }
+    if (level > ret)
+      ret = level;
+  }
+  return ret;
+};
 /**
  * 聊天客户端SDK集成。
  *
@@ -3958,12 +4351,18 @@ MobileForm.prototype.root = async function() {
       el = dom.templatize(`
         <input type="hidden" name="{{name}}">
       `, field);
+    } else if (field.input === 'mobile') {
+      el = this.buildMobile(field);
+    } else if (field.input === 'id') {
+      el = this.buildId(field);
+    } else if (field.input === 'district') {
+      el = this.buildDistrict(field);
     } else {
       el = dom.templatize(`
         <div class="form-group row">
           <label class="col-form-label col-24-06">{{title}}</label>
           <div class="col-24-18">
-            <input type="text" name="{{name}}" class="form-control">
+            <input type="text" name="{{name}}" class="form-control" placeholder="请填写">
           </div>
         </div>
       `, field);
@@ -3978,7 +4377,7 @@ MobileForm.prototype.buildDate = function (field) {
     <div class="form-group row">
       <label class="col-form-label col-24-06">{{title}}</label>
       <div class="col-24-18 d-flex">
-        <label class="col-form-label"></label>
+        <input type="text" class="form-control" readonly placeholder="请选择...">
         <input type="hidden" name="{{name}}">
         <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">calendar_today</span>
       </div>
@@ -3987,8 +4386,9 @@ MobileForm.prototype.buildDate = function (field) {
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
       confirm: date => {
-        dom.find('label', ev.target).innerHTML = moment(date).format('YYYY年MM月DD日');
-        dom.find('input', ev.target).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
+        let row = dom.ancestor(ev.target, 'div', 'col-24-18');
+        dom.find('input[type=text]', row).value = moment(date).format('YYYY年MM月DD日');
+        dom.find('input[type=hidden]', row).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
       },
     });
     rd.show();
@@ -4001,7 +4401,7 @@ MobileForm.prototype.buildSelect = async function (field) {
     <div class="form-group row">
       <label class="col-form-label col-24-06">{{title}}</label>
       <div class="col-24-18 d-flex">
-        <label class="col-form-label"></label>
+        <input type="text" class="form-control" readonly placeholder="请选择...">
         <input type="hidden" name="{{name}}">
         <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
       </div>
@@ -4026,13 +4426,775 @@ MobileForm.prototype.buildSelect = async function (field) {
       format: 'oo',
       values: values,
       confirm: data => {
-        dom.find('label', ev.target).innerHTML = data.text;
-        dom.find('input', ev.target).value = data.value;
+        let row = dom.ancestor(ev.target, 'div', 'col-24-18');
+        console.log(row);
+        dom.find('input[type=text]', row).value = data.text;
+        dom.find('input[type=hidden]', row).value = data.value;
       },
     });
     rd.show();
   });
   return ret;
+};
+
+MobileForm.prototype.buildMobile = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请输入...">
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  dom.bind(ret, 'click', ev => {
+    new Numpad({
+      type: 'mobile',
+      success: (val) => {
+        input.value = val;
+      }
+    }).show(document.body);
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildId = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请输入...">
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  dom.bind(ret, 'click', ev => {
+    new Numpad({
+      type: 'id',
+      success: (val) => {
+        input.value = val;
+      }
+    }).show(document.body);
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildDistrict = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请选择...">
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  dom.bind(ret, 'click', ev => {
+    new DistrictPicker({
+      type: 'id',
+      success: (val) => {
+        input.value = val;
+        console.log(val);
+      }
+    }).show(document.body);
+  });
+  return ret;
+};
+
+/*!
+** @param opt
+**        配置项，包括以下选项：
+**        unit：单位
+*/
+function Numpad(opt) {
+  this.unit = opt.unit || '';
+  this.regex = opt.regex || /.*/;
+  this.success = opt.success || function (val) {};
+  this.type = opt.type || 'decimal';
+}
+
+Numpad.prototype.root = function () {
+  let ret = dom.templatize(`
+    <div class="popup-container">
+      <div class="popup-mask"></div>
+      <div class="popup-bottom numpad">
+        <div class="popup-title">
+          <button class="cancel">取消</button>
+          <span class="value"></span>
+          <span class="unit">{{unit}}</span>
+          <button class="confirm">确认</button>
+        </div>
+        <div class="d-flex flex-wrap full-width">
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">1</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">2</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">3</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">4</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">5</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">6</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">7</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">8</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">9</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button widget-id="buttonSpecial" class="number">.</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px;">
+            <button class="number">0</button>
+          </div>
+          <div class="col-24-08" style="line-height: 48px; font-size: 24px;">
+            <button class="number">
+              <i class="fas fa-backspace" style="font-size: 20px;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `, this);
+  this.bottom = dom.find('.popup-bottom', ret);
+
+  let mask = dom.find('.popup-mask', ret);
+  let confirm = dom.find('.confirm', ret);
+  let cancel = dom.find('.cancel', ret);
+  let value = dom.find('.value', ret);
+  let special = dom.find('[widget-id=buttonSpecial]', ret);
+
+  if (this.type == 'id') {
+    special.innerText = 'X';
+    this.regex = /^.{0,18}$/;
+  } else if (this.type == 'mobile') {
+    special.remove();
+    this.regex = /^.{0,11}$/;
+  }
+
+  let numbers = ret.querySelectorAll('.number');
+  for (let i = 0; i < numbers.length; i++) {
+    let num = numbers[i];
+    dom.bind(num, 'click', ev => {
+      let str = value.innerText;
+      let text = ev.currentTarget.innerText;
+      if (text == '') {
+        if (str === '') return;
+        str = str.substr(0, str.length - 1);
+      } else {
+        if (this.regex.test(str + text)) {
+          str += text;
+        }
+      }
+      value.innerText = str;
+    });
+  }
+
+  dom.bind(mask, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(cancel, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(confirm, 'click', ev => {
+    this.success(value.innerText);
+    this.close();
+  });
+
+  setTimeout(() => {
+    this.bottom.classList.add('in');
+  }, 50);
+  return ret;
+};
+
+Numpad.prototype.show = function(container) {
+  container.appendChild(this.root());
+};
+
+Numpad.prototype.close = function() {
+  this.bottom.classList.remove('in');
+  this.bottom.classList.add('out');
+  setTimeout(() => {
+    this.bottom.parentElement.remove();
+  }, 300);
+};
+
+/*!
+** @param opt
+**        配置项，包括以下选项：
+**        unit：单位
+*/
+function DistrictPicker(opt) {
+  this.unit = opt.unit || '';
+  this.regex = opt.regex || /.*/;
+  this.success = opt.success || function (vals) {};
+  this.selections = opt.selections || {};
+}
+
+DistrictPicker.prototype.root = function () {
+  let ret = dom.templatize(`
+    <div class="popup-container">
+      <div class="popup-mask"></div>
+      <div class="popup-bottom district-picker">
+        <div class="popup-title">
+          <button class="cancel">取消</button>
+          <span class="value"></span>
+          <span class="unit">{{unit}}</span>
+          <button class="confirm">确认</button>
+        </div>
+        <div class="bottom-dialog-body">
+          <div style="padding: 4px 16px">
+            <div class="d-flex" style="line-height: 40px;">
+              <strong widget-id="widgetProvince" class="font-16">选择省份</strong>
+              <span class="ml-auto material-icons font-18 position-relative" style="top: 12px;">navigate_next</span>
+            </div>
+            <div class="d-flex" style="line-height: 40px;">
+              <strong widget-id="widgetCity" class="font-16">选择城市</strong>
+              <span class="ml-auto material-icons font-18 position-relative" style="top: 12px;">navigate_next</span>
+            </div>
+            <div class="d-flex" style="line-height: 40px;">
+              <strong widget-id="widgetCounty" class="font-16">选择区县</strong>
+              <span class="ml-auto material-icons font-18 position-relative" style="top: 12px;">navigate_next</span>
+            </div>
+            <div class="d-flex" style="line-height: 40px;">
+              <strong widget-id="widgetTown" class="font-16">选择街道/乡镇</strong>
+              <span class="ml-auto material-icons font-18 position-relative" style="top: 12px;">navigate_next</span>
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--color-divider);"></div>
+          <ul widget-id="widgetDistrict" class="list-group" style="height: 240px; overflow-y: auto;">
+          </ul>
+        </div>
+      </div>
+    </div>
+  `, this);
+  this.bottom = dom.find('.popup-bottom', ret);
+  this.district = dom.find('[widget-id=widgetDistrict]', ret);
+  this.province = dom.find('[widget-id=widgetProvince]', ret);
+  this.city = dom.find('[widget-id=widgetCity]', ret);
+  this.county = dom.find('[widget-id=widgetCounty]', ret);
+  this.town = dom.find('[widget-id=widgetTown]', ret);
+
+  let mask = dom.find('.popup-mask', ret);
+  let confirm = dom.find('.confirm', ret);
+  let cancel = dom.find('.cancel', ret);
+  let value = dom.find('.value', ret);
+
+  dom.bind(mask, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(cancel, 'click', ev => {
+    this.close();
+  });
+
+  if (this.selections.province) {
+    this.province.setAttribute('data-model-chinese-district-code', this.selections.province.chineseDistrictCode);
+    this.province.innerText = this.selections.province.chineseDistrictName;
+  }
+  if (this.selections.city) {
+    this.city.setAttribute('data-model-chinese-district-code', this.selections.city.chineseDistrictCode);
+    this.city.innerText = this.selections.city.chineseDistrictName;
+  }
+  if (this.selections.county) {
+    this.county.setAttribute('data-model-chinese-district-code', this.selections.county.chineseDistrictCode);
+    this.county.innerText = this.selections.county.chineseDistrictName;
+  }
+  if (this.selections.town) {
+    this.town.setAttribute('data-model-chinese-district-code', this.selections.town.chineseDistrictCode);
+    this.town.innerText = this.selections.town.chineseDistrictName;
+  }
+
+  dom.bind(confirm, 'click', ev => {
+    let vals = {};
+    let provinceCode = this.province.getAttribute('data-model-chinese-district-code');
+    let cityCode = this.city.getAttribute('data-model-chinese-district-code');
+    let countyCode = this.county.getAttribute('data-model-chinese-district-code');
+    let townCode = this.town.getAttribute('data-model-chinese-district-code');
+    if (provinceCode != '') {
+      vals.province = {chineseDistrictCode: provinceCode, chineseDistrictName: this.province.innerText,};
+    }
+    if (cityCode != '') {
+      vals.city = {chineseDistrictCode: cityCode, chineseDistrictName: this.city.innerText,};
+    }
+    if (countyCode != '') {
+      vals.county = {chineseDistrictCode: countyCode, chineseDistrictName: this.county.innerText,};
+    }
+    if (townCode != '') {
+      vals.town = {chineseDistrictCode: townCode, chineseDistrictName: this.town.innerText,};
+    }
+    this.success(vals);
+    this.close();
+  });
+
+  let onSelectionClicked = ev => {
+    let div = dom.ancestor(ev.target, 'div');
+    let strong = dom.find('strong', div);
+    let chineseDistrictCode = strong.getAttribute('data-model-chinese-district-code');
+    if (chineseDistrictCode.length == 9) {
+      this.renderDistrict(chineseDistrictCode.substr(0, 6));
+    } else {
+      this.renderDistrict(chineseDistrictCode.substr(0, chineseDistrictCode.length - 2));
+    }
+  }
+
+  dom.bind(this.province.parentElement, 'click', ev => {
+    onSelectionClicked(ev);
+  });
+  dom.bind(this.city.parentElement, 'click', ev => {
+    onSelectionClicked(ev);
+  });
+  dom.bind(this.county.parentElement, 'click', ev => {
+    onSelectionClicked(ev);
+  });
+  dom.bind(this.town.parentElement, 'click', ev => {
+    onSelectionClicked(ev);
+  });
+
+  setTimeout(() => {
+    this.bottom.classList.add('in');
+  }, 50);
+  return ret;
+};
+
+DistrictPicker.prototype.renderDistrict = async function(districtCode) {
+  let andCondition = null;
+  let elDistrict = null;
+  if (!districtCode) {
+    andCondition = `
+      and length(chndistcd) = 2
+    `;
+    elDistrict = this.province;
+    this.city.setAttribute('data-model-chinese-district-code', '');
+    this.city.innerText = '选择城市';
+    this.county.setAttribute('data-model-chinese-district-code', '');
+    this.county.innerText = '选择区县';
+    this.town.setAttribute('data-model-chinese-district-code', '');
+    this.town.innerText = '选择街道/乡镇';
+  } else if (districtCode.length == 2) {
+    andCondition = `
+      and length(chndistcd) = 4 and substring(chndistcd, 1, 2) = '${districtCode}'
+    `;
+    elDistrict = this.city;
+    this.county.setAttribute('data-model-chinese-district-code', '');
+    this.county.innerText = '选择区县';
+    this.town.setAttribute('data-model-chinese-district-code', '');
+    this.town.innerText = '选择街道/乡镇';
+  } else if (districtCode.length == 4) {
+    andCondition = `
+      and length(chndistcd) = 6 and substring(chndistcd, 1, 4) = '${districtCode}'
+    `;
+    elDistrict = this.county;
+    this.town.setAttribute('data-model-chinese-district-code', '');
+    this.town.innerText = '选择街道/乡镇';
+  } else if (districtCode.length == 6) {
+    andCondition = `
+      and length(chndistcd) = 9 and substring(chndistcd, 1, 6) = '${districtCode}'
+    `;
+    elDistrict = this.town;
+  } else {
+    return;
+  }
+  let districts = await xhr.promise({
+    url: "/api/v3/common/script/stdbiz/gb/chinese_district/find",
+    params: {
+      _and_condition: andCondition,
+      _order_by: 'convert(chndistnm using gbk) asc',
+    },
+  });
+  this.district.innerHTML = '';
+  for (let i = 0; i < districts.length; i++) {
+    let district = districts[i];
+    let el = dom.templatize(`
+      <li class="list-group-item">{{chineseDistrictName}}</li>
+    `, district);
+    dom.model(el, district);
+    dom.bind(el, 'click', ev => {
+      let li = dom.ancestor(ev.target, 'li');
+      let model = dom.model(li);
+      elDistrict.innerText = model.chineseDistrictName;
+      elDistrict.setAttribute('data-model-chinese-district-code', model.chineseDistrictCode);
+      this.renderDistrict(model.chineseDistrictCode);
+    });
+    this.district.appendChild(el);
+  }
+};
+
+DistrictPicker.prototype.show = function(container) {
+  container.appendChild(this.root());
+  this.renderDistrict();
+};
+
+DistrictPicker.prototype.close = function() {
+  this.bottom.classList.remove('in');
+  this.bottom.classList.add('out');
+  setTimeout(() => {
+    this.bottom.parentElement.remove();
+  }, 300);
+};
+
+/*!
+** 构造函数，配置项包括：
+**
+**
+**
+*/
+function Calendar(opt) {
+  this.today = moment(new Date());
+  this.currentMonth = moment(this.today).startOf('month');
+  this.currentIndex = 1;
+}
+
+Calendar.prototype.root = function () {
+  let ret = dom.templatize(`
+    <div class="calendar">
+      <div class="title"></div>
+      <div class="weekdays">
+        <div class="weekday">日</div>
+        <div class="weekday">一</div>
+        <div class="weekday">二</div>
+        <div class="weekday">三</div>
+        <div class="weekday">四</div>
+        <div class="weekday">五</div>
+        <div class="weekday">六</div>
+      </div>
+      <div class="swiper">
+        <div class="swiper-wrapper">
+          <div class="dates prev swiper-slide"></div>
+          <div class="dates curr swiper-slide"></div>
+          <div class="dates next swiper-slide"></div>
+        </div>
+      </div>
+    </div>
+  `, {});
+
+  this.widgetSwiper = dom.find('.swiper', ret);
+  this.title = dom.find('.title', ret);
+  let prev = dom.find('.dates.prev', ret);
+  let curr = dom.find('.dates.curr', ret);
+  let next = dom.find('.dates.next', ret);
+
+  this.renderMonth(prev, moment(this.currentMonth).subtract(1,'months').startOf('month'));
+  this.renderMonth(curr, this.currentMonth);
+  this.renderMonth(next, moment(this.currentMonth).add(1,'months').startOf('month'));
+
+  let swiper = new Swiper(this.widgetSwiper, {
+    speed: 400,
+    initialSlide: this.currentIndex,
+    loop: true,
+  });
+
+  swiper.on('slideChange', ev => {
+    if (ev.realIndex == 0) {
+      if (this.currentIndex == 1) {
+        this.currentMonth = moment(this.currentMonth).subtract(1, 'months');
+      } else if (this.currentIndex == 2) {
+        this.currentMonth = moment(this.currentMonth).add(1, 'months');
+      }
+    } else if (ev.realIndex == 1) {
+      if (this.currentIndex == 0) {
+        this.currentMonth = moment(this.currentMonth).add(1, 'months');
+      } else if (this.currentIndex == 2) {
+        this.currentMonth = moment(this.currentMonth).subtract(1, 'months');
+      }
+    } else if (ev.realIndex == 2) {
+      if (this.currentIndex == 0) {
+        this.currentMonth = moment(this.currentMonth).subtract(1, 'months');
+      } else if (this.currentIndex == 1) {
+        this.currentMonth = moment(this.currentMonth).add(1, 'months');
+      }
+    }
+    this.currentIndex = ev.realIndex;
+    let prevMonth = moment(this.currentMonth).subtract(1, 'months');
+    let nextMonth = moment(this.currentMonth).add(1, 'months');
+
+    let elPrev = null;
+    let elNext = null;
+    if (this.currentIndex == 0) {
+      elPrev = ret.querySelectorAll('.dates.next');
+      elNext = ret.querySelectorAll('.dates.curr');
+    } else if (this.currentIndex == 1) {
+      elPrev = ret.querySelectorAll('.dates.prev');
+      elNext = ret.querySelectorAll('.dates.next');
+    } else if (this.currentIndex == 2) {
+      elPrev = ret.querySelectorAll('.dates.curr');
+      elNext = ret.querySelectorAll('.dates.prev');
+    }
+
+    for (let i = 0; i < elPrev.length; i++) {
+      this.renderMonth(elPrev[i], prevMonth);
+    }
+    for (let i = 0; i < elNext.length; i++) {
+      this.renderMonth(elNext[i], nextMonth);
+    }
+  });
+
+  return ret;
+};
+
+Calendar.prototype.renderMonth = function(container, month) {
+  let weekday = month.startOf('month').day();
+  let days = month.daysInMonth();
+  container.innerHTML = '';
+  for (let i = 0; i < days + weekday; i++) {
+    let date = dom.element(`<div class="date"></div>`);
+    if (i >= weekday) {
+      date.innerHTML = (i - weekday + 1);
+    }
+    container.appendChild(date);
+  }
+  // 补足下月的空白
+  let residue = 7 - (days + weekday) % 7;
+  for (let i = 0; i < residue; i++) {
+    let date = dom.element(`<div class="date"></div>`);
+    container.appendChild(date);
+  }
+
+  // 显示月份
+  this.title.innerText = this.currentMonth.format('YYYY年MM月');
+};
+
+Calendar.prototype.render = function(containerId, params) {
+  let container = dom.find(containerId);
+  container.appendChild(this.root());
+};
+
+/*!
+** @param opt
+**        配置项，包括以下选项：
+**        unit：单位
+*/
+function CascadePicker(opt) {
+  this.success = opt.success || function (vals) {};
+  this.selections = opt.selections || {};
+  this.levels = opt.levels;
+}
+
+CascadePicker.prototype.root = function () {
+  let ret = dom.templatize(`
+    <div class="popup-container">
+      <div class="popup-mask"></div>
+      <div class="popup-bottom district-picker">
+        <div class="popup-title">
+          <button class="cancel">取消</button>
+          <span class="value"></span>
+          <span class="unit">{{unit}}</span>
+          <button class="confirm">确认</button>
+        </div>
+        <div>
+          <div widget-id="widgetLevel" style="padding: 4px 16px">
+          </div>
+          <div style="border-top: 1px solid var(--color-divider);"></div>
+          <ul widget-id="widgetValue" class="list-group" style="height: 240px; overflow-y: auto;">
+          </ul>
+        </div>
+      </div>
+    </div>
+  `, this);
+  this.bottom = dom.find('.popup-bottom', ret);
+  this.widgetLevel = dom.find('[widget-id=widgetLevel]', ret);
+  this.widgetValue = dom.find('[widget-id=widgetValue]', ret);
+
+  let mask = dom.find('.popup-mask', ret);
+  let confirm = dom.find('.confirm', ret);
+  let cancel = dom.find('.cancel', ret);
+
+  let onSelectionClicked = ev => {
+    let div = dom.ancestor(ev.target, 'div');
+    let strong = dom.find('strong', div);
+    let level = parseInt(strong.getAttribute('data-cascade-level'));
+    let value = strong.getAttribute('data-cascade-value');
+    let name = strong.getAttribute('data-cascade-name');
+    let params = null;
+
+    let  elPrev = dom.find('[data-cascade-level="' + (level - 1) + '"]', this.widgetLevel);
+    if (elPrev != null) {
+      let prevValue = elPrev.getAttribute('data-cascade-value');
+      let prevName = elPrev.getAttribute('data-cascade-name');
+      params = {};
+      params[prevName] = prevValue;
+    }
+    this.renderValue(level, params);
+
+    for (let i = level + 1; i < this.levels.length; i++) {
+      let  elNext = dom.find('[data-cascade-level="' + i + '"]', this.widgetLevel);
+      elNext.setAttribute('data-cascade-value', '');
+      elNext.innerText = this.levels[i].placeholder;
+    }
+  }
+
+  for (let i = 0; i < this.levels.length; i++) {
+    let el = dom.templatize(`
+      <div class="d-flex" style="line-height: 40px;">
+        <strong data-cascade-level="${i}" data-cascade-name="{{name}}" class="font-16">{{placeholder}}</strong>
+        <span class="ml-auto material-icons font-18 position-relative" style="top: 12px;">navigate_next</span>
+      </div>
+    `, this.levels[i]);
+    this.widgetLevel.appendChild(el);
+
+    dom.bind(el, 'click', ev => {
+      onSelectionClicked(ev);
+    });
+  }
+
+  dom.bind(mask, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(cancel, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(confirm, 'click', ev => {
+    let strongs = dom.find('strong', this.widgetLevel);
+    let vals = {};
+    for (let i = 0; i < strongs.length; i++) {
+      let strong = strongs[i];
+      let model = dom.model(strong);
+      vals[strong.getAttribute('data-cascade-name')] = model;
+    }
+    this.success(vals);
+    this.close();
+  });
+
+  setTimeout(() => {
+    this.bottom.classList.add('in');
+  }, 50);
+  return ret;
+};
+
+CascadePicker.prototype.renderValue = async function(level, params, selected) {
+  let elLevel = dom.find('[data-cascade-level="' + level + '"]', this.widgetLevel);
+  if (elLevel == null) {
+    return;
+  }
+  let optLevel = this.levels[level];
+  this.widgetValue.innerHTML = '';
+
+  if (!optLevel.url) {
+    return;
+  }
+  if (typeof optLevel.params === 'function') {
+    params = optLevel.params(params);
+  } else {
+    params = optLevel.params;
+  }
+  let rows = await xhr.promise({
+    url: optLevel.url,
+    params: params,
+  });
+  for (let i = 0; i < rows.length; i++) {
+    let data = {
+      value: rows[i][optLevel.fields.value],
+      text: rows[i][optLevel.fields.text],
+    };
+    let el = dom.templatize(`
+      <li class="list-group-item" data-cascade-value="{{value}}">{{text}}</li>
+    `, data);
+    dom.model(el, rows[i]);
+    dom.bind(el, 'click', ev => {
+      let li = dom.ancestor(ev.target, 'li');
+      let model = dom.model(li);
+      elLevel.innerText = model[optLevel.fields.text];
+      elLevel.setAttribute('data-cascade-value', model[optLevel.fields.value]);
+      dom.model(elLevel, model);
+      let newParams = {};
+      newParams[optLevel.fields.value] = model[optLevel.fields.value];
+      this.renderValue(level + 1, newParams, model);
+    });
+    this.widgetValue.appendChild(el);
+  }
+};
+
+CascadePicker.prototype.show = function(container) {
+  container.appendChild(this.root());
+  this.renderValue(0);
+};
+
+CascadePicker.prototype.close = function() {
+  this.bottom.classList.remove('in');
+  this.bottom.classList.add('out');
+  setTimeout(() => {
+    this.bottom.parentElement.remove();
+  }, 300);
+};
+
+function ActionSheet(opt) {
+  this.title = opt.title || '';
+  this.actions = opt.actions || [];
+}
+
+ActionSheet.prototype.root = function() {
+  let ret = dom.templatize(`
+    <div class="popup-container">
+      <div class="popup-mask"></div>
+      <div class="popup-bottom" style="background: transparent;">
+        <div class="action-sheet">
+          <div class="title">{{title}}</div>
+          <div class="actions"></div>
+          <div class="cancel">取消</div>
+        </div>
+      </div>
+    </div>
+  `, this);
+
+  this.bottom = dom.find('.popup-bottom', ret);
+  let cancel = dom.find('.cancel', ret);
+  let mask = dom.find('.popup-mask', ret);
+  let actions = dom.find('.actions', ret);
+
+  dom.bind(mask, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(cancel, 'click', ev => {
+    this.close();
+  });
+
+  for (let i = 0; i < this.actions.length; i++) {
+    let action = dom.templatize(`
+      <div class="action">{{text}}</div>
+    `, this.actions[i]);
+    dom.bind(action, 'click', ev => {
+      this.close();
+      this.actions[i].onClick(ev);
+    });
+    if (i == this.actions.length - 1) {
+      action.classList.add('last');
+    }
+    actions.appendChild(action);
+  }
+
+  setTimeout(() => {
+    this.bottom.classList.add('in');
+  }, 50);
+
+  return ret;
+};
+
+ActionSheet.prototype.show = function (container) {
+  container.appendChild(this.root());
+};
+
+ActionSheet.prototype.close = function () {
+  this.bottom.classList.remove('in');
+  this.bottom.classList.add('out');
+  setTimeout(() => {
+    this.bottom.parentElement.remove();
+  }, 300);
 };
 Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
   return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
@@ -4339,4 +5501,46 @@ kuim.wizard = function(opt) {
 
 kuim.overlay = function() {
 
+};
+
+kuim.success = function(message, callback) {
+  let el = dom.templatize(`
+    <div class="toast">
+      <i class="far fa-check-circle font-36"></i>
+      <div class="font-18 mt-2">${message}</div>
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('show');
+  }, 50);
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => {
+      el.remove();
+      if (callback)
+        callback();
+    }, 500);
+  }, 1000);
+};
+
+kuim.error = function(message, callback) {
+  let el = dom.templatize(`
+    <div class="toast">
+      <i class="far fa-times-circle font-36"></i>
+      <div class="font-18 mt-2">${message}</div>
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('show');
+  }, 50);
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => {
+      el.remove();
+      if (callback)
+        callback();
+    }, 500);
+  }, 1000);
 };

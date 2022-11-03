@@ -2587,16 +2587,16 @@ dom.html = function(element) {
 
 dom.init = function (owner, element) {
   if (!element) return;
-  if (element.children.length == 0) {
-    let name = element.getAttribute('name');
-    if (!name || name == '') {
-      name = element.getAttribute('widget-id');
-    }
-    if (!name || name == '') return;
+  let name = element.getAttribute('name');
+  if (!name || name == '') {
+    name = element.getAttribute('widget-id');
+  }
+  if (name && name != '') {
+    owner[name] = element;
   }
   for (let i = 0; i < element.children.length; i++) {
     let child = element.children[i];
-    dom.init(child);
+    dom.init(owner, child);
   }
 };
 var NO_ERRORS = 0;

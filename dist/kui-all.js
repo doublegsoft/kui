@@ -5560,16 +5560,16 @@ dom.html = function(element) {
 
 dom.init = function (owner, element) {
   if (!element) return;
-  if (element.children.length == 0) {
-    let name = element.getAttribute('name');
-    if (!name || name == '') {
-      name = element.getAttribute('widget-id');
-    }
-    if (!name || name == '') return;
+  let name = element.getAttribute('name');
+  if (!name || name == '') {
+    name = element.getAttribute('widget-id');
+  }
+  if (name && name != '') {
+    owner[name] = element;
   }
   for (let i = 0; i < element.children.length; i++) {
     let child = element.children[i];
-    dom.init(child);
+    dom.init(owner, child);
   }
 };
 
@@ -9414,6 +9414,48 @@ kuim.wizard = function(opt) {
 kuim.overlay = function() {
 
 };
+
+kuim.success = function(message, callback) {
+  let el = dom.templatize(`
+    <div class="toast">
+      <i class="far fa-check-circle font-36"></i>
+      <div class="font-18 mt-2">${message}</div>
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('show');
+  }, 50);
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => {
+      el.remove();
+      if (callback)
+        callback();
+    }, 500);
+  }, 1000);
+};
+
+kuim.error = function(message, callback) {
+  let el = dom.templatize(`
+    <div class="toast">
+      <i class="far fa-times-circle font-36"></i>
+      <div class="font-18 mt-2">${message}</div>
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('show');
+  }, 50);
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => {
+      el.remove();
+      if (callback)
+        callback();
+    }, 500);
+  }, 1000);
+};
 Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
   return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
@@ -12682,12 +12724,18 @@ MobileForm.prototype.root = async function() {
       el = dom.templatize(`
         <input type="hidden" name="{{name}}">
       `, field);
+    } else if (field.input === 'mobile') {
+      el = this.buildMobile(field);
+    } else if (field.input === 'id') {
+      el = this.buildId(field);
+    } else if (field.input === 'district') {
+      el = this.buildDistrict(field);
     } else {
       el = dom.templatize(`
         <div class="form-group row">
           <label class="col-form-label col-24-06">{{title}}</label>
           <div class="col-24-18">
-            <input type="text" name="{{name}}" class="form-control">
+            <input type="text" name="{{name}}" class="form-control" placeholder="请填写">
           </div>
         </div>
       `, field);
@@ -12702,7 +12750,7 @@ MobileForm.prototype.buildDate = function (field) {
     <div class="form-group row">
       <label class="col-form-label col-24-06">{{title}}</label>
       <div class="col-24-18 d-flex">
-        <label class="col-form-label"></label>
+        <input type="text" class="form-control" readonly placeholder="请选择...">
         <input type="hidden" name="{{name}}">
         <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">calendar_today</span>
       </div>
@@ -12711,8 +12759,9 @@ MobileForm.prototype.buildDate = function (field) {
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
       confirm: date => {
-        dom.find('label', ev.target).innerHTML = moment(date).format('YYYY年MM月DD日');
-        dom.find('input', ev.target).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
+        let row = dom.ancestor(ev.target, 'div', 'col-24-18');
+        dom.find('input[type=text]', row).value = moment(date).format('YYYY年MM月DD日');
+        dom.find('input[type=hidden]', row).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
       },
     });
     rd.show();
@@ -12725,7 +12774,7 @@ MobileForm.prototype.buildSelect = async function (field) {
     <div class="form-group row">
       <label class="col-form-label col-24-06">{{title}}</label>
       <div class="col-24-18 d-flex">
-        <label class="col-form-label"></label>
+        <input type="text" class="form-control" readonly placeholder="请选择...">
         <input type="hidden" name="{{name}}">
         <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
       </div>
@@ -12750,11 +12799,77 @@ MobileForm.prototype.buildSelect = async function (field) {
       format: 'oo',
       values: values,
       confirm: data => {
-        dom.find('label', ev.target).innerHTML = data.text;
-        dom.find('input', ev.target).value = data.value;
+        let row = dom.ancestor(ev.target, 'div', 'col-24-18');
+        console.log(row);
+        dom.find('input[type=text]', row).value = data.text;
+        dom.find('input[type=hidden]', row).value = data.value;
       },
     });
     rd.show();
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildMobile = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请输入...">
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  dom.bind(ret, 'click', ev => {
+    new Numpad({
+      type: 'mobile',
+      success: (val) => {
+        input.value = val;
+      }
+    }).show(document.body);
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildId = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请输入...">
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  dom.bind(ret, 'click', ev => {
+    new Numpad({
+      type: 'id',
+      success: (val) => {
+        input.value = val;
+      }
+    }).show(document.body);
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildDistrict = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请选择...">
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  dom.bind(ret, 'click', ev => {
+    new DistrictPicker({
+      type: 'id',
+      success: (val) => {
+        input.value = val;
+        console.log(val);
+      }
+    }).show(document.body);
   });
   return ret;
 };

@@ -304,3 +304,45 @@ kuim.wizard = function(opt) {
 kuim.overlay = function() {
 
 };
+
+kuim.success = function(message, callback) {
+  let el = dom.templatize(`
+    <div class="toast">
+      <i class="far fa-check-circle font-36"></i>
+      <div class="font-18 mt-2">${message}</div>
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('show');
+  }, 50);
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => {
+      el.remove();
+      if (callback)
+        callback();
+    }, 500);
+  }, 1000);
+};
+
+kuim.error = function(message, callback) {
+  let el = dom.templatize(`
+    <div class="toast">
+      <i class="far fa-times-circle font-36"></i>
+      <div class="font-18 mt-2">${message}</div>
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    el.classList.add('show');
+  }, 50);
+  setTimeout(() => {
+    el.classList.remove('show');
+    setTimeout(() => {
+      el.remove();
+      if (callback)
+        callback();
+    }, 500);
+  }, 1000);
+};
