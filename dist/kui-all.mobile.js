@@ -4964,9 +4964,15 @@ Calendar.prototype.renderMonth = function(container, month) {
   container.innerHTML = '';
   for (let i = 0; i < days + weekday; i++) {
     let date = dom.element(`<div class="date"></div>`);
+    let day = (i - weekday + 1);
     if (i >= weekday) {
-      date.innerHTML = (i - weekday + 1);
+      date.innerHTML = day;
     }
+    let dateVal = month.format('YYYY-MM-') + (day < 10 ? ('0' + day) : day);
+    if (dateVal == this.today.format('YYYY-MM-DD')) {
+      date.classList.add('today');
+    }
+    date.setAttribute('data-calendar-date', dateVal);
     container.appendChild(date);
   }
   // 补足下月的空白
@@ -4980,9 +4986,33 @@ Calendar.prototype.renderMonth = function(container, month) {
   this.title.innerText = this.currentMonth.format('YYYY年MM月');
 };
 
+Calendar.prototype.stylizeDates = function (style, startDate, endDate) {
+  let dates = dom.find('.dates.curr', this.root);
+  if (Array.isArray(startDate)) {
+    for (let i = 0; i < startDate.length; i++) {
+      for (let j = 0; j < dates.children.length; j++) {
+        if (moment(startDate[i]).format('YYYY-MM-DD') == dates.children[j].getAttribute('data-calendar-date')) {
+          dates.children[j].style = style;
+          break;
+        }
+      }
+    }
+    return;
+  }
+  startDate = moment(startDate).format('YYYY-MM-DD');
+  endDate = moment(endDate).format('YYYY-MM-DD');
+  for (let j = 0; j < dates.children.length; j++) {
+    let date = dates.children[j].getAttribute('data-calendar-date');
+    if (date >= startDate && date <= endDate ) {
+      dates.children[j].style = style;
+    }
+  }
+};
+
 Calendar.prototype.render = function(containerId, params) {
+  this.root = this.root();
   let container = dom.find(containerId);
-  container.appendChild(this.root());
+  container.appendChild(this.root);
 };
 
 /*!

@@ -14790,7 +14790,7 @@ html:not([dir=rtl]) .mfe-3 {
 }
 :root {
   /* main colors */
-  --color-primary: #14918f; /*#1976d2;*/
+  --color-primary: #73b17b; /*#1976d2;*/
   --color-secondary: #9c27b0;
   --color-success: #2e7d32;
   --color-error: #d32f2f;
@@ -15072,6 +15072,21 @@ footer {
   width: 36px!important;
 }
 
+.avatar-42 {
+  height: 42px!important;
+  width: 42px!important;
+}
+
+.avatar-48 {
+  height: 48px!important;
+  width: 48px!important;
+}
+
+.avatar-56 {
+  height: 56px!important;
+  width: 56px!important;
+}
+
 .avatar-64 {
   height: 64px!important;
   width: 64px!important;
@@ -15083,6 +15098,120 @@ footer {
 }
 
 .avatar-128 {
+  height: 128px!important;
+  width: 128px!important;
+}
+
+.circle {
+  border-radius: 9999px;
+}
+
+.circle-24 {
+  height: 24px!important;
+  width: 24px!important;
+  border-radius: 9999px;
+}
+
+.circle-28 {
+  height: 28px!important;
+  width: 28px!important;
+  border-radius: 9999px;
+}
+
+.circle-32 {
+  height: 32px!important;
+  width: 32px!important;
+  border-radius: 9999px;
+}
+
+.circle-36 {
+  height: 36px!important;
+  width: 36px!important;
+  border-radius: 9999px;
+}
+
+.circle-42 {
+  height: 42px!important;
+  width: 42px!important;
+  border-radius: 9999px;
+}
+
+.circle-48 {
+  height: 48px!important;
+  width: 48px!important;
+  border-radius: 9999px;
+}
+
+.circle-56 {
+  height: 56px!important;
+  width: 56px!important;
+  border-radius: 9999px;
+}
+
+.circle-64 {
+  height: 64px!important;
+  width: 64px!important;
+  border-radius: 9999px;
+}
+
+.circle-72 {
+  height: 72px!important;
+  width: 72px!important;
+  border-radius: 9999px;
+}
+
+.circle-128 {
+  height: 128px!important;
+  width: 128px!important;
+  border-radius: 9999px;
+}
+
+.rect-24 {
+  height: 24px!important;
+  width: 24px!important;
+}
+
+.rect-28 {
+  height: 28px!important;
+  width: 28px!important;
+}
+
+.rect-32 {
+  height: 32px!important;
+  width: 32px!important;
+}
+
+.rect-36 {
+  height: 36px!important;
+  width: 36px!important;
+}
+
+.rect-42 {
+  height: 42px!important;
+  width: 42px!important;
+}
+
+.rect-48 {
+  height: 48px!important;
+  width: 48px!important;
+}
+
+.rect-56 {
+  height: 56px!important;
+  width: 56px!important;
+}
+
+.rect-64 {
+  height: 64px!important;
+  width: 64px!important;
+}
+
+.rect-72 {
+  height: 72px!important;
+  width: 72px!important;
+}
+
+.rect-128 {
   height: 128px!important;
   width: 128px!important;
 }
@@ -16019,7 +16148,7 @@ footer {
 .bottom-bar ul li a i{
   position: absolute;
   font-size: 38px;
-  color: var(--color-success-light);
+  color: var(--color-primary);
 }
 
 ul li a i.active-icon{
@@ -16039,7 +16168,7 @@ ul li a i.active-icon{
   left: 34px;
   height: 36px;
   width: 25px;
-  background: var(--color-success-light);
+  background: var(--color-primary);
   border-radius: 50%;
   transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
@@ -16052,7 +16181,7 @@ ul .indicator::before{
   width: 20px;
   background: transparent;
   border-bottom-right-radius: 20px;
-  box-shadow: 0 10px 0 var(--color-success-light);
+  box-shadow: 0 10px 0 var(--color-primary);
 }
 ul .indicator::after{
   content: "";
@@ -16063,7 +16192,7 @@ ul .indicator::after{
   width: 20px;
   background: transparent;
   border-bottom-left-radius: 20px;
-  box-shadow: 0 10px 0 var(--color-success-light);
+  box-shadow: 0 10px 0 var(--color-primary);
 }
 
 a:hover, a:visited, a:link, a:active
@@ -17300,6 +17429,11 @@ span.tag-removable.danger > i:hover {
 	line-height: 48px;
 	width: calc(100% / 7);
 	text-align: center;
+}
+
+.calendar .today {
+	background: var(--color-primary);
+	color: var(--color-white);
 }
 .ab-chat {
   width: 100%;

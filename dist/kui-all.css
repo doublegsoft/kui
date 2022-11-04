@@ -18137,6 +18137,11 @@ a.disabled {
 	text-align: center;
 }
 
+.calendar .today {
+	background: var(--color-primary);
+	color: var(--color-white);
+}
+
 .flip-card {
   height: 15rem;
   perspective: 100rem;
