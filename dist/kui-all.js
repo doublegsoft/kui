@@ -12866,8 +12866,21 @@ MobileForm.prototype.buildDistrict = function (field) {
     new DistrictPicker({
       type: 'id',
       success: (val) => {
-        input.value = val;
-        console.log(val);
+        let str = '';
+        if (val.province) {
+          str += val.province.chineseDistrictName;
+        }
+        if (val.city) {
+          str += ' ' + val.city.chineseDistrictName;
+        }
+        if (val.county) {
+          str += ' ' + val.county.chineseDistrictName;
+        }
+        if (val.town) {
+          str += ' ' + val.town.chineseDistrictName;
+        }
+        input.value = str;
+        input.setAttribute('data-value', JSON.stringify(val));
       }
     }).show(document.body);
   });
