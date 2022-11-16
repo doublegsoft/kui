@@ -108,7 +108,7 @@ ImageElementRenderer.prototype.render = function (context, element) {
         let sWidth = img.naturalWidth;
         let sHeight = img.naturalHeight;
         context.drawImage(img, 0, 0, sWidth, sHeight, model.x, model.y, model.width, model.height);
-      }
+      };
       containerImage.append(img);
     } else {
       let sWidth = img.naturalWidth;

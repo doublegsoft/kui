@@ -1,0 +1,53 @@
+<div id="pageStoryboard" class="page bg-white" style="overflow-y: auto;">
+
+</div>
+
+<script>
+function PageStoryboard() {
+  this.page = dom.find('#pageStoryboard');
+  this.widgetSourceCode = dom.find('[widget-id=widgetSourceCode]', this.page);
+  this.widgetDesigner = dom.find('[widget-id=widgetDesigner]', this.page);
+}
+
+PageStoryboard.prototype.initialize = async function(params) {
+  dom.height2(this.page, 12, document.body);
+  let pages = [];
+  let page1 = {
+    id: 'page1',
+    title: '首页',
+    x: 100,
+    y: 100,
+    links: ['page2'],
+  };
+
+  let page2 = {
+    id: 'page2',
+    title: '个人设置',
+    x: 300,
+    y: 150,
+    links: ['page3'],
+  };
+
+  let page3 = {
+    id: 'page3',
+    title: '基本信息',
+    x: 600,
+    y: 200,
+    links: [],
+  };
+  pages.push(page1);
+  pages.push(page2);
+  pages.push(page3);
+  this.storyboard = new Storyboard({
+    pages: pages,
+  });
+  this.storyboard.render(this.page);
+};
+
+PageStoryboard.prototype.show = function(params) {
+  this.initialize(params);
+};
+
+pageStoryboard = new PageStoryboard();
+
+</script>

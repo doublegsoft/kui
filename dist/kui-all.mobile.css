@@ -14791,12 +14791,18 @@ html:not([dir=rtl]) .mfe-3 {
 :root {
   /* main colors */
   --color-primary: #73b17b; /*#1976d2;*/
-  --color-secondary: #9c27b0;
+  --color-secondary: #1976d2;;
   --color-success: #2e7d32;
   --color-error: #d32f2f;
   --color-warning: #ed6c02;
   --color-info: #0288d1;
   --color-white: #fff;
+
+  --color-primary-light: #a3e3aa;
+  --color-primary-dark: #44814e;
+
+  --color-secondary-light: #63a4ff;
+  --color-secondary-dark: #004ba0;
 
   --color-text-primary: rgba(0, 0, 0, 0.87);
   --color-text-secondary: rgba(153, 153, 153, 1);
@@ -14811,15 +14817,17 @@ html:not([dir=rtl]) .mfe-3 {
   --color-divider: rgba(0, 0, 0, 0.12);
   --color-mask: rgba(0, 0, 0, 0.3);
 
-  --color-primary-light: #42a5f5;
-  --color-secondary-light: #ba68c8;
+  --color-shadow-primary: rgba(115, 177, 123, 0.6);
+
+  /*--color-primary-light: #42a5f5;*/
+  /*--color-secondary-light: #ba68c8;*/
   --color-success-light: #4caf50;
   --color-error-light: #ef5350;
   --color-warning-light: #ff9800;
   --color-info-light: #03a9f4;
 
-  --color-primary-dark: #1565c0;
-  --color-secondary-dark: #7b1fa2;
+  /*--color-primary-dark: #1565c0;*/
+  /*--color-secondary-dark: #7b1fa2;*/
   --color-success-dark: #1b5e20;
   --color-error-dark: #c62828;
   --color-warning-dark: #e65100;
@@ -14946,6 +14954,14 @@ footer {
 
 .dark .text-primary {
   color: var(--color-primary-dark);
+}
+
+.text-light {
+  color: var(--color-white);
+}
+
+.text-dark {
+  color: var(--color-dark);
 }
 
 .height-24 {
@@ -16673,6 +16689,156 @@ a:hover, a:visited, a:link, a:active
   box-shadow: 2px 2px 3px #999;
 }
 
+.bottom-navigator {
+  --icon-active: #fff;
+  --icon-inactive: var(--color-primary);
+  --icon-hover: #99a3ba;
+  --text: var(--color-primary);
+  --circle: var(--color-primary);
+  --background: #fafafa;
+  --shadow: rgba(18, 22, 33, .1);
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  /* border-radius: 0 0 12px 12px; */
+  background: var(--background);
+  width: 100%;
+  height: 60px;
+  padding: 0 12px;
+  box-shadow: 0 8px 16px var(--shadow);
+  z-index: 9999;
+}
+
+.bottom-navigator > div {
+  display: flex;
+  height: 100%;
+  position: relative;
+}
+
+.bottom-navigator > div label {
+  flex: 0 0 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  z-index: 1;
+  margin-bottom: 0;
+}
+
+.bottom-navigator > div label i, .bottom-navigator > div label span {
+  display: block;
+  transition: transform 0.4s cubic-bezier(0.2, 0.64, 0.48, 1.12), opacity 0.4s ease, color 0.4s ease;
+  transform: translateY(var(--y)) scale(var(--s));
+}
+
+.bottom-navigator > div label i {
+  --y: -8px;
+  --s: 0.84;
+  position: relative;
+  left: 2px;
+  font-size: 32px;
+  width: 32px;
+  height:32px;
+  margin: auto;
+  color: var(--icon-inactive);
+  transform-origin: 50% 50%;
+}
+
+.bottom-navigator > div label.active i {
+  --s: 0.76;
+  --y: -24px;
+  color: var(--icon-active);
+}
+
+.bottom-navigator > div label span {
+  --y: -12px;
+  --s: 0.92;
+  font-size: 10px;
+  font-weight: 500;
+  position: absolute;
+  left: 0;
+  right: 0;
+  text-align: center;
+  bottom: 0;
+  opacity: 0;
+  color: var(--text);
+  transform-origin: 50% 0;
+}
+
+/* .bottom-navigator > div label:hover text {
+  color: var(--icon-hover);
+} */
+
+.bottom-navigator > div label:active i {
+  --s: 0.76;
+}
+
+.bottom-navigator > div input {
+  display: none;
+}
+
+.bottom-navigator > div.active-0 label + span {
+  --x: 0;
+}
+
+.bottom-navigator > div.active-1 label + span {
+  --x: 100%;
+}
+
+.bottom-navigator > div.active-2 label + span {
+  --x: 200%;
+}
+
+.bottom-navigator > div.active-3 label + span {
+  --x: 300%;
+}
+
+.bottom-navigator > div.active-4 label + span {
+  --x: 400%;
+}
+
+.bottom-navigator > div.active-5 label + span {
+  --x: 500%;
+}
+
+.bottom-navigator > div label.active image {
+  --y: -28px;
+  --s: 1;
+  color: var(--icon-active);
+}
+
+.bottom-navigator > div label.active span {
+  --s: 1;
+  --y: -10px;
+  opacity: 1;
+}
+
+.bottom-navigator > div > span {
+  --x: 0;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  transition: transform 0.4s cubic-bezier(0.2, 0.64, 0.48, 1.12);
+  transform: translateX(var(--x));
+}
+
+.bottom-navigator > div > span:after {
+  content: '';
+  width: 44px;
+  height: 44px;
+  display: block;
+  border-radius: 50%;
+  background: var(--circle);
+  position: absolute;
+  left: 50%;
+  top: 0;
+  box-shadow: 0 2px 8px var(--shadow);
+  margin: -14px 0 0 -22px;
+}
+
 
 .timeline {
   /*width: 100%;*/
@@ -17402,17 +17568,21 @@ span.tag-removable.danger > i:hover {
 }
 
 .calendar .title {
+	background: var(--color-primary);
+	color: var(--color-white);
 	font-size: 16px;
+	padding: 4px 8px;
 	font-weight: bold;
 }
 
-.calendar .weekdays {
+.calendar > .weekdays {
 	display: flex;
 	justify-content: space-between;
 }
 
-.calendar .weekday {
-	background: var(--color-divider);
+.calendar > .weekdays > .weekday {
+	background: var(--color-primary-dark);
+	color: var(--color-white);
 	height: 48px;
 	width: calc(100% / 7);
 	line-height: 48px;
@@ -17434,6 +17604,83 @@ span.tag-removable.danger > i:hover {
 .calendar .today {
 	background: var(--color-primary);
 	color: var(--color-white);
+}
+
+.weekly {
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	/*margin-right: 10px;*/
+	/*margin-left: 10px;*/
+	width: 100%;
+}
+
+.weekly .weekday {
+	list-style: none;
+	float: left;
+	text-align: center;
+	/*width: calc((100%) / 7);*/
+	padding-top: 8px;
+}
+
+.weekly .weekday.active {
+	background: var(--color-primary);
+	height: 68px;
+	width: 40px;
+	border-radius: 20px;
+	padding-top: 8px;
+	box-shadow: 2px 2px 8px -1px var(--color-shadow-primary);
+	display: flex;
+	flex-direction: column;
+}
+
+.weekly .weekday span.day {
+	font-size: 12px;
+	letter-spacing: 0.5px;
+	margin-bottom: 2px;
+	display: block;
+}
+
+.weekly .weekday.active span.day {
+	color: var(--color-white);
+	font-weight: bolder;
+}
+
+.weekly .weekday.active span.date {
+	background: var(--color-white);
+	height: 30px;
+	width: 30px;
+	border-radius: 50%;
+	line-height: 30px;
+	text-align: center;
+	margin-left: 5px;
+}
+
+.weekly .weekday span.date {
+	font-size: 15px;
+	font-weight: 500;
+	margin-top: 5px;
+}
+
+.daily {
+	width: 100%;
+}
+
+.daily .time-window {
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+
+.daily .time-window .time {
+	flex: 0 0 21%;
+	max-width: 21%;
+}
+
+.daily .time-window .event {
+	flex: 0 0 79%;
+	max-width: 79%;
+	padding-left: 0;
 }
 .ab-chat {
   width: 100%;

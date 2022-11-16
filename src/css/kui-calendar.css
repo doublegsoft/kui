@@ -5,17 +5,21 @@
 }
 
 .calendar .title {
+	background: var(--color-primary);
+	color: var(--color-white);
 	font-size: 16px;
+	padding: 4px 8px;
 	font-weight: bold;
 }
 
-.calendar .weekdays {
+.calendar > .weekdays {
 	display: flex;
 	justify-content: space-between;
 }
 
-.calendar .weekday {
-	background: var(--color-divider);
+.calendar > .weekdays > .weekday {
+	background: var(--color-primary-dark);
+	color: var(--color-white);
 	height: 48px;
 	width: calc(100% / 7);
 	line-height: 48px;
@@ -37,4 +41,81 @@
 .calendar .today {
 	background: var(--color-primary);
 	color: var(--color-white);
+}
+
+.weekly {
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	/*margin-right: 10px;*/
+	/*margin-left: 10px;*/
+	width: 100%;
+}
+
+.weekly .weekday {
+	list-style: none;
+	float: left;
+	text-align: center;
+	/*width: calc((100%) / 7);*/
+	padding-top: 8px;
+}
+
+.weekly .weekday.active {
+	background: var(--color-primary);
+	height: 68px;
+	width: 40px;
+	border-radius: 20px;
+	padding-top: 8px;
+	box-shadow: 2px 2px 8px -1px var(--color-shadow-primary);
+	display: flex;
+	flex-direction: column;
+}
+
+.weekly .weekday span.day {
+	font-size: 12px;
+	letter-spacing: 0.5px;
+	margin-bottom: 2px;
+	display: block;
+}
+
+.weekly .weekday.active span.day {
+	color: var(--color-white);
+	font-weight: bolder;
+}
+
+.weekly .weekday.active span.date {
+	background: var(--color-white);
+	height: 30px;
+	width: 30px;
+	border-radius: 50%;
+	line-height: 30px;
+	text-align: center;
+	margin-left: 5px;
+}
+
+.weekly .weekday span.date {
+	font-size: 15px;
+	font-weight: 500;
+	margin-top: 5px;
+}
+
+.daily {
+	width: 100%;
+}
+
+.daily .time-window {
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+
+.daily .time-window .time {
+	flex: 0 0 21%;
+	max-width: 21%;
+}
+
+.daily .time-window .event {
+	flex: 0 0 79%;
+	max-width: 79%;
+	padding-left: 0;
 }

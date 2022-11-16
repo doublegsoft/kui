@@ -178,8 +178,8 @@ xhr.promise = function(xhrOpt, error) {
   return new Promise(function(resolve, reject) {
     xhrOpt.success = function (resp) {
       if (resp.error) {
-        dialog.error(resp.error.message);
         if (error) error(resp.error);
+        else dialog.error(resp.error.message);
         return;
       }
       resolve(resp.data);
@@ -4581,7 +4581,7 @@ Numpad.prototype.root = function () {
     </div>
   `, this);
   this.bottom = dom.find('.popup-bottom', ret);
-
+  // this.audio = new Audio('img/keypressed.wav');
   let mask = dom.find('.popup-mask', ret);
   let confirm = dom.find('.confirm', ret);
   let cancel = dom.find('.cancel', ret);
@@ -4612,6 +4612,13 @@ Numpad.prototype.root = function () {
       }
       value.innerText = str;
     });
+    // dom.bind(num, 'touchstart', ev => {
+    //   this.audio.src= 'img/keypressed.wav';
+    //   this.audio.play();
+    // });
+    // dom.bind(num, 'touchend', ev => {
+    //   // this.audio.pause();
+    // });
   }
 
   dom.bind(mask, 'click', ev => {
@@ -5239,6 +5246,78 @@ ActionSheet.prototype.close = function () {
     this.bottom.parentElement.remove();
   }, 300);
 };
+
+function Weekdays(opt) {
+  opt = opt || {};
+  this.today = moment(new Date());
+  this.days = opt.days || 14;
+}
+
+Weekdays.prototype.root = function() {
+  let ret = dom.templatize(`
+    <div class="swiper weekly">
+      <div class="swiper-wrapper">
+      </div>
+    </div>
+  `, {});
+  let wrapper = dom.find('.swiper-wrapper', ret);
+  let dates = [];
+  for (let i = 0; i < this.days; i++) {
+    let date = moment(this.today).add(i, 'days');
+    let day = date.day();
+    if (day == 1) {
+      day = '一';
+    } else if (day == 2) {
+      day = '二';
+    } else if (day == 3) {
+      day = '三';
+    } else if (day == 4) {
+      day = '四';
+    } else if (day == 5) {
+      day = '五';
+    } else if (day == 6) {
+      day = '六';
+    } else {
+      day = '日';
+    }
+    let slide = dom.element('<div class="swiper-slide d-flex" style="width: calc(100% / 7)"></div>');
+    let el = dom.templatize(`
+      <div class="weekday pb-2" data-date="{{fulldate}}">
+        <span class="day">{{day}}</span>
+        <span class="date">{{date}}</span>
+      </div>
+    `, {
+      day: day,
+      date: date.format('DD'),
+      fulldate: date.format('YYYY-MM-DD'),
+    });
+    if (i == 0) {
+      el.classList.add('active');
+    }
+    slide.appendChild(el);
+    wrapper.appendChild(slide);
+
+    dom.bind(el, 'click', ev => {
+      let wds = ret.querySelectorAll('.weekday');
+      wds.forEach(wd => {
+        wd.classList.remove('active');
+      })
+      el.classList.add('active');
+    });
+  }
+
+  let swiper = new Swiper(ret, {
+    speed: 400,
+    slidesPerView: 7,
+    loop: false,
+  });
+  return ret;
+};
+
+Weekdays.prototype.render = function(containerId) {
+  let container = dom.find(containerId);
+  container.appendChild(this.root());
+};
 Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
   return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
@@ -5383,7 +5462,7 @@ kuim.replace = function (container, url, html, opt) {
 };
 
 kuim.setTitleAndIcon = function(title, icon) {
-  let bottomDiv = dom.find('.bottom-bar');
+  let bottomDiv = dom.find('.bottom-navigator');
   let titleDiv = dom.find('header h1.title');
   titleDiv.innerText = title;
   let iconDiv = dom.find('header div.left');

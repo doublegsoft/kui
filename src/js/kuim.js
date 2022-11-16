@@ -142,7 +142,7 @@ kuim.replace = function (container, url, html, opt) {
 };
 
 kuim.setTitleAndIcon = function(title, icon) {
-  let bottomDiv = dom.find('.bottom-bar');
+  let bottomDiv = dom.find('.bottom-navigator');
   let titleDiv = dom.find('header h1.title');
   titleDiv.innerText = title;
   let iconDiv = dom.find('header div.left');

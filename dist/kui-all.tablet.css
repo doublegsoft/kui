@@ -14856,6 +14856,14 @@ html:not([dir=rtl]) .mfe-3 {
   --color-divider-dark: rgba(255, 255, 255, 0.12);
 }
 
+.color-primary {
+  color: var(--color-primary)!important;
+}
+
+.color-error {
+  color: var(--color-danger)!important;
+}
+
 :root .c-dark-theme {
   --color-background: #20202a;
   --color-primary: #4638BF;
@@ -14920,6 +14928,179 @@ main {
   width: 100%;
 }
 
+.avatar {
+  background-color: var(--color-secondary);
+  border-radius: 9999px;
+  box-shadow: rgb(255, 255, 255) 0px 0px 0px 4px;
+  color: rgb(255, 255, 255);
+  height: 48px;
+  width: 48px;
+}
+
+.avatar-24 {
+  height: 24px!important;
+  width: 24px!important;
+}
+
+.avatar-28 {
+  height: 28px!important;
+  width: 28px!important;
+}
+
+.avatar-32 {
+  height: 32px!important;
+  width: 32px!important;
+}
+
+.avatar-36 {
+  height: 36px!important;
+  width: 36px!important;
+}
+
+.avatar-42 {
+  height: 42px!important;
+  width: 42px!important;
+}
+
+.avatar-48 {
+  height: 48px!important;
+  width: 48px!important;
+}
+
+.avatar-56 {
+  height: 56px!important;
+  width: 56px!important;
+}
+
+.avatar-64 {
+  height: 64px!important;
+  width: 64px!important;
+}
+
+.avatar-72 {
+  height: 72px!important;
+  width: 72px!important;
+}
+
+.avatar-128 {
+  height: 128px!important;
+  width: 128px!important;
+}
+
+.circle {
+  border-radius: 9999px;
+}
+
+.circle-24 {
+  height: 24px!important;
+  width: 24px!important;
+  border-radius: 9999px;
+}
+
+.circle-28 {
+  height: 28px!important;
+  width: 28px!important;
+  border-radius: 9999px;
+}
+
+.circle-32 {
+  height: 32px!important;
+  width: 32px!important;
+  border-radius: 9999px;
+}
+
+.circle-36 {
+  height: 36px!important;
+  width: 36px!important;
+  border-radius: 9999px;
+}
+
+.circle-42 {
+  height: 42px!important;
+  width: 42px!important;
+  border-radius: 9999px;
+}
+
+.circle-48 {
+  height: 48px!important;
+  width: 48px!important;
+  border-radius: 9999px;
+}
+
+.circle-56 {
+  height: 56px!important;
+  width: 56px!important;
+  border-radius: 9999px;
+}
+
+.circle-64 {
+  height: 64px!important;
+  width: 64px!important;
+  border-radius: 9999px;
+}
+
+.circle-72 {
+  height: 72px!important;
+  width: 72px!important;
+  border-radius: 9999px;
+}
+
+.circle-128 {
+  height: 128px!important;
+  width: 128px!important;
+  border-radius: 9999px;
+}
+
+.rect-24 {
+  height: 24px!important;
+  width: 24px!important;
+}
+
+.rect-28 {
+  height: 28px!important;
+  width: 28px!important;
+}
+
+.rect-32 {
+  height: 32px!important;
+  width: 32px!important;
+}
+
+.rect-36 {
+  height: 36px!important;
+  width: 36px!important;
+}
+
+.rect-42 {
+  height: 42px!important;
+  width: 42px!important;
+}
+
+.rect-48 {
+  height: 48px!important;
+  width: 48px!important;
+}
+
+.rect-56 {
+  height: 56px!important;
+  width: 56px!important;
+}
+
+.rect-64 {
+  height: 64px!important;
+  width: 64px!important;
+}
+
+.rect-72 {
+  height: 72px!important;
+  width: 72px!important;
+}
+
+.rect-128 {
+  height: 128px!important;
+  width: 128px!important;
+}
+
 /*!
 ** PAGE
 */
@@ -14937,9 +15118,9 @@ main {
   word-wrap: break-word;
   background-clip: border-box;
   /*border: 1px solid #c8ced3;*/
-  border-radius: .25rem;
-  margin-bottom: 1.5rem;
-  margin-bottom: 10px;
+  /*border-radius: .25rem;*/
+  /*margin-bottom: 1.5rem;*/
+  /*margin-bottom: 10px;*/
 }
 
 .page.side {
@@ -16020,6 +16201,10 @@ h6, .h6 {
 
 .font-24 {
   font-size: 24px !important;
+}
+
+.font-28 {
+  font-size: 28px !important;
 }
 
 .font-32 {

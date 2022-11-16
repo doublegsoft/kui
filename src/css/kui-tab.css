@@ -22,3 +22,12 @@
 .tab-item.active {
   color: var(--color-primary);
 }
+
+.nav-tabs .slider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: var(--color-primary);
+  transition: left .25s;
+}

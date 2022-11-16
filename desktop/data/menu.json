@@ -37,6 +37,10 @@
         "text": "网络拓扑",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/application/network/dashboard.html', containerId: 'container'});"
+      },{
+        "text": "故事板",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/application/storyboard/storyboard.html', containerId: 'container'});"
       }]
     }]
   }, {

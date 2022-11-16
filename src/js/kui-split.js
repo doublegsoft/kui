@@ -1,6 +1,6 @@
 if (typeof split === 'undefined') split = {};
 
-split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
+split.vertical = function(containerId, leftId, rightId, leftDefaultSize, callback) {
   const SPLITTER_WIDTH = 10;
   const splitterId = "__split_splitterId";
   leftDefaultSize = (leftDefaultSize || 300)
@@ -54,14 +54,17 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
   document.addEventListener('mouseup', function(event) {
     dragging = false;
     document.body.style.cursor = 'default';
+    if (callback) {
+      callback();
+    }
   });
 
-  function isUnderContainer(element, container) {
+  function isInContainer(element, container) {
     if (element == null) {
       return false;
     }
     if (element == container) return true;
-    return isUnderContainer(element.parentElement, container);
+    return isInContainer(element.parentElement, container);
   }
 
   let offsetLeftPrevious = -1;
@@ -81,7 +84,7 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         return;
       }
       let offset = 0;
-      if (isUnderContainer(target, left)) {
+      if (isInContainer(target, left)) {
         offset = parseInt(splitter.style.left) - 5;
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
@@ -90,7 +93,7 @@ split.vertical = function(containerId, leftId, rightId, leftDefaultSize) {
         right.style.flex = (container.clientWidth - offset - SPLITTER_WIDTH) + 'px';
         return;
       }
-      if (isUnderContainer(target, right)) {
+      if (isInContainer(target, right)) {
         offset = parseInt(splitter.style.left) + 5;
         splitter.style.left = offset + 'px';
         left.style.width = offset + 'px';
@@ -154,12 +157,12 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
     document.body.style.cursor = 'default';
   });
 
-  function isUnderContainer(element, container) {
+  function isInContainer(element, container) {
     if (element == null) {
       return false;
     }
     if (element == container) return true;
-    return isUnderContainer(element.parentElement, container);
+    return isInContainer(element.parentElement, container);
   }
 
   let offsetLeftPrevious = -1;
@@ -179,14 +182,14 @@ split.horizontal = function(containerId, topId, bottomId, topDefaultSize) {
         return;
       }
       let offset = 0;
-      if (isUnderContainer(target, top)) {
+      if (isInContainer(target, top)) {
         offset = parseInt(splitter.style.top) - 10;
         splitter.style.top = offset + 'px';
         top.style.height = offset + 'px';
         bot.style.height = (container.clientHeight - offset) + 'px';
         return;
       }
-      if (isUnderContainer(target, bot)) {
+      if (isInContainer(target, bot)) {
         offset = parseInt(splitter.style.top) + 10;
         splitter.style.top = offset + 'px';
         top.style.height = offset + 'px';

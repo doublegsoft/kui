@@ -178,8 +178,8 @@ xhr.promise = function(xhrOpt, error) {
   return new Promise(function(resolve, reject) {
     xhrOpt.success = function (resp) {
       if (resp.error) {
-        dialog.error(resp.error.message);
         if (error) error(resp.error);
+        else dialog.error(resp.error.message);
         return;
       }
       resolve(resp.data);

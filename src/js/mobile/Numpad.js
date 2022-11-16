@@ -66,7 +66,7 @@ Numpad.prototype.root = function () {
     </div>
   `, this);
   this.bottom = dom.find('.popup-bottom', ret);
-
+  // this.audio = new Audio('img/keypressed.wav');
   let mask = dom.find('.popup-mask', ret);
   let confirm = dom.find('.confirm', ret);
   let cancel = dom.find('.cancel', ret);
@@ -97,6 +97,13 @@ Numpad.prototype.root = function () {
       }
       value.innerText = str;
     });
+    // dom.bind(num, 'touchstart', ev => {
+    //   this.audio.src= 'img/keypressed.wav';
+    //   this.audio.play();
+    // });
+    // dom.bind(num, 'touchend', ev => {
+    //   // this.audio.pause();
+    // });
   }
 
   dom.bind(mask, 'click', ev => {
