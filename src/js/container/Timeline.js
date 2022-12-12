@@ -76,7 +76,6 @@ Timeline.prototype.render = function(container, params) {
       success: function (resp) {
         if (!resp.data) return;
         let data = resp.data;
-        console.log(data);
         for (let i = 0; i < data.length; i++) {
           ul.appendChild(self.createTile(data[i], i));
         }

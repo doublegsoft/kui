@@ -897,7 +897,7 @@ ajax.view = function(opt) {
         if (container) {
           fragment = utils.append(container, resp, empty);
         }
-        if (fragment.id) {
+        if (fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
         }
         if (callback)
@@ -1124,7 +1124,7 @@ ajax.append = function(opts) {
       success: function (resp) {
         let params = utils.getParameters(url);
         let fragment = utils.append(container, resp, false)
-        if (fragment.id) {
+        if (fragment.id && window[fragment.id] && window[fragment.id].show) {
           window[fragment.id].show(params);
         }
         for (let i = container.children.length - 1; i >= 0; i--) {
@@ -10374,6 +10374,8 @@ FormLayout.prototype.build = function(persisted) {
       new FileUpload(field.options).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'imageupload') {
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'images') {
+
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -10750,7 +10752,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       });
     }
     dom.find('input', input).setAttribute('name', field.name);
-  } else if (field.input == 'radiotext') {
+  } else if (field.input == 'radiotext' || field.input == 'booltext') {
     let radios = [];
     let defaultValue = '';
     for (let i = 0; i < field.values.length; i++) {
@@ -10957,6 +10959,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(timeIcon);
     group.appendChild(timeInput);
     return {label: label, input: group};
+  } else if (field.input == 'tags') {
+    input = dom.create('input', 'form-control');
+    input.name = field.name;
+    input.disabled = this.readonly || field.readonly || false;
   } else {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
@@ -10968,8 +10974,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(input);
   }
 
+  // 有了父节点以后的后续处理
   if (field.domain) {
     input.setAttribute('data-domain-type', field.domain);
+  }
+  if (field.input == 'tags') {
+    input.setAttribute('placeholder', '请输入');
+    new Tagify(input);
   } else if (field.input == 'date') {
     input.setAttribute('data-domain-type', 'date');
     input.setAttribute('placeholder', '请选择...');
@@ -16170,7 +16181,6 @@ Timeline.prototype.render = function(container, params) {
       success: function (resp) {
         if (!resp.data) return;
         let data = resp.data;
-        console.log(data);
         for (let i = 0; i < data.length; i++) {
           ul.appendChild(self.createTile(data[i], i));
         }

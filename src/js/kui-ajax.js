@@ -198,7 +198,7 @@ ajax.view = function(opt) {
         if (container) {
           fragment = utils.append(container, resp, empty);
         }
-        if (fragment.id) {
+        if (fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
         }
         if (callback)
@@ -425,7 +425,7 @@ ajax.append = function(opts) {
       success: function (resp) {
         let params = utils.getParameters(url);
         let fragment = utils.append(container, resp, false)
-        if (fragment.id) {
+        if (fragment.id && window[fragment.id] && window[fragment.id].show) {
           window[fragment.id].show(params);
         }
         for (let i = container.children.length - 1; i >= 0; i--) {
