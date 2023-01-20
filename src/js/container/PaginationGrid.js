@@ -54,20 +54,20 @@ function PaginationGrid(opt) {
  * @returns {HTMLTableElement}
  */
 PaginationGrid.prototype.root = function () {
-  this.root = dom.element(`
+  let ret = dom.element(`
     <div class="card">
       <div class="card-body">
         <div class="row" style="margin-left: -5px; margin-right: -5px;"></div>
       </div>
     </div>
   `);
-  this.rootBody = this.root.children[0].children[0];
+  this.rootBody = ret.children[0].children[0];
   if (this.borderless == true) {
-    this.root.classList.add('b-a-0', 'mb-0');
-    this.root.children[0].classList.add('p-0');
+    ret.classList.add('b-a-0', 'mb-0');
+    ret.children[0].classList.add('p-0');
   }
 
-  return this.root;
+  return ret;
 };
 
 /**

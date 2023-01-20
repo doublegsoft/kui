@@ -11,31 +11,54 @@ kuim = {
 
 kuim.navigateTo = async function (url, opt, clear) {
   clearTimeout(kuim.delayToLoad);
-  kuim.delayToLoad = setTimeout(() => {
-    if (typeof clear === "undefined") clear = false;
-    let main = document.querySelector('main');
+  // kuim.delayToLoad = setTimeout(() => {
+  //   if (typeof clear === "undefined") clear = false;
+  //   let main = document.querySelector('main');
+  //
+  //   if (kuim.presentPageObj) {
+  //     kuim.presentPageObj.page.classList.remove('in');
+  //     kuim.presentPageObj.page.classList.add('out');
+  //   }
+  //   setTimeout(async () => {
+  //     if (kuim.presentPageObj) {
+  //       kuim.presentPageObj.page.parentElement.style.display = 'none';
+  //     }
+  //     if (kuim.presentPageObj && clear !== false) {
+  //       kuim.presentPageObj.page.parentElement.remove();
+  //       if (kuim.presentPageObj.destroy) {
+  //         kuim.presentPageObj.destroy();
+  //       }
+  //       delete kuim.presentPageObj;
+  //     }
+  //     let html = await xhr.asyncGet({
+  //       url: url + '?' + new Date().getTime(),
+  //     }, 'GET');
+  //     kuim.reload(main, url, html, opt);
+  //   }, 400);
+  // }, 200);
+  if (typeof clear === "undefined") clear = false;
+  let main = document.querySelector('main');
 
+  if (kuim.presentPageObj) {
+    kuim.presentPageObj.page.classList.remove('in');
+    kuim.presentPageObj.page.classList.add('out');
+  }
+  kuim.delayToLoad = setTimeout(async () => {
     if (kuim.presentPageObj) {
-      kuim.presentPageObj.page.classList.remove('in');
-      kuim.presentPageObj.page.classList.add('out');
+      kuim.presentPageObj.page.parentElement.style.display = 'none';
     }
-    setTimeout(async () => {
-      if (kuim.presentPageObj) {
-        kuim.presentPageObj.page.parentElement.style.display = 'none';
+    if (kuim.presentPageObj && clear !== false) {
+      kuim.presentPageObj.page.parentElement.remove();
+      if (kuim.presentPageObj.destroy) {
+        kuim.presentPageObj.destroy();
       }
-      if (kuim.presentPageObj && clear !== false) {
-        kuim.presentPageObj.page.parentElement.remove();
-        if (kuim.presentPageObj.destroy) {
-          kuim.presentPageObj.destroy();
-        }
-        delete kuim.presentPageObj;
-      }
-      let html = await xhr.asyncGet({
-        url: url,
-      }, 'GET');
-      kuim.reload(main, url, html, opt);
-    }, 400);
-  }, 200);
+      delete kuim.presentPageObj;
+    }
+    let html = await xhr.asyncGet({
+      url: url + '?' + new Date().getTime(),
+    }, 'GET');
+    kuim.reload(main, url, html, opt);
+  }, 400);
 };
 
 kuim.navigateWidget = function (url, container, opt) {
@@ -148,11 +171,13 @@ kuim.setTitleAndIcon = function(title, icon) {
   let iconDiv = dom.find('header div.left');
   if (icon) {
     iconDiv.innerHTML = icon;
-    bottomDiv.style.display = '';
+    if (bottomDiv != null)
+      bottomDiv.style.display = '';
     iconDiv.onclick = (ev) => {}
   } else {
     iconDiv.innerHTML = '<i class="fas fa-arrow-left text-white button icon"></i>';
-    bottomDiv.style.display = 'none';
+    if (bottomDiv != null)
+      bottomDiv.style.display = 'none';
     iconDiv.onclick = (ev) => {
       kuim.navigateBack()
     }
@@ -346,3 +371,114 @@ kuim.error = function(message, callback) {
     }, 500);
   }, 1000);
 };
+
+kuim.loading = function(callback) {
+  if (document.getElementById('__widgetLoading') != null) return;
+  let el = dom.templatize(`
+    <div id="__widgetLoading" style="background: rgba(0,0,0,0.3); position: absolute; top: 0; left: 0; 
+                z-index: 9999; height: 100%; width: 100%; display: flex; color: white">
+      <div class="m-auto" style="text-align: center;">
+        <i class="fas fa-spinner fa-spin font-36"></i>
+        <div class="font-18 mt-2">数据加载中</div>
+      </div>          
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    if (callback)
+      callback(el);
+  }, 300);
+};
+
+kuim.dialog = function (opt) {
+  let confirm = opt.confirm;
+  let cancel = opt.cancel;
+  let mask = dom.element(`
+    <div style="background: rgba(0,0,0,0.3); position: absolute; top: 0; left: 0; 
+                z-index: 9999; height: 100%; width: 100%; display: flex;">
+      <div class="dialog m-auto" 
+           style="width: 88%; min-height: 400px; position: relative;
+                  background: var(--color-white);">
+        <div class="dialog-body">
+          <img src="/mobile/img/app/6.jpg" width="100%" style="max-height: 500px;">
+        </div>
+        <div class="dialog-footer" 
+             style="font-size: 24px; font-weight: bold; position: absolute;
+                    width: 100%; height: 56px; bottom: 0; display: table;">
+          <button style="background: var(--color-error); width: 50%; display: inline-table;
+                         color: var(--color-text-primary-dark); border: none; 
+                         line-height: 56px;">取  消</button>
+          <button style="background: var(--color-primary); width: 50%; display: inline-table;
+                         color: var(--color-text-primary-dark); border: none; 
+                         line-height: 56px;">确  定</button>
+        </div>
+      </div>
+    </div>
+  `);
+  let buttons = mask.querySelectorAll('button');
+  dom.bind(buttons[0], 'click', ev => {
+    mask.remove();
+    if (cancel) cancel();
+  });
+  dom.bind(buttons[1], 'click', ev => {
+    mask.remove();
+    if (confirm) confirm();
+  });
+  document.body.appendChild(mask);
+};
+
+let pStart = { x: 0, y: 0 };
+let pStop = { x: 0, y: 0 };
+
+kuim.swipeStart = function(e) {
+  if (typeof e["targetTouches"] !== "undefined") {
+    let touch = e.targetTouches[0];
+    pStart.x = touch.screenX;
+    pStart.y = touch.screenY;
+  } else {
+    pStart.x = e.screenX;
+    pStart.y = e.screenY;
+  }
+};
+
+kuim.swipeEnd = function(e) {
+  if (typeof e["changedTouches"] !== "undefined") {
+    let touch = e.changedTouches[0];
+    pStop.x = touch.screenX;
+    pStop.y = touch.screenY;
+  } else {
+    pStop.x = e.screenX;
+    pStop.y = e.screenY;
+  }
+};
+
+kuim.swipeCheck = function() {
+  let changeY = pStart.y - pStop.y;
+  let changeX = pStart.x - pStop.x;
+  return kuim.isPullDown(changeY, changeX);
+};
+
+kuim.isPullDown = function (dY, dX) {
+  // methods of checking slope, length, direction of line created by swipe action
+  return (
+    dY < 0 &&
+    ((Math.abs(dX) <= 100 && Math.abs(dY) >= 300) ||
+      (Math.abs(dX) / Math.abs(dY) <= 0.3 && dY >= 60))
+  );
+};
+
+document.addEventListener("touchstart", kuim.swipeStart, false);
+document.addEventListener("touchend", ev => {
+  kuim.swipeEnd(ev);
+  if (kuim.swipeCheck()) {
+    let rect = kuim.presentPageObj.page.getBoundingClientRect();
+    if (kuim.presentPageObj && kuim.presentPageObj.pullToRefresh) {
+      let rect = kuim.presentPageObj.page.getBoundingClientRect();
+      if (rect.top >= 0) {
+        kuim.loading(el => {
+          kuim.presentPageObj.pullToRefresh(el);
+        });
+      }
+    }
+  }
+}, false);

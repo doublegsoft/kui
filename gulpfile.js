@@ -106,23 +106,25 @@ gulp.task('dist', function() {
 
   // mobile js
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dom.js', 'src/js/kui-utils.js',
-    'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/Timeline.js',
-    'src/js/container/Tabs.js', 'src/js/editor/DataSheet.js', 'src/js/application/Chat.js',
+    'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/GridView.js',
+    'src/js/container/Timeline.js', 'src/js/container/Tabs.js', 'src/js/editor/DataSheet.js',
+    'src/js/application/Chat.js',
     'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
-    'src/js/kuim.js'])
+    'src/js/kuim.js', 'src/js/flutter.js'])
     .pipe(concat('./kui-all.mobile.min.js'))
     .pipe(uglify({}))
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dom.js', 'src/js/kui-utils.js',
-    'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/Timeline.js',
-    'src/js/container/Tabs.js', 'src/js/editor/DataSheet.js', 'src/js/application/Chat.js',
+    'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/GridView.js',
+    'src/js/container/Timeline.js', 'src/js/container/Tabs.js', 'src/js/editor/DataSheet.js',
+    'src/js/application/Chat.js',
     'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
-    'src/js/kuim.js'])
+    'src/js/kuim.js', 'src/js/flutter.js'])
     .pipe(concat('./kui-all.mobile.js'))
     .pipe(gulp.dest('./dist/'));
 

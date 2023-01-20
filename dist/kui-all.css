@@ -18443,8 +18443,15 @@ a.disabled {
   top: 0;
   width: 100%;
 }
+.ab-chat::-webkit-scrollbar {
+  display: none;
+}
+
 .ab-chat {
   width: 100%;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overflow: scroll;
 }
 
 .ab-chat .contact {
@@ -18519,7 +18526,7 @@ a.disabled {
 
 .ab-chat .conversation  {
   overflow: auto;
-  padding: 20px 0 50px 0;
+  padding: 20px 0 10px 0;
   background-color: #F7F7F7;
   opacity: 0.85;
 }
@@ -18626,18 +18633,86 @@ a.disabled {
 }
 
 .ab-chat .typebar {
-  position: absolute;
+  position: fixed;
   width: 100%;
-  /*height: 90px;*/
+  /*height: 120px;*/
+  height: 90px;
   padding-bottom: 10px;
+  padding-top: 10px;
   bottom: 0;
   left: 0;
   background: #F7F7F7;
-  display: flex;
-  align-items: center;
+  /*display: flex;*/
+  /*align-items: center;*/
 }
 
-.ab-chat .typebar input {
+.ab-chat .typebar-more {
+  border-top: 1px solid rgba(0,0,0,0.125);
+  row-gap: 4px;
+  opacity: 0;
+}
+
+.ab-chat .typebar-more.hidden {
+  opacity: 0;
+  animation-name: hidden;
+  animation-duration: 500ms;
+}
+
+.ab-chat .typebar-more.visible {
+  opacity: 1;
+  animation-name: visible;
+  animation-duration: 500ms;
+}
+
+.ab-chat .typebar.more {
+  height: 260px;
+  animation-name: more;
+  animation-duration: 500ms;
+}
+
+.ab-chat .typebar.less {
+  height: 90px;
+  animation-name: less;
+  animation-duration: 500ms;
+}
+
+@keyframes more {
+  from {
+    height: 90px;
+  }
+  to {
+    height: 260px;
+  }
+}
+
+@keyframes less {
+  from {
+    height: 260px;
+  }
+  to {
+    height: 90px;
+  }
+}
+
+@keyframes hidden {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes visible {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.ab-chat .typebar textarea {
   border: none;
   background-image: none;
   background-color: white;

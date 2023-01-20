@@ -1,0 +1,154 @@
+<style>
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow: scroll;
+  }
+
+  .nav-item {
+    min-width: 64px;
+    line-height: 36px;
+    height: 36px;
+  }
+
+  .active {
+    color: var(--color-primary);
+  }
+
+  .slider {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    background-color: var(--color-primary);
+    transition: left .25s;
+  }
+</style>
+<div id="pageExampleGridViewMerchandise" class="mobile page">
+  <div widget-id="widgetNavigator" class="d-flex no-scrollbar position-absolute"
+       style="z-index: 999; top: 0; background: white;"></div>
+  <div widget-id="widgetMerchandise" style="padding-top: 36px;"></div>
+</div>
+<script>
+function PageExampleGridViewMerchandise() {
+  this.page = dom.find('#pageExampleGridViewMerchandise');
+}
+
+PageExampleGridViewMerchandise.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  this.widgetNavigator.style.width = window.innerWidth + 'px';
+  dom.height2(this.widgetMerchandise, 58, document.body);
+  this.tabs = new Tabs({
+    navigatorId: this.widgetNavigator,
+    contentId: this.widgetMerchandise,
+    tabActiveClass: 'active',
+    tabs: [{
+      text: '食品',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '手机',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '男装',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '女装',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '童装',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '家居',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '鞋包',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '电脑',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '手机',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '海淘',
+      onClicked: () => {
+        this.loadData();
+      },
+    },{
+      text: '券商',
+      onClicked: () => {
+        this.loadData();
+      },
+    }]
+  });
+  this.tabs.render();
+};
+
+PageExampleGridViewMerchandise.prototype.destroy = async function (params) {
+  console.log('pageExampleGridViewMerchandise destroyed');
+};
+
+PageExampleGridViewMerchandise.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PageExampleGridViewMerchandise.prototype.loadData = async function () {
+  let data = await xhr.asyncGet({
+    url: '/mobile/data/merchandises.json',
+  });
+  data = JSON.parse(data);
+  this.gridView = new GridView({
+    local: data,
+    create: (idx, item, li) => {
+      let el = dom.templatize(`
+        <div style="background: #fff;
+                    border-bottom: 2px solid #d9d9d9;
+                    margin-bottom: 0.14rem;">
+          <img src="/img/{{src.[0]}}" style="width: 100%;">
+          <div style="height: 1.68rem;
+                      font-size: 0.52rem;
+                      line-height: 0.92rem;
+                      color: #333;
+                      font-size: 12px;
+                      padding: 0 0.36rem;
+                      overflow: hidden;
+                      text-overflow: ellipsis;">{{title}}</div>
+          <div class="price clear">
+            <span style="font-size: 0.32rem;
+                         color: #ff5000;
+                         float: left;">￥<em>{{price}}</em></span>
+            <b style="color: #a8a8a8;
+                      font-size: 0.4rem;
+                      float: right;">{{sales}}人付款</b>
+          </div>
+        </div>
+      `, item);
+      return el;
+    },
+  });
+  this.gridView.render(this.widgetMerchandise);
+};
+
+pageExampleGridViewMerchandise = new PageExampleGridViewMerchandise();
+</script>

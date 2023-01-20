@@ -1,0 +1,51 @@
+<div id="pageExampleReadonlyForm" class="mobile page">
+  <div class="card card-body">
+    <div class="title-bordered">
+      <strong>基本信息</strong>
+    </div>
+    <div widget-id="widgetFormLayout" class="full-width"></div>
+  </div>
+</div>
+<script>
+function PageExampleReadonlyForm() {
+  this.page = dom.find('#pageExampleReadonlyForm');
+}
+
+PageExampleReadonlyForm.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  this.form = new MobileForm({
+    readonly: true,
+    columnCount: 1,
+    fields: [{
+      title: '姓名',
+    },{
+      title: '性别',
+      input: 'select',
+      values: [{text: '男', value: '1'},{text: '女', value: '2'}]
+    },{
+      title: '出生日期',
+      input: 'date',
+    },{
+      title: '手机号',
+      input: 'mobile',
+    },{
+      title: '身份证号',
+      input: 'id',
+    },{
+      title: '所在地区',
+      input: 'district',
+    }]
+  });
+  this.form.render(this.widgetFormLayout);
+};
+
+PageExampleReadonlyForm.prototype.destroy = async function (params) {
+  console.log('pageExampleReadonlyForm destroyed');
+};
+
+PageExampleReadonlyForm.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageExampleReadonlyForm = new PageExampleReadonlyForm();
+</script>

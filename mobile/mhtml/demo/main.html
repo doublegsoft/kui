@@ -1,41 +1,101 @@
 <div id="pageDemoMain" class="mobile page" role="nav">
   <ul class="list-group">
-    <li widget-id="buttonChat" class="list-group-item list-group-item-action d-flex">
-      <strong class="font-20">聊天页面</strong>
-      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    <li widget-id="buttonWechat" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/wechat.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">微信</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
-    <li widget-id="buttonVideo" class="list-group-item list-group-item-action d-flex">
-      <strong class="font-20">视频页面</strong>
-      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    <li widget-id="buttonWeibo" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/weibo.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">微博</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
-    <li widget-id="buttonWeb" class="list-group-item list-group-item-action d-flex">
-      <strong class="font-20">三方网页</strong>
-      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    <li widget-id="buttonTaobao" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/taobao.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">淘宝</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonHot" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/jinritoutiao.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">今日头条</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonTiktok" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/tiktok.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">抖音</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonQQMusic" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/qqyinyue.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">QQ音乐</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonWeb" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <img src="img/logo/baidu.png" width="32px" class="position-relative" style="top: -2px;">
+        <strong class="font-18 ml-2">百度</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
   </ul>
 </div>
 <script>
 function PageDemoMain() {
   this.page = dom.find('#pageDemoMain');
-  this.buttonChat = dom.find('[widget-id=buttonChat]', this.page);
-  this.buttonVideo = dom.find('[widget-id=buttonVideo]', this.page);
-  this.buttonWeb = dom.find('[widget-id=buttonWeb]', this.page);
 }
 
 PageDemoMain.prototype.initialize = async function (params) {
-  dom.bind(this.buttonChat, 'click', ev => {
-    kuim.navigateTo('mhtml/demo/chat.html', {
-      title: '聊天',
+  dom.init(this, this.page);
+  dom.bind(this.buttonWechat, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/wechat/contact.html', {
+      title: '联系人',
     });
   });
-  dom.bind(this.buttonVideo, 'click', ev => {
-    kuim.navigateTo('mhtml/demo/video.html', {
-      title: '视频',
+  dom.bind(this.buttonTaobao, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/taobao/home.html', {
+      title: '微博',
+    });
+  });
+  dom.bind(this.buttonWeibo, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/weibo/home.html', {
+      title: '淘宝',
+    });
+  });
+  dom.bind(this.buttonTiktok, 'click', ev => {
+    // kuim.navigateTo('mhtml/demo/video.html', {
+    //   title: '视频',
+    // });
+    kuim.navigateTo('mhtml/demo/tiktok/home.html', {
+      title: '抖音',
+    });
+  });
+  dom.bind(this.buttonQQMusic, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/qqmusic/launch.html', {
+      title: 'QQ音乐',
     });
   });
   dom.bind(this.buttonWeb, 'click', ev => {
     kuim.navigateTo('mhtml/demo/web.html', {
-      title: '网页',
+      title: '百度',
     });
   });
 };

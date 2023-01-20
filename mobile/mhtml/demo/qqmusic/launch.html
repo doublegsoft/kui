@@ -1,0 +1,442 @@
+<style type="text/css">
+  .item{position:absolute;width:100%;height:100%;left:0;top:0;-webkit-transform:translateZ(0);overflow:hidden;z-index:31}
+  .touchmove{-webkit-transition:none}
+  .wrap{height:100%}
+  .item .m_animate_box{position:relative;height:100%;display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center}
+  .item .inner{position:relative;width:320px;-webkit-box-flex:1;padding-top:50px}
+  .clouds{position:absolute;width:100%;-webkit-transform:translate(0,-50%);top:50%;left:0;height:300px}
+  .mod_control{position:absolute;z-index:90;bottom:20px;left:50%;margin-left:-30px}
+  .mod_tag{margin:0;padding:0}
+  .mod_tag li{float:left;width:7px;height:7px;-webkit-border-radius:50%;background-color:rgba(255,255,255,.5);margin-right:9px;list-style:none;margin-top:0;padding:0}
+  .mod_tag li span{display:none}
+  .mod_tag .current{background-color:#fff}
+  .item .content{height:100%}
+  .logo{background:url(//imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/logo_M.png?max_age=19830212) no-repeat;background-size:cover}
+  .clouds .cld_con,.tellurion,.drafly,.ball_s1,.ball_s2,.nbox_t,.nbox_b,.share_btn,.close_btn,.play_box .play span{background-image:url(//imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/sprite.png?max_age=19830212);background-repeat:no-repeat;background-size:250px 185px;display:inline-block}
+  .logo{width:93px;height:98px}
+  .logo_contain{}
+  .logo_box{position:absolute;top:50%;margin-top:-35px;left:50%;margin-left:-46px}
+  .logo_box .logo,.logo_box .tellurion{position:absolute}
+  .logo_box .logo{z-index:100;left:0;top:0}
+  .tellurion{background-position:-135px -25px;width:87px;height:122px;z-index:30;left:14px;top:-4px}
+  .drafly{width:36px;height:17px;background-position:-125px 0;display:block;position:absolute;left:30px;top:-12px;z-index:90}
+  .nbox_t{position:absolute;top:135px;left:-15px;width:117px;height:60px;background-position:0 -50px;z-index:45}
+  .nbox_b{position:absolute;top:150px;left:-15px;width:130px;height:63px;background-position:0 -115px;z-index:55}
+  .clouds .cld_1{background-position:0 0;width:48px;height:25px;top:-15px}
+  .clouds .cld_2{background-position:-50px 0;width:23px;height:12px;top:36px}
+  .clouds .cld_3{background-position:-75px 0;width:28px;height:16px;bottom:20px}
+  .clouds .cld_con{position:absolute;left:-50px;z-index:1}
+  .music_tit,.qm_tit{background:url(//imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/title_bg.png?max_age=19830212) no-repeat;background-size:250px 180px;display:block;text-indent:-9999px}
+  .b_tit{font-size:18px;color:#fff;width:100%;text-align:center;font-weight:normal;position:absolute;top:-48px}
+  .qm_tit{position:absolute;top:-15px;left:50%}
+  .item-0 .qm_tit{width:250px;height:35px;margin-left:-125px;background-position:0 -65px}
+  .item-1 .qm_tit,.item-2 .qm_tit{width:157px;height:38px;margin-left:-78px}
+  .item-1 .qm_tit{background-position:0 -100px}
+  .item-2 .qm_tit{background-position:0 -140px}
+  .brand_list{position:relative;width:290px;height:300px;margin:0 auto;padding-bottom:25px}
+  .brand_loc{display:block;position:absolute;z-index:60}
+  .brand_loc img{display:block;height:auto}
+  .bld_1 img{width:65px}
+  .bld_2 img{width:54px}
+  .bld_3 img{width:54px}
+  .bld_4 img{width:72px}
+  .bld_5 img{width:54px}
+  .ball_s1{background-position:0 -30px;width:11px;height:14px}
+  .ball_s2{background-position:-15px -30px;width:9px;height:12px}
+  .m_singer{position:relative;width:300px;height:300px;z-index:2;margin:0 auto;-webkit-transition:ease 1.5s 1.5s}
+  .m_singer a{position:absolute;left:0;top:0;opacity:0;-webkit-transition:all ease .7s 1.5s;z-index:65}
+  .m_singer a .cover{display:block;border-radius:999px;-webkit-transition:ease .5s}
+  .m_singer a .cover img{display:block;width:100%;height:100%;border-radius:999px}
+  .m_singer a .name{display:block;text-align:center;padding-top:5px;color:#fff;display:none}
+  .m_hoter a{-webkit-transform:translate3d(100px,100px,0) scale(1)}
+  .m_newer a{-webkit-transform:scale(0);-webkit-transition-duration:.5s}
+  .m_hoter .zoom_1 .cover{width:75px;height:75px}
+  .m_hoter .zoom_2 .cover{width:65px;height:65px}
+  .m_hoter .zoom_3 .cover{width:70px;height:70px}
+  .m_hoter .zoom_4 .cover{width:75px;height:75px}
+  .m_hoter .zoom_5 .cover{width:75px;height:75px}
+  .m_newer .zoom_1{margin-top:15px;margin-left:50px}
+  .m_newer .zoom_1 .cover{width:68px;height:68px}
+  .m_newer .zoom_2{margin-top:5px;margin-left:184px}
+  .m_newer .zoom_2 .cover{width:65px;height:65px}
+  .m_newer .zoom_3{margin-top:82px;margin-left:138px}
+  .m_newer .zoom_3 .cover{width:60px;height:60px}
+  .m_newer .zoom_4{margin-top:137px;margin-left:218px}
+  .m_newer .zoom_4 .cover{width:80px;height:80px}
+  .m_newer .zoom_5{margin-top:108px;margin-left:5px}
+  .m_newer .zoom_5 .cover{width:80px;height:80px}
+  .rdoc_con{}
+  .rdoc_con .ral{display:block;border-radius:999px;position:absolute;top:50%;left:50%}
+  .item-1 .rdoc_con .ral_1{margin-top:-155px;margin-left:85px;width:7px;height:7px;background:#c78f58}
+  .item-1 .rdoc_con .ral_2{margin-top:75px;margin-left:132px;width:10px;height:10px;background:#a18674}
+  .item-1 .rdoc_con .ral_3{margin-top:-4px;margin-left:-115px;width:18px;height:18px;background:#b5e3ab}
+  .rn_ring{border-radius:999px;height:243px;width:243px;position:absolute;left:50%;top:50%;margin:-121px 0 0 -121px;border:1px solid #b8cfb2}
+  .music_tit{width:233px;height:55px;position:absolute;top:-170px;left:50%;margin-left:-117px}
+  .bott_bg{position:absolute;bottom:0;left:0;width:100%;z-index:0}
+  .bott_bg img{display:block;height:auto;width:100%}
+  .share_btn{background-position:-125px -155px;width:30px;height:30px;position:absolute;top:20px;right:20px;z-index:999;border-radius:999px;background-color:rgba(0,0,0,.4)}
+  .enter_btn{color:#fbf07a;border-radius:999px;border:1px solid #fbf07a;width:100px;height:30px;text-align:center;margin-left:-50px;position:absolute;bottom:40px;line-height:30px;left:50%;font-size:16px;display:block;z-index:130}
+  .singer_detail_dialog{position:absolute;z-index:9999;width:100%;height:100%;top:0;left:0;background-color:rgba(0,0,0,.5);display:-webkit-box;-webkit-box-align:center;-webkit-box-pack:center}
+  .singer_detail_dialog .content{-webkit-box-flex:1;background:#fff;margin:0 35px;border-radius:5px;position:relative;padding:10px 0}
+  .singer_detail_dialog .content .cover{width:90px;height:90px;border-radius:999px;margin:0 auto}
+  .singer_detail_dialog .content .cover a{display:block}
+  .singer_detail_dialog .content .cover img{display:block;width:88px;height:88px;border-radius:88px}
+  .singer_detail_dialog .content .singer_name{font-size:18px;color:#333;text-align:center;font-weight:normal;border-bottom:1px solid #0eaf52;padding-bottom:5px;margin-bottom:15px}
+  .singer_detail_dialog .detail{padding:0 20px 15px}
+  .singer_detail_dialog .detail .song_name{font-size:14px;color:#333;font-weight:normal}
+  .singer_detail_dialog .detail>p{color:#666}
+  .singer_detail_dialog .detail .inf{font-size:11px}
+  .play_box{height:45px;overflow:hidden;background-color:#dbdbdb;margin-top:15px;margin-bottom:15px}
+  .detail .play_box .play{float:left;width:45px;height:45px;background-color:#0eaf52}
+  .detail .play_box .intro{float:left;padding:0 0 0 10px}
+  .detail .play_box .play span{display:block;width:20px;height:20px;border:2px solid #fff;border-radius:20px;text-indent:-999px;overflow:hidden;margin:10px auto;background-position:-169px 4px}
+  .detail .play_box .playing span{background-position:-193px 4px}
+  .detail .inf{min-height:32px;margin-bottom:5px}
+  .detail .play_box .txt1{color:#333;line-height:45px;font-size:13px}
+  .close_btn{position:absolute;z-index:20;right:5px;top:5px;width:20px;height:20px;-webkit-transform:translate3d(0,0,0);background-position:-171px -151px}
+  .singer_detail_dialog .btn_close{position:absolute;top:-10px;right:-10px;display:block;width:29px;height:29px;-webkit-border-radius:40px;border:solid 2px #fff;background-color:#0eaf52}
+  .singer_detail_dialog .btn_close:before,.singer_detail_dialog .btn_close:after{content:"";position:absolute;top:50%;left:50%;margin:-2px 0 0 -7px;width:14px;height:4px;-webkit-border-radius:4px;background-color:#fff;-webkit-transform-origin:center center}
+  .singer_detail_dialog .btn_close:before{-webkit-transform:rotate(45deg)}
+  .singer_detail_dialog .btn_close:after{-webkit-transform:rotate(-45deg)}
+  .sg_tit{font-size:13px;color:#333;margin-bottom:8px}
+  .songer_box{}
+  .songer_box ul{overflow:hidden}
+  .songer_box li{margin-right:12px;float:left}
+  .songer_box li a{display:block;border-radius:999px}
+  .songer_box li img{width:55px;height:55px;display:block;border-radius:999px}
+  .logo_box{-webkit-transition:-webkit-transform .3s ease-in,opacity .5s ease-in;-webkit-transition-delay:.3s;-webkit-transform:translate3d(0,0,0);-webkit-backface-visibility:hidden}
+  .logo_box .logo{opacity:0;-webkit-transition:-webkit-transform .5s ease-in,opacity .5s ease-in;-webkit-backface-visibility:hidden}
+  .tellurion{opacity:0;-webkit-transition:-webkit-transform .5s ease-in,opacity .5s ease-in;-webkit-transform:rotateY(180deg);-webkit-transition-delay:.5s}
+  .drafly{opacity:0;-webkit-transition:-webkit-transform 1.5s ease-in,opacity .5s ease-in;-webkit-transform:rotateY(1080deg)}
+  .nbox_t,.nbox_b{opacity:0;-webkit-transition-delay:.5s;-webkit-transition:all .5s ease-in}
+  .step-1 .logo,.step-2 .logo,.step-3 .logo{opacity:1}
+  .step-1 .drafly{opacity:1;-webkit-transition-delay:.5s;-webkit-transform:rotateY(0deg)}
+  .step-2 .tellurion{opacity:1;-webkit-transform:rotateY(0deg);display:block}
+  .step-3 .logo_box{}
+  .step-3 .logo{z-index:50;-webkit-transform:translate3d(0,80px,0);-webkit-transition-delay:.5s}
+  .step-3 .tellurion{}
+  .step-3 .nbox_t,.step-3 .nbox_b{opacity:1;display:block}
+  .step-4 .logo{opacity:1}
+  .step-4 .logo{-webkit-transform:translate3d(0,-10px,0) scale(1.7741)}
+  .b_tit,.qm_tit,.music_tit{opacity:0;-webkit-transform:translate3d(0px,-20px,0);-webkit-transition:-webkit-transform .3s ease-out,opacity .3s ease-out}
+  .play .b_tit,.play .qm_tit,.play .music_tit{opacity:1;-webkit-transform:none}
+  .play .b_tit{-webkit-transition-delay:.3s}
+  .play .qm_tit{-webkit-transition-delay:.5s}
+  .play .music_tit{-webkit-transition-delay:.5s}
+  .enter_btn{-webkit-animation-delay:1s;-webkit-transition-delay:1s;opacity:0;-webkit-transition:opacity .5s ease-in}
+  .play .enter_btn{opacity:1;-webkit-animation:jelly ease-out 17.5s infinite}
+  .clouds .cld_1{-webkit-animation:moveclouds 20s linear infinite;-webkit-animation-delay:5s}
+  .clouds .cld_2{-webkit-animation:moveclouds 24s linear infinite}
+  .clouds .cld_3{-webkit-animation:moveclouds 32s linear infinite;-webkit-animation-delay:2s}
+  .brand_loc,.ball_s1,.ball_s2{-webkit-transform:translate3d(113px,132px,0) scale(0);opacity:0;-webkit-transition:all ease 1.0s 1.5s}
+  .play .bld_1{-webkit-transform:translate3d(65px,7px,0) scale(1);opacity:1;-webkit-transition-delay:.6s}
+  .play .bld_2{-webkit-transform:translate3d(189px,31px,0) scale(1);opacity:1;-webkit-transition-delay:.7s}
+  .play .bld_3{-webkit-transform:translate3d(232px,168px,0) scale(1);opacity:1;-webkit-transition-delay:.8s}
+  .play .bld_4{-webkit-transform:translate3d(88px,234px,0) scale(1);opacity:1;-webkit-transition-delay:.9s}
+  .play .bld_5{-webkit-transform:translate3d(7px,102px,0) scale(1);opacity:1;-webkit-transition-delay:1s}
+  .play .ball_s1{-webkit-transform:translate3d(43px,205px,0) scale(1);opacity:1;-webkit-transition-delay:1.2s}
+  .play .ball_s2{-webkit-transform:translate3d(245px,110px,0) scale(1);opacity:1;-webkit-transition-delay:1.3s}
+  .play .m_hoter{}
+  .play .m_hoter .zoom_1{-webkit-transform:translate3d(145px,5px,0) scale(1,1);opacity:1;-webkit-transition-delay:1.2s}
+  .play .m_hoter .zoom_2{-webkit-transform:translate3d(236px,115px,0) scale(1,1);opacity:1;-webkit-transition-delay:1.4s}
+  .play .m_hoter .zoom_3{-webkit-transform:translate3d(170px,225px,0) scale(1,1);opacity:1;-webkit-transition-delay:1.6s}
+  .play .m_hoter .zoom_4{-webkit-transform:translate3d(8px,182px,0) scale(1,1);opacity:1;-webkit-transition-delay:1.8s}
+  .play .m_hoter .zoom_5{-webkit-transform:translate3d(10px,54px,0) scale(1,1);opacity:1;-webkit-transition-delay:2s}
+  .play .m_newer .zoom_1{-webkit-transform:scale(1);opacity:1;-webkit-transition-delay:1.8s}
+  .play .m_newer .zoom_2{-webkit-transform:scale(1);opacity:1;-webkit-transition-delay:2s}
+  .play .m_newer .zoom_3{-webkit-transform:scale(1);opacity:1;-webkit-transition-delay:1.2s}
+  .play .m_newer .zoom_4{-webkit-transform:scale(1);opacity:1;-webkit-transition-delay:1.4s}
+  .play .m_newer .zoom_5{-webkit-transform:scale(1);opacity:1;-webkit-transition-delay:1.6s}
+  .rdoc_con .ral{opacity:0;-webkit-transition:opacity .5s ease-in}
+  .play .rdoc_con .ral{opacity:1;-webkit-transition-delay:2.5s;-webkit-animation-name:m2yball;-webkit-animation-duration:3s;-webkit-animation-delay:3s;-webkit-animation-timing-function:ease-in-out;-webkit-animation-fill-mode:forwards;-webkit-animation-iteration-count:infinite}
+  .play .rdoc_con .ral_2{-webkit-animation-duration:4s;-webkit-animation-delay:.7s}
+  .play .rdoc_con .ral_3{-webkit-animation-duration:3.5s;-webkit-animation-delay:1s}
+  .rn_ring{-webkit-transition:all ease .5s;-webkit-transform:scale(0)}
+  .play .rn_ring{-webkit-transform:scale(1);-webkit-transition-delay:.8s}
+  .bott_bg{opacity:0;-webkit-transform:translate3d(0,100%,0);-webkit-transition:opacity ease .5s;-webkit-transition-delay:1.5s}
+  .play .bott_bg{opacity:1;-webkit-transform:none}
+  @-webkit-keyframes moveclouds{to{-webkit-transform:translate(400px,0)}}
+  @-webkit-keyframes jelly{0%{-webkit-transform:scale(1.2,.8)}
+    0.1%{-webkit-transform:scale(1.18,.82)}
+    0.2%{-webkit-transform:scale(1.16,.84)}
+    0.3%{-webkit-transform:scale(1.13,.87)}
+    0.4%{-webkit-transform:scale(1.1,.9)}
+    0.5%{-webkit-transform:scale(1.07,.93)}
+    0.6%{-webkit-transform:scale(1.04,.96)}
+    0.7%{-webkit-transform:scale(1.01,.99)}
+    0.8%{-webkit-transform:scale(0.99,1.01)}
+    0.9%{-webkit-transform:scale(0.97,1.03)}
+    1%{-webkit-transform:scale(0.95,1.05)}
+    1.1%{-webkit-transform:scale(0.94,1.06)}
+    1.2%{-webkit-transform:scale(0.93,1.07)}
+    1.3%{-webkit-transform:scale(0.93,1.07)}
+    1.4%{-webkit-transform:scale(0.93,1.07)}
+    1.5%{-webkit-transform:scale(0.93,1.07)}
+    1.6%{-webkit-transform:scale(0.94,1.06)}
+    1.7%{-webkit-transform:scale(0.94,1.06)}
+    1.8%{-webkit-transform:scale(0.95,1.05)}
+    1.9%{-webkit-transform:scale(0.96,1.04)}
+    2%{-webkit-transform:scale(0.98,1.02)}
+    2.1%{-webkit-transform:scale(0.99,1.01)}
+    2.2%{-webkit-transform:scale(1,1)}
+    2.3%{-webkit-transform:scale(1,1)}
+    2.4%{-webkit-transform:scale(1.01,.99)}
+    2.5%{-webkit-transform:scale(1.02,.98)}
+    2.6%{-webkit-transform:scale(1.02,.98)}
+    2.7%{-webkit-transform:scale(1.02,.98)}
+    2.8%{-webkit-transform:scale(1.03,.97)}
+    2.9%{-webkit-transform:scale(1.03,.97)}
+    3.0%{-webkit-transform:scale(1.02,.98)}
+    3.1%{-webkit-transform:scale(1.02,.98)}
+    3.2%{-webkit-transform:scale(1.02,.98)}
+    3.3%{-webkit-transform:scale(1.02,.98)}
+    3.4%{-webkit-transform:scale(1.01,.99)}
+    3.5%{-webkit-transform:scale(1.01,.99)}
+    3.6%{-webkit-transform:scale(1.01,.99)}
+    3.7%{-webkit-transform:scale(1,1)}
+    3.8%{-webkit-transform:scale(1,1)}
+    3.9%{-webkit-transform:scale(1,1)}
+    4%{-webkit-transform:scale(0.99,1.01)}
+    4.1%{-webkit-transform:scale(0.99,1.01)}
+    4.2%{-webkit-transform:scale(0.99,1.01)}
+    4.3%{-webkit-transform:scale(0.99,1.01)}
+    4.4%{-webkit-transform:scale(0.99,1.01)}
+    4.5%{-webkit-transform:scale(0.99,1.01)}
+    4.6%{-webkit-transform:scale(0.99,1.01)}
+    4.7%{-webkit-transform:scale(0.99,1.01)}
+    4.8%{-webkit-transform:scale(0.99,1.01)}
+    4.9%,100%{-webkit-transform:scale(1,1)}}
+  @media screen and (max-height:400px){.logo_box{margin-top:-48px}
+    .item .m_animate_box .inner{padding-top:0}
+    .b_tit{top:-20px}
+    .qm_tit{top:8px}
+    .brand_list{padding-bottom:0}
+    .clouds .cld_3{bottom:80px}}
+  @media screen and (min-height:400px) and (max-height:450px){.qm_tit{top:16px}
+    .b_tit{top:-12px}
+    .step-3 .logo{-webkit-transform:translate3d(0,80px,0)}
+    .clouds .cld_3{bottom:40px}}
+  @media screen and (min-height:450px) and (max-height:500px){.qm_tit{top:7px}
+    .b_tit{top:-28px}
+    .step-3 .logo{-webkit-transform:translate3d(0,80px,0)}}
+  @media screen and (min-height:500px){}
+  #CssGaga{content:"150126173651,juu,332"}/*  |xGv00|3a478c7b9bb9ebd63a16c56027bca1fe */
+  .item{-webkit-transition:-webkit-transform .3s ease-out}
+  .touchmove{-webkit-transition:none}
+</style>
+<div id="pageDemoQQMusicLaunch" class="mobile page" style="background: #22ab73; overflow: hidden;">
+  <div class="wrap" id="wrap">
+    <div class="item item-0">
+      <div class="content">
+        <div class="m_animate_box">
+          <div class="inner">
+            <div class="inn_box">
+              <h2 class="b_tit">QQ音乐 独家专区</h2>
+              <h3 class="qm_tit">为正版音乐代言</h3>
+              <div class="brand_list">
+                <a href="javascript:;" class="brand_loc bld_1 js_showcp" data-id="0">
+                  <img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/bnd_lone.png" alt="华谊" />
+                </a>
+                <a href="javascript:;" class="brand_loc bld_2 js_showcp" data-id="1">
+                  <img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/bnd_warner.png" alt="华纳" />
+                </a>
+                <a href="javascript:;" class="brand_loc bld_3 js_showcp" data-id="2">
+                  <img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/bnd_bin.png" alt="YG" />
+                </a>
+                <a href="javascript:;" class="brand_loc bld_4 js_showcp" data-id="3">
+                  <img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/bnd_jvr.png" alt="JVR" />
+                </a>
+                <a href="javascript:;" class="brand_loc bld_5 js_showcp" data-id="4">
+                  <img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/bnd_yingh.png" alt="英皇" />
+                </a>
+                <span class="ball_s1"></span>
+                <span class="ball_s2"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="item item-1">
+      <div class="content">
+        <div class="m_animate_box">
+          <div class="inner">
+            <div class="inn_box">
+              <h2 class="b_tit">QQ音乐 独家专区</h2>
+              <h3 class="qm_tit">大咖云集</h3>
+              <div class="m_singer m_hoter"><!--这个元素处理旋转效果 -webkit-transition: ease 0.3s 0;-webkit-transform:rotate(xxxdeg);-->
+                <a href="javascript:;" class="zoom_1 js_showsinger" data-id="4558">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_zhoujl.jpg" alt="周杰伦" /></span>
+                  <span class="name">周杰伦</span>
+                </a>
+                <a href="javascript:;" class="zoom_2 js_showsinger" data-id="227">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_caiyl.jpg" alt="蔡依林" /></span>
+                  <span class="name">蔡依林</span>
+                </a>
+                <a href="javascript:;" class="zoom_3 js_showsinger" data-id="19851">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_quanzl.jpg" alt="权志龙" /></span>
+                  <span class="name">权志龙</span>
+                </a>
+                <a href="javascript:;" class="zoom_4 js_showsinger" data-id="146">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_xietf.jpg" alt="谢霆锋" /></span>
+                  <span class="name">谢霆锋</span>
+                </a>
+                <a href="javascript:;" class="zoom_5 js_showsinger" data-id="4607"><!--当前态，最大那个-->
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_zhangly.jpg" alt="张靓颖" /></span>
+                  <span class="name">张靓颖</span>
+                </a>
+                <div class="rdoc_con">
+                  <span class="ral ral_1"></span>
+                  <span class="ral ral_2"></span>
+                  <span class="ral ral_3"></span>
+                  <span class="sym_1"></span>
+                </div>
+                <div class="rn_ring"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="item item-2">
+      <div class="content">
+        <div class="m_animate_box">
+          <div class="inner">
+            <div class="inn_box">
+              <h2 class="b_tit">QQ音乐 独家专区</h2>
+              <h3 class="qm_tit">新秀崛起</h3>
+              <div class="m_singer m_newer" style="">
+                <a href="javascript:;" class="zoom_1 js_showsinger" data-id="31035">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_jianhong.jpg" alt="简红" /></span>
+                  <span class="name">简红</span>
+                </a>
+                <a href="javascript:;" class="zoom_2 js_showsinger" data-id="37459">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_cuizg.jpg" alt="崔子格" /></span>
+                  <span class="name">崔子格</span>
+                </a>
+                <a href="javascript:;" class="zoom_3 js_showsinger" data-id="36691">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_yuanyw.jpg" alt="袁娅维" /></span>
+                  <span class="name">袁娅维</span>
+                </a>
+                <a href="javascript:;" class="zoom_4 js_showsinger" data-id="172581">
+                  <span class="cover"><img src="http://i.gtimg.cn/music/common/upload/t_cm3_photo_publish/1421917698892.jpg" alt="覃桢" /></span>
+                  <span class="name">BTOB</span>
+                </a>
+                <a href="javascript:;" class="zoom_5 js_showsinger" data-id="4422">
+                  <span class="cover"><img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/songer_niunkf.jpg" alt="牛奶咖啡" /></span>
+                  <span class="name">牛奶咖啡</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="item item-3">
+      <div class="content">
+        <div class="m_animate_box">
+          <div class="inner">
+            <div class="inn_box">
+              <h2 class="music_tit">更多精彩，尽在QQ音乐独家专区</h2>
+            </div>
+          </div>
+        </div>
+        <a href="javascript:;" class="share_btn js_share" style="display:none"></a>
+        <a href="javascript:;" class="enter_btn js_jump" data-url="http://y.qq.com/m/dj/">点击进入</a>
+        <div class="bott_bg">
+          <img src="http://imgcache.gtimg.cn/mediastyle/mobile/event/20141216_dujia/img/bg_bot.png" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="wrap">
+    <div class="clouds">
+      <span class="cld_con cld_1"></span>
+      <span class="cld_con cld_2"></span>
+      <span class="cld_con cld_3"></span>
+    </div>
+    <div class="logo_contain" id="logo_contain">
+      <div class="logo_box">
+        <span class="drafly"></span>
+        <a href="javascript:;" class="logo"></a>
+        <span class="tellurion"></span>
+        <span class="nbox_t"></span>
+        <span class="nbox_b"></span>
+      </div>
+    </div>
+    <div class="mod_control">
+      <ul class="mod_tag">
+        <li class="current"><span>1</span></li>
+        <li><span>2</span></li>
+        <li><span>3</span></li>
+        <li><span>4</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!--公司详情浮层 S-->
+  <div id="dlg_cp" class="singer_detail_dialog js_close" style="display:none;">
+    <div class="content" style="padding-top:10px">
+      <a href="javascript:;" class="btn_close js_close"></a>
+      <p class="cover"><a href="javascript:;" target="_blank"><img src="" title="" /></a></p>
+      <h2 class="singer_name"></h2>
+      <div class="detail">
+        <p class="inf"></p>
+        <div class="songer_box">
+          <p class="sg_tit">推荐艺人</p>
+          <ul></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--公司详情浮层 E-->
+
+  <!--歌手详情浮层 S-->
+  <div id="dlg_singer" class="singer_detail_dialog js_close" style="display:none;">
+    <div class="content" style="padding-top:10px">
+      <a href="javascript:;" class="btn_close js_close"></a>
+      <p class="cover"><a href="javascript:;" style="display:block;" target="_blank"><img src="" title="" /></a></p>
+      <h2 class="singer_name"></h2>
+      <div class="detail">
+        <h3 class="song_name"></h3>
+        <p></p>
+        <div class="play_box">
+          <a href="javascript:;" class="play playing js_playsong"><span>播放</span></a>
+          <div class="intro"><p class="txt1"></p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PageDemoQQMusicLaunch() {
+  this.page = dom.find('#pageDemoQQMusicLaunch');
+}
+
+PageDemoQQMusicLaunch.prototype.initialize = async function (params) {
+  var myslider=new iSlider({
+    wrap:'#wrap',
+    item:'.item',
+    isVertical:false,
+    speed:500,
+    onslide:function (index) {
+      document.querySelector('.mod_tag .current').className=''
+      document.querySelectorAll('.mod_tag li')[index].className='current';
+      document.getElementById('logo_contain').className='logo_contain step-' + (index + 1);
+    }
+  });
+
+
+  //业务代码
+  setTimeout(function(){
+    document.getElementById('logo_contain').className='logo_contain step-1';
+  }, 100);
+};
+
+PageDemoQQMusicLaunch.prototype.show = function (params) {
+  this.initialize(params)
+};
+
+pageDemoQQMusicLaunch = new PageDemoQQMusicLaunch();
+</script>

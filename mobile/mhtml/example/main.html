@@ -1,16 +1,54 @@
 <div id="pageExampleMain" class="mobile page" role="nav">
   <ul class="list-group">
-    <li widget-id="buttonFormLayout" class="list-group-item list-group-item-action d-flex">
-      <strong class="font-20">编辑表单</strong>
-      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    <li widget-id="buttonFormLayout" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">编辑表单</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
-    <li class="list-group-item list-group-item-action d-flex">
-      <strong class="font-20">只读表单</strong>
-      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    <li widget-id="buttonReadonlyForm" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">只读表单</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
-    <li class="list-group-item list-group-item-action d-flex">
-      <strong class="font-20">待分配</strong>
-      <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">navigate_next</span>
+    <li widget-id="buttonListViewContact" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">消息列表</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonListViewNews" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">新闻列表</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonGridViewMerchandise" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">商品列表</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonCalendar" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">日历控件</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonWeekdays" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">星期控件</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonDialog" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">对话框</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonIndex" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">指标输入</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonChart" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">图表显示</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
   </ul>
 </div>
@@ -21,9 +59,54 @@ function PageExampleMain() {
 }
 
 PageExampleMain.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  dom.height2(this.page, 133, document.body);
   dom.bind(this.buttonFormLayout, 'click', ev => {
     kuim.navigateTo('mhtml/example/formlayout.html', {
       title: '编辑表单',
+    });
+  });
+  dom.bind(this.buttonReadonlyForm, 'click', ev => {
+    kuim.navigateTo('mhtml/example/readonlyform.html', {
+      title: '只读表单',
+    });
+  });
+  dom.bind(this.buttonListViewContact, 'click', ev => {
+    kuim.navigateTo('mhtml/example/listview-contact.html', {
+      title: '消息列表',
+    });
+  });
+  dom.bind(this.buttonListViewNews, 'click', ev => {
+    kuim.navigateTo('mhtml/example/listview-news.html', {
+      title: '新闻列表',
+    });
+  });
+  dom.bind(this.buttonListViewNews, 'click', ev => {
+    kuim.navigateTo('mhtml/example/listview-news.html', {
+      title: '新闻列表',
+    });
+  });
+
+  dom.bind(this.buttonGridViewMerchandise, 'click', ev => {
+    kuim.navigateTo('mhtml/example/gridview-merchandise.html', {
+      title: '商品列表',
+    });
+  });
+  dom.bind(this.buttonCalendar, 'click', ev => {
+    kuim.navigateTo('mhtml/example/calendar.html', {
+      title: '日历控件',
+    });
+  });
+  dom.bind(this.buttonWeekdays, 'click', ev => {
+    kuim.navigateTo('mhtml/example/weekdays.html', {
+      title: '星期控件',
+    });
+  });
+  dom.bind(this.buttonDialog, 'click', ev => {
+    kuim.dialog({
+      confirm: () => {
+
+      }
     });
   });
 };

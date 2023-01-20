@@ -1,0 +1,188 @@
+<div id="pageDemoWechatChat" class="mobile page">
+  <div widget-id="widgetChat" class="ab-chat">
+<!--    <div class="contact bar d-flex">-->
+<!--      <img class="avatar ml-3" src="img/user.png">-->
+<!--      <div>-->
+<!--        <div class="name">某某人</div>-->
+<!--        <div class="seen">某某职位</div>-->
+<!--      </div>-->
+<!--    </div>-->
+    <div class="conversation">
+      <div class="time" style="font-size: 12px;">2022年08月21日 13:28</div>
+      <div class="messages outgoing">
+        <div class="message">你好，某某人</div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月21日 13:31</div>
+      <div class="messages incoming">
+        <div class="message">勤洗手</div>
+        <div class="message">
+          <img src="/mobile/img/news/doctor.jpg" style="width: 120px; height: 80px;" onclick="pageDemoWechatChat.viewImage(this);">
+        </div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月21日 13:33</div>
+      <div class="messages outgoing">
+        <div class="message">
+          <div class="voice">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月23日 13:28</div>
+      <div class="messages outgoing">
+        <div class="message">我又来了，你在不在？</div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月23日 14:31</div>
+      <div class="messages incoming">
+        <div class="message">这是你的第二张图片</div>
+        <div class="message">
+          <img src="/mobile/img/news/zhongnanshan.jpeg" style="width: 120px; height: 80px;" onclick="pageDemoWechatChat.viewImage(this);">
+        </div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月24日 13:28</div>
+      <div class="messages outgoing">
+        <div class="message">还有没有图片？</div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月24日 13:31</div>
+      <div class="messages incoming">
+        <div class="message">又来一张</div>
+        <div class="message">
+          <img src="/mobile/img/news/weiyi.jpeg" style="width: 120px; height: 80px;" onclick="pageDemoWechatChat.viewImage(this);">
+        </div>
+      </div>
+      <div class="time" style="font-size: 12px;">2022年08月25日 13:33</div>
+      <div class="messages outgoing">
+        <div class="message">
+          <div class="voice">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div widget-id="widgetTypebar" class="typebar">
+      <div class="d-flex">
+        <span class="material-icons font-32 mx-2" style="color: var(--color-primary);">keyboard_voice</span>
+        <textarea confirm-type="send" rows="1" style="height: 36px;"></textarea>
+        <span widget-id="buttonMore" class="material-icons font-32 mr-2" style="color: var(--color-primary);">add_circle</span>
+      </div>
+      <div widget-id="widgetTypebarMore" class="typebar-more square-menu mt-3 d-flex p-2">
+        <a class="entry btn">
+          <div class="d-flex flex-column text-primary"
+               style="width: 100%; background: white; border-radius: 10px;
+                      color: rgba(0,0,0,0.6)!important;">
+            <i class="fas fa-image font-4xl position-relative" style="top: 10px;"></i>
+            <span class="font-14 text-gray mt-2">照片</span>
+          </div>
+        </a>
+        <a class="entry btn">
+          <div class="d-flex flex-column text-primary"
+               style="width: 100%; background: white; border-radius: 10px;
+                      color: rgba(0,0,0,0.6)!important;">
+            <i class="fas fa-camera font-4xl position-relative" style="top: 10px;"></i>
+            <span class="font-14 text-gray mt-2">拍摄</span>
+          </div>
+        </a>
+        <a class="entry btn">
+          <div class="d-flex flex-column text-primary"
+               style="width: 100%; background: white; border-radius: 10px;
+                      color: rgba(0,0,0,0.6)!important;">
+            <i class="fas fa-id-card text-gray font-4xl position-relative" style="top: 10px"></i>
+            <span class="font-14 text-gray mt-2">患者档案</span>
+          </div>
+        </a>
+        <a class="entry btn">
+          <div class="d-flex flex-column text-primary"
+               style="width: 100%; background: white; border-radius: 10px;
+                      color: rgba(0,0,0,0.6)!important;">
+            <i class="fas fa-book-medical text-gray font-4xl position-relative" style="top: 10px"></i>
+            <span class="font-14 text-gray mt-2">医学知识</span>
+          </div>
+        </a>
+        <a class="entry btn">
+          <div class="d-flex flex-column text-primary"
+               style="width: 100%; background: white; border-radius: 10px;
+                      color: rgba(0,0,0,0.6)!important;">
+            <i class="fas fa-poll text-gray font-4xl position-relative" style="top: 10px"></i>
+            <span class="font-14 text-gray mt-2">问卷</span>
+          </div>
+        </a>
+        <a class="entry btn">
+          <div class="d-flex flex-column text-primary"
+               style="width: 100%; background: white; border-radius: 10px;
+                      color: rgba(0,0,0,0.6)!important;">
+            <i class="fas fa-money-check-alt text-gray font-4xl position-relative" style="top: 10px;"></i>
+            <span class="font-14 text-gray mt-2">账单</span>
+          </div>
+        </a>
+        <a class="entry btn"></a>
+        <a class="entry btn"></a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PageDemoWechatChat() {
+  this.page = dom.find('#pageDemoWechatChat');
+}
+
+PageDemoWechatChat.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  dom.height2(this.widgetChat, 90 + 52, document.body);
+  this.widgetChat.scrollTo(0, document.body.scrollHeight);
+
+  dom.bind(this.buttonMore, 'click', ev => {
+    this.widgetTypebar.classList.remove('less');
+    this.widgetTypebar.classList.add('more');
+    this.widgetTypebarMore.classList.remove('hidden');
+    this.widgetTypebarMore.classList.add('visible');
+
+    ev.preventDefault();
+    ev.stopPropagation();
+  });
+
+  dom.bind(this.widgetChat, 'click', ev => {
+    if (!this.widgetTypebar.classList.contains('more')) return;
+    this.widgetTypebar.classList.remove('more');
+    this.widgetTypebar.classList.add('less');
+    this.widgetTypebarMore.classList.remove('visible');
+    this.widgetTypebarMore.classList.add('hidden');
+  })
+};
+
+PageDemoWechatChat.prototype.viewImage = function (img) {
+  let viewerContainer = dom.find('.viewer-container');
+  if (viewerContainer != null) {
+    viewerContainer.remove();
+  }
+  let viewer = new Viewer(img, {
+    toolbar: false,
+    navbar: false,
+    tooltip: false,
+    title: false,
+  });
+  viewer.show();
+};
+
+PageDemoWechatChat.prototype.show = function (params) {
+  this.initialize(params)
+};
+
+pageDemoWechatChat = new PageDemoWechatChat();
+</script>

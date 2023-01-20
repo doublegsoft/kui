@@ -1,0 +1,255 @@
+<style>
+  div.hot a {
+    display: -webkit-box;
+    display: box;
+    padding: 0.2rem 0;
+  }
+  div.hot a div {
+    height: 48px;
+    text-align: center;
+  }
+  div.hot a .hot-image {
+    -webkit-box-flex: 1;
+    box-flex: 1;
+    line-height: 36px;
+    border-right: 1px solid #e6e6e6;
+  }
+  div.hot a .hot-image img {
+    width: 48px;
+    height: 38px;
+    vertical-align: middle;
+  }
+   div.hot a .hot-detail {
+     -webkit-box-flex: 4;
+     box-flex: 4;
+     font-size: 12px;
+     padding-left: 0.44rem;
+     overflow: hidden;
+     padding-top: 0.1rem;
+   }
+  div.hot a .hot-detail ul {
+    padding-left: 0;
+  }
+   div.hot a .hot-detail ul li {
+     width: 100%;
+     height: 20px;
+     text-align: left;
+     margin-bottom: 0.2rem;
+     line-height: 20px;
+     list-style: none;
+   }
+   div.hot a .hot-detail ul li em {
+    float: left;
+    box-sizing: border-box;
+    font-size: 10px;
+    text-align: center;
+    line-height: 16px;
+    margin-right: 0.16rem;
+    margin-top: 0.08rem;
+    padding: 0 0.12rem;
+    border-radius: 0.14rem;
+    border: 1px solid #b83957;
+    color: #b83957; }
+   div.hot a .hot-detail ul li span {
+     float: left;
+     width: 200px;
+     height: 20px;
+     overflow: hidden;
+     text-overflow: ellipsis;
+     color: black;
+   }
+</style>
+<div id="pageDemoTaobaoHome" class="page mobile">
+  <div style="position: absolute;
+              left: 0;
+              top: 0;
+              right: 0;
+              background-color: #fe4f00;
+              padding: 8px;
+              z-index: 100;
+              box-sizing: border-box;
+              width: 100%;">
+    <img src="/mobile/img/taobao/tao.png"
+         style="float: left;
+                height: 32px;
+                width: 32px;
+                margin-left: 0.36rem;">
+    <div class="search-index" style="margin: 0 auto; width: 260px;">
+      <a widget-id="widgetSearch" href="javascript:;"
+         style="border-radius: 5px;
+                display: inline-block;
+                height: 32px;
+                width: 260px;
+                padding: 0 6px;
+                line-height: 32px;
+                background-color: #d42d00;
+                font-size: 16px;
+                color: #fff;">
+        <img src="/mobile/img/taobao/search.png"
+             style="float: left;
+                    margin-top: 6px;
+                    margin-right: 6px;
+                    height: 18px;
+                    width: 18px;">克罗心
+      </a>
+    </div>
+  </div>
+  <div widget-id="widgetAd" class="swiper">
+    <div class="swiper-wrapper">
+    </div>
+    <div class="swiper-pagination"></div>
+  </div>
+  <div class="square-menu mt-2">
+    <a class="entry btn" style="width: 19%;">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/taobao/menu/items_09.png" style="width: 48px;">
+        <span class="font-14 text-gray">服饰</span>
+      </div>
+    </a>
+    <a class="entry btn" style="width: 19%;">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/taobao/menu/items_11.png" style="width: 48px;">
+        <span class="font-14 text-gray">美食</span>
+      </div>
+    </a>
+    <a class="entry btn" style="width: 19%;">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/taobao/menu/items_13.png" style="width: 48px;">
+        <span class="font-14 text-gray">书籍</span>
+      </div>
+    </a>
+    <a class="entry btn" style="width: 19%;">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/taobao/menu/items_15.png" style="width: 48px;">
+        <span class="font-14 text-gray">美妆</span>
+      </div>
+    </a>
+    <a class="entry btn" style="width: 19%;">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/taobao/menu/items_17.jpg" style="width: 48px;">
+        <span class="font-14 text-gray">箱包</span>
+      </div>
+    </a>
+  </div>
+  <div class="hot">
+    <a href="javascript:;">
+      <div class="hot-image">
+        <img src="img/taobao/top.jpg" alt="头条新闻">
+        </div>
+      <div class="hot-detail">
+        <div widget-id="widgetHot">
+        </div>
+      </div>
+    </a>
+  </div>
+  <div widget-id="widgetMerchandise" style="padding-top: 8px;"></div>
+</div>
+
+<script>
+function PageDemoTaobaoHome() {
+  this.page = dom.find('#pageDemoTaobaoHome');
+}
+
+PageDemoTaobaoHome.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+
+  let data = await xhr.asyncGet({
+    url: '/mobile/data/taobao/ad.json',
+  });
+  data = JSON.parse(data).data;
+  let html = '';
+  for(let i = 0;i < data.length;i++){
+    let path = data[i].path;
+    html += `
+      <div class="swiper-slide height-150">
+        <img src="${path}">
+      </div>
+    `;
+  }
+  this.widgetAd.children[0].innerHTML = html;
+  new Swiper(this.widgetAd, {
+    direction: 'horizontal',
+    loop: true,
+    pagination: {
+      el: '.swiper-pagination',
+    },
+  });
+
+  data = await xhr.asyncGet({
+    url: '/mobile/data/taobao/hot.json',
+  });
+  data = JSON.parse(data).data;
+
+  html = '';
+  for(let i = 0;i < data.length;i++){
+    html += '<ul>'+
+      '<li><em>' + data[i].type + '</em><span>' + data[i].title + '</span></li>'+
+      '<li><em>' + data[i].type1 + '</em><span>' + data[i].title1 + '</span></li>'+
+      '</ul>';
+  }
+  this.widgetHot.innerHTML = html;
+
+  data = await xhr.asyncGet({
+    url: '/mobile/data/merchandises.json',
+  });
+  data = JSON.parse(data);
+  this.gridView = new GridView({
+    local: data,
+    create: (idx, item, li) => {
+      let el = dom.templatize(`
+        <div style="background: #fff;
+                    border-bottom: 2px solid #d9d9d9;
+                    margin-bottom: 0.14rem;">
+          <img src="/img/{{src.[0]}}" style="width: 100%;">
+          <div style="height: 1.68rem;
+                      font-size: 0.52rem;
+                      line-height: 0.92rem;
+                      color: #333;
+                      font-size: 12px;
+                      padding: 0 0.36rem;
+                      overflow: hidden;
+                      text-overflow: ellipsis;">{{title}}</div>
+          <div class="price clear">
+            <span style="font-size: 0.32rem;
+                         color: #ff5000;
+                         float: left;">￥<em>{{price}}</em></span>
+            <b style="color: #a8a8a8;
+                      font-size: 0.4rem;
+                      float: right;">{{sales}}人付款</b>
+          </div>
+        </div>
+      `, item);
+      return el;
+    },
+  });
+  this.gridView.render(this.widgetMerchandise);
+
+  let self = this;
+  (function() {
+    let uls = self.widgetHot.getElementsByTagName('ul');
+    function moveFn() {
+      let height = self.widgetHot.offsetHeight + 9;
+      self.widgetHot.style.transition = 1+'s';
+      self.widgetHot.style.webkitTransform = 'translateY(-'+height+'px)';
+      setTimeout(function(){
+        self.widgetHot.style.transition = 0+'s';
+        self.widgetHot.appendChild(uls[0]);
+        self.widgetHot.style.webkitTransform = 'translateY(0px)';
+      },1200)
+    }
+    setInterval(moveFn,2000);
+  })();
+
+  dom.bind(this.widgetSearch, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/taobao/search.html', {
+      title: '搜索',
+    })
+  });
+};
+
+PageDemoTaobaoHome.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageDemoTaobaoHome = new PageDemoTaobaoHome();
+</script>

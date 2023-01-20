@@ -1,0 +1,64 @@
+<div id="pageDemoVideo" class="mobile page">
+<!--  <div class="d-flex align-items-center justify-content-center" style="height: calc(100% - 52px); width: 100%;">-->
+<!--    <span class="material-icons text-muted" style="font-size: 96px;">video_camera_front</span>-->
+<!--  </div>-->
+<!--  <div class="tabs-bar height-100" style="background: var(&#45;&#45;color-primary);">-->
+<!--    <div widget-id="tabsNavigator" data-tab-active-class="active" class="tabs">-->
+<!--      <a widget-id="buttonHome" class="btn text-white active position-relative"-->
+<!--         style="padding: 0.375rem 2rem; top: 10px;">-->
+<!--        <i class="fas fa-video-slash font-24"></i>-->
+<!--      </a>-->
+<!--      <a widget-id="buttonBuilding" class="btn text-white mr-4 position-relative"-->
+<!--         style="padding: 0.375rem 2rem; top: 5px;">-->
+<!--        <i class="fas fa-microphone-slash font-24"></i>-->
+<!--      </a>-->
+<!--      <div class="circle bg-danger">-->
+<!--        <i class="fas fa-phone-slash text-white font-24"></i>-->
+<!--      </div>-->
+<!--      <div class="circle-background plus-icon bg-white"></div>-->
+<!--    </div>-->
+<!--  </div>-->
+  <video-js
+      id="videojs-mobile-ui-player"
+      class="video-js vjs-default-skin vjs-fluid"
+      preload="auto"
+      autoplay="true"
+      playsinline>
+<!--    <source src="https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8" type="application/x-mpegurl" />-->
+  </video-js>
+</div>
+<script>
+function PageDemoVideo() {
+  this.page = dom.find('#pageDemoVideo');
+}
+
+PageDemoVideo.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+
+  this.player = videojs('videojs-mobile-ui-player');
+  this.player.mobileUi();
+
+  this.player.playlist([{
+    sources: [{
+      src: 'http://192.168.3.207:9000/mobile/img/video/1.mp4',
+      type: 'video/mp4'
+    }]
+  },{
+    sources: [{
+      src: 'http://192.168.3.207:9000/mobile/img/video/2.mp4',
+      type: 'video/mp4'
+    }],
+  }]);
+  this.player.play();
+};
+
+PageDemoVideo.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PageDemoVideo.prototype.destroy = function (params) {
+  delete pageDemoVideo;
+};
+
+pageDemoVideo = new PageDemoVideo();
+</script>

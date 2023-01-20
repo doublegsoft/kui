@@ -10,11 +10,14 @@ function Tabs(opts) {
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
   let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
-  ajax.view({
-    url: url,
-    containerId: contentPage,
-    success: success || function() {}
-  });
+  if (typeof url !== 'undefined') {
+    ajax.view({
+      url: url,
+      containerId: contentPage,
+      success: success || function () {
+      }
+    });
+  }
   if (hidden === true) {
     contentPage.style.display = 'none';
   }
@@ -27,7 +30,7 @@ Tabs.prototype.render = function() {
   this.content.innerHTML = '';
   this.navigator.innerHTML = '';
 
-  this.slider = dom.element('<div class="slider"></div>');
+  this.slider = dom.element('<div class="slider position-absolute"></div>');
   this.navigator.appendChild(this.slider);
 
   this.tabs.forEach((tab, idx) => {
@@ -62,15 +65,15 @@ Tabs.prototype.render = function() {
         // 只有在懒加载情况下，设置自动清除内容才有效
         this.content.innerHTML = '';
       }
-      let contentPage = dom.find('div[data-tab-content-id=' + nav.getAttribute('data-tab-id') + ']', self.content);
+      let contentPage = dom.find('div[data-tab-content-id="' + nav.getAttribute('data-tab-id') + '"]', self.content);
       if (contentPage != null) {
         contentPage.style.display = '';
       } else {
-        let id = nav.getAttribute('data-tab-id');
-        let url = nav.getAttribute('data-tab-url');
         if (tab.onClicked) {
           tab.onClicked(ev);
         } else {
+          let id = nav.getAttribute('data-tab-id');
+          let url = nav.getAttribute('data-tab-url');
           self.loadPage(id, url, false, tab.success);
         }
       }
@@ -81,7 +84,7 @@ Tabs.prototype.render = function() {
       if (idx == 0) {
         self.activate(nav);
         if (tab.onClicked) {
-          tab.onClicked(ev);
+          tab.onClicked();
         } else {
           self.loadPage(tab.id, tab.url, false, tab.success);
         }

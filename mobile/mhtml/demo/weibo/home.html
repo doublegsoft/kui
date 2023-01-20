@@ -1,0 +1,228 @@
+<style>
+.blog-list{
+  background: #f8f8f8;
+}
+.blog-item{
+  padding: 10px 10px 0;
+  background: #fff;
+  margin-bottom: 10px;
+}
+.blog-head{
+  display: flex;
+  justify-content: space-between;
+}
+.blog-avatar{
+  position: relative;
+  display: flex;
+  width: 50px;
+  height: 50px;
+}
+.avatar-img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+.label-v{
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #fdff82;
+  border-radius: 50%;
+  background:#e32c08 ;
+  color: #fdff82;
+  font-size: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.blog-top{
+  display: flex;
+}
+.icon-vipimg{
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}
+.blog-title{
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+.blog-time{
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+.line-btn{
+  color: #ff8200;
+  border: 1px solid #ff8200;
+  width: 64px;
+  height: 28px;
+  line-height: 26px;
+  text-align: center;
+  border-radius: 14px;
+}
+.ml10{
+  margin-left: 10px;
+}
+.blog-wbtext{
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+.blog-wbtext a {
+  color: #eb7340 !important;
+}
+.blog-imgs{
+  display: flex;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+}
+.picture-img{
+  width: 33.33%;
+  padding: 4px;
+  border-radius: 8px;
+}
+.blog-bottom{
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 20px;
+}
+.share-btn{
+  display: flex;
+  align-items: center;
+}
+.share-icon{
+  width: 24px;
+  height: auto;
+}
+.share-btn span{
+  font-size: 12px;
+  color: #666;
+  padding-left: 6px;
+}
+.blog-video{
+  height: 240px;
+  margin-bottom: 20px;
+}
+.video-bg{
+  width: 100%;
+  height: 100%;
+}
+</style>
+<div id="pageDemoWeiboHome">
+  <div widget-id="widgetBlog" class="blog-list">
+    <div class="blog-item">
+      <div class="blog-head">
+        <div class="blog-top">
+          <div class="blog-avatar">
+            <img src="/mobile/img/avatar/baogong.jpeg" class="avatar-img" />
+            <span class="label-v">V</span>
+          </div>
+          <div class="ml10">
+            <div class="blog-title"><span>王者荣耀七年QINIAN</span>
+              <img src="img/avatar/nezha.png" class="icon-vipimg"/></div>
+            <div class="blog-time"><span> 1-2   12:00 </span><span>设计美学博主</span></div>
+          </div>
+        </div>
+        <div class="line-btn">
+          +关注
+        </div>
+      </div>
+      <div class="blog-wbtext">
+        <a>#外交部回应印度人口预计已超中国#</a>【<a >#外界预计印度人口已超越中国#</a>，成世界人口最多国家，外交部回应】外交部发言人汪文斌17日主持例行记者会。有外媒记者提问说，今天中方公布2022年末中国人口是14亿1175万，根据联合国数据，去年印度人口推算为14亿1200万，因此预计已经超越中国，成为世界上人口最多  ...
+      </div>
+      <div class="blog-video">
+        <img src="/mobile/img/news/zhongnanshan.jpeg" class="video-bg">
+      </div>
+      <div class="blog-bottom">
+        <div class="share-btn"><i class="fas fa-share share-icon"></i><span>3149</span></div>
+        <div class="share-btn"><i class="fas fa-thumbs-up share-icon"></i><span>3149</span></div>
+        <div class="share-btn"><i class="fas fa-comment share-icon"></i><span>3149</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+function PageDemoWeiboHome() {
+  this.page = dom.find('#pageDemoWeiboHome');
+}
+
+PageDemoWeiboHome.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  // dom.height2(this.widgetBlog, 52, document.body);
+  this.pullToRefresh();
+
+  let zt = new ZingTouch.Region(this.page);
+  zt.bind(this.widgetBlog.children[0], 'swipe', (e) => {
+    console.log(e.detail);
+  });
+};
+
+PageDemoWeiboHome.prototype.pullToRefresh = function (el) {
+  xhr.asyncGet({
+    url: '/mobile/data/weibo/list.json',
+  }).then((data) => {
+    data = JSON.parse(data).data;
+    this.listBlog = new ListView({
+      local: data,
+      create: (idx, row, li) => {
+        li.classList.remove('list-group-item-action');
+        let ret = dom.templatize(`
+        <div class="blog-item">
+          <div class="blog-head">
+            <div class="blog-top">
+              <div class="blog-avatar">
+                <img src="{{avatar}}" class="avatar-img" />
+                <span class="label-v">V</span>
+              </div>
+              <div class="ml10">
+                <div class="blog-title"><span>{{author}}</span></div>
+                <div class="blog-time"><span>01月04日 12:00 </span><span>{{title}}</span></div>
+              </div>
+            </div>
+            <div class="line-btn">
+              +关注
+            </div>
+          </div>
+          <div class="blog-wbtext">
+            <a>#外交部回应印度人口预计已超中国#</a>【<a >#外界预计印度人口已超越中国#</a>，成世界人口最多国家，外交部回应】外交部发言人汪文斌17日主持例行记者会。有外媒记者提问说，今天中方公布2022年末中国人口是14亿1175万，根据联合国数据，去年印度人口推算为14亿1200万，因此预计已经超越中国，成为世界上人口最多  ...
+          </div>
+          {{#if images}}
+          <div class="blog-imgs">
+            {{#each images}}
+            <img src="{{this}}" class="picture-img">
+            {{/each}}
+          </div>
+          {{/if}}
+          {{#if video}}
+          <div class="blog-video">
+            <img src="/mobile/img/news/zhongnanshan.jpeg" class="video-bg">
+          </div>
+          {{/if}}
+          <div class="blog-bottom">
+            <div class="share-btn"><i class="fas fa-share share-icon"></i><span>3149</span></div>
+            <div class="share-btn"><i class="fas fa-thumbs-up share-icon"></i><span>3149</span></div>
+            <div class="share-btn"><i class="fas fa-comment share-icon"></i><span>3149</span></div>
+          </div>
+        </div>
+      `, row);
+        return ret;
+      }
+    });
+    this.listBlog.render(this.widgetBlog);
+    if (el) {
+      el.remove();
+    }
+  });
+};
+
+PageDemoWeiboHome.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageDemoWeiboHome = new PageDemoWeiboHome();
+</script>

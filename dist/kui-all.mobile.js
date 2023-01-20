@@ -2877,6 +2877,7 @@ function ListView(opt) {
   this.hoverable = opt.hoverable !== false;
   this.activateable = opt.activateable === true;
   this.itemClass = opt.itemClass || [];
+  this.slidingActions = opt.slidingActions || [];
 
   this.emptyHtml = opt.emptyHtml;
   this.idField = opt.idField;
@@ -3123,6 +3124,7 @@ ListView.prototype.append = function(data, index) {
     }
 
     let div = this.create(len, row, li);
+    div.style.width = '100%';
 
     if (this.onCheck) {
       let input = dom.element(`
@@ -3141,6 +3143,68 @@ ListView.prototype.append = function(data, index) {
       li.appendChild(input);
     }
     li.appendChild(div);
+
+    if (this.slidingActions.length > 0) {
+      this.actionElements = [];
+      for (let i = 0; i < this.slidingActions.length; i++) {
+        let slidingAction = this.slidingActions[i];
+        slidingAction.width = parseInt(slidingAction.width || 64);
+        li.appendChild(slidingAction.create());
+      }
+      dom.bind(li, 'touchstart', ev => {
+        this.touchStartX = ev.touches[0].screenX;
+        this.touchStartY = ev.touches[0].screenY;
+      });
+      dom.bind(li, 'touchmove', ev => {
+        this.touchMoveX = ev.touches[0].screenX;
+        this.touchMoveY = ev.touches[0].screenY;
+        let distanceX = this.touchStartX - this.touchMoveX;
+        let distanceY = this.touchStartY - this.touchMoveY;
+        if (Math.abs(distanceX) < 30) return;
+        if (Math.abs(distanceY) > 30) return;
+        if (distanceX > 0) {
+          let avg = distanceX / this.slidingActions.length;
+          for (let j = 1; j < li.children.length; j++) {
+            let rect = li.children[j].getBoundingClientRect();
+            if (rect.width >= this.slidingActions[j - 1].width) {
+              continue;
+            }
+            if (avg >= this.slidingActions[j - 1].width) avg = this.slidingActions[j - 1].width;
+            li.children[j].style.minWidth = avg + 'px';
+            li.children[j].style.display = '';
+          }
+        } else {
+          distanceX = -distanceX / 10;
+          let avg = distanceX / this.slidingActions.length;
+          for (let j = 1; j < li.children.length; j++) {
+            let rect = li.children[j].getBoundingClientRect();
+            let width = rect.width - avg;
+            width = width <= 5 ? 0 : width;
+            if (width == 0) {
+              li.children[j].style.width = '0';
+              li.children[j].style.minWidth = 'unset';
+            } else {
+              li.children[j].style.minWidth = width + 'px';
+            }
+          }
+        }
+      });
+      dom.bind(li, 'touchend', ev => {
+        this.touchendX = ev.changedTouches[0].screenX;
+        this.touchendY = ev.changedTouches[0].screenY;
+        let distanceX = this.touchStartX - this.touchendX;
+        let distanceY = this.touchStartY - this.touchendY;
+        if (Math.abs(distanceX) < 30) return;
+        if (Math.abs(distanceY) > 30) return;
+        if (distanceX >= 30) {
+          this.expandSlidingActions(li);
+        } else if (distanceX <= -30) {
+          this.collapseSlidingActions(li);
+        } else {
+          this.collapseSlidingActions(li);
+        }
+      });
+    }
 
     if (this.idField) {
       li.setAttribute("data-list-item-id", row[this.idField])
@@ -3258,7 +3322,6 @@ ListView.prototype.setReorderable = function(li) {
     y = target.offsetTop + y;
 
     this.clonedDraggingElement = li.cloneNode(true);
-    console.log(this.clonedDraggingElement);
 
     this.draggingElement = li;
     this.draggingElement.style.opacity = "0.3";
@@ -3292,8 +3355,89 @@ ListView.prototype.activate = function(li) {
   li.classList.add('active');
 };
 
+ListView.prototype.expandSlidingActions = function (li) {
+  let width = li.children[1].getBoundingClientRect().width;
+  if (width >= this.slidingActions[0].width.width) return;
+  let fun = (li) => {
+    for (let i = 1; i < li.children.length; i++) {
+      let action = li.children[i];
+      let rect = action.getBoundingClientRect();
+      if ((rect.width + 5) >= this.slidingActions[i - 1].width) {
+        action.style.minWidth = this.slidingActions[i - 1].width + 'px';
+        clearInterval(this.interval4SlidingActions);
+        continue;
+      };
+      action.style.minWidth = (rect.width + 5) + 'px';
+    }
+  };
+  this.interval4SlidingActions = setInterval(() => {
+    fun(li);
+  }, 5);
+};
+
+ListView.prototype.collapseSlidingActions = function (li) {
+  let width = li.children[1].getBoundingClientRect().width;
+  if (width <= 0) return;
+  this.interval4SlidingActions = setInterval(() => {
+    for (let i = 1; i < li.children.length; i++) {
+      let action = li.children[i];
+      let rect = action.getBoundingClientRect();
+      if ((rect.width - 5) <= 0) {
+        action.style.width = '0';
+        action.style.minWidth = 'unset';
+        action.style.display = 'none';
+        clearInterval(this.interval4SlidingActions);
+        continue;
+      };
+      action.style.minWidth = (rect.width - 5) + 'px';
+    }
+  }, 10);
+
+};
+
 ListView.prototype.subscribe = function(name, callback) {
 
+};
+
+function GridView(opt) {
+  this.columnCount = opt.columnCount || 2;
+  this.local = opt.local || [];
+  this.url = opt.url;
+  this.params = opt.params || {};
+  // functions
+  this.create = opt.create;
+  this.error = opt.error || function (err) {};
+}
+
+GridView.prototype.fetch = async function (error) {
+  if (!this.url) return this.local;
+  let data = await xhr.promise({
+    url: this.url,
+    params: this.params,
+  }, error);
+  console.log(data);
+  if (data) {
+    this.local = data;
+  }
+  return this.local;
+};
+
+GridView.prototype.root = async function () {
+  let ret = dom.element('<ul class="list-grid"></ul>');
+  this.local = await this.fetch();
+  for (let i = 0; i < this.local.length; i++) {
+    let item = this.local[i];
+    let li = dom.element('<li class="list-grid-item"></li>');
+    let el = this.create(i, item, li);
+    li.appendChild(el);
+    ret.appendChild(li);
+  }
+  return ret;
+};
+
+GridView.prototype.render = async function (containerId) {
+  this.container = dom.find(containerId);
+  this.container.appendChild(await this.root());
 };
 
 function Timeline(opt) {
@@ -3399,11 +3543,14 @@ function Tabs(opts) {
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
   let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
-  ajax.view({
-    url: url,
-    containerId: contentPage,
-    success: success || function() {}
-  });
+  if (typeof url !== 'undefined') {
+    ajax.view({
+      url: url,
+      containerId: contentPage,
+      success: success || function () {
+      }
+    });
+  }
   if (hidden === true) {
     contentPage.style.display = 'none';
   }
@@ -3416,7 +3563,7 @@ Tabs.prototype.render = function() {
   this.content.innerHTML = '';
   this.navigator.innerHTML = '';
 
-  this.slider = dom.element('<div class="slider"></div>');
+  this.slider = dom.element('<div class="slider position-absolute"></div>');
   this.navigator.appendChild(this.slider);
 
   this.tabs.forEach((tab, idx) => {
@@ -3451,15 +3598,15 @@ Tabs.prototype.render = function() {
         // 只有在懒加载情况下，设置自动清除内容才有效
         this.content.innerHTML = '';
       }
-      let contentPage = dom.find('div[data-tab-content-id=' + nav.getAttribute('data-tab-id') + ']', self.content);
+      let contentPage = dom.find('div[data-tab-content-id="' + nav.getAttribute('data-tab-id') + '"]', self.content);
       if (contentPage != null) {
         contentPage.style.display = '';
       } else {
-        let id = nav.getAttribute('data-tab-id');
-        let url = nav.getAttribute('data-tab-url');
         if (tab.onClicked) {
           tab.onClicked(ev);
         } else {
+          let id = nav.getAttribute('data-tab-id');
+          let url = nav.getAttribute('data-tab-url');
           self.loadPage(id, url, false, tab.success);
         }
       }
@@ -3470,7 +3617,7 @@ Tabs.prototype.render = function() {
       if (idx == 0) {
         self.activate(nav);
         if (tab.onClicked) {
-          tab.onClicked(ev);
+          tab.onClicked();
         } else {
           self.loadPage(tab.id, tab.url, false, tab.success);
         }
@@ -4365,6 +4512,10 @@ MobileForm.prototype.root = async function() {
           </div>
         </div>
       `, field);
+      if (this.readonly === true) {
+        dom.find('input', el).setAttribute('placeholder', '');
+        dom.find('input', el).setAttribute('readonly', true);
+      }
     }
     ret.appendChild(el);
   }
@@ -4382,6 +4533,10 @@ MobileForm.prototype.buildDate = function (field) {
       </div>
     </div>
   `, field);
+  if (this.readonly === true) {
+    ret.querySelectorAll('input')[0].setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
       confirm: date => {
@@ -4406,6 +4561,10 @@ MobileForm.prototype.buildSelect = async function (field) {
       </div>
     </div>
   `, field);
+  if (this.readonly === true) {
+    ret.querySelectorAll('input')[0].setAttribute('placeholder', '');
+    return ret;
+  }
   let values = field.values;
   if (!values && field.url) {
     let data = await xhr.promise({
@@ -4446,6 +4605,10 @@ MobileForm.prototype.buildMobile = function (field) {
     </div>
   `, field);
   let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     new Numpad({
       type: 'mobile',
@@ -4467,6 +4630,10 @@ MobileForm.prototype.buildId = function (field) {
     </div>
   `, field);
   let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     new Numpad({
       type: 'id',
@@ -4488,6 +4655,10 @@ MobileForm.prototype.buildDistrict = function (field) {
     </div>
   `, field);
   let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     new DistrictPicker({
       type: 'id',
@@ -5330,31 +5501,54 @@ kuim = {
 
 kuim.navigateTo = async function (url, opt, clear) {
   clearTimeout(kuim.delayToLoad);
-  kuim.delayToLoad = setTimeout(() => {
-    if (typeof clear === "undefined") clear = false;
-    let main = document.querySelector('main');
+  // kuim.delayToLoad = setTimeout(() => {
+  //   if (typeof clear === "undefined") clear = false;
+  //   let main = document.querySelector('main');
+  //
+  //   if (kuim.presentPageObj) {
+  //     kuim.presentPageObj.page.classList.remove('in');
+  //     kuim.presentPageObj.page.classList.add('out');
+  //   }
+  //   setTimeout(async () => {
+  //     if (kuim.presentPageObj) {
+  //       kuim.presentPageObj.page.parentElement.style.display = 'none';
+  //     }
+  //     if (kuim.presentPageObj && clear !== false) {
+  //       kuim.presentPageObj.page.parentElement.remove();
+  //       if (kuim.presentPageObj.destroy) {
+  //         kuim.presentPageObj.destroy();
+  //       }
+  //       delete kuim.presentPageObj;
+  //     }
+  //     let html = await xhr.asyncGet({
+  //       url: url + '?' + new Date().getTime(),
+  //     }, 'GET');
+  //     kuim.reload(main, url, html, opt);
+  //   }, 400);
+  // }, 200);
+  if (typeof clear === "undefined") clear = false;
+  let main = document.querySelector('main');
 
+  if (kuim.presentPageObj) {
+    kuim.presentPageObj.page.classList.remove('in');
+    kuim.presentPageObj.page.classList.add('out');
+  }
+  kuim.delayToLoad = setTimeout(async () => {
     if (kuim.presentPageObj) {
-      kuim.presentPageObj.page.classList.remove('in');
-      kuim.presentPageObj.page.classList.add('out');
+      kuim.presentPageObj.page.parentElement.style.display = 'none';
     }
-    setTimeout(async () => {
-      if (kuim.presentPageObj) {
-        kuim.presentPageObj.page.parentElement.style.display = 'none';
+    if (kuim.presentPageObj && clear !== false) {
+      kuim.presentPageObj.page.parentElement.remove();
+      if (kuim.presentPageObj.destroy) {
+        kuim.presentPageObj.destroy();
       }
-      if (kuim.presentPageObj && clear !== false) {
-        kuim.presentPageObj.page.parentElement.remove();
-        if (kuim.presentPageObj.destroy) {
-          kuim.presentPageObj.destroy();
-        }
-        delete kuim.presentPageObj;
-      }
-      let html = await xhr.asyncGet({
-        url: url,
-      }, 'GET');
-      kuim.reload(main, url, html, opt);
-    }, 400);
-  }, 200);
+      delete kuim.presentPageObj;
+    }
+    let html = await xhr.asyncGet({
+      url: url + '?' + new Date().getTime(),
+    }, 'GET');
+    kuim.reload(main, url, html, opt);
+  }, 400);
 };
 
 kuim.navigateWidget = function (url, container, opt) {
@@ -5467,11 +5661,13 @@ kuim.setTitleAndIcon = function(title, icon) {
   let iconDiv = dom.find('header div.left');
   if (icon) {
     iconDiv.innerHTML = icon;
-    bottomDiv.style.display = '';
+    if (bottomDiv != null)
+      bottomDiv.style.display = '';
     iconDiv.onclick = (ev) => {}
   } else {
     iconDiv.innerHTML = '<i class="fas fa-arrow-left text-white button icon"></i>';
-    bottomDiv.style.display = 'none';
+    if (bottomDiv != null)
+      bottomDiv.style.display = 'none';
     iconDiv.onclick = (ev) => {
       kuim.navigateBack()
     }
@@ -5664,4 +5860,122 @@ kuim.error = function(message, callback) {
         callback();
     }, 500);
   }, 1000);
+};
+
+kuim.loading = function(callback) {
+  if (document.getElementById('__widgetLoading') != null) return;
+  let el = dom.templatize(`
+    <div id="__widgetLoading" style="background: rgba(0,0,0,0.3); position: absolute; top: 0; left: 0; 
+                z-index: 9999; height: 100%; width: 100%; display: flex; color: white">
+      <div class="m-auto" style="text-align: center;">
+        <i class="fas fa-spinner fa-spin font-36"></i>
+        <div class="font-18 mt-2">数据加载中</div>
+      </div>          
+    </div>
+  `);
+  document.body.appendChild(el);
+  setTimeout(() => {
+    if (callback)
+      callback(el);
+  }, 300);
+};
+
+kuim.dialog = function (opt) {
+  let confirm = opt.confirm;
+  let cancel = opt.cancel;
+  let mask = dom.element(`
+    <div style="background: rgba(0,0,0,0.3); position: absolute; top: 0; left: 0; 
+                z-index: 9999; height: 100%; width: 100%; display: flex;">
+      <div class="dialog m-auto" 
+           style="width: 88%; min-height: 400px; position: relative;
+                  background: var(--color-white);">
+        <div class="dialog-body">
+          <img src="/mobile/img/app/6.jpg" width="100%" style="max-height: 500px;">
+        </div>
+        <div class="dialog-footer" 
+             style="font-size: 24px; font-weight: bold; position: absolute;
+                    width: 100%; height: 56px; bottom: 0; display: table;">
+          <button style="background: var(--color-error); width: 50%; display: inline-table;
+                         color: var(--color-text-primary-dark); border: none; 
+                         line-height: 56px;">取  消</button>
+          <button style="background: var(--color-primary); width: 50%; display: inline-table;
+                         color: var(--color-text-primary-dark); border: none; 
+                         line-height: 56px;">确  定</button>
+        </div>
+      </div>
+    </div>
+  `);
+  let buttons = mask.querySelectorAll('button');
+  dom.bind(buttons[0], 'click', ev => {
+    mask.remove();
+    if (cancel) cancel();
+  });
+  dom.bind(buttons[1], 'click', ev => {
+    mask.remove();
+    if (confirm) confirm();
+  });
+  document.body.appendChild(mask);
+};
+
+let pStart = { x: 0, y: 0 };
+let pStop = { x: 0, y: 0 };
+
+kuim.swipeStart = function(e) {
+  if (typeof e["targetTouches"] !== "undefined") {
+    let touch = e.targetTouches[0];
+    pStart.x = touch.screenX;
+    pStart.y = touch.screenY;
+  } else {
+    pStart.x = e.screenX;
+    pStart.y = e.screenY;
+  }
+};
+
+kuim.swipeEnd = function(e) {
+  if (typeof e["changedTouches"] !== "undefined") {
+    let touch = e.changedTouches[0];
+    pStop.x = touch.screenX;
+    pStop.y = touch.screenY;
+  } else {
+    pStop.x = e.screenX;
+    pStop.y = e.screenY;
+  }
+};
+
+kuim.swipeCheck = function() {
+  let changeY = pStart.y - pStop.y;
+  let changeX = pStart.x - pStop.x;
+  return kuim.isPullDown(changeY, changeX);
+};
+
+kuim.isPullDown = function (dY, dX) {
+  // methods of checking slope, length, direction of line created by swipe action
+  return (
+    dY < 0 &&
+    ((Math.abs(dX) <= 100 && Math.abs(dY) >= 300) ||
+      (Math.abs(dX) / Math.abs(dY) <= 0.3 && dY >= 60))
+  );
+};
+
+document.addEventListener("touchstart", kuim.swipeStart, false);
+document.addEventListener("touchend", ev => {
+  kuim.swipeEnd(ev);
+  if (kuim.swipeCheck()) {
+    let rect = kuim.presentPageObj.page.getBoundingClientRect();
+    if (kuim.presentPageObj && kuim.presentPageObj.pullToRefresh) {
+      let rect = kuim.presentPageObj.page.getBoundingClientRect();
+      if (rect.top >= 0) {
+        kuim.loading(el => {
+          kuim.presentPageObj.pullToRefresh(el);
+        });
+      }
+    }
+  }
+}, false);
+
+flutter = {};
+
+flutter.log = (data) => {
+  if (!window.print) return;
+  print.postMessage(data);
 };

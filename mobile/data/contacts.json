@@ -1,0 +1,33 @@
+{
+  "data": [{
+    "id": "1", "text": "哪吒", "avatar": "img/avatar/nezha.png"
+  },{
+    "id": "2", "text": "和尚", "avatar": "img/avatar/monk.png"
+  },{
+    "id": "4", "text": "孙悟空", "avatar": "img/avatar/sunwukong.png"
+  },{
+    "id": "5", "text": "猪八戒", "avatar": "img/avatar/zhubajie.png"
+  },{
+    "id": "6", "text": "沙和尚", "avatar": "img/avatar/shaheshang.png"
+  },{
+    "id": "7", "text": "红孩儿", "avatar": "img/avatar/honghaier.png"
+  },{
+    "id": "8", "text": "老人家", "avatar": "img/avatar/old.png"
+  },{
+    "id": "9", "text": "小崽儿", "avatar": "img/avatar/kid.png"
+  },{
+    "id": "10", "text": "铁扇公主", "avatar": "img/avatar/tieshangongzhu.jpg"
+  },{
+    "id": "11", "text": "牛魔王", "avatar": "img/avatar/niumowang.jpeg"
+  },{
+    "id": "12", "text": "观音菩萨", "avatar": "img/avatar/guanyinpusa.jpeg"
+  },{
+    "id": "13", "text": "如来", "avatar": "img/avatar/rulai.jpg"
+  },{
+    "id": "14", "text": "济公", "avatar": "img/avatar/jigong.jpeg"
+  },{
+    "id": "15", "text": "包公", "avatar": "img/avatar/baogong.jpeg"
+  },{
+    "id": "3", "text": "雷震子", "avatar": "img/user.png"
+  }]
+}

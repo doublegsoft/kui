@@ -1,0 +1,24 @@
+<div id="pageExampleWeekdays" class="mobile page">
+  <div widget-id="widgetWeekdays"></div>
+</div>
+<script>
+function PageExampleWeekdays() {
+  this.page = dom.find('#pageExampleWeekdays');
+}
+
+PageExampleWeekdays.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  this.weekdays = new Weekdays({});
+  this.weekdays.render(this.widgetWeekdays);
+};
+
+PageExampleWeekdays.prototype.destroy = async function (params) {
+  console.log('pageExampleWeekdays destroyed');
+};
+
+PageExampleWeekdays.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageExampleWeekdays = new PageExampleWeekdays();
+</script>

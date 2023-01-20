@@ -42,6 +42,10 @@ MobileForm.prototype.root = async function() {
           </div>
         </div>
       `, field);
+      if (this.readonly === true) {
+        dom.find('input', el).setAttribute('placeholder', '');
+        dom.find('input', el).setAttribute('readonly', true);
+      }
     }
     ret.appendChild(el);
   }
@@ -59,6 +63,10 @@ MobileForm.prototype.buildDate = function (field) {
       </div>
     </div>
   `, field);
+  if (this.readonly === true) {
+    ret.querySelectorAll('input')[0].setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
       confirm: date => {
@@ -83,6 +91,10 @@ MobileForm.prototype.buildSelect = async function (field) {
       </div>
     </div>
   `, field);
+  if (this.readonly === true) {
+    ret.querySelectorAll('input')[0].setAttribute('placeholder', '');
+    return ret;
+  }
   let values = field.values;
   if (!values && field.url) {
     let data = await xhr.promise({
@@ -123,6 +135,10 @@ MobileForm.prototype.buildMobile = function (field) {
     </div>
   `, field);
   let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     new Numpad({
       type: 'mobile',
@@ -144,6 +160,10 @@ MobileForm.prototype.buildId = function (field) {
     </div>
   `, field);
   let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     new Numpad({
       type: 'id',
@@ -165,6 +185,10 @@ MobileForm.prototype.buildDistrict = function (field) {
     </div>
   `, field);
   let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
   dom.bind(ret, 'click', ev => {
     new DistrictPicker({
       type: 'id',

@@ -6,10 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1">
   <title>手机应用展示</title>
   <style>
-    body {
+    html, body {
       -ms-overflow-style: none;
       scrollbar-width: none;
       overflow-y: scroll;
+      overscroll-behavior: contain;
     }
 
     body::-webkit-scrollbar {
@@ -20,7 +21,9 @@
   <link href="/3rd/animation/animate.min.css" rel="stylesheet">
   <link href="/3rd/material-icons/material-icons.css" rel="stylesheet">
   <link href="/3rd/swiper/swiper-bundle.min.css" rel="stylesheet">
-
+  <link href="/3rd/viewerjs/viewer.min.css" rel="stylesheet">
+  <link href="/3rd/videojs/video-js.min.css" rel="stylesheet">
+  <link href="/3rd/videojs/videojs-mobile-ui.css" rel="stylesheet">
   <link href="/dist/kui-all.mobile.min.css" rel="stylesheet">
 
   <script src="/3rd/jquery/jquery-3.2.1.min.js"></script>
@@ -30,8 +33,12 @@
   <script src="/3rd/rxjs/rxjs.umd.js"></script>
   <script src="/3rd/rxjs/rxjs-pubsub.js"></script>
   <script src="/3rd/viewerjs/viewer.js"></script>
+  <script src="/3rd/videojs/video.min.js"></script>
+  <script src="/3rd/videojs/videojs-mobile-ui.min.js"></script>
   <script src="/3rd/mobile/rolldate.js"></script>
   <script src="/3rd/swiper/swiper-bundle.min.js"></script>
+  <script src="/3rd/iSlider/iSlider.js"></script>
+  <script src="/3rd/echarts/echarts.simple.min.js"></script>
 
   <script src="/dist/kui-all.mobile.min.js"></script>
 </head>
@@ -43,43 +50,32 @@
     <div class="center">
       <h1 class="title">首页</h1>
     </div>
-    <div class="ml-auto">
-
-    </div>
   </header>
   <div widget-id="widgetRefresh" class="pull-to-refresh out">
     <i class="fas fa-spinner fa-spin font-48 text-gray m-auto"></i>
   </div>
   <main></main>
   <footer>
-    <div class="bottom-bar">
-      <ul style="padding-left: 0;">
-        <li class="active">
-          <a widget-id="buttonHome" href="#">
-            <i class='fas fa-home text-info'></i>
-            <i class='fas fa-home active-icon'></i>
-          </a>
-        </li>
-        <li>
-          <a widget-id="buttonFavourite" href="#">
-            <i class='fas fa-heart text-info'></i>
-            <i class='fas fa-heart active-icon'></i>
-          </a>
-        </li>
-        <li>
-          <a widget-id="buttonCalendar" href="#">
-            <i class='fas fa-calendar text-info'></i>
-            <i class='fas fa-calendar active-icon'></i>
-          </a>
-        </li>
-        <li>
-          <a widget-id="buttonUser" href="#">
-            <i class='fas fa-user text-info'></i>
-            <i class='fas fa-user active-icon'></i>
-          </a>
-        </li>
-        <div class="indicator"></div>
-      </ul>
+    <div class="bottom-navigator">
+      <div class="active-0">
+        <label widget-id="buttonHome" class="active" style="flex: 0 0 25%;">
+          <i class="fas fa-home" style="left: -2px;"></i>
+          <span>首页</span>
+        </label>
+        <label widget-id="buttonComponent" style="flex: 0 0 25%;">
+          <i class="fas fa-window-maximize" style="left: -1px;"></i>
+          <span>组件</span>
+        </label>
+        <label widget-id="buttonApplication" style="flex: 0 0 25%;">
+          <i class="fab fa-app-store-ios" style="left: 1px;"></i>
+          <span>应用</span>
+        </label>
+        <label widget-id="buttonUser" style="flex: 0 0 25%;">
+          <i class="fas fa-user" style="left: 1px;"></i>
+          <span>用户</span>
+        </label>
+        <span style="width: 25%;"></span>
+      </div>
     </div>
   </footer>
 </body>
@@ -96,10 +92,10 @@ PageIndex.prototype.initialize = async function (params) {
   let footer = document.querySelector('footer');
   let tabsNavigator = document.querySelector('[widget-id=tabsNavigator]');
   this.buttonHome = document.querySelector('[widget-id=buttonHome]');
-  this.buttonFavourite = document.querySelector('[widget-id=buttonFavourite]');
-  this.buttonCalendar = document.querySelector('[widget-id=buttonCalendar]');
+  this.buttonComponent = document.querySelector('[widget-id=buttonComponent]');
+  this.buttonApplication = document.querySelector('[widget-id=buttonApplication]');
   this.buttonUser = document.querySelector('[widget-id=buttonUser]');
-
+  this.buttonSettings = document.querySelector('[widget-id=buttonSettings]');
   // 初始化环境
   // header.style.width = window.clientWidth + 'px';
   // footer.style.width = window.clientWidth + 'px';
@@ -112,48 +108,80 @@ PageIndex.prototype.initialize = async function (params) {
     start.y = ev.changedTouches[0].screenY;
   });
 
-  let widgetRefresh = dom.find('[widget-id=widgetRefresh]');
-  document.addEventListener('touchend', ev => {
-    end.x = ev.changedTouches[0].screenX;
-    end.y = ev.changedTouches[0].screenY;
-    if ((end.y - start.y) >= 200 && window.scrollY <= 0) {
-      widgetRefresh.classList.remove('out');
-      widgetRefresh.classList.add('in');
-      setTimeout(() => {
-        widgetRefresh.classList.remove('in');
-        widgetRefresh.classList.add('out');
-      }, 600)
-    }
-    start = {};
-    end = {};
-  });
+  // let widgetRefresh = dom.find('[widget-id=widgetRefresh]');
+  // document.addEventListener('touchend', ev => {
+  //   end.x = ev.changedTouches[0].screenX;
+  //   end.y = ev.changedTouches[0].screenY;
+  //   if ((end.y - start.y) >= 200 && window.scrollY <= 0) {
+  //     widgetRefresh.classList.remove('out');
+  //     widgetRefresh.classList.add('in');
+  //     setTimeout(() => {
+  //       widgetRefresh.classList.remove('in');
+  //       widgetRefresh.classList.add('out');
+  //     }, 600)
+  //   }
+  //   start = {};
+  //   end = {};
+  // });
 
   dom.bind(this.buttonHome, 'click', ev => {
+    // if (this.buttonHome.parentElement.classList.contains('active-0')) return;
+    this.buttonHome.parentElement.className = 'active-0';
+    this.buttonHome.parentElement.querySelectorAll('label').forEach(el => {
+      el.className = '';
+    });
+    this.buttonHome.classList.add('active');
     kuim.navigateTo('mhtml/home.html', {
       title: '首页',
       icon: '<i class="fas fa-home text-white button icon"></i>',
     }, true);
   });
 
-  dom.bind(this.buttonFavourite, 'click', ev => {
+  dom.bind(this.buttonComponent, 'click', ev => {
+    if (this.buttonComponent.parentElement.classList.contains('active-1')) return;
+    this.buttonComponent.parentElement.className = 'active-1';
+    this.buttonComponent.parentElement.querySelectorAll('label').forEach(el => {
+      el.className = '';
+    });
+    this.buttonComponent.classList.add('active');
     kuim.navigateTo('mhtml/example/main.html', {
-      title: '示例',
-      icon: '<i class="fas fa-heart text-white button icon"></i>',
+      title: '组件示例',
+      icon: '<i class="fas fa-window-maximize text-white button icon"></i>',
     }, true);
   });
 
-  dom.bind(this.buttonCalendar, 'click', ev => {
+  dom.bind(this.buttonApplication, 'click', ev => {
+    if (this.buttonApplication.parentElement.classList.contains('active-2')) return;
+    this.buttonApplication.parentElement.className = 'active-2';
+    this.buttonApplication.parentElement.querySelectorAll('label').forEach(el => {
+      el.className = '';
+    });
+    this.buttonApplication.classList.add('active');
     kuim.navigateTo('mhtml/demo/main.html', {
-      title: '页面',
-      icon: '<i class="fas fa-calendar text-white button icon"></i>',
+      title: '页面示例',
+      icon: '<i class="fab fa-app-store-ios text-white button icon"></i>',
     }, true);
   });
 
   dom.bind(this.buttonUser, 'click', ev => {
+    if (this.buttonUser.parentElement.classList.contains('active-3')) return;
+    this.buttonUser.parentElement.className = 'active-3';
+    this.buttonUser.parentElement.querySelectorAll('label').forEach(el => {
+      el.className = '';
+    });
+    this.buttonUser.classList.add('active');
     kuim.navigateTo('mhtml/personal/main.html', {
       title: '用户',
       icon: '<i class="fas fa-user text-white button icon"></i>',
     }, true);
+  });
+
+  dom.bind(this.buttonSettings, 'click', ev => {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.openFavourite) {
+      window.webkit.messageHandlers.openFavourite.postMessage({
+        "message": ""
+      });
+    }
   });
 
   // 底部导航

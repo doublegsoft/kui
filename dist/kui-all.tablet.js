@@ -4052,11 +4052,14 @@ function Tabs(opts) {
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
   let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
-  ajax.view({
-    url: url,
-    containerId: contentPage,
-    success: success || function() {}
-  });
+  if (typeof url !== 'undefined') {
+    ajax.view({
+      url: url,
+      containerId: contentPage,
+      success: success || function () {
+      }
+    });
+  }
   if (hidden === true) {
     contentPage.style.display = 'none';
   }
@@ -4069,7 +4072,7 @@ Tabs.prototype.render = function() {
   this.content.innerHTML = '';
   this.navigator.innerHTML = '';
 
-  this.slider = dom.element('<div class="slider"></div>');
+  this.slider = dom.element('<div class="slider position-absolute"></div>');
   this.navigator.appendChild(this.slider);
 
   this.tabs.forEach((tab, idx) => {
@@ -4104,15 +4107,15 @@ Tabs.prototype.render = function() {
         // 只有在懒加载情况下，设置自动清除内容才有效
         this.content.innerHTML = '';
       }
-      let contentPage = dom.find('div[data-tab-content-id=' + nav.getAttribute('data-tab-id') + ']', self.content);
+      let contentPage = dom.find('div[data-tab-content-id="' + nav.getAttribute('data-tab-id') + '"]', self.content);
       if (contentPage != null) {
         contentPage.style.display = '';
       } else {
-        let id = nav.getAttribute('data-tab-id');
-        let url = nav.getAttribute('data-tab-url');
         if (tab.onClicked) {
           tab.onClicked(ev);
         } else {
+          let id = nav.getAttribute('data-tab-id');
+          let url = nav.getAttribute('data-tab-url');
           self.loadPage(id, url, false, tab.success);
         }
       }
@@ -4123,7 +4126,7 @@ Tabs.prototype.render = function() {
       if (idx == 0) {
         self.activate(nav);
         if (tab.onClicked) {
-          tab.onClicked(ev);
+          tab.onClicked();
         } else {
           self.loadPage(tab.id, tab.url, false, tab.success);
         }
@@ -4208,20 +4211,20 @@ function PaginationGrid(opt) {
  * @returns {HTMLTableElement}
  */
 PaginationGrid.prototype.root = function () {
-  this.root = dom.element(`
+  let ret = dom.element(`
     <div class="card">
       <div class="card-body">
         <div class="row" style="margin-left: -5px; margin-right: -5px;"></div>
       </div>
     </div>
   `);
-  this.rootBody = this.root.children[0].children[0];
+  this.rootBody = ret.children[0].children[0];
   if (this.borderless == true) {
-    this.root.classList.add('b-a-0', 'mb-0');
-    this.root.children[0].classList.add('p-0');
+    ret.classList.add('b-a-0', 'mb-0');
+    ret.children[0].classList.add('p-0');
   }
 
-  return this.root;
+  return ret;
 };
 
 /**
@@ -4799,6 +4802,7 @@ function ListView(opt) {
   this.hoverable = opt.hoverable !== false;
   this.activateable = opt.activateable === true;
   this.itemClass = opt.itemClass || [];
+  this.slidingActions = opt.slidingActions || [];
 
   this.emptyHtml = opt.emptyHtml;
   this.idField = opt.idField;
@@ -5045,6 +5049,7 @@ ListView.prototype.append = function(data, index) {
     }
 
     let div = this.create(len, row, li);
+    div.style.width = '100%';
 
     if (this.onCheck) {
       let input = dom.element(`
@@ -5063,6 +5068,68 @@ ListView.prototype.append = function(data, index) {
       li.appendChild(input);
     }
     li.appendChild(div);
+
+    if (this.slidingActions.length > 0) {
+      this.actionElements = [];
+      for (let i = 0; i < this.slidingActions.length; i++) {
+        let slidingAction = this.slidingActions[i];
+        slidingAction.width = parseInt(slidingAction.width || 64);
+        li.appendChild(slidingAction.create());
+      }
+      dom.bind(li, 'touchstart', ev => {
+        this.touchStartX = ev.touches[0].screenX;
+        this.touchStartY = ev.touches[0].screenY;
+      });
+      dom.bind(li, 'touchmove', ev => {
+        this.touchMoveX = ev.touches[0].screenX;
+        this.touchMoveY = ev.touches[0].screenY;
+        let distanceX = this.touchStartX - this.touchMoveX;
+        let distanceY = this.touchStartY - this.touchMoveY;
+        if (Math.abs(distanceX) < 30) return;
+        if (Math.abs(distanceY) > 30) return;
+        if (distanceX > 0) {
+          let avg = distanceX / this.slidingActions.length;
+          for (let j = 1; j < li.children.length; j++) {
+            let rect = li.children[j].getBoundingClientRect();
+            if (rect.width >= this.slidingActions[j - 1].width) {
+              continue;
+            }
+            if (avg >= this.slidingActions[j - 1].width) avg = this.slidingActions[j - 1].width;
+            li.children[j].style.minWidth = avg + 'px';
+            li.children[j].style.display = '';
+          }
+        } else {
+          distanceX = -distanceX / 10;
+          let avg = distanceX / this.slidingActions.length;
+          for (let j = 1; j < li.children.length; j++) {
+            let rect = li.children[j].getBoundingClientRect();
+            let width = rect.width - avg;
+            width = width <= 5 ? 0 : width;
+            if (width == 0) {
+              li.children[j].style.width = '0';
+              li.children[j].style.minWidth = 'unset';
+            } else {
+              li.children[j].style.minWidth = width + 'px';
+            }
+          }
+        }
+      });
+      dom.bind(li, 'touchend', ev => {
+        this.touchendX = ev.changedTouches[0].screenX;
+        this.touchendY = ev.changedTouches[0].screenY;
+        let distanceX = this.touchStartX - this.touchendX;
+        let distanceY = this.touchStartY - this.touchendY;
+        if (Math.abs(distanceX) < 30) return;
+        if (Math.abs(distanceY) > 30) return;
+        if (distanceX >= 30) {
+          this.expandSlidingActions(li);
+        } else if (distanceX <= -30) {
+          this.collapseSlidingActions(li);
+        } else {
+          this.collapseSlidingActions(li);
+        }
+      });
+    }
 
     if (this.idField) {
       li.setAttribute("data-list-item-id", row[this.idField])
@@ -5180,7 +5247,6 @@ ListView.prototype.setReorderable = function(li) {
     y = target.offsetTop + y;
 
     this.clonedDraggingElement = li.cloneNode(true);
-    console.log(this.clonedDraggingElement);
 
     this.draggingElement = li;
     this.draggingElement.style.opacity = "0.3";
@@ -5212,6 +5278,46 @@ ListView.prototype.activate = function(li) {
     ul.children[i].classList.remove('active');
   }
   li.classList.add('active');
+};
+
+ListView.prototype.expandSlidingActions = function (li) {
+  let width = li.children[1].getBoundingClientRect().width;
+  if (width >= this.slidingActions[0].width.width) return;
+  let fun = (li) => {
+    for (let i = 1; i < li.children.length; i++) {
+      let action = li.children[i];
+      let rect = action.getBoundingClientRect();
+      if ((rect.width + 5) >= this.slidingActions[i - 1].width) {
+        action.style.minWidth = this.slidingActions[i - 1].width + 'px';
+        clearInterval(this.interval4SlidingActions);
+        continue;
+      };
+      action.style.minWidth = (rect.width + 5) + 'px';
+    }
+  };
+  this.interval4SlidingActions = setInterval(() => {
+    fun(li);
+  }, 5);
+};
+
+ListView.prototype.collapseSlidingActions = function (li) {
+  let width = li.children[1].getBoundingClientRect().width;
+  if (width <= 0) return;
+  this.interval4SlidingActions = setInterval(() => {
+    for (let i = 1; i < li.children.length; i++) {
+      let action = li.children[i];
+      let rect = action.getBoundingClientRect();
+      if ((rect.width - 5) <= 0) {
+        action.style.width = '0';
+        action.style.minWidth = 'unset';
+        action.style.display = 'none';
+        clearInterval(this.interval4SlidingActions);
+        continue;
+      };
+      action.style.minWidth = (rect.width - 5) + 'px';
+    }
+  }, 10);
+
 };
 
 ListView.prototype.subscribe = function(name, callback) {

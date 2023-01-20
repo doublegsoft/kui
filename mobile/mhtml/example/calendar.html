@@ -1,0 +1,24 @@
+<div id="pageExampleCalendar" class="mobile page">
+  <div widget-id="widgetCalendar"></div>
+</div>
+<script>
+function PageExampleCalendar() {
+  this.page = dom.find('#pageExampleCalendar');
+}
+
+PageExampleCalendar.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  this.calendar = new Calendar({});
+  this.calendar.render(this.widgetCalendar);
+};
+
+PageExampleCalendar.prototype.destroy = async function (params) {
+  console.log('pageExampleCalendar destroyed');
+};
+
+PageExampleCalendar.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageExampleCalendar = new PageExampleCalendar();
+</script>

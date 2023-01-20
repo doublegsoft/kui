@@ -1,0 +1,78 @@
+<div id="pageDemoWechatContact" class="mobile page">
+  <div widget-id="widgetListView"></div>
+</div>
+<script>
+function PageDemoWechatContact() {
+  this.page = dom.find('#pageDemoWechatContact');
+}
+
+PageDemoWechatContact.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  let data = await xhr.asyncGet({
+    url: '/mobile/data/contacts.json',
+  });
+  data = JSON.parse(data).data;
+  this.listview = new ListView({
+    local: data,
+    idField: 'id',
+    activateable: false,
+    hoverable: false,
+    create: (idx, row) => {
+      let ret = dom.templatize(`
+        <div class="d-flex" style="height: 48px;">
+          <img class="avatar" src="img/user.png">
+          <div class="pl-2 pt-2">
+            <strong>{{text}}</strong>
+            <div class="small text-muted">这是{{text}}给你发的消息</div>
+          </div>
+        </div>
+      `, row);
+      dom.bind(ret, 'click', ev => {
+        kuim.navigateTo('mhtml/demo/wechat/chat.html', {
+          title: row.text,
+        });
+      });
+      setTimeout(() => {
+        dom.find('img', ret).src = row.avatar;
+      }, 1000);
+      return ret;
+    },
+    slidingActions: [{
+      create: () => {
+        return dom.templatize(`
+        <div class="bg-info text-white font-16 ml-auto"
+             style="width: 0; height: 64px; text-align: center; white-space: nowrap;
+             margin: -8px 0 -8px 0; line-height: 64px; display: none;">已读</div>
+      `);
+      },
+    },{
+      create: () => {
+        let ret = dom.templatize(`
+          <div class="bg-danger text-white font-16 ml-auto"
+               style="width: 0; height: 64px; text-align: center; white-space: nowrap;
+               margin: -8px -16px -8px 0; line-height: 64px; display: none;">删除</div>
+        `);
+        dom.bind(ret, 'click', ev => {
+          ret.parentElement.remove();
+        });
+        return ret;
+      },
+    }]
+  });
+  this.listview.render(this.widgetListView);
+
+  dom.bind(this.widgetListView, 'scroll', ev => {
+    console.log(ev);
+  });
+};
+
+PageDemoWechatContact.prototype.destroy = async function (params) {
+  console.log('pageDemoWechatContact destroyed');
+};
+
+PageDemoWechatContact.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageDemoWechatContact = new PageDemoWechatContact();
+</script>

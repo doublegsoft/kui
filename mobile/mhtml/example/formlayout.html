@@ -1,205 +1,21 @@
 <div id="pageExampleFormLayout" class="mobile page">
-  <form class="form form-horizontal px-3">
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">患者姓名</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
+  <div class="card card-body">
+    <div class="title-bordered">
+      <strong>基本信息</strong>
     </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">性别</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">出生日期</label>
-      <div class="col-24-18 d-flex" onclick="pageExampleFormLayout.pickDate(event);">
-        <label class="col-form-label"></label>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">calendar_today</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">手机号码</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">院内地址</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">证件号码</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">身份证件号</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">出生日期</label>
-      <div class="col-24-18 d-flex">
-        <label class="col-form-label"></label>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">calendar_today</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">性别</label>
-      <div class="col-24-18 d-flex" widget-id="selectGender" onclick="pageExampleFormLayout.pickValue(event);">
-        <label class="col-form-label"></label>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">国籍</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">民族</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">籍贯</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">婚姻状况</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">健康状况</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">教育程度</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">健康状况</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">家庭住址</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">办公地址</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">手机号</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">座机号</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">电子邮箱</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">备注</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">所在省份</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">所在城市</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">所在区县</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">所在乡镇</label>
-      <div class="col-24-18 d-flex">
-        <span></span>
-        <input type="hidden">
-        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">邮政编码</label>
-      <div class="col-24-18">
-        <input type="text" class="form-control">
-      </div>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">身高</label>
-    </div>
-    <div class="form-group row">
-      <label class="col-form-label col-24-06">体重</label>
-    </div>
-  </form>
-  <button class="font-3xl" style="width: 100%; height: 50px;
-      color: var(--color-light);
-      background-color: var(--color-primary);">保存</button>
+    <div widget-id="widgetFormLayout" class="full-width"></div>
+  </div>
+  <div class="full-width d-flex">
+    <button style="width: 90%; height: 40px;
+        color: var(--color-light);
+        line-height: 40px;
+        border-radius: 40px;
+        margin: auto;
+        font-size: 16px;
+        font-weight: bold;
+        border: 0;
+        background-color: var(--color-primary);">保存</button>
+  </div>
 </div>
 <script>
 function PageExampleFormLayout() {
@@ -207,39 +23,33 @@ function PageExampleFormLayout() {
 }
 
 PageExampleFormLayout.prototype.initialize = async function (params) {
-  let selectGender = dom.find('[widget-id=selectGender]', this.page);
+  dom.init(this, this.page);
+  this.form = new MobileForm({
+    fields: [{
+      title: '姓名',
+    },{
+      title: '性别',
+      input: 'select',
+      values: [{text: '男', value: '1'},{text: '女', value: '2'}]
+    },{
+      title: '出生日期',
+      input: 'date',
+    },{
+      title: '手机号',
+      input: 'mobile',
+    },{
+      title: '身份证号',
+      input: 'id',
+    },{
+      title: '所在地区',
+      input: 'district',
+    }]
+  });
+  this.form.render(this.widgetFormLayout);
 };
 
 PageExampleFormLayout.prototype.destroy = async function (params) {
   console.log('pageExampleFormLayout destroyed');
-};
-
-PageExampleFormLayout.prototype.pickDate = function (ev) {
-  let div = ev.target;
-  let label = div.children[0];
-  let rd = new Rolldate({
-    confirm: function(date) {
-      label.innerHTML = moment(date).format('YYYY年MM月DD日');
-    }
-  });
-  rd.show();
-};
-
-PageExampleFormLayout.prototype.pickValue = function (ev) {
-  let div = ev.target;
-  let label = div.children[0];
-  let rd = new Rolldate({
-    format: 'oo',
-    values: [
-      { value: "1", text: "男" },
-      { value: "2", text: "女" },
-      { value: "99", text: "保密" },
-    ],
-    confirm: function(data) {
-      label.innerHTML = data.text;
-    },
-  });
-  rd.show();
 };
 
 PageExampleFormLayout.prototype.show = function (params) {

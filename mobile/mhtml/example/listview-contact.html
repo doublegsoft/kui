@@ -1,0 +1,61 @@
+<div id="pageExampleListViewContact" class="mobile page">
+  <div widget-id="widgetListView"></div>
+</div>
+<script>
+function PageExampleListViewContact() {
+  this.page = dom.find('#pageExampleListViewContact');
+}
+
+PageExampleListViewContact.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  let data = await xhr.asyncGet({
+    url: '/mobile/data/contacts.json',
+  });
+  data = JSON.parse(data).data;
+  this.listview = new ListView({
+    local: data,
+    idField: 'id',
+    activateable: false,
+    hoverable: false,
+    create: (idx, row) => {
+      return dom.templatize(`
+        <div class="d-flex" style="height: 48px;">
+          <img class="avatar" src="{{avatar}}">
+          <div class="pl-2 pt-2">
+            <strong>{{text}}</strong>
+            <div class="small text-muted">这是{{text}}给你发的消息</div>
+          </div>
+        </div>
+      `, row);
+    },
+    slidingActions: [{
+      create: () => {
+        return dom.templatize(`
+          <div class="bg-info text-white font-16 ml-auto"
+               style="width: 0; height: 64px; text-align: center; white-space: nowrap;
+               margin: -8px 0 -8px 0; line-height: 64px; display: none;">已读</div>
+        `);
+      },
+    },{
+      create: () => {
+        return dom.templatize(`
+          <div class="bg-danger text-white font-16 ml-auto"
+               style="width: 0; height: 64px; text-align: center; white-space: nowrap;
+               margin: -8px -16px -8px 0; line-height: 64px; display: none;">删除</div>
+        `);
+      },
+    }]
+  });
+  this.listview.render(this.widgetListView);
+};
+
+PageExampleListViewContact.prototype.destroy = async function (params) {
+  console.log('pageExampleListViewContact destroyed');
+};
+
+PageExampleListViewContact.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageExampleListViewContact = new PageExampleListViewContact();
+</script>

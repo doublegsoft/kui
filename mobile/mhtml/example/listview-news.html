@@ -1,0 +1,59 @@
+<div id="pageExampleListViewNews" class="mobile page">
+  <div widget-id="widgetListView"></div>
+</div>
+<script>
+function PageExampleListViewNews() {
+  this.page = dom.find('#pageExampleListViewNews');
+}
+
+PageExampleListViewNews.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  this.listview = new ListView({
+    local: [{
+      id: '1', title: '疫后新常态：中国医疗健康平台产业不断升级', thumbnail: 'img/news/weiyi.jpeg',
+    },{
+      id: '2', title: '医疗健康领域投融资日报（1月12日）：核芯医药被并购', thumbnail: 'img/news/yiou.jpeg',
+    },{
+      id: '3', title: '非常有用的养生小短文（值得一看）', thumbnail: 'img/news/zhihu.jpeg',
+    },{
+      id: '4', title: '阳康后不能大意，这20件事不可忽略！', thumbnail: 'img/news/doctor.jpg',
+    },{
+      id: '5', title: '华中大新研究：任何一种健康饮食模式，都有助延寿，降低死亡风险', thumbnail: 'img/news/salad.jpg',
+    },{
+      id: '6', title: '研究表明：男性比女性更容易患上与肥胖相关的疾病', thumbnail: 'img/news/fat.jpg',
+    },{
+      id: '7', title: '孕产妇感染新冠后该怎么办？', thumbnail: 'img/news/pregnant.jpg',
+    },{
+      id: '8', title: '中国新冠近零亡 中医药功不可没', thumbnail: 'img/news/zhongnanshan.jpeg',
+    },{
+      id: '9', title: '防出轨施阳痿药 夫妻互害何时休', thumbnail: 'img/news/drug.jpeg',
+    },{
+      id: '10', title: '关注JPM医疗健康大会，看看不可忽视的诊断市场', thumbnail: 'img/news/diagnosis.jpeg',
+    }],
+    activateable: false,
+    idField: 'id',
+    create: (idx, row) => {
+      return dom.templatize(`
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong style="font-size: 16px;">{{title}}</strong>
+            <p class="small text-muted mt-2">李思思<span>｜</span>3320人看过</p>
+          </div>
+          <img class="mt-2 ml-1" width="80px" height="64px" src="{{thumbnail}}">
+        </div>
+      `, row);
+    },
+  });
+  this.listview.render(this.widgetListView);
+};
+
+PageExampleListViewNews.prototype.destroy = async function (params) {
+  console.log('pageExampleListViewNews destroyed');
+};
+
+PageExampleListViewNews.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageExampleListViewNews = new PageExampleListViewNews();
+</script>

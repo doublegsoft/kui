@@ -1,0 +1,106 @@
+<style>
+  .historical-data {
+    display: inline-block;
+    height: 31px;
+    margin: 4px 0;
+    padding: 0 16px;
+    text-align: center;
+    line-height: 31px;
+    background: #f5f5f5;
+  }
+</style>
+<div id="pageDemoTaobaoSearch" class="mobile page">
+  <div style="display: flex;
+              display: -webkit-flex;
+              align-items: center;
+              width: 100%;
+              height: 45px;
+              background: #f8f8f8;">
+    <div style="display: flex;
+                display: -webkit-flex;
+                align-items: center;
+                height: 32px;
+                margin-left: 0.4rem;
+                background: #e5e5e5;">
+      <div>
+        <p style="width: 46px; height: 100%; text-align: center; line-height: 32px;
+                  margin-right: 10px; border-right: 1px solid #5f646e; margin-bottom: 0;">宝贝</p>
+      </div>
+      <div>
+        <input type="text" placeholder="请输入内容" class='header-search-input' autocomplete="off"
+               style="width: 260px; border: none;
+                      height: 100%;
+                      background-color: #e5e5e5;"/>
+      </div>
+    </div>
+    <div style="flex: 2;
+                display: inline-block;
+                width: 50px;
+                text-align: center;">搜索</div>
+  </div>
+  <div id='content'>
+    <div id='contentOff' v-show="text==''">
+      <div style="padding: 12px;">
+        <div>
+          <p style="display: inline-block; font-weight: bold;">历史搜索</p>
+          <a style="float: right;"><i class="fas fa-trash"></i></a>
+        </div>
+        <div style='width:100%' v-show='historyonoff'>
+          <span class='historical-data'>女靴</span>
+          <span class='historical-data'>包包女</span>
+          <span class='historical-data'>高领毛衣 宽松</span>
+          <span class='historical-data'>羊毛衫 杉杉</span>
+          <span class='historical-data'>闪存64G</span>
+          <span class='historical-data'>机械键盘进口</span>
+          <span class='historical-data'>中华上下五千年[上下册]正版当天发货</span>
+          <span class='historical-data'>芙丽芳丝洁面乳300ml</span>
+          <span class='historical-data'>美宝莲眼线笔 专柜</span>
+          <span class='historical-data'>秋季新款女装韩版进口面料真丝衬衫</span>
+          <span class='historical-data'>优衣库呢大衣 男</span>
+          <span class='historical-data'>男靴</span>
+          <span class='historical-data'>画册精装</span>
+          <span class='historical-data'>书籍</span>
+        </div>
+      </div>
+      <!-- 搜索发现 -->
+      <div style="padding: 12px;">
+        <div>
+          <p style="display: inline-block; font-weight: bold;">搜索发现</p>
+          <div class='searchAttention' @touchend='searchFindonoff=!searchFindonoff'></div></div>
+        <div style='width:100%' v-show='searchFindonoff'>
+          <span class='historical-data'>SKII化妆水</span>
+          <span class='historical-data'>男装</span>
+          <span class='historical-data'>男靴</span>
+          <span class='historical-data'>棉衣</span>
+          <span class='historical-data'>书籍</span>
+          <span class='historical-data'>眉笔</span>
+          <span class='historical-data'>背包</span>
+          <span class='historical-data'>html5指南</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PageDemoTaobaoSearch() {
+  this.page = dom.find('#pageDemoTaobaoSearch');
+  this.buttonChat = dom.find('[widget-id=buttonChat]', this.page);
+}
+
+PageDemoTaobaoSearch.prototype.initialize = async function (params) {
+  dom.bind(this.buttonFormLayout, 'click', ev => {
+    kuim.navigateTo('mhtml/demo/buttonChat.html', {
+      title: '编辑表单',
+      success: () => {
+        pageExampleFormLayout.show();
+      },
+    });
+  });
+};
+
+PageDemoTaobaoSearch.prototype.show = function (params) {
+  this.initialize(params)
+};
+
+pageDemoTaobaoSearch = new PageDemoTaobaoSearch();
+</script>
