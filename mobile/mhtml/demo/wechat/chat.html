@@ -7,7 +7,7 @@
 <!--        <div class="seen">某某职位</div>-->
 <!--      </div>-->
 <!--    </div>-->
-    <div class="conversation">
+    <div widget-id="widgetConversation" class="conversation">
       <div class="time" style="font-size: 12px;">2022年08月21日 13:28</div>
       <div class="messages outgoing">
         <div class="message">你好，某某人</div>
@@ -78,9 +78,16 @@
     </div>
     <div widget-id="widgetTypebar" class="typebar">
       <div class="d-flex">
-        <span class="material-icons font-32 mx-2" style="color: var(--color-primary);">keyboard_voice</span>
-        <textarea confirm-type="send" rows="1" style="height: 36px;"></textarea>
-        <span widget-id="buttonMore" class="material-icons font-32 mr-2" style="color: var(--color-primary);">add_circle</span>
+        <span widget-id="buttonMore" class="material-icons font-32 ml-1 mr-2 position-relative"
+              style="top: 3px; color: var(--color-primary);">add_circle</span>
+        <textarea widget-id="longtextMessage" confirm-type="send" rows="1"
+                  style="height: 36px; flex-grow: 2; width: calc(100% - 170px); z-index: 9;"></textarea>
+<!--        <span widget-id="buttonSend" class="material-icons font-32 ml-1 mr-2" style="color: var(&#45;&#45;color-primary);">send</span>-->
+        <div style="flex-grow: 1;">
+          <button widget-id="buttonSend"
+                  style="color: var(--color-white);background: var(--color-primary);
+                         height: 36px; width: 60px; text-align: right; padding-right: 10px;">发送</button>
+        </div>
       </div>
       <div widget-id="widgetTypebarMore" class="typebar-more square-menu mt-3 d-flex p-2">
         <a class="entry btn">
@@ -163,7 +170,24 @@ PageDemoWechatChat.prototype.initialize = async function (params) {
     this.widgetTypebar.classList.add('less');
     this.widgetTypebarMore.classList.remove('visible');
     this.widgetTypebarMore.classList.add('hidden');
-  })
+  });
+
+  dom.bind(this.buttonSend, 'click', ev => {
+    let text = this.longtextMessage.value;
+    if (text == '') return;
+    jim.sendText(text);
+    this.longtextMessage.value = '';
+    this.appendMessage({
+      op: 'sendMessage',
+      data: {
+        messageTime: moment().format('YYYY-MM-DD hh:mm:ss'),
+        messageType: 'TEXT',
+        messageContent: text,
+      }
+    })
+  });
+
+  jim.enter('123&321');
 };
 
 PageDemoWechatChat.prototype.viewImage = function (img) {
@@ -182,6 +206,48 @@ PageDemoWechatChat.prototype.viewImage = function (img) {
 
 PageDemoWechatChat.prototype.show = function (params) {
   this.initialize(params)
+};
+
+PageDemoWechatChat.prototype.destroy = function () {
+  jim.exit();
+};
+
+PageDemoWechatChat.prototype.appendMessage = function (msg) {
+  if (msg.data.messageType === 'TEXT') {
+    this.appendText(msg);
+  } else if (msg.data.messageType === 'IMAGE') {
+
+  }
+};
+
+PageDemoWechatChat.prototype.appendText = function (msg) {
+  let cont = null;
+  let content = msg.data.messageContent;
+  let time = dom.templatize(`
+    <div class="time" style="font-size: 12px;">{{messageTime}}</div>
+  `, {
+    messageTime: moment(msg.data.messageTime).format('YYYY年MM月DD日 hh:mm')
+  });
+  if (msg.op === 'sendMessage') {
+    cont = dom.templatize(`
+      <div class="messages outgoing">
+        <div class="message">${content}</div>
+      </div>
+    `,);
+  } else if (msg.op === 'receivedMessage') {
+    cont = dom.templatize(`
+      <div class="messages incoming">
+        <div class="message">${content}</div>
+      </div>
+    `,);
+  }
+  this.widgetConversation.appendChild(time);
+  this.widgetConversation.appendChild(cont);
+
+  setTimeout(() => {
+    this.widgetChat.scrollTo(0, this.widgetChat.scrollHeight);
+    this.widgetChat.scrollTop = this.widgetChat.scrollHeight;
+  }, 100);
 };
 
 pageDemoWechatChat = new PageDemoWechatChat();

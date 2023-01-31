@@ -35,9 +35,9 @@
       <strong class="font-18">星期控件</strong>
       <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
-    <li widget-id="buttonDialog" class="list-group-item d-flex"
+    <li widget-id="buttonPopup" class="list-group-item d-flex"
         style="line-height: 40px;">
-      <strong class="font-18">对话框</strong>
+      <strong class="font-18">弹出式交互</strong>
       <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
     <li widget-id="buttonIndex" class="list-group-item d-flex"
@@ -48,6 +48,11 @@
     <li widget-id="buttonChart" class="list-group-item d-flex"
         style="line-height: 40px;">
       <strong class="font-18">图表显示</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonSkeleton" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">向导页面</strong>
       <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
   </ul>
@@ -102,11 +107,19 @@ PageExampleMain.prototype.initialize = async function (params) {
       title: '星期控件',
     });
   });
-  dom.bind(this.buttonDialog, 'click', ev => {
-    kuim.dialog({
-      confirm: () => {
-
-      }
+  dom.bind(this.buttonIndex, 'click', ev => {
+    kuim.navigateTo('mhtml/example/ruler.html', {
+      title: '指标控件',
+    });
+  });
+  dom.bind(this.buttonPopup, 'click', ev => {
+    kuim.navigateTo('mhtml/example/popup.html', {
+      title: '弹出式交互',
+    });
+  });
+  dom.bind(this.buttonSkeleton, 'click', ev => {
+    kuim.navigateTo('mhtml/example/wizard.html', {
+      title: '向导页面',
     });
   });
 };

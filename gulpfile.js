@@ -108,7 +108,7 @@ gulp.task('dist', function() {
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dom.js', 'src/js/kui-utils.js',
     'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/GridView.js',
     'src/js/container/Timeline.js', 'src/js/container/Tabs.js', 'src/js/editor/DataSheet.js',
-    'src/js/application/Chat.js',
+    'src/js/application/Chat.js', 'src/js/widget/Sparkline.js', 'src/js/widget/Ruler.js',
     'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
@@ -120,7 +120,7 @@ gulp.task('dist', function() {
   gulp.src(['src/js/kui-xhr.js', 'src/js/kui-ajax.js', 'src/js/kui-dom.js', 'src/js/kui-utils.js',
     'src/js/kui-dialog.js', 'src/js/container/ListView.js', 'src/js/container/GridView.js',
     'src/js/container/Timeline.js', 'src/js/container/Tabs.js', 'src/js/editor/DataSheet.js',
-    'src/js/application/Chat.js',
+    'src/js/application/Chat.js', 'src/js/widget/Sparkline.js', 'src/js/widget/Ruler.js',
     'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
@@ -181,13 +181,13 @@ gulp.task('dist', function() {
   // mobile css
   gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuim.css',
     'src/css/kui-timeline.css', 'src/css/kui-wizard.css', 'src/css/kui-tag.css',
-    'src/css/kui-calendar.css', 'src/css/kui-chat.css'])
+    'src/css/kui-calendar.css', 'src/css/kui-chat.css', 'src/css/kui-skeleton.css'])
     .pipe(concat('./kui-all.mobile.css'))
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuim.css',
     'src/css/kui-timeline.css', 'src/css/kui-wizard.css', 'src/css/kui-tag.css',
-    'src/css/kui-calendar.css', 'src/css/kui-chat.css'])
+    'src/css/kui-calendar.css', 'src/css/kui-chat.css', 'src/css/kui-skeleton.css'])
     .pipe(concat('./kui-all.mobile.min.css'))
     .pipe(uglifycss())
     .pipe(gulp.dest('./dist/'));

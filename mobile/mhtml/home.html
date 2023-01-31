@@ -1,5 +1,108 @@
 <div id="pageHome" class="mobile page" role="nav">
-  <div widget-id="widgetCarousel" class="swiper">
+<!--     style="overscroll-behavior-y: contain;-webkit-overscroll-behavior-y: contain;">-->
+  <div style="background: var(--color-primary);
+              border-bottom-left-radius: 30px;
+              border-bottom-right-radius: 30px;
+              height: 240px;">
+    <div style="background: var(--color-white);
+                border-radius: 30px;
+                padding: 30px;
+                margin: 0 12px;
+                height: 228px;
+                text-align: center;">
+      <img src="/img/logo-symbol.png" class="m-auto"
+           style="width: 64px; height: 64px; position: relative; top: -18px;">
+      <ul style="padding-left: 0; position: relative; top: -12px;">
+        <li class="list-group-item d-flex">
+          <span>JS</span>
+          <strong class="ml-auto">22935</strong>
+        </li>
+        <li class="list-group-item d-flex">
+          <span>CSS</span>
+          <strong class="ml-auto">8401</strong>
+        </li>
+        <li class="list-group-item d-flex">
+          <span>HTML</span>
+          <strong class="ml-auto">15231</strong>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="d-flex p-2" style="width: 100%; height: 180px; color: white; column-gap: 12px; flex-direction: row;">
+    <div style="width: 48%; background: var(--color-warning); border-radius: 20px; padding: 16px;">
+      <strong class="font-20">
+        <i class="fas fa-window-maximize" style="margin-right: 12px; font-size: 22px;"></i>组件
+      </strong>
+      <div style="text-align: center; font: 36px bold; margin-top: 16px;">18</div>
+      <div widget-id="widgetComponentChart" style="height: 60px; width: 100%"></div>
+    </div>
+    <div style="width: 48%; background: var(--color-info); border-radius: 20px; padding: 16px;">
+      <strong class="font-20">
+        <i class="fab fa-app-store-ios" style="margin-right: 12px; font-size: 22px;"></i>应用
+      </strong>
+      <div style="text-align: center; font: 36px bold; margin-top: 16px;">7</div>
+      <div widget-id="widgetApplicationChart" style="height: 60px; width: 100%"></div>
+    </div>
+  </div>
+  <div class="bordered-title p-2">
+    <i class="fas fa-circle position-relative mr-1" style="color: var(--color-info); font-size: 6px; top: -4px;"></i>
+    <strong class="font-16">设计风格</strong>
+  </div>
+  <div class="square-menu mt-2">
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/medical.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">医疗风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/healthcare.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">健康风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/finance.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">金融风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/sporting.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">运动风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/shopping.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">购物风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/education.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">教育风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/iot.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">物联网风格</span>
+      </div>
+    </a>
+    <a class="entry btn">
+      <div class="d-flex flex-column text-primary">
+        <img src="/mobile/img/icon/management.png" width="42px" class="m-auto">
+        <span class="font-14 text-gray">管理风格</span>
+      </div>
+    </a>
+  </div>
+  <div class="bordered-title p-2">
+    <i class="fas fa-circle position-relative mr-1" style="color: var(--color-info); font-size: 6px; top: -4px;"></i>
+    <strong class="font-16">效果概览</strong>
+  </div>
+  <div widget-id="widgetMyCards" class="swiper">
     <div class="swiper-wrapper">
       <div class="swiper-slide height-150">
         <img src="/mobile/img/app/1.jpg">
@@ -8,173 +111,114 @@
         <img src="/mobile/img/app/2.png">
       </div>
       <div class="swiper-slide height-150">
+        <img src="/mobile/img/app/3.jpg">
+      </div>
+      <div class="swiper-slide height-150">
         <img src="/mobile/img/app/4.png">
       </div>
       <div class="swiper-slide height-150">
         <img src="/mobile/img/app/5.png">
       </div>
-    </div>
-    <div class="swiper-pagination"></div>
-  </div>
-  <div widget-id="widgetChart" class="height-200 m-2"
-       style="background: var(--color-primary);">
-  </div>
-  <div class="d-flex p-2" style="width: 100%; height: 180px; color: white; column-gap: 12px; flex-direction: row;">
-    <div style="width: 48%; background: var(--color-warning); border-radius: 20px; padding: 16px;">
-      <strong class="font-20">
-        <i class="fas fa-window-maximize" style="margin-right: 12px; font-size: 22px;"></i>组件
-      </strong>
-      <div style="text-align: center; font: 36px bold; margin-top: 16px;">18</div>
-    </div>
-    <div style="width: 48%; background: var(--color-info); border-radius: 20px; padding: 16px;">
-      <strong class="font-20">
-        <i class="fab fa-app-store-ios" style="margin-right: 12px; font-size: 22px;"></i>应用
-      </strong>
-      <div style="text-align: center; font: 36px bold; margin-top: 16px;">7</div>
-    </div>
-  </div>
-  <div class="square-menu mt-2">
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-    <a class="entry btn">
-      <div class="d-flex flex-column text-primary">
-        <i class="fas fa-monument text-gray font-4xl"></i>
-        <span class="font-14 text-gray mt-2">功能入口</span>
-      </div>
-    </a>
-  </div>
-  <div widget-id="widgetMyCards" class="swiper">
-    <div class="swiper-wrapper">
       <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
-      </div>
-      <div class="swiper-slide height-150">
-        <img src="https://via.placeholder.com/240x150">
+        <img src="/mobile/img/app/6.png">
       </div>
     </div>
   </div>
-  <div class="spacer" style="height: 12px; background: transparent;"></div>
+  <div class="bordered-title p-2 border-less">
+    <i class="fas fa-circle position-relative mr-1" style="color: var(--color-info); font-size: 6px; top: -4px;"></i>
+    <strong class="font-16">技术新闻</strong>
+  </div>
   <ul class="list-group border-less">
-    <li class="list-group-item">
+    <li class="list-group-item" onclick="pageHome.gotoNews1();">
       <div class="d-flex align-items-center">
         <div class="bg-gradient-primary mr-2">
-          <img src="https://via.placeholder.com/64" style="width:56px; height: 56px">
+          <img src="img/others/e97c2294799f9cefea4856ab3324a2eec67819.jpg" style="width:56px; height: 56px">
         </div>
         <div>
-          <div class="text-value text-primary font-16">标题</div>
-          <div class="text-muted font-weight-bold small">这里是简介</div>
+          <div class="text-value text-primary font-16"
+               style="width: 280px; text-overflow: ellipsis;white-space: nowrap; overflow: hidden;">报告：2023年低代码开发平台市场规模将增长25%至100亿美元</div>
+          <div class="text-muted font-weight-bold small"
+               style="width: 280px; text-overflow: ellipsis;white-space: nowrap; overflow: hidden;">根据调研机构最近进行的一项研究，面对持续的IT技能短缺，低代码和无代码平台等能够实现流程自动化并使员工能够完成任务的技术正在显著增长。 </div>
         </div>
       </div>
     </li>
-    <li class="list-group-item">
+    <li class="list-group-item"  onclick="pageHome.gotoNews2();">
       <div class="d-flex align-items-center mr-2">
         <div>
-          <div class="text-value text-primary font-16">标题</div>
-          <div class="text-muted font-weight-bold small">这里是简介</div>
+          <div class="text-value text-primary font-16"
+               style="width: 280px; text-overflow: ellipsis;white-space: nowrap; overflow: hidden;">UI設計工具2023】網頁必備免費UI設計軟體 創科巨頭都在用（附介面設計教學）</div>
+          <div class="text-muted font-weight-bold small"
+               style="width: 280px; text-overflow: ellipsis;white-space: nowrap; overflow: hidden;">作為老闆的你，有沒想過你的企業都可擁有如Uber，Github這些創科巨頭的程式介面？其實你都可以動手設計到！即使你直接聘請UI designer製作介面，還是自己設計好再轉給coder，都需要理解 UI的實際運作，才可靈活地與第三方溝通，往下一文看清何為UI、其重要性，及逐步教你用平台設計介面！</div>
         </div>
         <div class="bg-gradient-primary ml-auto">
-          <img src="https://via.placeholder.com/64" style="width:56px; height: 56px">
+          <img src="img/others/getImage.jpeg" style="width:56px; height: 56px">
         </div>
       </div>
     </li>
   </ul>
+  <div class="bordered-title p-2 border-less">
+    <i class="fas fa-circle position-relative mr-1" style="color: var(--color-info); font-size: 6px; top: -4px;"></i>
+    <strong class="font-16">优秀作品</strong>
+  </div>
   <ul class="list-grid">
     <li class="list-grid-item">
       <div class="card">
-        <div class="card-image card-image flowers"></div>
-        <div class="card-content">
-          <div class="card-title">Flex Shrink</div>
-          <p class="card-text"></p>
-          <button class="btn">Button</button>
-        </div>
+        <img src="img/others/1.png">
       </div>
     </li>
     <li class="list-grid-item">
       <div class="card">
-        <div class="card-image card-image fence"></div>
-        <div class="card-content">
-          <div class="card-title">Flex</div>
-          <p class="card-text"></p>
-          <button class="btn">Button</button>
-        </div>
+        <img src="img/others/2.png">
       </div>
     </li>
     <li class="list-grid-item">
       <div class="card">
-        <div class="card-image card-image river"></div>
-        <div class="card-content">
-          <div class="card-title">Flex Grow</div>
-          <p class="card-text"></p>
-          <button class="btn">Button</button>
-        </div>
+        <img src="img/others/3.png">
       </div>
     </li>
     <li class="list-grid-item">
       <div class="card">
-        <div class="card-image card-image record"></div>
-        <div class="card-content">
-          <div class="card-title">Flex Shrink</div>
-          <p class="card-text"></p>
-          <button class="btn">Button</button>
-        </div>
+        <img src="img/others/4.png">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/5.png">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/6.jpeg">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/7.png">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/8.gif">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/9.png">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/10.jpeg">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/11.gif">
+      </div>
+    </li>
+    <li class="list-grid-item">
+      <div class="card">
+        <img src="img/others/12.gif">
       </div>
     </li>
   </ul>
@@ -186,43 +230,50 @@ function PageHome() {
 
 PageHome.prototype.initialize = function(params) {
   dom.init(this, this.page);
-  let swiper = new Swiper(dom.find('[widget-id=widgetCarousel]'), {
-    direction: 'horizontal',
-    loop: true,
-    pagination: {
-      el: '.swiper-pagination',
-    },
-  });
+  dom.height2(this.page, PAGE_OFFSET, document.body);
   swiper = new Swiper(dom.find('[widget-id=widgetMyCards]'), {
     slidesPerView: "auto",
     spaceBetween: 30,
     loop: true,
   });
 
-  let options = {
-    grid: {
-      left: 36,
-      top: 12,
-      right: 12,
-      bottom: 24,
-    },
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        data: [820, 932, 901, 934, 1290, 1330, 1320],
-        type: 'line',
-        smooth: true
-      }
-    ]
-  };
-  let chart = echarts.init(this.widgetChart);
-  chart.setOption(options);
+  new Sparkline({
+    data: [8.3,8.4,8.2,8.2,8.4,8.2,8.4,8.2,8.7],
+    color: 'white',
+  }).render(this.widgetComponentChart);
+
+  new Sparkline({
+    data: [93.7,88.6,91.2,96.2,105,93.7,102.5,103.8,108.9,108.9],
+    type: 'bar',
+    color: '#FFC0C7',
+  }).render(this.widgetApplicationChart);
+
+  let imgs = this.page.querySelectorAll('.card img');
+  imgs.forEach(img => {
+    dom.bind(img.parentElement, 'click', ev => {
+      ev.stopPropagation();
+      ev.preventDefault();
+      let viewer = new Viewer(img, {
+        toolbar: false,
+        navbar: false,
+        tooltip: false,
+        title: false,
+      });
+      viewer.show();
+    })
+  });
+};
+
+PageHome.prototype.gotoNews1 = function() {
+  kuim.navigateTo('mhtml/home/news1.html', {
+    title: '新闻'
+  });
+};
+
+PageHome.prototype.gotoNews2 = function() {
+  kuim.navigateTo('mhtml/home/news2.html', {
+    title: '新闻'
+  });
 };
 
 PageHome.prototype.show = function(params) {

@@ -1,0 +1,64 @@
+<div id="pageExamplePopup" class="page">
+  <ul class="list-group">
+    <li widget-id="buttonDialog" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">下拉刷新</strong>
+    </li>
+    <li widget-id="buttonDialog" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">确认对话框</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+    <li widget-id="buttonActionSheet" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <strong class="font-18">多命令框</strong>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
+  </ul>
+</div>
+<script>
+function PageExamplePopup() {
+  this.page = dom.find('#pageExamplePopup');
+}
+
+PageExamplePopup.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PageExamplePopup.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  dom.height2(this.page, PAGE_OFFSET, document.body);
+  dom.bind(this.buttonDialog, 'click', ev => {
+    kuim.dialog({
+      content: '<strong>' + window.navigator.standalone + '</strong>',
+      confirm: () => {},
+    });
+  });
+
+  dom.bind(this.buttonActionSheet, 'click', ev => {
+    new ActionSheet({
+      title: '您的指令',
+      actions: [{
+        text: '发射',
+      },{
+        text: '延迟发射',
+      }]
+    }).show(this.page);
+  });
+
+};
+
+PageExamplePopup.prototype.pullToRefresh = async function (el) {
+  setTimeout(() => {
+    if (el) {
+      el.remove();
+    }
+  }, 2000);
+};
+
+PageExamplePopup.prototype.destroy = async function (params) {
+
+};
+
+pageExamplePopup = new PageExamplePopup();
+</script>

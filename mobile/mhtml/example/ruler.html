@@ -1,0 +1,119 @@
+<style>
+  .ruler-wrap {
+    border-top: 1px solid #eee;
+    width: 100%;
+    max-width: 600px;
+    line-height: 1px;
+    overflow: hidden;
+    margin: 0 auto 20px;
+    padding-top: 6px;
+  }
+  .ruler-title{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    line-height: 30px;
+    color: #73B17B;
+    font-family: DINCond-Bold, DINCond;
+  }
+  .ruler-left{
+    position: absolute;
+    left: 0;
+    top: 0;
+    line-height: 30px;
+    font-size: 17px;
+    color: #333333;
+    font-weight: 500;
+  }
+  .ruler-time{
+    height: 44px;
+    background: #F5F9F6;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+  .ruler-right{
+    display: flex;
+    align-items: center;
+  }
+  .ruler-item{
+    margin-bottom: 40px;
+  }
+</style>
+<div id="pageExampleRuler" class="mobile page" style="overscroll-behavior-y: contain;">
+  <div class="card card-body">
+    <div class="ruler-item">
+      <div class="ruler-title">
+        <span class="ruler-left">身高</span>
+        <span style="font-size: 20px" id="heightText"></span>
+        <span class="ml5" style="font-size: 14px">KG</span>
+      </div>
+      <div class="ruler-wrap" id="height"></div>
+    </div>
+    <div class="ruler-item">
+      <div class="ruler-title">
+        <span class="ruler-left">体重</span>
+        <span style="font-size: 20px" id="weightText"></span>
+        <span class="ml5" style="font-size: 14px">CM</span>
+      </div>
+      <div class="ruler-wrap" id="weight"></div>
+    </div>
+  </div>
+</div>
+<script>
+function PageExampleRuler() {
+  this.page = dom.find('#pageExampleRuler');
+}
+
+PageExampleRuler.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  let heightText = document.getElementById("heightText");
+  heightText.innerText = 160;
+  //调用刻度尺方法
+  ruler.initPlugin({
+    el: "height", //容器id
+    startValue: 160,
+    maxScale: 300, //最大刻度
+    region: [0, 300], //选择刻度的区间范围
+    background: "#fff",
+    color: "#E0E0E0", //刻度线和字体的颜色
+    markColor: "#73B17B", //中心刻度标记颜色
+    isConstant: true, //是否不断地获取值
+    success: function (res) {
+      heightText.innerText=res
+    }
+  });
+
+  let weightText = document.getElementById("weightText");
+  weightText.innerText = 50;
+  //调用刻度尺方法
+  ruler.initPlugin({
+    el: "weight", //容器id
+    startValue: 500,
+    maxScale: 5000, //最大刻度
+    region: [0, 5000], //选择刻度的区间范围
+    background: "#fff",
+    color: "#E0E0E0", //刻度线和字体的颜色
+    markColor: "#73B17B", //中心刻度标记颜色
+    scale:10,
+    point:1,
+    isConstant: true, //是否不断地获取值
+    success: function (res) {
+      weightText.innerText=(res/10).toFixed(1)
+    }
+  });
+};
+
+PageExampleRuler.prototype.destroy = async function (params) {
+  console.log('pageExampleRuler destroyed');
+};
+
+PageExampleRuler.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageExampleRuler = new PageExampleRuler();
+</script>

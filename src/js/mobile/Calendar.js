@@ -152,5 +152,6 @@ Calendar.prototype.stylizeDates = function (style, startDate, endDate) {
 Calendar.prototype.render = function(containerId, params) {
   this.root = this.root();
   let container = dom.find(containerId);
+  container.innerHTML = '';
   container.appendChild(this.root);
 };

@@ -43,9 +43,13 @@ MobileWizard.prototype.display = function(current) {
   let elStep = dom.find('div[data-step="' + current.index + '"]', this.root);
   elStep.classList.remove('completed');
   elStep.classList.add('active');
-  kuim.navigateWidget(current.url, this.content, {
-    wizard: this,
-  });
+  if (current.onClicked) {
+
+  } else {
+    kuim.navigateWidget(current.url, this.content, {
+      wizard: this,
+    });
+  }
 };
 
 /**

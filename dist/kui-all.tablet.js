@@ -3393,7 +3393,7 @@ $.fn.formdata = function(initial) {
   return ret;
 };
 
-let utils = {};
+utils = {};
 
 /**
  * 

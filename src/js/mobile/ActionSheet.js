@@ -44,10 +44,11 @@ ActionSheet.prototype.root = function() {
     }
     actions.appendChild(action);
   }
+  this.bottom.classList.add('in');
 
   setTimeout(() => {
-    this.bottom.classList.add('in');
-  }, 50);
+    this.bottom.style.bottom = '0';
+  }, 300);
 
   return ret;
 };

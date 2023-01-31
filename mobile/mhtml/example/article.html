@@ -1,0 +1,187 @@
+<style>
+  .title1 {
+    font-size: 17px;
+  }
+
+  .name {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #999;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .cont {
+    font-size: 12px;
+    color: #999;
+    margin: 15px 0;
+  }
+
+  .content {
+    font-size: 14px;
+    line-height: 23px;
+    margin-top: 15px;
+    padding-bottom: 60px;
+  }
+
+  .pos-rigth {
+    color: #333;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    width: 100%;
+    box-shadow: 1px 2px 5px #bbbbbb;
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-top: calc(env(safe-area-inset-bottom) / 10);
+  }
+
+  .shareBtn {
+    background: transparent;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 400;
+    width: auto !important;
+    display: flex;
+    align-items: center;
+    margin: 0 !important;
+  }
+
+  .dfcenter {
+    position: relative;
+    flex: 1;
+    width: calc(100% / 3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 0;
+    min-height: 50px;
+    color: #4c4c4c;
+    font-size: 14px;
+  }
+
+  .dfcenter span {
+    margin-left: 10px;
+  }
+
+  .dfcenter:nth-child(n + 2)::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 20px;
+    width: 1px;
+    background: #ddd;
+    z-index: 2;
+    margin-top: -10px;
+  }
+
+  .data-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 0;
+  }
+  .label-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+  }
+  .tag {
+    margin-right: 5px;
+    background: rgba(63, 134, 255, 0.1);
+    color: #fff;
+    font-size: 11px;
+    color: #3f86ff;
+    padding: 2px 5px;
+    border-radius: 1px;
+  }
+</style>
+<div id="pageArticle" class="mobile page">
+  <div class="container">
+    <div class="title1">20年来中国不孕不育率飙升，专家称环境污染也是病因</div>
+    <div class="label-list">
+      <span class="tag">不孕不育</span>
+    </div>
+    <div class="name">
+      <span class="mr16">作者：澎湃新闻</span>
+      <span class="mr16">2022-04-13 09:30:35</span>
+    </div>
+    <div class="pos-rigth">
+      <div class="dfcenter" bindtap="getLike">
+        <i class="iconfont icon-thumb-up-line" style="color: #4C4C4C;font-size: 22px;"></i>
+        <!-- <i class="iconfont icon-thumb-up-fill" style="color: #ff9c00;font-size: 22px;"></i> -->
+        <span>赞</span>
+      </div>
+      <div class="dfcenter" bindtap="getCollect">
+        <!-- <i class="iconfont icon-star" style="color: #4C4C4C;font-size: 24px;"></i> -->
+        <i class="iconfont icon-star-fill" style="color: #ff9c00;font-size: 24px;"></i>
+        <span>已收藏</span>
+      </div>
+      <div class="dfcenter" bindtap="getShare">
+        <i class="iconfont icon-transfer" style="color: #4C4C4C;font-size: 22px;"></i>
+        <span>分享</span>
+      </div>
+    </div>
+    <div class="content">
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">近日网上有关不孕不育的新标准引发关注，虽然世界卫生组织官微已经出面辟谣称“不育”≠“残疾”，但生宝宝这回事，确实令很多人伤透脑筋。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">20年前，中国育龄人口中不孕不育的平均发病率仅为3%，而2011年年底，中国不孕不育的平均发病率已然飙升至12%，更有部分地区发生率高达15%。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">生宝宝为什么这么难？环境污染、工作压力、不良生活方式都成为适龄男女不易怀孕的诱因。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">上海市第一妇婴保健院生殖医学中心主任滕晓明分析，近年环境污染的加剧导致了国内各种不孕不育症的高发、频发。中国正处于高速工业化和城市化进程中，相当一部分环境内分泌干扰物通过某些途径，如污染水源、食物或经皮肤吸收进入肌体后，对人类的生殖障碍、发育异常、某些癌症及某些免疫系统、神经系统疾病都产生了影响。各种因素的环境污染直接导致男性无精症、少精症、弱精症病人明显增加，生精细胞严重损害，精子质量下降。尤其在最近10年中，世界卫生组织对精子的评估数据也都全面下调，而中国男性与三四十年前相比，每毫升精液所含精子数量从1亿个左右降至目前的2000万到4000万个，而且越是现代化程度高的地区，男性的精子质量随之下降速度也越快。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">不孕不育的烦恼更多地困扰着女性。在外企做高管的徐女士早上8点走进一所医院生殖中心的候诊大厅时惊讶地发现，在自己前面等候的有百余人，一对对年轻夫妇的脸上都写满焦虑。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">刚从学校毕业时徐女士一心想着工作，很少有时间陪伴男友，恋爱多年终是劳燕分飞，通过多年打拼，终于做到了公司主管，可眼看已过了35岁，个人婚姻问题都尚未解决。如今40岁的徐女士虽已结婚2年，可怀上宝宝却成为她心中一直以来的痛，“正是因为工作原因，怀孕计划搁浅直至错过了最佳生育时期，我现在不得不借助辅助生殖技术。”</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">在复旦大学附属妇产科医院上海集爱遗传与不育诊疗中心副院长孙晓溪看来，事业压力是女性不孕不育的重要原因。随着生活压力日趋变大，女性普遍推迟结婚、生育年龄，年龄越大对生育能力影响越大，比如卵巢功能降低、生育整体机能下降都会导致不孕，“35岁以后女性生育能力更是明显走下坡路了，30岁之前则是最佳生育年龄。”</span>
+      </p>
+      <p><span style="color: rgb(51, 51, 51); font-size: 16px;">一些不被人关注的现代生活方式及习惯也在“潜移默化”地推高不孕不育的发病率。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">和很多年轻人一样，安娜不过深夜12点绝不睡觉，周末就喜欢和朋友一起抽抽烟、泡泡吧，为了让自己形象更完美，安娜更是将减肥视为终身事业。然而近几个月来，安娜发现一向规律的月经周期出现了紊乱，迟来的情形常常发生，来时还伴随着剧烈的腹痛。当医生告诉她这样下去可能会导致不孕时，安娜整个人都虚脱了。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">安娜的生活方式是很多年轻人的典型代表，对此，上海红房子医院产科副主任医师李桂英则连连摇头，“其实，一部分不孕不育完全可以预防，甚至避免。除了避免过度晚婚晚育外，辅助手段是调整生活方式。”</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">首先，男女都应该避免体重不足或超重，病态肥胖的妇女尝试生育治疗的成功率也会较低，盲目过度减肥有可能导致内分泌紊乱、月经周期失调。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">同时，戒烟戒酒也至关重要，因为烟草中的尼古丁能减少性激素的分泌量，引起月经不调、卵巢早衰的问题。过量饮酒可危及生殖系统功能，导致内分泌紊乱，并使生殖细胞染色体结构和数目发生变化。长期嗜酒成癖能使不孕和畸形婴儿率增加。</span>
+      </p>
+      <p><span
+          style="color: rgb(51, 51, 51); font-size: 16px;">此外，办公室女性，由于长期久坐，缺乏运动，以致气血循环障碍，有些气滞血淤也易导致淋巴或血行性的栓塞，使输卵管不通，如此种种都有可能导致不孕。“对于打算怀孕的年轻夫妇们来说，‘戒掉’抽烟、应酬、熬夜等不规律的生活，恢复健康的生活急不可待。”李桂英强调。</span>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+function PageArticle() {
+  this.page = dom.find('#pageArticle');
+}
+
+PageArticle.prototype.initialize = function (params) {
+
+};
+PageArticle.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+pageArticle = new PageArticle();
+</script>
+

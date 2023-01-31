@@ -156,10 +156,10 @@ PageDemoWeiboHome.prototype.initialize = async function (params) {
   // dom.height2(this.widgetBlog, 52, document.body);
   this.pullToRefresh();
 
-  let zt = new ZingTouch.Region(this.page);
-  zt.bind(this.widgetBlog.children[0], 'swipe', (e) => {
-    console.log(e.detail);
-  });
+  // let zt = new ZingTouch.Region(this.page);
+  // zt.bind(this.widgetBlog.children[0], 'swipe', (e) => {
+  //   console.log(e.detail);
+  // });
 };
 
 PageDemoWeiboHome.prototype.pullToRefresh = function (el) {

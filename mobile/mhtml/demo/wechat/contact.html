@@ -1,4 +1,4 @@
-<div id="pageDemoWechatContact" class="mobile page">
+<div id="pageDemoWechatContact" class="mobile page" style="overscroll-behavior-y: contain;">
   <div widget-id="widgetListView"></div>
 </div>
 <script>
@@ -20,6 +20,8 @@ PageDemoWechatContact.prototype.initialize = async function (params) {
     create: (idx, row) => {
       let ret = dom.templatize(`
         <div class="d-flex" style="height: 48px;">
+          <div style="position: absolute; width: 8px; height: 8px; display: none;
+                      border-radius: 100%; background: var(--color-error);z-index: 9;"></div>
           <img class="avatar" src="img/user.png">
           <div class="pl-2 pt-2">
             <strong>{{text}}</strong>
@@ -64,10 +66,29 @@ PageDemoWechatContact.prototype.initialize = async function (params) {
   dom.bind(this.widgetListView, 'scroll', ev => {
     console.log(ev);
   });
+
+  let userId = '123';
+  if (window.navigator.standalone === false) {
+    userId = '321';
+  }
+  jim.login(userId, 'STDBIZ.PCM.DOCTOR', msg => {
+    console.log(msg);
+    if (msg.op === 'receivedMessage') {
+      if (jim.conversationId) {
+        pageDemoWechatChat.appendMessage(msg);
+      } else {
+        let ul = dom.find('ul', this.widgetListView);
+        let first = ul.children[0];
+        let last = ul.children[ul.children.length - 1];
+        last.children[0].children[0].style.display = '';
+        ul.insertBefore(last, first);
+      }
+    }
+  });
 };
 
 PageDemoWechatContact.prototype.destroy = async function (params) {
-  console.log('pageDemoWechatContact destroyed');
+  jim.logout();
 };
 
 PageDemoWechatContact.prototype.show = function (params) {

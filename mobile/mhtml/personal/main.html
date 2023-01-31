@@ -30,7 +30,8 @@ function PagePersonalMain() {
 }
 
 PagePersonalMain.prototype.initialize = async function (params) {
-  stdbiz.init(this);
+  dom.init(this);
+  dom.height2(this.page, PAGE_OFFSET, document.body);
 };
 
 PagePersonalMain.prototype.destroy = function () {

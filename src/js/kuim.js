@@ -55,7 +55,7 @@ kuim.navigateTo = async function (url, opt, clear) {
       delete kuim.presentPageObj;
     }
     let html = await xhr.asyncGet({
-      url: url + '?' + new Date().getTime(),
+      url: url + (url.indexOf('?') == -1 ? '?' : '&') + new Date().getTime(),
     }, 'GET');
     kuim.reload(main, url, html, opt);
   }, 400);
@@ -393,15 +393,14 @@ kuim.loading = function(callback) {
 kuim.dialog = function (opt) {
   let confirm = opt.confirm;
   let cancel = opt.cancel;
+  let content = opt.content;
   let mask = dom.element(`
     <div style="background: rgba(0,0,0,0.3); position: absolute; top: 0; left: 0; 
                 z-index: 9999; height: 100%; width: 100%; display: flex;">
       <div class="dialog m-auto" 
            style="width: 88%; min-height: 400px; position: relative;
                   background: var(--color-white);">
-        <div class="dialog-body">
-          <img src="/mobile/img/app/6.jpg" width="100%" style="max-height: 500px;">
-        </div>
+        <div class="dialog-body">${content}</div>
         <div class="dialog-footer" 
              style="font-size: 24px; font-weight: bold; position: absolute;
                     width: 100%; height: 56px; bottom: 0; display: table;">
@@ -427,8 +426,8 @@ kuim.dialog = function (opt) {
   document.body.appendChild(mask);
 };
 
-let pStart = { x: 0, y: 0 };
-let pStop = { x: 0, y: 0 };
+pStart = { x: 0, y: 0 };
+pStop = { x: 0, y: 0 };
 
 kuim.swipeStart = function(e) {
   if (typeof e["targetTouches"] !== "undefined") {
