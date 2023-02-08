@@ -15,7 +15,7 @@ Calendar.prototype.root = function () {
   let ret = dom.templatize(`
     <div class="calendar">
       <div class="title"></div>
-      <div class="weekdays">
+      <div class="weekdays" style="position: sticky; top: 0;z-index: 10;">
         <div class="weekday">日</div>
         <div class="weekday">一</div>
         <div class="weekday">二</div>
@@ -26,9 +26,9 @@ Calendar.prototype.root = function () {
       </div>
       <div class="swiper">
         <div class="swiper-wrapper">
-          <div class="dates prev swiper-slide"></div>
-          <div class="dates curr swiper-slide"></div>
-          <div class="dates next swiper-slide"></div>
+          <div class="prev swiper-slide"></div>
+          <div class="curr swiper-slide"></div>
+          <div class="next swiper-slide"></div>
         </div>
       </div>
     </div>
@@ -36,9 +36,9 @@ Calendar.prototype.root = function () {
 
   this.widgetSwiper = dom.find('.swiper', ret);
   this.title = dom.find('.title', ret);
-  let prev = dom.find('.dates.prev', ret);
-  let curr = dom.find('.dates.curr', ret);
-  let next = dom.find('.dates.next', ret);
+  let prev = dom.find('.prev', ret);
+  let curr = dom.find('.curr', ret);
+  let next = dom.find('.next', ret);
 
   this.renderMonth(prev, moment(this.currentMonth).subtract(1,'months').startOf('month'));
   this.renderMonth(curr, this.currentMonth);
@@ -77,14 +77,14 @@ Calendar.prototype.root = function () {
     let elPrev = null;
     let elNext = null;
     if (this.currentIndex == 0) {
-      elPrev = ret.querySelectorAll('.dates.next');
-      elNext = ret.querySelectorAll('.dates.curr');
+      elPrev = ret.querySelectorAll('.next');
+      elNext = ret.querySelectorAll('.curr');
     } else if (this.currentIndex == 1) {
-      elPrev = ret.querySelectorAll('.dates.prev');
-      elNext = ret.querySelectorAll('.dates.next');
+      elPrev = ret.querySelectorAll('.prev');
+      elNext = ret.querySelectorAll('.next');
     } else if (this.currentIndex == 2) {
-      elPrev = ret.querySelectorAll('.dates.curr');
-      elNext = ret.querySelectorAll('.dates.prev');
+      elPrev = ret.querySelectorAll('.curr');
+      elNext = ret.querySelectorAll('.prev');
     }
 
     for (let i = 0; i < elPrev.length; i++) {
@@ -102,7 +102,11 @@ Calendar.prototype.renderMonth = function(container, month) {
   let weekday = month.startOf('month').day();
   let days = month.daysInMonth();
   container.innerHTML = '';
+  let row = null;
   for (let i = 0; i < days + weekday; i++) {
+    if (i % 7 == 0) {
+      row = dom.create('div', 'dates');
+    }
     let date = dom.element(`<div class="date"></div>`);
     let day = (i - weekday + 1);
     if (i >= weekday) {
@@ -113,7 +117,14 @@ Calendar.prototype.renderMonth = function(container, month) {
       date.classList.add('today');
     }
     date.setAttribute('data-calendar-date', dateVal);
-    container.appendChild(date);
+    row.appendChild(date);
+    if (i % 7 == 6) {
+      container.appendChild(row);
+      row = null;
+    }
+  }
+  if (row != null) {
+    container.appendChild(row);
   }
   // 补足下月的空白
   let residue = 7 - (days + weekday) % 7;

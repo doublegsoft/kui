@@ -184,7 +184,18 @@ xhr.promise = function(xhrOpt, error) {
       }
       resolve(resp.data);
     };
-    xhrOpt.error = error;
+    if (error) {
+      xhrOpt.error = error;
+    } else {
+      xhrOpt.error = () => {
+        resolve({
+          error: {
+            code: '500',
+            message: '网络异常'
+          }
+        });
+      };
+    }
     xhr.post(xhrOpt);
   });
 };

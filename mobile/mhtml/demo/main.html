@@ -56,6 +56,14 @@
       </div>
       <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
     </li>
+    <li widget-id="buttonSoccer" class="list-group-item d-flex"
+        style="line-height: 40px;">
+      <div style="line-height: 32px">
+        <i class="fas fa-futbol" style="font-size: 32px;"></i>
+        <strong class="font-18 ml-2 position-relative" style="top: -4px;">足球</strong>
+      </div>
+      <span class="ml-auto material-icons font-20 position-relative" style="top: 8px;">navigate_next</span>
+    </li>
   </ul>
 </div>
 <script>
@@ -96,6 +104,11 @@ PageDemoMain.prototype.initialize = async function (params) {
   dom.bind(this.buttonWeb, 'click', ev => {
     kuim.navigateTo('mhtml/demo/web.html', {
       title: '百度',
+    });
+  });
+  dom.bind(this.buttonSoccer, 'click', ev => {
+    kuim.navigateTo('mhtml/game/soccer.html', {
+      title: '足球',
     });
   });
 };

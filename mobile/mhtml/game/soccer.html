@@ -1,0 +1,98 @@
+<div id="pageSoccer" class="page mobile">
+
+</div>
+<script>
+function PageSoccer() {
+  this.page = dom.find('#pageSoccer');
+}
+
+PageSoccer.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PageSoccer.prototype.initialize = async function (params) {
+  let scene = new THREE.Scene();
+  scene.background = new THREE.Color( 0xffffff );
+
+  let camera = new THREE.PerspectiveCamera(32, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 0;
+  camera.position.x = 0;
+  camera.position.y = 110;
+
+  let renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  this.page.appendChild(renderer.domElement);
+
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.25;
+  controls.enableZoom = true;
+
+  const light_2 = new THREE.DirectionalLight(0xFFFFFF);
+  light_2.position.set(10, 10, 20)
+  light_2.intensity = 3
+  light_2.castShadow = true;
+  scene.add(light_2)
+
+  const ambient = new THREE.SpotLight(0xFFD500, 2);
+  ambient.castShadow = true;
+  ambient.position.set(0, 100, 10)
+  ambient.shadow.bias = -0.0001;
+  ambient.shadow.mapSize.width = 1024 * 4;
+  ambient.shadow.mapSize.height = 1024 * 4;
+  scene.add(ambient);
+
+  const loader = new THREE.GLTFLoader()
+  loader.load(
+    'img/3d/soccerboard.glb',
+    function (gltf) {
+      let car = gltf.scene;
+      car.traverse(n => {
+        if (n.isMesh) {
+          n.castShadow = true;
+          n.receiveShadow = true;
+          if (n.material.map) n.material.map.anisotropy = 16;
+        }
+      });
+      scene.add(gltf.scene);
+      gltf.scene.position.z = -2;
+      animate();
+    },
+    (xhr) => {
+      console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    },
+    (error) => {
+      console.log(error)
+    }
+  )
+
+  // var mtlLoader = new THREE.MTLLoader();
+  // mtlLoader.setPath('img/3d/assets/');
+  // mtlLoader.load('r2-d2.mtl', function (materials) {
+  //   materials.preload();
+  //   var objLoader = new THREE.OBJLoader();
+  //   objLoader.setMaterials(materials);
+  //   objLoader.setPath('img/3d/assets/');
+  //   objLoader.load('r2-d2.obj', function (object) {
+  //     scene.add(object);
+  //     object.position.y -= 60;
+  //   });
+  // });
+
+
+  let animate = function () {
+    requestAnimationFrame(animate);
+    controls.update();
+    // console.log(controls.object.position);
+    renderer.render(scene, camera);
+  };
+
+  animate();
+};
+
+PageSoccer.prototype.destroy = async function (params) {
+
+};
+
+pageSoccer = new PageSoccer();
+</script>

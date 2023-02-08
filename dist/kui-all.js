@@ -4576,14 +4576,14 @@ dialog.confirm = function (message, callback) {
 
 dialog.view = function (opts) {
   let dialogTemplate = '' +
-    '<div class="modal fade" id="dialogApplication">' +
+    '<div class="modal fade fadeIn show" id="dialogApplication">' +
     '  <div class="modal-dialog modal-dialog-centered">' +
     '    <div class="modal-content">' +
     '      <div class="modal-header">' +
     '        <h4 class="modal-title">{{title}}</h4>' +
     '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
     '      </div>' +
-    '      <div id="dialogApplicationBody" class="modal-body">{{body}}</div>' +
+    '      <div id="dialogApplicationBody" class="modal-body">{{{body}}}</div>' +
     '      <div class="modal-footer">' +
     '        {{#each buttons}}' +
     '        <button type="button" class="btn {{class}}" data-dismiss="modal">{{text}}</button>' +
@@ -4605,7 +4605,7 @@ dialog.view = function (opts) {
     buttons.push({
       text: '保存',
       class: 'btn-save',
-      success: opts.save
+      onClicked: opts.save
     })
   }
   $.ajax({
@@ -4618,6 +4618,11 @@ dialog.view = function (opts) {
         buttons: buttons
       });
       $(document.body).append(html);
+      if (opts.success) {
+        opts.success({
+          onClosed: opts.onClosed,
+        });
+      }
       $('#dialogApplication').modal('show');
     }
   });
@@ -8187,9 +8192,10 @@ utils.nameAttr = function(name) {
  *
  * @return {string} javascript variable name
  */
-utils.nameVar = function(name) {
-  if (name.indexOf('-') == -1) return name;
-  const names = name.split('-');
+utils.nameVar = function(name, sep) {
+  sep = sep || '-';
+  if (name.indexOf(sep) == -1) return name;
+  const names = name.split(sep);
   let ret = '';
   for (let i = 0; i < names.length; i++) {
     const name = names[i];
@@ -8289,6 +8295,16 @@ utils.isExisting = (array, obj, idField) => {
       return true;
   }
   return false;
+};
+
+utils.textSize = (text, font) => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = font;
+  const metrics = context.measureText(text);
+  console.log(metrics);
+  canvas.remove();
+  return {width: metrics.width, height: metrics.height};
 };
 
 var NO_ERRORS = 0;
@@ -9084,7 +9100,18 @@ xhr.promise = function(xhrOpt, error) {
       }
       resolve(resp.data);
     };
-    xhrOpt.error = error;
+    if (error) {
+      xhrOpt.error = error;
+    } else {
+      xhrOpt.error = () => {
+        resolve({
+          error: {
+            code: '500',
+            message: '网络异常'
+          }
+        });
+      };
+    }
     xhr.post(xhrOpt);
   });
 };
@@ -9418,7 +9445,7 @@ kuim.setTitleAndIcon = function(title, icon) {
       bottomDiv.style.display = '';
     iconDiv.onclick = (ev) => {}
   } else {
-    iconDiv.innerHTML = '<i class="fas fa-arrow-left text-white button icon"></i>';
+    iconDiv.innerHTML = '<i class="fas fa-arrow-left button icon"></i>';
     if (bottomDiv != null)
       bottomDiv.style.display = 'none';
     iconDiv.onclick = (ev) => {
@@ -12341,7 +12368,6 @@ GridView.prototype.fetch = async function (error) {
     url: this.url,
     params: this.params,
   }, error);
-  console.log(data);
   if (data) {
     this.local = data;
   }
@@ -12349,14 +12375,24 @@ GridView.prototype.fetch = async function (error) {
 };
 
 GridView.prototype.root = async function () {
-  let ret = dom.element('<ul class="list-grid"></ul>');
+  let ret = dom.element(`
+    <div class="row mx-0">
+      <div class="col-24-12 pr-1"></div>
+      <div class="col-24-12 pl-1"></div>
+    </div>
+  `);
+  let first = ret.children[0];
+  let second = ret.children[1];
+
   this.local = await this.fetch();
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
-    let li = dom.element('<li class="list-grid-item"></li>');
-    let el = this.create(i, item, li);
-    li.appendChild(el);
-    ret.appendChild(li);
+    let el = this.create(i, item);
+    if (i % 2 == 0) {
+      first.appendChild(el);
+    } else {
+      second.appendChild(el);
+    }
   }
   return ret;
 };
@@ -13128,6 +13164,7 @@ function MobileForm(opts) {
 }
 
 MobileForm.prototype.render = async function (container) {
+  container.innerHTML = '';
   let root = await this.root();
   container.appendChild(root);
 };
@@ -13189,6 +13226,7 @@ MobileForm.prototype.buildDate = function (field) {
   }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
+      title: field.title,
       confirm: date => {
         let row = dom.ancestor(ev.target, 'div', 'col-24-18');
         dom.find('input[type=text]', row).value = moment(date).format('YYYY年MM月DD日');
@@ -13217,7 +13255,8 @@ MobileForm.prototype.buildSelect = async function (field) {
   }
   let values = field.values;
   if (!values && field.url) {
-    let data = await xhr.promise({
+    let data = [];
+    data = await xhr.promise({
       url: field.url,
       params: {},
     });
@@ -13231,6 +13270,7 @@ MobileForm.prototype.buildSelect = async function (field) {
   }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
+      title: field.title,
       format: 'oo',
       values: values,
       confirm: data => {
@@ -16383,7 +16423,9 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
 Tabs.prototype.render = function() {
   let self = this;
 
-  this.content.innerHTML = '';
+  if (this.content) {
+    this.content.innerHTML = '';
+  }
   this.navigator.innerHTML = '';
 
   this.slider = dom.element('<div class="slider position-absolute"></div>');
@@ -16391,6 +16433,7 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
+    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"
@@ -22849,9 +22892,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       divProp.append(select);
 
       select.addEventListener('change', function(evt) {
-        let changed = {};
-        changed[prop.name] = select.value;
-        self.notifyPropertyChangedListeners(changed);
+        self.notifyPropertyChangedInArrayOrNot(evt.target, prop);
       });
     } else if (prop.input == 'number') {
       //
@@ -22907,9 +22948,9 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       let input = document.createElement('input');
       input.setAttribute('type', 'file');
       input.setAttribute('property-model-name', prop.name);
-      input.value = prop.value;
       input.classList.add('group-item-input');
-      divProp.append(input);
+      divProp.appendChild(input);
+      input.value = prop.value || '';
 
       input.addEventListener('input', function(evt) {
         let reader = new FileReader();
@@ -22947,69 +22988,22 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         tileStyle: 'position: relative; left: 40px; width: 360px; -moz-transform: scale(0.6); zoom: 0.6;'
       };
       let input = dom.templatize(`
-        <div class="dropdown show" style="display: unset;">
-          <a class="btn-link text-white dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择瓦片</a>
-          <div class="dropdown-menu" style="width: 360px;">
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center" style="padding: 8px 16px;">      
-                <img class="avatar" src="/img/placeholder/64.png">      
-                <div class="pl-2">        
-                  <strong>主要文本</strong>        
-                  <div class="small text-muted">次要文本</div>      
-                </div>      
-                <div class="font-13 tag-success pointer position-relative ml-auto" style="top: 4px;">        
-                  <span>当前状态</span>        
-                  <div class="tag-success-after"></div>      
-                </div>    
-              </div>
-            </a>
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center" style="padding: 8px 16px;">
-                <img class="avatar circle-64" src="img/user.png">
-                <div class="pl-2 full-width">
-                  <div>
-                    <strong>蒂安娜</strong>
-                    <span class="float-right">1999-12-12</span>
-                  </div>
-                  <div class="small text-muted">安娜乐队贝斯手，毕业于伯克利音乐学院。出生在南加州的一个中产家庭，自幼跟随父亲学习古典音乐，尤其对低音乐器十分痴迷。</div>
-                  <div class="d-flex">
-                    <div>
-                      <i class="fas fa-fan mr-1"></i>1024
-                    </div>
-                    <div class="ml-auto">
-                      <i class="fas fa-credit-card mr-1"></i>1024
-                    </div>
-                    <div class="ml-auto">
-                      <i class="fas fa-user-friends mr-1"></i>1024
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center"
-                   style="padding: 8px 16px;">
-                <div class="pl-2">
-                  <strong>主要文本</strong>
-                  <div class="small text-muted">次要文本</div>
-                </div>
-                <img class="avatar ml-auto" src="img/user.png">
-              </div>
-            </a>
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center">        
-                <div class="bg-gradient-primary mr-2">          
-                  <img src="/img/placeholder/64.png" style="width:56px; height: 56px">        
-                </div>        
-                <div>          
-                  <div class="text-value text-primary font-16">标题</div>          
-                  <div class="text-muted font-weight-bold small">这里是简介</div>        
-                </div>      
-              </div>
-            </a>
-          </div>
+        <div style="display: unset;">
+          <a class="btn-link text-white pointer">选择瓦片</a>
         </div>
       `, templateData);
+      dom.bind(dom.find('a', input), 'click', ev => {
+        dialog.view({
+          url: prop.url,
+          success: prop.success,
+          onClosed: (data) => {
+            tile.innerHTML = data;
+            let emit = {};
+            emit[prop.name] = data;
+            this.notifyPropertyChangedListeners(emit);
+          }
+        });
+      });
       labelProp.append(input);
       let tile = dom.templatize(`
         <div style="position: relative; left: -100px; min-height: 64px; width: 400px; 
@@ -23018,15 +23012,6 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         </div>
       `, prop);
       divProp.appendChild(tile);
-      let links = input.querySelectorAll('a.dropdown-item');
-      for (let i = 0; i < links.length; i++) {
-        links[i].onclick = ev => {
-          tile.innerHTML = links[i].innerHTML;
-          let emit = {};
-          emit[prop.name] = tile.innerHTML;
-          this.notifyPropertyChangedListeners(emit);
-        };
-      }
     } else if (prop.display) {
       //
       // 【自定义】
@@ -23072,28 +23057,31 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       input.value = prop.value || '';
       input.classList.add('group-item-input');
       divProp.append(input);
-      input.addEventListener('input', function(evt) {
-        let input = evt.target;
-        let changed = {};
-        if (input.parentElement.parentElement.tagName === 'LI') {
-          let li = input.parentElement.parentElement;
-          let ul = li.parentElement;
-          let parentName = ul.getAttribute('property-model-name');
-          let nodes = Array.prototype.slice.call(ul.children);
-          changed._index = nodes.indexOf(li);
-          changed._name = parentName;
-          changed[parentName] = {};
-          changed[parentName][prop.name] = input.value;
-        } else {
-          changed[prop.name] = input.value;
-        };
-        self.notifyPropertyChangedListeners(changed);
+      input.addEventListener('change', function(evt) {
+        self.notifyPropertyChangedInArrayOrNot(evt.target, prop);
       });
     }
     divProp.append(divInput);
     container.append(divProp);
   }
 };
+
+PropertiesEditor.prototype.notifyPropertyChangedInArrayOrNot = function (input, prop) {
+  let changed = {};
+  if (input.parentElement.parentElement.tagName === 'LI') {
+    let li = input.parentElement.parentElement;
+    let ul = li.parentElement;
+    let parentName = ul.getAttribute('property-model-name');
+    let nodes = Array.prototype.slice.call(ul.children);
+    changed._index = nodes.indexOf(li);
+    changed._name = parentName;
+    changed[parentName] = {};
+    changed[parentName][prop.name] = input.value;
+  } else {
+    changed[prop.name] = input.value;
+  };
+  this.notifyPropertyChangedListeners(changed);
+}
 
 PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, values) {
   let li = dom.element(`
@@ -23180,7 +23168,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     } else if (data[dataId]) {
       // 特殊处理BUG
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
-      if (dataId != 'image')
+      if (dataId.indexOf('image') == -1 && dataId.indexOf('Image') == -1)
         input.value = data[dataId];
     }
     if (input.type === 'range') {
@@ -27948,7 +27936,7 @@ ruler = {
       return false;
     }
 
-    let rulerWrap = document.getElementById(initParams.el); //获取容器
+    let rulerWrap = params.el;
     rulerWrap.style.height = initParams.height < 50 ? 50 + "px" : initParams.height + "px";
 
     //最大刻度的小值是50

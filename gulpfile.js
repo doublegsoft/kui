@@ -112,6 +112,7 @@ gulp.task('dist', function() {
     'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
+    'src/js/mobile/PopupRuler.js',
     'src/js/kuim.js', 'src/js/flutter.js'])
     .pipe(concat('./kui-all.mobile.min.js'))
     .pipe(uglify({}))
@@ -124,6 +125,7 @@ gulp.task('dist', function() {
     'src/js/container/MobileWizard.js', 'src/js/container/MobileForm.js',
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
+    'src/js/mobile/PopupRuler.js',
     'src/js/kuim.js', 'src/js/flutter.js'])
     .pipe(concat('./kui-all.mobile.js'))
     .pipe(gulp.dest('./dist/'));

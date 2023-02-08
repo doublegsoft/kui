@@ -15,7 +15,7 @@ Numpad.prototype.root = function () {
   let ret = dom.templatize(`
     <div class="popup-container">
       <div class="popup-mask"></div>
-      <div class="popup-bottom numpad">
+      <div class="popup-bottom numpad in">
         <div class="popup-title">
           <button class="cancel">取消</button>
           <span class="value"></span>
@@ -107,6 +107,8 @@ Numpad.prototype.root = function () {
   }
 
   dom.bind(mask, 'click', ev => {
+    ev.stopPropagation();
+    ev.preventDefault();
     this.close();
   });
 
@@ -118,10 +120,6 @@ Numpad.prototype.root = function () {
     this.success(value.innerText);
     this.close();
   });
-
-  setTimeout(() => {
-    this.bottom.classList.add('in');
-  }, 50);
   return ret;
 };
 

@@ -15535,17 +15535,6 @@ footer {
 ** 栅格按钮
 */
 .square-menu {
-  /*padding: 0;*/
-  /*margin: 0;*/
-  /*list-style: none;*/
-  /*display: -webkit-box;*/
-  /*display: -moz-box;*/
-  /*display: -ms-flexbox;*/
-  /*display: -webkit-flex;*/
-  /*display: flex;*/
-  /*-webkit-flex-flow: row;*/
-  /*justify-content: space-around;*/
-  /*line-height:30px;*/
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -16291,7 +16280,7 @@ a:hover, a:visited, a:link, a:active
   height: 52px;
   line-height: 52px!important;
   vertical-align: middle;
-  color: #fff;
+  /*color: #fff;*/
   background-color: transparent;
   border: none;
   border-radius: 0;
@@ -16420,7 +16409,7 @@ a:hover, a:visited, a:link, a:active
 }
 
 .popup-bottom {
-  position: absolute;
+  position: fixed;
   left: 0;
   bottom: -100%;
   width: 100%;
@@ -16891,6 +16880,33 @@ a:hover, a:visited, a:link, a:active
   margin: -14px 0 0 -22px;
 }
 
+.rating {
+  align-items: center;
+  display: flex;
+  font-size: 32px;
+  justify-content: center;
+  flex-direction: row-reverse;
+}
+
+.rating-star {
+  background-color: transparent;
+  border: transparent;
+  margin: 0 2px;
+  padding: 0;
+  position: relative;
+}
+
+.rating .rating-star:hover,
+.rating .rating-star:hover ~ .rating-star {
+  color: transparent;
+}
+
+.rating .rating-star:hover:before,
+.rating .rating-star:hover ~ .rating-star:before {
+  content: '\2605';
+  left: 0;
+  position: absolute;
+}
 
 .timeline {
   /*width: 100%;*/
@@ -17656,6 +17672,9 @@ span.tag-removable.danger > i:hover {
 .calendar .today {
 	background: var(--color-primary);
 	color: var(--color-white);
+	position: sticky;
+	top: 0;
+	z-index: 9999;
 }
 
 .weekly {

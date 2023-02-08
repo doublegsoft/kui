@@ -27,7 +27,9 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
 Tabs.prototype.render = function() {
   let self = this;
 
-  this.content.innerHTML = '';
+  if (this.content) {
+    this.content.innerHTML = '';
+  }
   this.navigator.innerHTML = '';
 
   this.slider = dom.element('<div class="slider position-absolute"></div>');
@@ -35,6 +37,7 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
+    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"

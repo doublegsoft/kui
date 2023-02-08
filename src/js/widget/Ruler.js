@@ -33,7 +33,7 @@ ruler = {
       return false;
     }
 
-    let rulerWrap = document.getElementById(initParams.el); //获取容器
+    let rulerWrap = params.el;
     rulerWrap.style.height = initParams.height < 50 ? 50 + "px" : initParams.height + "px";
 
     //最大刻度的小值是50

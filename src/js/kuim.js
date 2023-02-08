@@ -175,7 +175,7 @@ kuim.setTitleAndIcon = function(title, icon) {
       bottomDiv.style.display = '';
     iconDiv.onclick = (ev) => {}
   } else {
-    iconDiv.innerHTML = '<i class="fas fa-arrow-left text-white button icon"></i>';
+    iconDiv.innerHTML = '<i class="fas fa-arrow-left button icon"></i>';
     if (bottomDiv != null)
       bottomDiv.style.display = 'none';
     iconDiv.onclick = (ev) => {

@@ -47,19 +47,19 @@
   <div class="card card-body">
     <div class="ruler-item">
       <div class="ruler-title">
-        <span class="ruler-left">身高</span>
-        <span style="font-size: 20px" id="heightText"></span>
+        <span class="ruler-left">体重</span>
+        <span style="font-size: 20px" widget-id="widgetWeightText"></span>
         <span class="ml5" style="font-size: 14px">KG</span>
       </div>
-      <div class="ruler-wrap" id="height"></div>
+      <div class="ruler-wrap" widget-id="widgetWeight"></div>
     </div>
     <div class="ruler-item">
       <div class="ruler-title">
-        <span class="ruler-left">体重</span>
-        <span style="font-size: 20px" id="weightText"></span>
+        <span class="ruler-left">身高</span>
+        <span style="font-size: 20px" widget-id="widgetHeightText"></span>
         <span class="ml5" style="font-size: 14px">CM</span>
       </div>
-      <div class="ruler-wrap" id="weight"></div>
+      <div class="ruler-wrap" widget-id="widgetHeight"></div>
     </div>
   </div>
 </div>
@@ -70,28 +70,11 @@ function PageExampleRuler() {
 
 PageExampleRuler.prototype.initialize = async function (params) {
   dom.init(this, this.page);
-  let heightText = document.getElementById("heightText");
-  heightText.innerText = 160;
-  //调用刻度尺方法
-  ruler.initPlugin({
-    el: "height", //容器id
-    startValue: 160,
-    maxScale: 300, //最大刻度
-    region: [0, 300], //选择刻度的区间范围
-    background: "#fff",
-    color: "#E0E0E0", //刻度线和字体的颜色
-    markColor: "#73B17B", //中心刻度标记颜色
-    isConstant: true, //是否不断地获取值
-    success: function (res) {
-      heightText.innerText=res
-    }
-  });
 
-  let weightText = document.getElementById("weightText");
-  weightText.innerText = 50;
+  this.widgetHeightText.innerText = 50;
   //调用刻度尺方法
   ruler.initPlugin({
-    el: "weight", //容器id
+    el: this.widgetHeight,
     startValue: 500,
     maxScale: 5000, //最大刻度
     region: [0, 5000], //选择刻度的区间范围
@@ -101,8 +84,27 @@ PageExampleRuler.prototype.initialize = async function (params) {
     scale:10,
     point:1,
     isConstant: true, //是否不断地获取值
-    success: function (res) {
-      weightText.innerText=(res/10).toFixed(1)
+    success: res => {
+      this.widgetHeightText.innerText=(res/10).toFixed(1)
+    }
+  });
+
+
+  this.widgetWeightText.innerText = 50;
+  //调用刻度尺方法
+  ruler.initPlugin({
+    el: this.widgetWeight,
+    startValue: 500,
+    maxScale: 5000, //最大刻度
+    region: [0, 5000], //选择刻度的区间范围
+    background: "#fff",
+    color: "#E0E0E0", //刻度线和字体的颜色
+    markColor: "#73B17B", //中心刻度标记颜色
+    scale:10,
+    point:1,
+    isConstant: true, //是否不断地获取值
+    success: res => {
+      this.widgetWeightText.innerText=(res/10).toFixed(1)
     }
   });
 };

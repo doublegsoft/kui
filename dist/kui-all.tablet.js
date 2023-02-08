@@ -184,7 +184,18 @@ xhr.promise = function(xhrOpt, error) {
       }
       resolve(resp.data);
     };
-    xhrOpt.error = error;
+    if (error) {
+      xhrOpt.error = error;
+    } else {
+      xhrOpt.error = () => {
+        resolve({
+          error: {
+            code: '500',
+            message: '网络异常'
+          }
+        });
+      };
+    }
     xhr.post(xhrOpt);
   });
 };
@@ -1540,14 +1551,14 @@ dialog.confirm = function (message, callback) {
 
 dialog.view = function (opts) {
   let dialogTemplate = '' +
-    '<div class="modal fade" id="dialogApplication">' +
+    '<div class="modal fade fadeIn show" id="dialogApplication">' +
     '  <div class="modal-dialog modal-dialog-centered">' +
     '    <div class="modal-content">' +
     '      <div class="modal-header">' +
     '        <h4 class="modal-title">{{title}}</h4>' +
     '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
     '      </div>' +
-    '      <div id="dialogApplicationBody" class="modal-body">{{body}}</div>' +
+    '      <div id="dialogApplicationBody" class="modal-body">{{{body}}}</div>' +
     '      <div class="modal-footer">' +
     '        {{#each buttons}}' +
     '        <button type="button" class="btn {{class}}" data-dismiss="modal">{{text}}</button>' +
@@ -1569,7 +1580,7 @@ dialog.view = function (opts) {
     buttons.push({
       text: '保存',
       class: 'btn-save',
-      success: opts.save
+      onClicked: opts.save
     })
   }
   $.ajax({
@@ -1582,6 +1593,11 @@ dialog.view = function (opts) {
         buttons: buttons
       });
       $(document.body).append(html);
+      if (opts.success) {
+        opts.success({
+          onClosed: opts.onClosed,
+        });
+      }
       $('#dialogApplication').modal('show');
     }
   });
@@ -3543,9 +3559,10 @@ utils.nameAttr = function(name) {
  *
  * @return {string} javascript variable name
  */
-utils.nameVar = function(name) {
-  if (name.indexOf('-') == -1) return name;
-  const names = name.split('-');
+utils.nameVar = function(name, sep) {
+  sep = sep || '-';
+  if (name.indexOf(sep) == -1) return name;
+  const names = name.split(sep);
   let ret = '';
   for (let i = 0; i < names.length; i++) {
     const name = names[i];
@@ -3645,6 +3662,16 @@ utils.isExisting = (array, obj, idField) => {
       return true;
   }
   return false;
+};
+
+utils.textSize = (text, font) => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = font;
+  const metrics = context.measureText(text);
+  console.log(metrics);
+  canvas.remove();
+  return {width: metrics.width, height: metrics.height};
 };
 
 
@@ -4069,7 +4096,9 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
 Tabs.prototype.render = function() {
   let self = this;
 
-  this.content.innerHTML = '';
+  if (this.content) {
+    this.content.innerHTML = '';
+  }
   this.navigator.innerHTML = '';
 
   this.slider = dom.element('<div class="slider position-absolute"></div>');
@@ -4077,6 +4106,7 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
+    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"

@@ -148,9 +148,10 @@ utils.nameAttr = function(name) {
  *
  * @return {string} javascript variable name
  */
-utils.nameVar = function(name) {
-  if (name.indexOf('-') == -1) return name;
-  const names = name.split('-');
+utils.nameVar = function(name, sep) {
+  sep = sep || '-';
+  if (name.indexOf(sep) == -1) return name;
+  const names = name.split(sep);
   let ret = '';
   for (let i = 0; i < names.length; i++) {
     const name = names[i];
@@ -250,4 +251,14 @@ utils.isExisting = (array, obj, idField) => {
       return true;
   }
   return false;
+};
+
+utils.textSize = (text, font) => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = font;
+  const metrics = context.measureText(text);
+  console.log(metrics);
+  canvas.remove();
+  return {width: metrics.width, height: metrics.height};
 };

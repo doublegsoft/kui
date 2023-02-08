@@ -203,9 +203,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       divProp.append(select);
 
       select.addEventListener('change', function(evt) {
-        let changed = {};
-        changed[prop.name] = select.value;
-        self.notifyPropertyChangedListeners(changed);
+        self.notifyPropertyChangedInArrayOrNot(evt.target, prop);
       });
     } else if (prop.input == 'number') {
       //
@@ -261,9 +259,9 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       let input = document.createElement('input');
       input.setAttribute('type', 'file');
       input.setAttribute('property-model-name', prop.name);
-      input.value = prop.value;
       input.classList.add('group-item-input');
-      divProp.append(input);
+      divProp.appendChild(input);
+      input.value = prop.value || '';
 
       input.addEventListener('input', function(evt) {
         let reader = new FileReader();
@@ -301,69 +299,22 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         tileStyle: 'position: relative; left: 40px; width: 360px; -moz-transform: scale(0.6); zoom: 0.6;'
       };
       let input = dom.templatize(`
-        <div class="dropdown show" style="display: unset;">
-          <a class="btn-link text-white dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">选择瓦片</a>
-          <div class="dropdown-menu" style="width: 360px;">
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center" style="padding: 8px 16px;">      
-                <img class="avatar" src="/img/placeholder/64.png">      
-                <div class="pl-2">        
-                  <strong>主要文本</strong>        
-                  <div class="small text-muted">次要文本</div>      
-                </div>      
-                <div class="font-13 tag-success pointer position-relative ml-auto" style="top: 4px;">        
-                  <span>当前状态</span>        
-                  <div class="tag-success-after"></div>      
-                </div>    
-              </div>
-            </a>
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center" style="padding: 8px 16px;">
-                <img class="avatar circle-64" src="img/user.png">
-                <div class="pl-2 full-width">
-                  <div>
-                    <strong>蒂安娜</strong>
-                    <span class="float-right">1999-12-12</span>
-                  </div>
-                  <div class="small text-muted">安娜乐队贝斯手，毕业于伯克利音乐学院。出生在南加州的一个中产家庭，自幼跟随父亲学习古典音乐，尤其对低音乐器十分痴迷。</div>
-                  <div class="d-flex">
-                    <div>
-                      <i class="fas fa-fan mr-1"></i>1024
-                    </div>
-                    <div class="ml-auto">
-                      <i class="fas fa-credit-card mr-1"></i>1024
-                    </div>
-                    <div class="ml-auto">
-                      <i class="fas fa-user-friends mr-1"></i>1024
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center"
-                   style="padding: 8px 16px;">
-                <div class="pl-2">
-                  <strong>主要文本</strong>
-                  <div class="small text-muted">次要文本</div>
-                </div>
-                <img class="avatar ml-auto" src="img/user.png">
-              </div>
-            </a>
-            <a class="dropdown-item p-0" href="#" style="{{tileStyle}}">
-              <div class="d-flex align-items-center">        
-                <div class="bg-gradient-primary mr-2">          
-                  <img src="/img/placeholder/64.png" style="width:56px; height: 56px">        
-                </div>        
-                <div>          
-                  <div class="text-value text-primary font-16">标题</div>          
-                  <div class="text-muted font-weight-bold small">这里是简介</div>        
-                </div>      
-              </div>
-            </a>
-          </div>
+        <div style="display: unset;">
+          <a class="btn-link text-white pointer">选择瓦片</a>
         </div>
       `, templateData);
+      dom.bind(dom.find('a', input), 'click', ev => {
+        dialog.view({
+          url: prop.url,
+          success: prop.success,
+          onClosed: (data) => {
+            tile.innerHTML = data;
+            let emit = {};
+            emit[prop.name] = data;
+            this.notifyPropertyChangedListeners(emit);
+          }
+        });
+      });
       labelProp.append(input);
       let tile = dom.templatize(`
         <div style="position: relative; left: -100px; min-height: 64px; width: 400px; 
@@ -372,15 +323,6 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         </div>
       `, prop);
       divProp.appendChild(tile);
-      let links = input.querySelectorAll('a.dropdown-item');
-      for (let i = 0; i < links.length; i++) {
-        links[i].onclick = ev => {
-          tile.innerHTML = links[i].innerHTML;
-          let emit = {};
-          emit[prop.name] = tile.innerHTML;
-          this.notifyPropertyChangedListeners(emit);
-        };
-      }
     } else if (prop.display) {
       //
       // 【自定义】
@@ -426,28 +368,31 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       input.value = prop.value || '';
       input.classList.add('group-item-input');
       divProp.append(input);
-      input.addEventListener('input', function(evt) {
-        let input = evt.target;
-        let changed = {};
-        if (input.parentElement.parentElement.tagName === 'LI') {
-          let li = input.parentElement.parentElement;
-          let ul = li.parentElement;
-          let parentName = ul.getAttribute('property-model-name');
-          let nodes = Array.prototype.slice.call(ul.children);
-          changed._index = nodes.indexOf(li);
-          changed._name = parentName;
-          changed[parentName] = {};
-          changed[parentName][prop.name] = input.value;
-        } else {
-          changed[prop.name] = input.value;
-        };
-        self.notifyPropertyChangedListeners(changed);
+      input.addEventListener('change', function(evt) {
+        self.notifyPropertyChangedInArrayOrNot(evt.target, prop);
       });
     }
     divProp.append(divInput);
     container.append(divProp);
   }
 };
+
+PropertiesEditor.prototype.notifyPropertyChangedInArrayOrNot = function (input, prop) {
+  let changed = {};
+  if (input.parentElement.parentElement.tagName === 'LI') {
+    let li = input.parentElement.parentElement;
+    let ul = li.parentElement;
+    let parentName = ul.getAttribute('property-model-name');
+    let nodes = Array.prototype.slice.call(ul.children);
+    changed._index = nodes.indexOf(li);
+    changed._name = parentName;
+    changed[parentName] = {};
+    changed[parentName][prop.name] = input.value;
+  } else {
+    changed[prop.name] = input.value;
+  };
+  this.notifyPropertyChangedListeners(changed);
+}
 
 PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, values) {
   let li = dom.element(`
@@ -534,7 +479,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     } else if (data[dataId]) {
       // 特殊处理BUG
       if (dataId == 'x') data[dataId] = parseInt(data[dataId]);
-      if (dataId != 'image')
+      if (dataId.indexOf('image') == -1 && dataId.indexOf('Image') == -1)
         input.value = data[dataId];
     }
     if (input.type === 'range') {

@@ -184,7 +184,18 @@ xhr.promise = function(xhrOpt, error) {
       }
       resolve(resp.data);
     };
-    xhrOpt.error = error;
+    if (error) {
+      xhrOpt.error = error;
+    } else {
+      xhrOpt.error = () => {
+        resolve({
+          error: {
+            code: '500',
+            message: '网络异常'
+          }
+        });
+      };
+    }
     xhr.post(xhrOpt);
   });
 };
@@ -2509,9 +2520,10 @@ utils.nameAttr = function(name) {
  *
  * @return {string} javascript variable name
  */
-utils.nameVar = function(name) {
-  if (name.indexOf('-') == -1) return name;
-  const names = name.split('-');
+utils.nameVar = function(name, sep) {
+  sep = sep || '-';
+  if (name.indexOf(sep) == -1) return name;
+  const names = name.split(sep);
   let ret = '';
   for (let i = 0; i < names.length; i++) {
     const name = names[i];
@@ -2613,6 +2625,16 @@ utils.isExisting = (array, obj, idField) => {
   return false;
 };
 
+utils.textSize = (text, font) => {
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d");
+  context.font = font;
+  const metrics = context.measureText(text);
+  console.log(metrics);
+  canvas.remove();
+  return {width: metrics.width, height: metrics.height};
+};
+
 if (typeof dialog === 'undefined') dialog = {};
 
 dialog.alert = function (message) {
@@ -2712,14 +2734,14 @@ dialog.confirm = function (message, callback) {
 
 dialog.view = function (opts) {
   let dialogTemplate = '' +
-    '<div class="modal fade" id="dialogApplication">' +
+    '<div class="modal fade fadeIn show" id="dialogApplication">' +
     '  <div class="modal-dialog modal-dialog-centered">' +
     '    <div class="modal-content">' +
     '      <div class="modal-header">' +
     '        <h4 class="modal-title">{{title}}</h4>' +
     '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
     '      </div>' +
-    '      <div id="dialogApplicationBody" class="modal-body">{{body}}</div>' +
+    '      <div id="dialogApplicationBody" class="modal-body">{{{body}}}</div>' +
     '      <div class="modal-footer">' +
     '        {{#each buttons}}' +
     '        <button type="button" class="btn {{class}}" data-dismiss="modal">{{text}}</button>' +
@@ -2741,7 +2763,7 @@ dialog.view = function (opts) {
     buttons.push({
       text: '保存',
       class: 'btn-save',
-      success: opts.save
+      onClicked: opts.save
     })
   }
   $.ajax({
@@ -2754,6 +2776,11 @@ dialog.view = function (opts) {
         buttons: buttons
       });
       $(document.body).append(html);
+      if (opts.success) {
+        opts.success({
+          onClosed: opts.onClosed,
+        });
+      }
       $('#dialogApplication').modal('show');
     }
   });
@@ -3415,7 +3442,6 @@ GridView.prototype.fetch = async function (error) {
     url: this.url,
     params: this.params,
   }, error);
-  console.log(data);
   if (data) {
     this.local = data;
   }
@@ -3423,14 +3449,24 @@ GridView.prototype.fetch = async function (error) {
 };
 
 GridView.prototype.root = async function () {
-  let ret = dom.element('<ul class="list-grid"></ul>');
+  let ret = dom.element(`
+    <div class="row mx-0">
+      <div class="col-24-12 pr-1"></div>
+      <div class="col-24-12 pl-1"></div>
+    </div>
+  `);
+  let first = ret.children[0];
+  let second = ret.children[1];
+
   this.local = await this.fetch();
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
-    let li = dom.element('<li class="list-grid-item"></li>');
-    let el = this.create(i, item, li);
-    li.appendChild(el);
-    ret.appendChild(li);
+    let el = this.create(i, item);
+    if (i % 2 == 0) {
+      first.appendChild(el);
+    } else {
+      second.appendChild(el);
+    }
   }
   return ret;
 };
@@ -3560,7 +3596,9 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
 Tabs.prototype.render = function() {
   let self = this;
 
-  this.content.innerHTML = '';
+  if (this.content) {
+    this.content.innerHTML = '';
+  }
   this.navigator.innerHTML = '';
 
   this.slider = dom.element('<div class="slider position-absolute"></div>');
@@ -3568,6 +3606,7 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
+    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"
@@ -4519,7 +4558,7 @@ ruler = {
       return false;
     }
 
-    let rulerWrap = document.getElementById(initParams.el); //获取容器
+    let rulerWrap = params.el;
     rulerWrap.style.height = initParams.height < 50 ? 50 + "px" : initParams.height + "px";
 
     //最大刻度的小值是50
@@ -4809,6 +4848,7 @@ function MobileForm(opts) {
 }
 
 MobileForm.prototype.render = async function (container) {
+  container.innerHTML = '';
   let root = await this.root();
   container.appendChild(root);
 };
@@ -4870,6 +4910,7 @@ MobileForm.prototype.buildDate = function (field) {
   }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
+      title: field.title,
       confirm: date => {
         let row = dom.ancestor(ev.target, 'div', 'col-24-18');
         dom.find('input[type=text]', row).value = moment(date).format('YYYY年MM月DD日');
@@ -4898,7 +4939,8 @@ MobileForm.prototype.buildSelect = async function (field) {
   }
   let values = field.values;
   if (!values && field.url) {
-    let data = await xhr.promise({
+    let data = [];
+    data = await xhr.promise({
       url: field.url,
       params: {},
     });
@@ -4912,6 +4954,7 @@ MobileForm.prototype.buildSelect = async function (field) {
   }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
+      title: field.title,
       format: 'oo',
       values: values,
       confirm: data => {
@@ -5031,7 +5074,7 @@ Numpad.prototype.root = function () {
   let ret = dom.templatize(`
     <div class="popup-container">
       <div class="popup-mask"></div>
-      <div class="popup-bottom numpad">
+      <div class="popup-bottom numpad in">
         <div class="popup-title">
           <button class="cancel">取消</button>
           <span class="value"></span>
@@ -5123,6 +5166,8 @@ Numpad.prototype.root = function () {
   }
 
   dom.bind(mask, 'click', ev => {
+    ev.stopPropagation();
+    ev.preventDefault();
     this.close();
   });
 
@@ -5134,10 +5179,6 @@ Numpad.prototype.root = function () {
     this.success(value.innerText);
     this.close();
   });
-
-  setTimeout(() => {
-    this.bottom.classList.add('in');
-  }, 50);
   return ret;
 };
 
@@ -5383,7 +5424,7 @@ Calendar.prototype.root = function () {
   let ret = dom.templatize(`
     <div class="calendar">
       <div class="title"></div>
-      <div class="weekdays">
+      <div class="weekdays" style="position: sticky; top: 0;z-index: 10;">
         <div class="weekday">日</div>
         <div class="weekday">一</div>
         <div class="weekday">二</div>
@@ -5394,9 +5435,9 @@ Calendar.prototype.root = function () {
       </div>
       <div class="swiper">
         <div class="swiper-wrapper">
-          <div class="dates prev swiper-slide"></div>
-          <div class="dates curr swiper-slide"></div>
-          <div class="dates next swiper-slide"></div>
+          <div class="prev swiper-slide"></div>
+          <div class="curr swiper-slide"></div>
+          <div class="next swiper-slide"></div>
         </div>
       </div>
     </div>
@@ -5404,9 +5445,9 @@ Calendar.prototype.root = function () {
 
   this.widgetSwiper = dom.find('.swiper', ret);
   this.title = dom.find('.title', ret);
-  let prev = dom.find('.dates.prev', ret);
-  let curr = dom.find('.dates.curr', ret);
-  let next = dom.find('.dates.next', ret);
+  let prev = dom.find('.prev', ret);
+  let curr = dom.find('.curr', ret);
+  let next = dom.find('.next', ret);
 
   this.renderMonth(prev, moment(this.currentMonth).subtract(1,'months').startOf('month'));
   this.renderMonth(curr, this.currentMonth);
@@ -5445,14 +5486,14 @@ Calendar.prototype.root = function () {
     let elPrev = null;
     let elNext = null;
     if (this.currentIndex == 0) {
-      elPrev = ret.querySelectorAll('.dates.next');
-      elNext = ret.querySelectorAll('.dates.curr');
+      elPrev = ret.querySelectorAll('.next');
+      elNext = ret.querySelectorAll('.curr');
     } else if (this.currentIndex == 1) {
-      elPrev = ret.querySelectorAll('.dates.prev');
-      elNext = ret.querySelectorAll('.dates.next');
+      elPrev = ret.querySelectorAll('.prev');
+      elNext = ret.querySelectorAll('.next');
     } else if (this.currentIndex == 2) {
-      elPrev = ret.querySelectorAll('.dates.curr');
-      elNext = ret.querySelectorAll('.dates.prev');
+      elPrev = ret.querySelectorAll('.curr');
+      elNext = ret.querySelectorAll('.prev');
     }
 
     for (let i = 0; i < elPrev.length; i++) {
@@ -5470,7 +5511,11 @@ Calendar.prototype.renderMonth = function(container, month) {
   let weekday = month.startOf('month').day();
   let days = month.daysInMonth();
   container.innerHTML = '';
+  let row = null;
   for (let i = 0; i < days + weekday; i++) {
+    if (i % 7 == 0) {
+      row = dom.create('div', 'dates');
+    }
     let date = dom.element(`<div class="date"></div>`);
     let day = (i - weekday + 1);
     if (i >= weekday) {
@@ -5481,7 +5526,14 @@ Calendar.prototype.renderMonth = function(container, month) {
       date.classList.add('today');
     }
     date.setAttribute('data-calendar-date', dateVal);
-    container.appendChild(date);
+    row.appendChild(date);
+    if (i % 7 == 6) {
+      container.appendChild(row);
+      row = null;
+    }
+  }
+  if (row != null) {
+    container.appendChild(row);
   }
   // 补足下月的空白
   let residue = 7 - (days + weekday) % 7;
@@ -5821,6 +5873,90 @@ Weekdays.prototype.render = function(containerId) {
   let container = dom.find(containerId);
   container.appendChild(this.root());
 };
+
+/*!
+** @param opt
+**        配置项，包括以下选项：
+**        unit：单位
+*/
+function PopupRuler(opt) {
+  this.unit = opt.unit || '';
+  this.regex = opt.regex || /.*/;
+  this.success = opt.success || function (val) {};
+  this.type = opt.type || 'decimal';
+  this.value = opt.value;
+  this.range = opt.range;
+}
+
+PopupRuler.prototype.root = function () {
+  let ret = dom.templatize(`
+    <div class="popup-container">
+      <div class="popup-mask"></div>
+      <div class="popup-bottom in">
+        <div class="popup-title">
+          <button class="cancel">取消</button>
+          <span class="value"></span>
+          <span class="unit">{{unit}}</span>
+          <button class="confirm">确认</button>
+        </div>
+        <div class="popup-content" style="height: 200px; width: 100%;"></div>
+      </div>
+    </div>
+  `, this);
+
+  this.bottom = dom.find('.popup-bottom', ret);
+  let mask = dom.find('.popup-mask', ret);
+  let confirm = dom.find('.confirm', ret);
+  let cancel = dom.find('.cancel', ret);
+  let value = dom.find('.value', ret);
+
+  dom.bind(mask, 'click', ev => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    this.close();
+  });
+
+  dom.bind(cancel, 'click', ev => {
+    this.close();
+  });
+
+  dom.bind(confirm, 'click', ev => {
+    this.success(value.innerText);
+    this.close();
+  });
+
+  return ret;
+};
+
+PopupRuler.prototype.show = function(container) {
+  let root = this.root();
+  container.appendChild(root);
+
+  let content = dom.find('.popup-content', root);
+  let value = dom.find('.value', root);
+  value.innerText = this.value;
+  ruler.initPlugin({
+    el: content, //容器id
+    startValue: this.value,
+    maxScale: this.range[1], //最大刻度
+    region: [this.range[0], this.range[1]], //选择刻度的区间范围
+    background: "#fff",
+    color: "#E0E0E0", //刻度线和字体的颜色
+    markColor: "#73B17B", //中心刻度标记颜色
+    isConstant: true, //是否不断地获取值
+    success: res => {
+      value.innerText = res;
+    }
+  });
+};
+
+PopupRuler.prototype.close = function() {
+  this.bottom.classList.remove('in');
+  this.bottom.classList.add('out');
+  setTimeout(() => {
+    this.bottom.parentElement.remove();
+  }, 300);
+};
 Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
   return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 });
@@ -5998,7 +6134,7 @@ kuim.setTitleAndIcon = function(title, icon) {
       bottomDiv.style.display = '';
     iconDiv.onclick = (ev) => {}
   } else {
-    iconDiv.innerHTML = '<i class="fas fa-arrow-left text-white button icon"></i>';
+    iconDiv.innerHTML = '<i class="fas fa-arrow-left button icon"></i>';
     if (bottomDiv != null)
       bottomDiv.style.display = 'none';
     iconDiv.onclick = (ev) => {

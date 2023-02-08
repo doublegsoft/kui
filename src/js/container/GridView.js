@@ -15,7 +15,6 @@ GridView.prototype.fetch = async function (error) {
     url: this.url,
     params: this.params,
   }, error);
-  console.log(data);
   if (data) {
     this.local = data;
   }
@@ -23,14 +22,24 @@ GridView.prototype.fetch = async function (error) {
 };
 
 GridView.prototype.root = async function () {
-  let ret = dom.element('<ul class="list-grid"></ul>');
+  let ret = dom.element(`
+    <div class="row mx-0">
+      <div class="col-24-12 pr-1"></div>
+      <div class="col-24-12 pl-1"></div>
+    </div>
+  `);
+  let first = ret.children[0];
+  let second = ret.children[1];
+
   this.local = await this.fetch();
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
-    let li = dom.element('<li class="list-grid-item"></li>');
-    let el = this.create(i, item, li);
-    li.appendChild(el);
-    ret.appendChild(li);
+    let el = this.create(i, item);
+    if (i % 2 == 0) {
+      first.appendChild(el);
+    } else {
+      second.appendChild(el);
+    }
   }
   return ret;
 };

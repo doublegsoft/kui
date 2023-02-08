@@ -8,6 +8,7 @@ function MobileForm(opts) {
 }
 
 MobileForm.prototype.render = async function (container) {
+  container.innerHTML = '';
   let root = await this.root();
   container.appendChild(root);
 };
@@ -69,6 +70,7 @@ MobileForm.prototype.buildDate = function (field) {
   }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
+      title: field.title,
       confirm: date => {
         let row = dom.ancestor(ev.target, 'div', 'col-24-18');
         dom.find('input[type=text]', row).value = moment(date).format('YYYY年MM月DD日');
@@ -97,7 +99,8 @@ MobileForm.prototype.buildSelect = async function (field) {
   }
   let values = field.values;
   if (!values && field.url) {
-    let data = await xhr.promise({
+    let data = [];
+    data = await xhr.promise({
       url: field.url,
       params: {},
     });
@@ -111,6 +114,7 @@ MobileForm.prototype.buildSelect = async function (field) {
   }
   dom.bind(ret, 'click', ev => {
     let rd = new Rolldate({
+      title: field.title,
       format: 'oo',
       values: values,
       confirm: data => {

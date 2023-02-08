@@ -18329,6 +18329,9 @@ a.disabled {
 .calendar .today {
 	background: var(--color-primary);
 	color: var(--color-white);
+	position: sticky;
+	top: 0;
+	z-index: 9999;
 }
 
 .weekly {

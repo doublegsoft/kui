@@ -97,14 +97,14 @@ dialog.confirm = function (message, callback) {
 
 dialog.view = function (opts) {
   let dialogTemplate = '' +
-    '<div class="modal fade" id="dialogApplication">' +
+    '<div class="modal fade fadeIn show" id="dialogApplication">' +
     '  <div class="modal-dialog modal-dialog-centered">' +
     '    <div class="modal-content">' +
     '      <div class="modal-header">' +
     '        <h4 class="modal-title">{{title}}</h4>' +
     '        <button type="button" class="close" data-dismiss="modal">&times;</button>' +
     '      </div>' +
-    '      <div id="dialogApplicationBody" class="modal-body">{{body}}</div>' +
+    '      <div id="dialogApplicationBody" class="modal-body">{{{body}}}</div>' +
     '      <div class="modal-footer">' +
     '        {{#each buttons}}' +
     '        <button type="button" class="btn {{class}}" data-dismiss="modal">{{text}}</button>' +
@@ -126,7 +126,7 @@ dialog.view = function (opts) {
     buttons.push({
       text: '保存',
       class: 'btn-save',
-      success: opts.save
+      onClicked: opts.save
     })
   }
   $.ajax({
@@ -139,6 +139,11 @@ dialog.view = function (opts) {
         buttons: buttons
       });
       $(document.body).append(html);
+      if (opts.success) {
+        opts.success({
+          onClosed: opts.onClosed,
+        });
+      }
       $('#dialogApplication').modal('show');
     }
   });

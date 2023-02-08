@@ -270,6 +270,9 @@
       };
     },
     extend: function extend(config) {
+      if (config.title) {
+        config.lang = {title: config.title};
+      }
       var _this = this,
           opts = _this.baseData().opts;
 
