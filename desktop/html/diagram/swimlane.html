@@ -1,0 +1,80 @@
+<div class="card">
+  <div class="card-header pl-3 pr-3">
+    <i class="fa fa-list"></i>
+    <strong>泳道图示</strong>
+  </div>
+  <div class="card-body row">
+    <div class="col-md-12">
+      <div id="diagramSwimlane" class="full-width overflow-hidden"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+diagram = dom.find('#diagramSwimlane');
+dom.height2(diagram, 140, document.body);
+new Swimlane({
+  lanes: [{
+    title: '督办人员',
+    actions: [{
+      id: 'AS0P',
+      name: '立项',
+      type: 'PROC',
+      next: 'AS1',
+    },{
+      id: 'AS0S',
+      name: '成功',
+      type: 'PROC',
+    }],
+  },{
+    title: '督办部门主管',
+    actions: [{
+      id: 'AS1',
+      name: '审阅',
+      type: 'COND',
+      next: {
+        'Y': 'AS2',
+        'N': 'AS0P',
+      }
+    }]
+  },{
+    title: '督办部门分管领导',
+    actions: [{
+      id: 'AS2',
+      name: '审批',
+      type: 'COND',
+      next: {
+        'Y': 'AC1A',
+        'N': 'AS0P',
+      }
+    }]
+  },{
+    title: '经办部门主管',
+    actions: [{
+      id: 'AC1A',
+      name: '任务派发',
+      type: 'PROC',
+      next: 'AC0P',
+    }]
+  },{
+    title: '经办人员',
+    actions: [{
+      id: 'AC0P',
+      name: '工作填报',
+      type: 'PROC',
+      next: 'AC2',
+    }]
+  },{
+    title: '经办部门分管领导',
+    actions: [{
+      id: 'AC2',
+      name: '审批',
+      type: 'COND',
+      next: {
+        'Y': 'AS0S',
+        'N': 'AC0P',
+      }
+    }]
+  }]
+}).render(diagram);
+</script>

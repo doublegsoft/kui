@@ -2496,8 +2496,8 @@ int main(int argc, char **argv){
     }
   }
   if( getuid()==0 ){
-    Malfunction(590, /* LOG: cannot run as root */
-                "cannot run as root");
+//    Malfunction(590, /* LOG: cannot run as root */
+//                "cannot run as root");
   }
 
   /* Get the IP address from whence the request originates

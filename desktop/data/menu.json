@@ -43,7 +43,7 @@
         "url": "javascript:ajax.view({url: 'html/application/storyboard/storyboard.html', containerId: 'container'});"
       }]
     }]
-  }, {
+  },{
     "title": "组件示例",
     "menus": [{
       "text": "单一示例",
@@ -92,6 +92,10 @@
         "text": "分栏显示",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/component/splitter.html', containerId: 'container'});"
+      }, {
+        "text": "泳道图示",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/diagram/swimlane.html', containerId: 'container'});"
       }]
     },{
       "text": "组合示例",

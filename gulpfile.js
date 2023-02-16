@@ -73,14 +73,14 @@ gulp.task('dist', function() {
 
   // desktop js
   gulp.src(['src/js/*.js', 'src/js/application/*.js', 'src/js/container/*.js', 'src/js/control/*.js',
-    'src/js/editor/*.js', 'src/js/widget/*.js'])
+    'src/js/editor/*.js', 'src/js/widget/*.js', 'src/js/diagram/*.js'])
     // .pipe(babel({presets: ['es2015']}))
     .pipe(concat('./kui-all.min.js'))
     .pipe(uglify({}))
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/js/*.js', 'src/js/application/*.js', 'src/js/container/*.js', 'src/js/control/*.js',
-    'src/js/editor/*.js', 'src/js/widget/*.js'])
+    'src/js/editor/*.js', 'src/js/widget/*.js', 'src/js/diagram/*.js'])
     .pipe(concat('./kui-all.js'))
     .pipe(gulp.dest('./dist/'));
 

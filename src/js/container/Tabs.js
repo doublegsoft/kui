@@ -57,8 +57,10 @@ Tabs.prototype.render = function() {
         _nav.classList.remove(self.tabActiveClass);
       }
 
-      for (let i = 0; i < self.content.children.length; i++) {
-        self.content.children[i].style.display = 'none';
+      if (self.content) {
+        for (let i = 0; i < self.content.children.length; i++) {
+          self.content.children[i].style.display = 'none';
+        }
       }
 
       // 激活现在点击的页签及内容
