@@ -3,7 +3,7 @@ function Swimlane(opt) {
   this.lanes = opt.lanes || [];
   this.shapes = [];
   this.padding = 10;
-  this.gutter = 60;
+  this.gutter = 40;
   this.defaultWidth = 120;
 
   this.colorSuccess = '#73b17b';
@@ -52,9 +52,9 @@ Swimlane.prototype.draw = function() {
     for (let j = 0; j < lane.actions.length; j++) {
       let action = lane.actions[j];
       if (action.type == 'PROC') {
-        this.drawProcess(this.padding * 3 + headSize + this.gutter * (j + 1) + this.defaultWidth * j, i, action)
+        this.drawProcess(this.padding * 2 + headSize + this.gutter * j + this.defaultWidth * j, i, action)
       } else if (action.type == 'COND') {
-        this.drawCondition(this.padding * 3 + headSize + this.gutter * (j + 1) + this.defaultWidth * j, i, action);
+        this.drawCondition(this.padding * 2 + headSize + this.gutter * j + this.defaultWidth * j, i, action);
       }
     }
   }
