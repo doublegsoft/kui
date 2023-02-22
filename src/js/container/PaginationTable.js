@@ -848,8 +848,12 @@ PaginationTable.prototype.loadLocal = function () {
   let result = {};
   result.total = this.local.total;
   result.data = [];
-  for (let i = this.start; i < (this.start + this.limit) && i < this.local.total; i++) {
-    result.data.push(this.local.data[i] == null ? "&nbsp;" : this.local.data[i]);
+  if (this.limit != -1) {
+    for (let i = this.start; i < (this.start + this.limit) && i < this.local.total; i++) {
+      result.data.push(this.local.data[i] == null ? "&nbsp;" : this.local.data[i]);
+    }
+  } else {
+    result = this.local;
   }
   this.fill(result);
   this.showPageNumber();

@@ -519,6 +519,55 @@ ajax.shade = function(opts) {
   }
 };
 
+ajax.shade = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let callback = opts.success;
+
+  let shade = document.querySelector('.page.full');
+  if (shade != null) shade.parentElement.remove();
+  if (url.indexOf(':') === -1) {
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let fragment = utils.append(document.body, resp);
+        if (callback)
+          callback(opts.title || '', fragment);
+      }
+    });
+  } else {
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: url.substring(1)
+      },
+      success: function (resp) {
+        let script = resp.data.script;
+        let fragment = utils.append(document.body, script);
+        if (callback)
+          callback(opts.title || '', fragment);
+      }
+    });
+  }
+};
+
+ajax.shade2 = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let callback = opts.success;
+
+  xhr.get({
+    url: url,
+    success: function (resp) {
+      let fragment = utils.append(document.body, resp);
+      if (callback)
+        callback(opts.title || '', fragment);
+    }
+  });
+};
+
 /**
  * 叠加远程页面到现有容器中，不替换现有页面，只隐藏现有页面。
  *

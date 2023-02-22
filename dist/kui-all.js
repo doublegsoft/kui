@@ -1348,6 +1348,55 @@ ajax.shade = function(opts) {
   }
 };
 
+ajax.shade = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let callback = opts.success;
+
+  let shade = document.querySelector('.page.full');
+  if (shade != null) shade.parentElement.remove();
+  if (url.indexOf(':') === -1) {
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let fragment = utils.append(document.body, resp);
+        if (callback)
+          callback(opts.title || '', fragment);
+      }
+    });
+  } else {
+    xhr.post({
+      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
+      data: {
+        customWindowId: url.substring(1)
+      },
+      success: function (resp) {
+        let script = resp.data.script;
+        let fragment = utils.append(document.body, script);
+        if (callback)
+          callback(opts.title || '', fragment);
+      }
+    });
+  }
+};
+
+ajax.shade2 = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let callback = opts.success;
+
+  xhr.get({
+    url: url,
+    success: function (resp) {
+      let fragment = utils.append(document.body, resp);
+      if (callback)
+        callback(opts.title || '', fragment);
+    }
+  });
+};
+
 /**
  * 叠加远程页面到现有容器中，不替换现有页面，只隐藏现有页面。
  *
@@ -15333,8 +15382,12 @@ PaginationTable.prototype.loadLocal = function () {
   let result = {};
   result.total = this.local.total;
   result.data = [];
-  for (let i = this.start; i < (this.start + this.limit) && i < this.local.total; i++) {
-    result.data.push(this.local.data[i] == null ? "&nbsp;" : this.local.data[i]);
+  if (this.limit != -1) {
+    for (let i = this.start; i < (this.start + this.limit) && i < this.local.total; i++) {
+      result.data.push(this.local.data[i] == null ? "&nbsp;" : this.local.data[i]);
+    }
+  } else {
+    result = this.local;
   }
   this.fill(result);
   this.showPageNumber();
@@ -16226,6 +16279,9 @@ ReadonlyForm.prototype.root = function (data) {
 				_value = field.getValue.apply(null, data);
 			} else {
 				_value = data[field.name] == undefined ? field.emptyText : data[field.name];
+			}
+			if (field.display) {
+				_value = field.display(data[field.name]);
 			}
 			if (_value != '-') {
 				if (field.display) {
@@ -28297,14 +28353,20 @@ function Swimlane(opt) {
   this.padding = 10;
   this.gutter = 40;
   this.defaultWidth = 120;
+  this.passed = opt.passed || [];
 
   this.colorSuccess = '#73b17b';
   this.colorFailed = '#d32f2f';
-  this.colorDefault = 'black';
+  this.colorDefault = '#333333';
 }
 
 Swimlane.prototype.draw = function() {
+  const headSize = 36;
+
   // top-left corner
+  this.context.beginPath();
+  this.setColorContext(null);
+
   this.context.strokeWidth = 1;
   this.context.moveTo(this.padding, this.padding);
   this.context.lineTo(this.width - this.padding, this.padding);
@@ -28313,11 +28375,10 @@ Swimlane.prototype.draw = function() {
   this.context.lineTo(this.padding, this.padding);
   this.context.stroke();
 
-  const headSize = 36;
-
   this.context.moveTo(this.padding + headSize, this.padding);
   this.context.lineTo(this.padding + headSize, this.height - this.padding);
   this.context.stroke();
+  this.context.closePath();
 
   let len = this.lanes.length;
   if (len == 0) return;
@@ -28327,6 +28388,8 @@ Swimlane.prototype.draw = function() {
   this.context.font = 'bold 14px arial';
   const textPadding = 4;
   for (let i = 0; i < len; i++) {
+    this.context.beginPath()
+    this.setColorContext(null);
     let lane = this.lanes[i];
     this.context.moveTo(this.padding, this.padding + this.laneHeight * i);
     this.context.lineTo(this.width - this.padding, this.padding + this.laneHeight * i);
@@ -28340,7 +28403,7 @@ Swimlane.prototype.draw = function() {
       this.context.fillText(lane.title.substring(j * 2, (j + 1) * 2),
         this.padding + textPadding, textY + (j + 1) * 18);
     }
-
+    this.context.closePath();
     for (let j = 0; j < lane.actions.length; j++) {
       let action = lane.actions[j];
       if (action.type == 'PROC') {
@@ -28363,6 +28426,9 @@ Swimlane.prototype.drawProcess = function(x, laneIndex, action) {
 
   let y = this.laneHeight * laneIndex + (this.laneHeight - height) / 2 + this.padding;
 
+  this.context.beginPath();
+  this.setColorContext(action.id);
+
   this.context.moveTo(x + radius, y);
   this.context.lineTo(x + width - radius, y);
   this.context.quadraticCurveTo(x + width, y, x + width, y + radius);
@@ -28378,6 +28444,7 @@ Swimlane.prototype.drawProcess = function(x, laneIndex, action) {
   let textY = y + (height - 0) / 2;
   this.context.fillText(text, textX, textY);
   this.context.stroke();
+  this.context.closePath();
 
   this.shapes.push({
     id: action.id,
@@ -28399,6 +28466,8 @@ Swimlane.prototype.drawCondition = function(x, laneIndex, action) {
 
   let y = this.laneHeight * laneIndex + (this.laneHeight - height) / 2 + this.padding;
 
+  this.context.beginPath();
+  this.setColorContext(action.id);
   // 从左侧开始画
   this.context.moveTo(x, y + height / 2);
   // 到顶部
@@ -28415,6 +28484,7 @@ Swimlane.prototype.drawCondition = function(x, laneIndex, action) {
   let textY = y + (height - 0) / 2;
   this.context.fillText(text, textX, textY);
   this.context.stroke();
+  this.context.closePath();
 
   this.shapes.push({
     id: action.id,
@@ -28435,21 +28505,28 @@ Swimlane.prototype.drawConnections = function () {
       let shape = this.getShape(action.id);
       if (typeof next === 'string') {
         let nextShape = this.getShape(next);
-        this.drawConnection(shape, nextShape);
+        this.drawConnection(shape, nextShape, '', this.isDone(action.id));
       } else if (typeof next === 'object') {
         for (let key in next) {
           let nextShape = this.getShape(next[key]);
           if (key === 'Y')
-            this.drawConnection(shape, nextShape, '同意');
+            this.drawConnection(shape, nextShape, '同意', this.isDone(action.id + 'Y'));
           else if (key === 'N')
-            this.drawConnection(shape, nextShape, '驳回');
+            this.drawConnection(shape, nextShape, '驳回', this.isDone(action.id + 'N'));
         }
       }
     }
   }
 };
 
-Swimlane.prototype.drawConnection = function(curr, next, text) {
+Swimlane.prototype.drawConnection = function(curr, next, text, done) {
+  this.context.beginPath();
+  if (done === true) {
+    this.setColorContext(curr.id);
+  } else {
+    this.setColorContext(null);
+  }
+
   if (next.y > curr.y) {
     // 底部连接顶部
     this.context.moveTo(curr.x + curr.width / 2, curr.y + curr.height);
@@ -28507,6 +28584,7 @@ Swimlane.prototype.drawConnection = function(curr, next, text) {
       this.context.closePath();
     }
   }
+  this.context.closePath();
 };
 
 Swimlane.prototype.getShape = function (id) {
@@ -28535,6 +28613,51 @@ Swimlane.prototype.render = function(containerId) {
   this.container.appendChild(canvas);
   this.context.scale(scale, scale);
 
+  this.context.lineWidth = 2;
+  this.context.fillStyle = this.colorDefault;
+  this.context.strokeStyle = this.colorSuccess;
+
   this.draw();
+};
+
+Swimlane.prototype.isCompleted = function (id) {
+  for (let i = 0; i < this.passed.length; i++) {
+    if (this.passed[i].status === id ||
+        this.passed[i].status === (id + 'Y')) {
+      return true;
+    }
+  }
+  return false;
+};
+
+Swimlane.prototype.isFailed = function (id) {
+  for (let i = 0; i < this.passed.length; i++) {
+    if (this.passed[i].status === (id + 'N')) {
+      return true;
+    }
+  }
+  return false;
+};
+
+Swimlane.prototype.isDone = function (id) {
+  for (let i = 0; i < this.passed.length; i++) {
+    if (this.passed[i].status === id) {
+      return true;
+    }
+  }
+  return false;
+};
+
+Swimlane.prototype.setColorContext = function (id) {
+  if (this.isCompleted(id) === true) {
+    this.context.fillStyle = this.colorSuccess;
+    this.context.strokeStyle = this.colorSuccess;
+  } else if (this.isFailed(id) === true) {
+    this.context.fillStyle = this.colorFailed;
+    this.context.strokeStyle = this.colorFailed;
+  } else {
+    this.context.fillStyle = this.colorDefault;
+    this.context.strokeStyle = this.colorDefault;
+  }
 };
 

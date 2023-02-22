@@ -82,6 +82,9 @@ ReadonlyForm.prototype.root = function (data) {
 			} else {
 				_value = data[field.name] == undefined ? field.emptyText : data[field.name];
 			}
+			if (field.display) {
+				_value = field.display(data[field.name]);
+			}
 			if (_value != '-') {
 				if (field.display) {
 					_value = field.display(data[field.name]);
