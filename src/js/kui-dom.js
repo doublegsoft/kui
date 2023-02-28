@@ -375,7 +375,7 @@ dom.switch = function (selector, resolve) {
   let elements = container.querySelectorAll(sources[0]);
   for (let i = 0; i < elements.length; i++) {
     let element = elements[i];
-    element.addEventListener('click',  function() {
+    element.onclick = ev => {
       // clear all
       let siblings = container.querySelectorAll(sources[0]);
       for (let i = 0; i < siblings.length; i++) {
@@ -383,7 +383,7 @@ dom.switch = function (selector, resolve) {
       }
       element.classList.add(sources[1].substring(1));
       if (resolve) resolve(element);
-    });
+    };
   }
 };
 
@@ -552,6 +552,18 @@ dom.formdata = function(selector, data) {
     function setValue(container, name, val) {
       let el = dom.find('[name=\'' + name + '\']', container);
       if (el == null) return;
+      if (el.length > 1) {
+        if (el[0].type == 'radio') {
+          let radios = el;
+          radios.forEach((el, idx) => {
+            if (el.value === val) {
+              el.checked = true;
+            } else {
+              el.checked = false;
+            }
+          });
+        }
+      }
       if (el.tagName == 'INPUT') {
         if (el.type == 'check') {
           // TODO
@@ -560,6 +572,8 @@ dom.formdata = function(selector, data) {
         }
       } else if (el.tagName == 'SELECT') {
         $('select[name=\'' + name + '\']').val(val).trigger('change');
+      } else if (el.tagName == 'TEXTAREA') {
+        el.innerHTML = val;
       }
     }
 

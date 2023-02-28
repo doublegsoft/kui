@@ -1604,7 +1604,7 @@ ajax.dialog = function(opts) {
   let data = opts.params || {};
   let callback = opts.success;
   let end = opts.end;
-  let shadeClose = opts.shadeClose !== false;
+  let shadeClose = opts.shadeClose === false ?  false : true;
   let allowClose = opts.allowClose === true;
   let width=opts.width || '80%';
   let height = opts.height || '';
@@ -1625,7 +1625,7 @@ ajax.dialog = function(opts) {
         offset: offset,
         title : title,
         closeBtn: (allowClose === true) ? 1: 0,
-        shade: 0.3,
+        shade: 0.5,
         shadeClose : shadeClose,
         area : [width, height],
         content : html,
@@ -5215,7 +5215,7 @@ dom.switch = function (selector, resolve) {
   let elements = container.querySelectorAll(sources[0]);
   for (let i = 0; i < elements.length; i++) {
     let element = elements[i];
-    element.addEventListener('click',  function() {
+    element.onclick = ev => {
       // clear all
       let siblings = container.querySelectorAll(sources[0]);
       for (let i = 0; i < siblings.length; i++) {
@@ -5223,7 +5223,7 @@ dom.switch = function (selector, resolve) {
       }
       element.classList.add(sources[1].substring(1));
       if (resolve) resolve(element);
-    });
+    };
   }
 };
 
@@ -5392,6 +5392,18 @@ dom.formdata = function(selector, data) {
     function setValue(container, name, val) {
       let el = dom.find('[name=\'' + name + '\']', container);
       if (el == null) return;
+      if (el.length > 1) {
+        if (el[0].type == 'radio') {
+          let radios = el;
+          radios.forEach((el, idx) => {
+            if (el.value === val) {
+              el.checked = true;
+            } else {
+              el.checked = false;
+            }
+          });
+        }
+      }
       if (el.tagName == 'INPUT') {
         if (el.type == 'check') {
           // TODO
@@ -5400,6 +5412,8 @@ dom.formdata = function(selector, data) {
         }
       } else if (el.tagName == 'SELECT') {
         $('select[name=\'' + name + '\']').val(val).trigger('change');
+      } else if (el.tagName == 'TEXTAREA') {
+        el.innerHTML = val;
       }
     }
 
@@ -10448,6 +10462,7 @@ function FormLayout(opts) {
   this.actions = opts.actions || [];
   this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
+  this.saveText = opts.saveText || '保存';
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
 	this.mode = opts.mode || 'rightbar';
@@ -10777,7 +10792,7 @@ FormLayout.prototype.build = function(persisted) {
     buttons.appendChild(buttonClose);
   }
   let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
-  buttonSave.textContent = '保存';
+  buttonSave.textContent = this.saveText;
 
   dom.bind(buttonSave, 'click', function(event) {
     event.preventDefault();
@@ -10957,7 +10972,7 @@ FormLayout.prototype.save = async function () {
     success: function (resp) {
       // enable all buttons
       if (buttonSave != null)
-        buttonSave.innerHTML = '保存';
+        buttonSave.innerHTML = self.saveText;
       dom.enable('button', self.container);
       if (resp.error) {
         self.error(resp.error.message);
@@ -11304,12 +11319,19 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('input', 'form-control');
     input.name = field.name;
     input.disabled = this.readonly || field.readonly || false;
+  } else if (field.input == 'custom') {
+    input = dom.create('input', 'form-control');
+    input.name = field.name;
+    input.disabled = true;
   } else {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请输入...');
     input.setAttribute('autocomplete', 'off');
+    if (field.value) {
+      input.value = field.value;
+    }
   }
   if (input != null) {
     group.appendChild(input);
@@ -11341,6 +11363,24 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       event.preventDefault();
       event.stopPropagation();
       input.value = fileinput.files[0].name;
+      let idx = input.value.lastIndexOf('.');
+      let ext = '';
+      if (idx != -1) {
+        ext = input.value.substring(input.value.lastIndexOf('.') + 1);
+      }
+      xhr.upload({
+        url: '/api/v3/common/upload',
+        params: field.params,
+        file: fileinput.files[0],
+        success: function(resp) {
+          let item = resp.data;
+          input.setAttribute('data-file-type', fileinput.files[0].type);
+          input.setAttribute('data-file-size', fileinput.files[0].size);
+          input.setAttribute('data-file-path', item.filepath);
+          input.setAttribute('data-file-ext', ext);
+        }
+      });
+
       FormLayout.validate(input);
     });
     group.appendChild(fileinput);
@@ -11357,7 +11397,20 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         </span>
       </div>
     `);
-    group.appendChild(addnew);
+
+    if (field.input == 'custom' || field.input == 'select') {
+      let name = field.name;
+      let custom = dom.element(`
+        <div widget-id="widgetCustom_${name}" class="full-width"></div>
+      `);
+      dom.bind(addnew, 'click', ev => {
+        field.create(addnew, custom, field);
+      });
+      group.appendChild(addnew);
+      group.appendChild(custom);
+    } else {
+      group.appendChild(addnew);
+    }
   }
 
   let unit = dom.element(`
@@ -16269,45 +16322,51 @@ ReadonlyForm.prototype.root = function (data) {
 			labelGridCount = 2;
 			inputGridCount = 4;
 		}
-		let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px;"></div>');
-		let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;"></strong>');
+		let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px; height: 32px;"></div>');
+		let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;  height: 32px;"></strong>');
 
 		if (field.title) {
 			caption.innerText = field.title + '：';
-			var _value = null;
+			let _value = null;
 			if (typeof field.getValue !== 'undefined') {
 				_value = field.getValue.apply(null, data);
 			} else {
 				_value = data[field.name] == undefined ? field.emptyText : data[field.name];
 			}
 			if (field.display) {
-				_value = field.display(data[field.name]);
-			}
-			if (_value != '-') {
-				if (field.display) {
-					_value = field.display(data[field.name]);
-				} else {
-					if (field.values && field.values.length > 0) {
-						field.values.forEach(function (item) {
-							if (field.input && (field.input == 'radio' || field.input == 'select') && item.value == data[field.name]) {
-								_value = item.text
+				value = dom.element('<div class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;  height: 32px;"></div>');
+				field.display(data, value);
+			} else {
+				// 值转换
+				if (field.convert) {
+					_value = field.convert(data[field.name]);
+				}
+				if (_value != '-') {
+					if (field.convert) {
+						_value = field.convert(data[field.name]);
+					} else {
+						if (field.values && field.values.length > 0) {
+							field.values.forEach(function (item) {
+								if (field.input && (field.input == 'radio' || field.input == 'select') && item.value == data[field.name]) {
+									_value = item.text
+								}
+								if (field.input && field.input == 'checkbox' && data[field.name].indexOf(item.value) > -1) {
+									_value.push(item.text)
+								}
+							});
+							if (field.input && field.input == 'checkbox' && typeof (_value) == 'object') {
+								_value = _value.join(",");
 							}
-							if (field.input && field.input == 'checkbox' && data[field.name].indexOf(item.value) > -1) {
-								_value.push(item.text)
-							}
-						});
-						if (field.input && field.input == 'checkbox' && typeof (_value) == 'object') {
-							_value = _value.join(",");
 						}
 					}
+					if (field.unit) {
+						_value = _value + field.unit;
+					}
+				} else {
+					_value = '-';
 				}
-				if (field.unit) {
-					_value = _value + field.unit;
-				}
-			} else {
-				_value = '-';
+				value.innerHTML = _value;
 			}
-			value.innerText = _value;
 		}
 		root.appendChild(caption);
 		root.appendChild(value);
@@ -18844,6 +18903,11 @@ function FileUpload(opts) {
 }
 
 FileUpload.prototype.fetch = function (containerId) {
+  if (!this.fetchUrl) {
+    this.local = [];
+    this.render(containerId);
+    return;
+  }
   let self = this;
   xhr.post({
     url: this.fetchUrl,
@@ -18855,7 +18919,11 @@ FileUpload.prototype.fetch = function (containerId) {
 };
 
 FileUpload.prototype.append = function (item) {
-  let url = item.filepath.replace('/www/', '');
+  if (!item) return;
+  let url = '';
+  if (item.filepath) {
+    item.filepath.replace('/www/', '');
+  }
   let ul = dom.find('ul', this.container);
   let li = dom.create('li', 'list-group-item', 'list-group-item-input');
   let link = dom.create('a', 'btn', 'btn-link', 'text-info');

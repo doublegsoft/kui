@@ -19,6 +19,11 @@ function FileUpload(opts) {
 }
 
 FileUpload.prototype.fetch = function (containerId) {
+  if (!this.fetchUrl) {
+    this.local = [];
+    this.render(containerId);
+    return;
+  }
   let self = this;
   xhr.post({
     url: this.fetchUrl,
@@ -30,7 +35,11 @@ FileUpload.prototype.fetch = function (containerId) {
 };
 
 FileUpload.prototype.append = function (item) {
-  let url = item.filepath.replace('/www/', '');
+  if (!item) return;
+  let url = '';
+  if (item.filepath) {
+    item.filepath.replace('/www/', '');
+  }
   let ul = dom.find('ul', this.container);
   let li = dom.create('li', 'list-group-item', 'list-group-item-input');
   let link = dom.create('a', 'btn', 'btn-link', 'text-info');

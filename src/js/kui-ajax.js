@@ -775,7 +775,7 @@ ajax.dialog = function(opts) {
   let data = opts.params || {};
   let callback = opts.success;
   let end = opts.end;
-  let shadeClose = opts.shadeClose !== false;
+  let shadeClose = opts.shadeClose === false ?  false : true;
   let allowClose = opts.allowClose === true;
   let width=opts.width || '80%';
   let height = opts.height || '';
@@ -796,7 +796,7 @@ ajax.dialog = function(opts) {
         offset: offset,
         title : title,
         closeBtn: (allowClose === true) ? 1: 0,
-        shade: 0.3,
+        shade: 0.5,
         shadeClose : shadeClose,
         area : [width, height],
         content : html,

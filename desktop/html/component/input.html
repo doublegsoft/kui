@@ -43,7 +43,7 @@
   </div>
   <div class="card-body row">
     <div class="col-md-3">
-      <div class="text-switch">
+      <div class="text-switch" data-switch="label+.checked">
         <label class="mb-0 checked" data-switch=".checked">
           <input name="text-switch" type="radio" style="display: none"/>年度
         </label>
@@ -53,7 +53,7 @@
       </div>
     </div>
     <div class="col-md-3">
-      <div class="text-multi-switch">
+      <div class="text-multi-switch" data-switch="label+.checked">
         <label class="checked mb-0" style="width: 33.3%" data-switch=".checked">
           <input type="radio" style="display: none;"/>年度
         </label>
@@ -69,6 +69,6 @@
 </div>
 
 <script>
-dom.switch('.text-switch label');
-dom.switch('.text-multi-switch label');
+dom.switch('.text-switch');
+dom.switch('.text-multi-switch');
 </script>

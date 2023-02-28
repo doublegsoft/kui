@@ -71,45 +71,51 @@ ReadonlyForm.prototype.root = function (data) {
 			labelGridCount = 2;
 			inputGridCount = 4;
 		}
-		let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px;"></div>');
-		let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;"></strong>');
+		let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px; height: 32px;"></div>');
+		let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;  height: 32px;"></strong>');
 
 		if (field.title) {
 			caption.innerText = field.title + '：';
-			var _value = null;
+			let _value = null;
 			if (typeof field.getValue !== 'undefined') {
 				_value = field.getValue.apply(null, data);
 			} else {
 				_value = data[field.name] == undefined ? field.emptyText : data[field.name];
 			}
 			if (field.display) {
-				_value = field.display(data[field.name]);
-			}
-			if (_value != '-') {
-				if (field.display) {
-					_value = field.display(data[field.name]);
-				} else {
-					if (field.values && field.values.length > 0) {
-						field.values.forEach(function (item) {
-							if (field.input && (field.input == 'radio' || field.input == 'select') && item.value == data[field.name]) {
-								_value = item.text
+				value = dom.element('<div class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;  height: 32px;"></div>');
+				field.display(data, value);
+			} else {
+				// 值转换
+				if (field.convert) {
+					_value = field.convert(data[field.name]);
+				}
+				if (_value != '-') {
+					if (field.convert) {
+						_value = field.convert(data[field.name]);
+					} else {
+						if (field.values && field.values.length > 0) {
+							field.values.forEach(function (item) {
+								if (field.input && (field.input == 'radio' || field.input == 'select') && item.value == data[field.name]) {
+									_value = item.text
+								}
+								if (field.input && field.input == 'checkbox' && data[field.name].indexOf(item.value) > -1) {
+									_value.push(item.text)
+								}
+							});
+							if (field.input && field.input == 'checkbox' && typeof (_value) == 'object') {
+								_value = _value.join(",");
 							}
-							if (field.input && field.input == 'checkbox' && data[field.name].indexOf(item.value) > -1) {
-								_value.push(item.text)
-							}
-						});
-						if (field.input && field.input == 'checkbox' && typeof (_value) == 'object') {
-							_value = _value.join(",");
 						}
 					}
+					if (field.unit) {
+						_value = _value + field.unit;
+					}
+				} else {
+					_value = '-';
 				}
-				if (field.unit) {
-					_value = _value + field.unit;
-				}
-			} else {
-				_value = '-';
+				value.innerHTML = _value;
 			}
-			value.innerText = _value;
 		}
 		root.appendChild(caption);
 		root.appendChild(value);

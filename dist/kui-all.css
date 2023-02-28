@@ -16675,7 +16675,7 @@ a {
 }
 
 .text-switch > label.checked {
-  background-color: #357edd;
+  background-color: var(--color-primary);
   color: #fff;
 }
 
