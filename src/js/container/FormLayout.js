@@ -11,6 +11,8 @@ function FormLayout(opts) {
   this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
   this.saveText = opts.saveText || '保存';
+  this.savePrompt = typeof (opts.savePromptText === 'undefined') ? true : false;
+  this.savePromptText = opts.savePromptText;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
 	this.mode = opts.mode || 'rightbar';
@@ -417,6 +419,9 @@ FormLayout.prototype.fetch = async function (params) {
   }
   if (utils.isEmpty(data)) {
     self.build(params);
+    if (self.readOpt.callback) {
+      self.readOpt.callback(params);
+    }
   } else {
     for (let keyParam in params) {
       if (typeof data[keyParam] === 'undefined') {
@@ -424,6 +429,9 @@ FormLayout.prototype.fetch = async function (params) {
       }
     }
     self.build(data);
+    if (self.readOpt.callback) {
+      self.readOpt.callback(data);
+    }
   }
 };
 
@@ -532,17 +540,18 @@ FormLayout.prototype.save = async function () {
       }
       if (self.saveOpt.callback) self.saveOpt.callback(resp.data);
       if (self.saveOpt.success) self.saveOpt.success(resp.data);
-      self.success("数据保存成功！");
-      // 默认自动关闭
-      if (self.saveOpt.autoClose !== false) {
-        let rightbar = dom.find('div[widget-id=right-bar]');
-        if (rightbar != null) {
-          rightbar.children[0].classList.add('out');
-          setTimeout(function () {
-            rightbar.remove();
-          }, 300);
+      self.success(self.savePromptText || '数据保存成功！', () => {
+        // 默认自动关闭
+        if (self.saveOpt.autoClose !== false) {
+          let rightbar = dom.find('div[widget-id=right-bar]');
+          if (rightbar != null) {
+            rightbar.children[0].classList.add('out');
+            setTimeout(function () {
+              rightbar.remove();
+            }, 300);
+          }
         }
-      }
+      });
     }
   });
 };
@@ -951,9 +960,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       let custom = dom.element(`
         <div widget-id="widgetCustom_${name}" class="full-width"></div>
       `);
-      dom.bind(addnew, 'click', ev => {
-        field.create(addnew, custom, field);
-      });
+      field.create(addnew, custom, field);
       group.appendChild(addnew);
       group.appendChild(custom);
     } else {
@@ -1121,11 +1128,12 @@ FormLayout.prototype.error = function (message) {
   this.toast.classList.add('show', 'in');
 };
 
-FormLayout.prototype.success = function (message) {
+FormLayout.prototype.success = function (message, callback) {
   let self = this;
   this.toast.style.zIndex = 11000;
   this.toast.classList.remove('bg-danger', 'hidden');
-  this.toast.classList.add('bg-success');
+  // this.toast.classList.add('bg-success');
+  this.toast.style.backgroundColor = 'var(--color-success)'
 
   let posInScreen = this.container.getBoundingClientRect();
   let offsetTop = posInScreen.top - this.originalPositionTop;
@@ -1136,7 +1144,8 @@ FormLayout.prototype.success = function (message) {
   this.toast.classList.add('show', 'in');
   setTimeout(function() {
     dom.find('button', self.toast).click();
-  }, 2000);
+    if (callback) callback();
+  }, 1000);
 };
 
 /**
