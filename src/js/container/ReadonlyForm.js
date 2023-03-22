@@ -71,8 +71,8 @@ ReadonlyForm.prototype.root = function (data) {
 			labelGridCount = 2;
 			inputGridCount = 4;
 		}
-		let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px; height: 32px;"></div>');
-		let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;  height: 32px;"></strong>');
+		let caption = dom.element('<div class="col-24-' + this.formatGridCount(labelGridCount) + '" style="line-height: 32px;"></div>');
+		let value = dom.element('<strong class="col-24-' + this.formatGridCount(inputGridCount) + '" style="line-height: 32px;"></strong>');
 
 		if (field.title) {
 			caption.innerText = field.title + '：';

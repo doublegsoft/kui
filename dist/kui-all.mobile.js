@@ -3730,13 +3730,13 @@ Tabs.prototype.render = function() {
       if (idx == 0) {
         self.activate(nav);
         if (tab.onClicked) {
-          tab.onClicked(ev);
+          tab.onClicked();
         } else {
           self.loadPage(tab.id, tab.url, false, tab.success);
         }
       } else {
         if (tab.onClicked) {
-          tab.onClicked(ev);
+          tab.onClicked();
         } else {
           self.loadPage(tab.id, tab.url, true, tab.success);
         }

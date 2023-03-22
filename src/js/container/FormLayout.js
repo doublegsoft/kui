@@ -411,6 +411,7 @@ FormLayout.prototype.fetch = async function (params) {
     url: this.readOpt.url,
     data: params,
   });
+  if (!data) data = {};
   if (self.readOpt.asyncConvert) {
     data = await  self.readOpt.asyncConvert(data);
   }

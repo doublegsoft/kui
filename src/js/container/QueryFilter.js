@@ -2,6 +2,7 @@
 function QueryFilter(opts) {
   this.fields = opts.fields;
   this.table = opts.table;
+  this.convert = opts.convert || function (data) {return data};
 }
 
 QueryFilter.prototype.getRoot = function() {
@@ -101,6 +102,7 @@ QueryFilter.prototype.addFilter = function(filter) {
     let span = ev.target.parentElement;
     span.remove();
     // 回调表格重新请求
+
     self.request();
   });
   let strong = dom.find('strong', el);
@@ -284,6 +286,6 @@ QueryFilter.prototype.getValues = function() {
 
 QueryFilter.prototype.request = function() {
   if (this.table) {
-    this.table.go(1);
+    this.table.go(1, this.convert(this.getValues()));
   }
 };

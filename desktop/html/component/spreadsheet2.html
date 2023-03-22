@@ -1,7 +1,8 @@
-<div id="spreadsheet"></div>
+<div id="spreadsheet" class="overflow-hidden"></div>
 
 <script>
-dom.height('#spreadsheet', 28, body);
+var spreadsheet = dom.find('#spreadsheet');
+dom.height(spreadsheet, 24, body);
 
 function initialize() {
   const rows10 = { len: 1000 };
@@ -70,6 +71,10 @@ function initialize() {
 
   xs.on('cell-selected', (cell, ri, ci) => {
     // console.log('cell:', cell, ', ri:', ri, ', ci:', ci);
+    ajax.sidebar({
+      containerId: document.body,
+      url: 'html/component/form.html',
+    })
   }).on('cell-edited', (text, ri, ci) => {
     // console.log('text:', text, ', ri: ', ri, ', ci:', ci);
   });
@@ -77,12 +82,11 @@ function initialize() {
   setTimeout(() => {
     // xs.loadData([{ rows }]);
     xs.cellText(14, 3, 'cell-text').reRender();
-    console.log('cell(8, 8):', xs.cell(8, 8));
-    console.log('cellStyle(8, 8):', xs.cellStyle(8, 8));
+    // console.log('cell(8, 8):', xs.cell(8, 8));
+    // console.log('cellStyle(8, 8):', xs.cellStyle(8, 8));
   }, 5000);
 }
 
 initialize();
-
-dom.find('div.x-spreadsheet-sheet').style.height = dom.find('#spreadsheet').clientHeight - 66 + 'px';
+dom.find('div.x-spreadsheet-sheet').style.height = dom.find('#spreadsheet').clientHeight - 80 + 'px';
 </script>

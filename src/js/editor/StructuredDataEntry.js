@@ -2,6 +2,7 @@ function StructuredDataEntry(opts) {
   if (opts && opts.container) {
     this.container = dom.find(opts.container);
   }
+  this.onInput = opts.onInput;
 }
 
 StructuredDataEntry.prototype.initialize = function(data) {
@@ -29,33 +30,40 @@ StructuredDataEntry.prototype.initialize = function(data) {
       self.bindMultiselectInput(el);
     } else {
       el.setAttribute('contenteditable', true);
-      self.bindNumberInput(el);
+      self.bindTextInput(el);
     }
     if (data[el.getAttribute('data-sde-name')]) {
       let _value=data[el.getAttribute('data-sde-name')];
       let selectvalue=el.getAttribute('data-sde-values');
       let trigger = el;
       let par = trigger.parentElement.parentElement;
-      console.log(data,_value,selectvalue);
-      if(input=='number'&&data[el.getAttribute('data-sde-name')]!=0
-        || input=='select'&&selectvalue.indexOf(_value)>-1
-        || input=='multiselect' && _value.length>0
-        || input=='text'&&data[el.getAttribute('data-sde-name')]!=el.getAttribute('data-sde-label') ){
-        el.classList.remove('sde-input-default');
-        el.innerText = data[el.getAttribute('data-sde-name')];
-        par.dataset.nodata='false';
+      el.classList.remove('sde-input-default');
+      el.innerText = '【' + data[el.getAttribute('data-sde-name')] + '】';
+      // 非显示的引用值
+      if (el.getAttribute('data-sde-param') != '') {
+        el.setAttribute('data-sde-value', data[el.getAttribute('data-sde-param')]);
       }
-      par.children.forEach(function(el, idx) {
-        let visible = el.getAttribute('data-sde-visible');
-        if (visible) {
-          let strs = visible.split('==');
-          if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
-            el.style.display = '';
-          } else {
-            el.style.display = 'none';
+      // if(input=='number'&&data[el.getAttribute('data-sde-name')]!=0
+      //   || input=='select'&&selectvalue.indexOf(_value)>-1
+      //   || input=='multiselect' && _value.length>0
+      //   || input=='text'&&data[el.getAttribute('data-sde-name')]!=el.getAttribute('data-sde-label') ){
+      //   el.classList.remove('sde-input-default');
+      //   el.innerText = data[el.getAttribute('data-sde-name')];
+      //   par.dataset.nodata='false';
+      // }
+      if (par.children.forEach) {
+        par.children.forEach(function (el, idx) {
+          let visible = el.getAttribute('data-sde-visible');
+          if (visible) {
+            let strs = visible.split('==');
+            if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
+              el.style.display = '';
+            } else {
+              el.style.display = 'none';
+            }
           }
-        }
-      });
+        });
+      }
     }
   });
 };
@@ -132,6 +140,15 @@ StructuredDataEntry.prototype.getHasDataHtml = function() {
   return _html;
 };
 
+StructuredDataEntry.prototype.bindTextInput = function(el) {
+  dom.bind(el, 'input', ev => {
+    let el = ev.currentTarget;
+    let name = el.getAttribute('data-sde-name');
+    let value = el.innerText;
+    this.onInput(name, value);
+  });
+};
+
 StructuredDataEntry.prototype.bindNumberInput = function(el) {
   dom.bind(el, 'keypress', function(ev) {
     let charCode = (ev.which) ? ev.which : ev.keyCode;
@@ -158,18 +175,38 @@ StructuredDataEntry.prototype.bindNumberInput = function(el) {
       par.dataset.nodata='true';
     }
   });
+  dom.bind(el, 'input', ev => {
+    let el = ev.currentTarget;
+    let name = el.getAttribute('data-sde-name');
+    let value = el.innerText;
+    this.onInput(name, value);
+  });
 };
 
 StructuredDataEntry.prototype.bindSelectInput = function(el) {
-  dom.bind(el, 'click', function(ev) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
     ev.stopPropagation();
 
     let div = dom.find('[sde-select]');
     if (div != null) div.remove();
 
     let values = this.getAttribute('data-sde-values');
-    values = values.substring(1, values.length - 1);
-    let vals = values.split(',');
+    let url = this.getAttribute('data-sde-url');
+    // 用于显示的字段
+    let field = this.getAttribute('data-sde-field');
+
+    let vals = [];
+    if (values) {
+      values = values.substring(1, values.length - 1);
+      vals = values.split(',');
+    } else if (url) {
+      let data = await xhr.promise({
+        url: url,
+        params: {},
+      });
+      vals = data;
+    }
 
     let rectThis = this.getBoundingClientRect();
     let rectParent = this.parentElement.getBoundingClientRect();
@@ -179,6 +216,8 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
     div.setAttribute('sde-select', true);
     div.style.position = 'absolute';
     div.style.top = '0px';
+    div.style.overflowY = 'auto';
+    div.style.maxHeight = '300px';
     div.style.left = (this.parentElement.offsetLeft + 60) + 'px';
 
     let ul = dom.create('ul');
@@ -197,24 +236,35 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
       li.style.lineHeight = '2rem';
       li.style.width = '100%';
 			li.style.whiteSpace='nowrap';
-      li.innerText = vals[i];
+
+      if (typeof vals[i] === 'string') {
+        li.innerText = vals[i];
+      } else {
+        dom.model(li, vals[i]);
+        li.innerText = vals[i][field];
+      }
       li.style.cursor = 'pointer';
       dom.bind(li, 'click', function() {
         trigger.innerText = li.innerText;
         trigger.style.color = 'black';
         var par = trigger.parentElement.parentElement;
         par.dataset.nodata='false';
-        par.children.forEach(function(el, idx) {
-          var visible = el.getAttribute('data-sde-visible');
-          if (visible) {
-            let strs = visible.split('==');
-            if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
-              el.style.display = '';
-            } else {
-              el.style.display = 'none';
+        if (par.children.forEach) {
+          par.children.forEach(function (el, idx) {
+            let visible = el.getAttribute('data-sde-visible');
+            if (visible) {
+              let strs = visible.split('==');
+              if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
+                el.style.display = '';
+              } else {
+                el.style.display = 'none';
+              }
             }
-          }
-        });
+          });
+        }
+        if (self.onInput) {
+          self.onInput(trigger.getAttribute('data-sde-name'), li.innerText, dom.model(li));
+        }
         div.remove();
       });
       ul.appendChild(li);
@@ -231,11 +281,14 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
     if (containerWidth < (rectDiv.left)) {
       div.style.left = (this.parentElement.offsetLeft) + 'px';
     }
-		let _container=dom.find('.right-bar').getBoundingClientRect()
-    if(_container.right < rectDiv.right){
-			div.style.right ='0px';
-			div.style.left = 'auto';
-		}
+		let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
+      }
+    }
   });
 };
 
@@ -358,5 +411,26 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
 			div.style.left = 'auto';
 		}
   });
+};
+
+StructuredDataEntry.prototype.getEntries = function () {
+  let sdes = this.container.querySelectorAll('span[data-sde-name]');
+  let ret = [];
+  for (let sde of sdes) {
+    ret.push({
+      name: sde.getAttribute('data-sde-name'),
+      value: sde.innerText,
+    })
+  }
+  return ret;
+};
+
+StructuredDataEntry.prototype.getParams = function () {
+  let sdes = this.container.querySelectorAll('span[data-sde-param]');
+  let ret = {};
+  for (let sde of sdes) {
+    ret[sde.getAttribute('data-sde-param')] = sde.getAttribute('data-sde-value');
+  }
+  return ret;
 };
 

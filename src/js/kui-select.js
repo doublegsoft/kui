@@ -138,7 +138,7 @@ $.fn.searchselect = function (opts) {
         });
         self.on('change', function(evt) {
           validate(self.get(0));
-          if (onchange) onchange(evt);
+          if (onchange) onchange(self.get(0).value);
         });
         if (select) {
           if (!hasSelected) {
@@ -185,7 +185,7 @@ $.fn.searchselect = function (opts) {
     }
     $(this).on('change', function(evt) {
       validate($(this).get(0));
-      if (onchange) onchange(evt);
+      if (onchange) onchange($(this).get(0).vallue);
     });
     validate($(this).get(0));
     complete([]);
