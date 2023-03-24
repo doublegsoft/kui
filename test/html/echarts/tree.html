@@ -1,0 +1,20 @@
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+<div id="chart" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+<script src="https://unpkg.com/echarts-gl@2.0.8/dist/echarts-gl.js"></script>
+</html>
+<script>
+var chart = echarts.init(document.getElementById('chart'));
+chart.setOption({
+      series: [{
+        type: 'tree',
+        data: [{"name":"根","children":[{"name":"药品","children":[{"name":"维生素","value":928},{"name":"冲剂","value":774},{"name":"茶","value":2640},{"name":"速冻食品","value":723}]},{"name":"工业用品","children":[{"name":"米饭","value":820},{"name":"快餐","value":977},{"name":"面食","value":679}]},{"name":"军品","children":[{"name":"茶","value":1700},{"name":"冲剂","value":843},{"name":"面食","value":554},{"name":"维生素","value":632}]},{"name":"食品","children":[{"name":"酒","value":889},{"name":"面食","value":675},{"name":"冲剂","value":531},{"name":"维生素","value":674}]},{"name":"保健品","children":[{"name":"速冻食品","value":530},{"name":"米饭","value":796}]}]}],
+      }]
+    });
+</script>

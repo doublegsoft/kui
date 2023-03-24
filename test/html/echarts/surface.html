@@ -1,0 +1,32 @@
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+<div id="chart" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+<script src="https://unpkg.com/echarts-gl@2.0.8/dist/echarts-gl.js"></script>
+</html>
+<script>
+var chart = echarts.init(document.getElementById('chart'));
+chart.setOption({
+      xAxis3D: {
+        type: 'category'
+      },
+      yAxis3D: {
+        type: 'category'
+      },
+      zAxis3D: {
+        type: 'value'
+      },
+      grid3D: {
+        viewControl: {}
+      },
+      series: [{
+        type: 'surface',
+        data: [["药品","维生素",928],["工业用品","米饭",820],["军品","茶",1700],["食品","酒",889],["药品","冲剂",774],["药品","茶",2640],["军品","冲剂",843],["食品","面食",675],["药品","速冻食品",723],["保健品","速冻食品",530],["食品","冲剂",531],["军品","面食",554],["军品","维生素",632],["保健品","米饭",796],["食品","维生素",674],["工业用品","快餐",977],["工业用品","面食",679]],
+      }]
+    });
+</script>

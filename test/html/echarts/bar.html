@@ -1,0 +1,25 @@
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+</head>
+<body>
+<div id="chart" style="height:500px;border:1px solid #ccc;padding:10px;"></div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.0/echarts.min.js"></script>
+<script src="https://unpkg.com/echarts-gl@2.0.8/dist/echarts-gl.js"></script>
+</html>
+<script>
+var chart = echarts.init(document.getElementById('chart'));
+chart.setOption({
+      xAxis: {
+        type: 'category',
+        data: ["药品","工业用品","军品","食品","保健品"],
+      },
+      yAxis: {},
+      series: [{
+        type: 'bar',
+        data: [5065,2476,3729,2769,1326],
+      }]
+    });
+</script>
