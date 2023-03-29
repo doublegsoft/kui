@@ -7,6 +7,8 @@ function FormLayout(opts) {
   let self = this;
   this.fields = opts.fields;
   this.readonly = opts.readonly || false;
+  // 判断是否保存前提示，此处是提示语
+  this.confirmText = opts.confirmText || '';
   this.actions = opts.actions || [];
   this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
@@ -342,12 +344,22 @@ FormLayout.prototype.build = function(persisted) {
     buttons.appendChild(buttonClose);
   }
   let buttonSave = dom.create('button', 'btn', 'btn-sm', 'btn-save');
-  buttonSave.textContent = this.saveText;
+  buttonSave.innerHTML = this.saveText;
 
   dom.bind(buttonSave, 'click', function(event) {
     event.preventDefault();
     event.stopPropagation();
-    self.save();
+    if (self.confirmText !== '') {
+      let ct = self.confirmText;
+      if (typeof self.confirmText === 'function') {
+        ct = self.confirmText();
+      }
+      dialog.confirm(ct, () => {
+        self.save();
+      })
+    } else {
+      self.save();
+    }
   });
 
   let rightBarBottom = dom.find('div[widget-id=right-bar-bottom]');
@@ -482,40 +494,6 @@ FormLayout.prototype.save = async function () {
   if (this.saveOpt.convert) {
     if (awaitConvert) {
       data = await this.saveOpt.convert(data)
-        // .then(ret => {
-        // if(ret.isReady){
-        //   xhr.post({
-        //     url: this.saveOpt.url,
-        //     usecase: this.saveOpt.usecase,
-        //     data: data,
-        //     success: function (resp) {
-        //       // enable all buttons
-        //       if (buttonSave != null)
-        //         buttonSave.innerHTML = '保存';
-        //       dom.enable('button', self.container);
-        //       if (resp.error) {
-        //         self.error(resp.error.message);
-        //         return;
-        //       }
-        //       let identifiables = document.querySelectorAll(' input[data-identifiable=true]', self.container);
-        //       for (let i = 0; i < identifiables.length; i++) {
-        //         identifiables[i].value = resp.data[identifiables[i].name];
-        //       }
-        //       if (self.saveOpt.callback)
-        //         self.saveOpt.callback(resp.data);
-        //       if (self.saveOpt.success)
-        //         self.saveOpt.success(resp.data);
-        //       self.success("数据保存成功！");
-        //     }
-        //   });
-        // } else {
-        //   if (buttonSave != null) {
-        //     buttonSave.innerHTML = '保存';
-        //     dom.enable('button', self.container);
-        //   }
-        // 	return;
-        // }
-      // });
     } else {
       data = this.saveOpt.convert(data);
     }
@@ -962,7 +940,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         <div widget-id="widgetCustom_${name}" class="full-width"></div>
       `);
       field.create(addnew, custom, field);
-      group.appendChild(addnew);
+      if (field.readonly !== true) {
+        group.appendChild(addnew);
+      }
       group.appendChild(custom);
     } else {
       group.appendChild(addnew);
