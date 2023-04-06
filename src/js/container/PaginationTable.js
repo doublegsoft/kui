@@ -226,7 +226,10 @@ PaginationTable.prototype.render = function (containerId, params) {
   if(this.widgetExcess){
     $(this.container).append(this.widgetExcess.template);
   }
-  $(this.container).append(this.root(params)).append(this.pagination());
+  $(this.container).append(this.root(params));
+  if (this.limit != -1) {
+    $(this.container).append(this.pagination());
+  }
   if (typeof params === "undefined" || params == '' || params == '{}') {
     this.go(1);
     this.afterRequest();
@@ -285,7 +288,7 @@ PaginationTable.prototype.root = function (initParams) {
   if (typeof initParams === "undefined") {
     initParams = {};
   }
-  let ret = $('<div class="">');
+  let ret = $('<div class="full-width">');
   ret.css('overflow-y', 'auto');
   this.table = $("<table></table>");
   if (typeof this.width !== 'undefined') this.table.css('width', this.width);
@@ -412,7 +415,7 @@ PaginationTable.prototype.pagination = function () {
   let ul = $('<ul class="pagination mb-0 mt-2 ml-auto"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
-  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
+  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('首页');
   a.html('<i class="material-icons">first_page</i>');
@@ -426,7 +429,7 @@ PaginationTable.prototype.pagination = function () {
   }
 
   this.prevPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('上一页');
   a.html('<i class="material-icons">chevron_left</i>');
@@ -438,7 +441,7 @@ PaginationTable.prototype.pagination = function () {
 
   li = $('<li class="page-item disabled"></li>');
   li.addClass('disabled');
-  this.pagebar = $('<a class="page-link b-a-0 pt-1 font-14" style="padding-bottom: 2px; height: 30px; line-height: 30px"></a>');
+  this.pagebar = $('<a class="page-link b-a-0 pt-1 font-14" style="height: 30px; line-height: 30px"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
   this.pagebar.attr('style', 'cursor: default');
   this.pagebar.text("0/0");
@@ -446,7 +449,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(li);
 
   this.nextPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('下一页');
   a.html('<i class="material-icons">chevron_right</i>');
@@ -457,7 +460,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(this.nextPage);
 
   this.lastPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14"  style="padding-bottom: 2px; line-height: 34px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('末页');
   a.html('<i class="material-icons">last_page</i>');
@@ -551,7 +554,7 @@ PaginationTable.prototype.tableTopActions = function () {
   if (this.refreshable) {
     let action = dom.element('' +
         '<a widget-id="toggleFilter" class="card-header-action text-primary ml-2">\n' +
-        '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
+        '  <i class="fas fa-sync-alt position-relative" style="top: 4px;"></i>\n' +
         '</a>');
     dom.bind(action, 'click', function () {
       self.request();
@@ -566,7 +569,6 @@ PaginationTable.prototype.tableTopActions = function () {
   //     ul.css('height', '34.75px');
   // }
   // div.get(0).appendChild(ul.get(0));
-
   return div;
 }
 /**

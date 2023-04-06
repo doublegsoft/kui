@@ -13,7 +13,6 @@ function FormLayout(opts) {
   this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
   this.saveText = opts.saveText || '保存';
-  this.savePrompt = typeof (opts.savePromptText === 'undefined') ? true : false;
   this.savePromptText = opts.savePromptText;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
@@ -70,7 +69,7 @@ FormLayout.prototype.render = async function (containerId, params) {
  *
  * @private
  */
-FormLayout.prototype.build = function(persisted) {
+FormLayout.prototype.build = async function(persisted) {
   let self = this;
   persisted = persisted || {};
   let form = dom.create('div', 'col-md-12', 'form-horizontal');
@@ -79,8 +78,9 @@ FormLayout.prototype.build = function(persisted) {
   let shownFields = [];
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
+    let defaultValue = field.value;
     // make default value working
-    if (!field.value && field.name) {
+    if (field.name) {
       if (field.name.indexOf("[]") != -1) {
         let name = field.name.substring(0, field.name.indexOf('[]'));
         field.value = (typeof persisted[name] === 'undefined' || persisted[name] == 'null') ? null : persisted[name];
@@ -92,8 +92,10 @@ FormLayout.prototype.build = function(persisted) {
       } else {
         field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
       }
-    } else {
-      field.value = field.value || '';
+    }
+    // 默认值设置
+    if (!field.value && defaultValue) {
+      field.value = defaultValue;
     }
     if (field.input == 'hidden') {
       hiddenFields.push(field);
@@ -149,10 +151,10 @@ FormLayout.prototype.build = function(persisted) {
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
-      let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0');
+      let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0', 'mb-2');
       if (pair.label != null) {
         pair.label.classList.add('pl-3');
-        pair.input.classList.add('mb-2', 'pr-3');
+        pair.input.classList.add('pr-3');
         labelAndInput.appendChild(pair.label);
       }
       labelAndInput.appendChild(pair.input);
@@ -279,7 +281,10 @@ FormLayout.prototype.build = function(persisted) {
       this[field.name].render(dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container), field.value);
       // this[field.name].setValues(field.value);
     } else if (field.input == 'fileupload') {
-      new FileUpload(field.options).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
+      await new FileUpload({
+        ...field.options,
+        name: field.name,
+      }).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'imageupload') {
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
@@ -425,7 +430,7 @@ FormLayout.prototype.fetch = async function (params) {
   });
   if (!data) data = {};
   if (self.readOpt.asyncConvert) {
-    data = await  self.readOpt.asyncConvert(data);
+    data = await self.readOpt.asyncConvert(data);
   }
   if (self.readOpt.convert) {
     data = self.readOpt.convert(data);
@@ -659,7 +664,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       let val = field.values[i];
       let radio = dom.element(`
         <div class="form-check form-check-inline">
-          <input id="" name="" value="" type="radio"
+          <input name="" value="" type="radio"
                  class="form-check-input radio color-primary is-outline">
           <label class="form-check-label" for=""></label>
         </div>
@@ -717,7 +722,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       let val = field.values[i];
       let radio = dom.element(`
         <div class="form-check form-check-inline">
-          <input id="" name="" value="" type="radio"
+          <input name="" value="" type="radio"
                  class="form-check-input radio color-primary is-outline">
           <label class="form-check-label" for=""></label>
         </div>
@@ -916,7 +921,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           input.setAttribute('data-file-ext', ext);
         }
       });
-
       FormLayout.validate(input);
     });
     group.appendChild(fileinput);
@@ -1224,3 +1228,18 @@ FormLayout.prototype.setVariables = function(vars){
     }
   }
 };
+
+/**
+ * 通过字段值判断其他字段显示与否。
+ */
+// FormLayout.prototype.controlFields = function() {
+//   console.log('hello');
+//   let data = dom.formdata(this.container);
+//   for (let field of this.fields) {
+//     if (field.visible) {
+//       let input = this.container.querySelector('[name="' + field.name + '"]');
+//       if (input != null)
+//         field.visible(data, input.parentElement.parentElement);
+//     }
+//   }
+// };

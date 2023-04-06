@@ -1269,7 +1269,7 @@ ajax.sidebar = function(opt) {
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto;"></div>
-            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
+            <div style="position: absolute; bottom: 8px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>

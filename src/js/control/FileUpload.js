@@ -11,78 +11,79 @@ const FILE_TYPE_FILE = '<i class="far fa-file-alt"></i>';
 
 function FileUpload(opts) {
   // upload url
+  this.name = opts.name;
   this.fetchUrl = opts.url.fetch;
   this.usecase = opts.usecase;
-  this.uploadUrl = opts.url.upload;
+  this.uploadUrl = opts.url.upload || '/api/v3/common/upload';
   this.local = opts.local;
   this.params = opts.params;
 }
 
-FileUpload.prototype.fetch = function (containerId) {
+FileUpload.prototype.fetch = async function (containerId) {
   if (!this.fetchUrl) {
     this.local = [];
     this.render(containerId);
     return;
   }
   let self = this;
-  xhr.post({
+  self.local = await xhr.promise({
     url: this.fetchUrl,
-    success: function (resp) {
-      self.local = resp.data;
-      self.render(containerId);
-    }
+    params: self.params,
   });
+  self.render(containerId);
 };
 
 FileUpload.prototype.append = function (item) {
   if (!item) return;
   let url = '';
   if (item.filepath) {
-    item.filepath.replace('/www/', '');
+    item.filepath = item.filepath.replace('/www/', '');
   }
+  url = item.filepath;
   let ul = dom.find('ul', this.container);
   let li = dom.create('li', 'list-group-item', 'list-group-item-input');
-  let link = dom.create('a', 'btn', 'btn-link', 'text-info');
+  li.style.lineHeight = '32px';
+  let link = dom.create('span', 'text-info');
   link.style.paddingBottom = '8px';
   link.innerText = item.filename;
   let icon = null;
-  if (item.extension === '.xls' || item.extension === '.xlsx') {
+  if (item.extension === 'xls' || item.extension === 'xlsx') {
     icon = dom.element(FILE_TYPE_EXCEL);
-  } else if (item.extension === '.doc' || item.extension === '.docx') {
+  } else if (item.extension === 'doc' || item.extension === 'docx') {
     icon = dom.element(FILE_TYPE_WORD);
-  } else if (item.extension === '.ppt' || item.extension === '.pptx') {
+  } else if (item.extension === 'ppt' || item.extension === 'pptx') {
     icon = dom.element(FILE_TYPE_POWERPOINT);
-  } else if (item.extension === '.pdf') {
+  } else if (item.extension === 'pdf') {
     icon = dom.element(FILE_TYPE_PDF);
-  } else if (item.extension === '.png' || item.extension === '.jpg') {
+  } else if (item.extension === 'png' || item.extension === 'jpg') {
     icon = dom.element(FILE_TYPE_IMAGE);
   } else {
     icon = dom.element(FILE_TYPE_FILE);
   }
+  icon.classList.add('mr-2');
   li.appendChild(icon);
   li.appendChild(link);
-  link.setAttribute('data-img-url', url);
+  link.setAttribute('data-img-url', item.filepath);
+  link.setAttribute('data-file-path', item.filepath);
+  link.setAttribute('data-file-name', item.filename);
+  link.setAttribute('data-file-type', item.type);
+  link.setAttribute('data-file-size', item.size);
+  link.setAttribute('data-file-ext', item.extension);
+
+  li.setAttribute('data-file-path', item.filepath);
+  li.setAttribute('data-file-name', item.filename);
+  li.setAttribute('data-file-type', item.type);
+  li.setAttribute('data-file-size', item.size);
+  li.setAttribute('data-file-ext', item.extension);
   let img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '" width="48" height="48" style="display: none;">');
-  li.appendChild(img);
+  // li.appendChild(img);
   ul.appendChild(li);
-
-  dom.bind(link, 'click', function() {
-    let url = link.getAttribute('data-img-url');
-    let viewerContainer = dom.find('.viewer-container');
-    if (viewerContainer != null) {
-      viewerContainer.remove();
-    }
-
-    let img = dom.find('img[widget-id="widget-' + url + '"]');
-    let viewer = new Viewer(img);
-    viewer.show();
-  });
 };
 
-FileUpload.prototype.render = function(containerId) {
+FileUpload.prototype.render = async function(containerId) {
   let self = this;
   if (typeof this.local === 'undefined') {
-    this.fetch(containerId);
+    await this.fetch(containerId);
     return;
   }
   if (typeof containerId === 'string')
@@ -118,9 +119,18 @@ FileUpload.prototype.render = function(containerId) {
       url: self.uploadUrl,
       params: self.params,
       file: this.files[0],
-      success: function(resp) {
+      success: resp => {
         let item = resp.data;
-        item.filename = item.filepath.substring(item.filepath.lastIndexOf('/') + 1);
+        item.filename = this.files[0].name;
+        let idx = item.filename.lastIndexOf('.');
+        let ext = '';
+        if (idx != -1) {
+          ext = input.value.substring(input.value.lastIndexOf('.') + 1);
+        }
+        item.filename = item.filename.replaceAll('/www', '');
+        item.type = this.files[0].type;
+        item.size = this.files[0].size;
+        item.extension = ext;
         self.append(item);
       }
     });

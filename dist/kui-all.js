@@ -1744,7 +1744,7 @@ ajax.sidebar = function(opt) {
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto;"></div>
-            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
+            <div style="position: absolute; bottom: 8px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>
@@ -10465,7 +10465,6 @@ function FormLayout(opts) {
   this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
   this.saveText = opts.saveText || '保存';
-  this.savePrompt = typeof (opts.savePromptText === 'undefined') ? true : false;
   this.savePromptText = opts.savePromptText;
   this.saveOpt = opts.save;
   this.readOpt = opts.read;
@@ -10522,7 +10521,7 @@ FormLayout.prototype.render = async function (containerId, params) {
  *
  * @private
  */
-FormLayout.prototype.build = function(persisted) {
+FormLayout.prototype.build = async function(persisted) {
   let self = this;
   persisted = persisted || {};
   let form = dom.create('div', 'col-md-12', 'form-horizontal');
@@ -10531,8 +10530,9 @@ FormLayout.prototype.build = function(persisted) {
   let shownFields = [];
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
+    let defaultValue = field.value;
     // make default value working
-    if (!field.value && field.name) {
+    if (field.name) {
       if (field.name.indexOf("[]") != -1) {
         let name = field.name.substring(0, field.name.indexOf('[]'));
         field.value = (typeof persisted[name] === 'undefined' || persisted[name] == 'null') ? null : persisted[name];
@@ -10544,8 +10544,10 @@ FormLayout.prototype.build = function(persisted) {
       } else {
         field.value = (typeof persisted[field.name] === 'undefined' || persisted[field.name] == 'null') ? null : persisted[field.name];
       }
-    } else {
-      field.value = field.value || '';
+    }
+    // 默认值设置
+    if (!field.value && defaultValue) {
+      field.value = defaultValue;
     }
     if (field.input == 'hidden') {
       hiddenFields.push(field);
@@ -10601,10 +10603,10 @@ FormLayout.prototype.build = function(persisted) {
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
-      let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0');
+      let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0', 'mb-2');
       if (pair.label != null) {
         pair.label.classList.add('pl-3');
-        pair.input.classList.add('mb-2', 'pr-3');
+        pair.input.classList.add('pr-3');
         labelAndInput.appendChild(pair.label);
       }
       labelAndInput.appendChild(pair.input);
@@ -10731,7 +10733,10 @@ FormLayout.prototype.build = function(persisted) {
       this[field.name].render(dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container), field.value);
       // this[field.name].setValues(field.value);
     } else if (field.input == 'fileupload') {
-      new FileUpload(field.options).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
+      await new FileUpload({
+        ...field.options,
+        name: field.name,
+      }).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'imageupload') {
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
@@ -10799,6 +10804,7 @@ FormLayout.prototype.build = function(persisted) {
   buttonSave.innerHTML = this.saveText;
 
   dom.bind(buttonSave, 'click', function(event) {
+    buttonSave.setAttribute('disabled', true);
     event.preventDefault();
     event.stopPropagation();
     if (self.confirmText !== '') {
@@ -10877,7 +10883,7 @@ FormLayout.prototype.fetch = async function (params) {
   });
   if (!data) data = {};
   if (self.readOpt.asyncConvert) {
-    data = await  self.readOpt.asyncConvert(data);
+    data = await self.readOpt.asyncConvert(data);
   }
   if (self.readOpt.convert) {
     data = self.readOpt.convert(data);
@@ -11111,7 +11117,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       let val = field.values[i];
       let radio = dom.element(`
         <div class="form-check form-check-inline">
-          <input id="" name="" value="" type="radio"
+          <input name="" value="" type="radio"
                  class="form-check-input radio color-primary is-outline">
           <label class="form-check-label" for=""></label>
         </div>
@@ -11169,7 +11175,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       let val = field.values[i];
       let radio = dom.element(`
         <div class="form-check form-check-inline">
-          <input id="" name="" value="" type="radio"
+          <input name="" value="" type="radio"
                  class="form-check-input radio color-primary is-outline">
           <label class="form-check-label" for=""></label>
         </div>
@@ -11368,7 +11374,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           input.setAttribute('data-file-ext', ext);
         }
       });
-
       FormLayout.validate(input);
     });
     group.appendChild(fileinput);
@@ -11676,6 +11681,21 @@ FormLayout.prototype.setVariables = function(vars){
     }
   }
 };
+
+/**
+ * 通过字段值判断其他字段显示与否。
+ */
+// FormLayout.prototype.controlFields = function() {
+//   console.log('hello');
+//   let data = dom.formdata(this.container);
+//   for (let field of this.fields) {
+//     if (field.visible) {
+//       let input = this.container.querySelector('[name="' + field.name + '"]');
+//       if (input != null)
+//         field.visible(data, input.parentElement.parentElement);
+//     }
+//   }
+// };
 /**
  * 
  */
@@ -14803,7 +14823,10 @@ PaginationTable.prototype.render = function (containerId, params) {
   if(this.widgetExcess){
     $(this.container).append(this.widgetExcess.template);
   }
-  $(this.container).append(this.root(params)).append(this.pagination());
+  $(this.container).append(this.root(params));
+  if (this.limit != -1) {
+    $(this.container).append(this.pagination());
+  }
   if (typeof params === "undefined" || params == '' || params == '{}') {
     this.go(1);
     this.afterRequest();
@@ -14862,7 +14885,7 @@ PaginationTable.prototype.root = function (initParams) {
   if (typeof initParams === "undefined") {
     initParams = {};
   }
-  let ret = $('<div class="">');
+  let ret = $('<div class="full-width">');
   ret.css('overflow-y', 'auto');
   this.table = $("<table></table>");
   if (typeof this.width !== 'undefined') this.table.css('width', this.width);
@@ -14989,7 +15012,7 @@ PaginationTable.prototype.pagination = function () {
   let ul = $('<ul class="pagination mb-0 mt-2 ml-auto"></ul>');
   // ul.addClass('pagination mb-0');
   this.firstPage = $('<li class="page-item"></li>');
-  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
+  let a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('首页');
   a.html('<i class="material-icons">first_page</i>');
@@ -15003,7 +15026,7 @@ PaginationTable.prototype.pagination = function () {
   }
 
   this.prevPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('上一页');
   a.html('<i class="material-icons">chevron_left</i>');
@@ -15015,7 +15038,7 @@ PaginationTable.prototype.pagination = function () {
 
   li = $('<li class="page-item disabled"></li>');
   li.addClass('disabled');
-  this.pagebar = $('<a class="page-link b-a-0 pt-1 font-14" style="padding-bottom: 2px; height: 30px; line-height: 30px"></a>');
+  this.pagebar = $('<a class="page-link b-a-0 pt-1 font-14" style="height: 30px; line-height: 30px"></a>');
   this.pagebar.attr('href', 'javascript:void(0)');
   this.pagebar.attr('style', 'cursor: default');
   this.pagebar.text("0/0");
@@ -15023,7 +15046,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(li);
 
   this.nextPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14" style="padding-bottom: 2px; line-height: 34px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('下一页');
   a.html('<i class="material-icons">chevron_right</i>');
@@ -15034,7 +15057,7 @@ PaginationTable.prototype.pagination = function () {
   ul.append(this.nextPage);
 
   this.lastPage = $('<li class="page-item"></li>');
-  a = $('<a class="page-link b-a-0 pt-0 font-14"  style="padding-bottom: 2px; line-height: 34px;"></a>');
+  a = $('<a class="page-link b-a-0 pt-0 font-14" style="top: 4px;"></a>');
   a.attr('href', 'javascript:void(0)');
   // a.text('末页');
   a.html('<i class="material-icons">last_page</i>');
@@ -15128,7 +15151,7 @@ PaginationTable.prototype.tableTopActions = function () {
   if (this.refreshable) {
     let action = dom.element('' +
         '<a widget-id="toggleFilter" class="card-header-action text-primary ml-2">\n' +
-        '  <i class="fas fa-sync-alt position-relative" style="top: 3px;"></i>\n' +
+        '  <i class="fas fa-sync-alt position-relative" style="top: 4px;"></i>\n' +
         '</a>');
     dom.bind(action, 'click', function () {
       self.request();
@@ -15143,7 +15166,6 @@ PaginationTable.prototype.tableTopActions = function () {
   //     ul.css('height', '34.75px');
   // }
   // div.get(0).appendChild(ul.get(0));
-
   return div;
 }
 /**
@@ -18887,78 +18909,79 @@ const FILE_TYPE_FILE = '<i class="far fa-file-alt"></i>';
 
 function FileUpload(opts) {
   // upload url
+  this.name = opts.name;
   this.fetchUrl = opts.url.fetch;
   this.usecase = opts.usecase;
-  this.uploadUrl = opts.url.upload;
+  this.uploadUrl = opts.url.upload || '/api/v3/common/upload';
   this.local = opts.local;
   this.params = opts.params;
 }
 
-FileUpload.prototype.fetch = function (containerId) {
+FileUpload.prototype.fetch = async function (containerId) {
   if (!this.fetchUrl) {
     this.local = [];
     this.render(containerId);
     return;
   }
   let self = this;
-  xhr.post({
+  self.local = await xhr.promise({
     url: this.fetchUrl,
-    success: function (resp) {
-      self.local = resp.data;
-      self.render(containerId);
-    }
+    params: self.params,
   });
+  self.render(containerId);
 };
 
 FileUpload.prototype.append = function (item) {
   if (!item) return;
   let url = '';
   if (item.filepath) {
-    item.filepath.replace('/www/', '');
+    item.filepath = item.filepath.replace('/www/', '');
   }
+  url = item.filepath;
   let ul = dom.find('ul', this.container);
   let li = dom.create('li', 'list-group-item', 'list-group-item-input');
-  let link = dom.create('a', 'btn', 'btn-link', 'text-info');
+  li.style.lineHeight = '32px';
+  let link = dom.create('span', 'text-info');
   link.style.paddingBottom = '8px';
   link.innerText = item.filename;
   let icon = null;
-  if (item.extension === '.xls' || item.extension === '.xlsx') {
+  if (item.extension === 'xls' || item.extension === 'xlsx') {
     icon = dom.element(FILE_TYPE_EXCEL);
-  } else if (item.extension === '.doc' || item.extension === '.docx') {
+  } else if (item.extension === 'doc' || item.extension === 'docx') {
     icon = dom.element(FILE_TYPE_WORD);
-  } else if (item.extension === '.ppt' || item.extension === '.pptx') {
+  } else if (item.extension === 'ppt' || item.extension === 'pptx') {
     icon = dom.element(FILE_TYPE_POWERPOINT);
-  } else if (item.extension === '.pdf') {
+  } else if (item.extension === 'pdf') {
     icon = dom.element(FILE_TYPE_PDF);
-  } else if (item.extension === '.png' || item.extension === '.jpg') {
+  } else if (item.extension === 'png' || item.extension === 'jpg') {
     icon = dom.element(FILE_TYPE_IMAGE);
   } else {
     icon = dom.element(FILE_TYPE_FILE);
   }
+  icon.classList.add('mr-2');
   li.appendChild(icon);
   li.appendChild(link);
-  link.setAttribute('data-img-url', url);
+  link.setAttribute('data-img-url', item.filepath);
+  link.setAttribute('data-file-path', item.filepath);
+  link.setAttribute('data-file-name', item.filename);
+  link.setAttribute('data-file-type', item.type);
+  link.setAttribute('data-file-size', item.size);
+  link.setAttribute('data-file-ext', item.extension);
+
+  li.setAttribute('data-file-path', item.filepath);
+  li.setAttribute('data-file-name', item.filename);
+  li.setAttribute('data-file-type', item.type);
+  li.setAttribute('data-file-size', item.size);
+  li.setAttribute('data-file-ext', item.extension);
   let img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '" width="48" height="48" style="display: none;">');
-  li.appendChild(img);
+  // li.appendChild(img);
   ul.appendChild(li);
-
-  dom.bind(link, 'click', function() {
-    let url = link.getAttribute('data-img-url');
-    let viewerContainer = dom.find('.viewer-container');
-    if (viewerContainer != null) {
-      viewerContainer.remove();
-    }
-
-    let img = dom.find('img[widget-id="widget-' + url + '"]');
-    let viewer = new Viewer(img);
-    viewer.show();
-  });
 };
 
-FileUpload.prototype.render = function(containerId) {
+FileUpload.prototype.render = async function(containerId) {
   let self = this;
   if (typeof this.local === 'undefined') {
-    this.fetch(containerId);
+    await this.fetch(containerId);
     return;
   }
   if (typeof containerId === 'string')
@@ -18994,9 +19017,18 @@ FileUpload.prototype.render = function(containerId) {
       url: self.uploadUrl,
       params: self.params,
       file: this.files[0],
-      success: function(resp) {
+      success: resp => {
         let item = resp.data;
-        item.filename = item.filepath.substring(item.filepath.lastIndexOf('/') + 1);
+        item.filename = this.files[0].name;
+        let idx = item.filename.lastIndexOf('.');
+        let ext = '';
+        if (idx != -1) {
+          ext = input.value.substring(input.value.lastIndexOf('.') + 1);
+        }
+        item.filename = item.filename.replaceAll('/www', '');
+        item.type = this.files[0].type;
+        item.size = this.files[0].size;
+        item.extension = ext;
         self.append(item);
       }
     });
@@ -25490,6 +25522,12 @@ function StructuredDataEntry(opts) {
     this.container = dom.find(opts.container);
   }
   this.onInput = opts.onInput;
+
+  dom.bind(this.container, 'click', ev => {
+    this.container.querySelectorAll('[sde-select]').forEach(el => {
+      el.remove();
+    })
+  })
 }
 
 StructuredDataEntry.prototype.initialize = function(data) {
@@ -25512,6 +25550,15 @@ StructuredDataEntry.prototype.initialize = function(data) {
       self.bindSelectInput(el);
     } else if (input === 'date') {
 
+    } else if (input === 'year') {
+      el.classList.add('pointer');
+      self.bindYearInput(el);
+    } else if (input === 'month') {
+      el.classList.add('pointer');
+      self.bindMonthInput(el);
+    } else if (input === 'day') {
+      el.classList.add('pointer');
+      self.bindDayInput(el);
     } else if (input === 'multiselect') {
       el.classList.add('pointer');
       self.bindMultiselectInput(el);
@@ -25640,7 +25687,7 @@ StructuredDataEntry.prototype.bindNumberInput = function(el) {
   dom.bind(el, 'keypress', function(ev) {
     let charCode = (ev.which) ? ev.which : ev.keyCode;
     if (charCode != 46 && charCode > 31
-        && (charCode < 48 || charCode > 57)) {
+      && (charCode < 48 || charCode > 57)) {
       ev.preventDefault();
     }
   });
@@ -25695,80 +25742,98 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
       vals = data;
     }
 
+    div = self.createPopupSelect(this, vals);
+    self.container.appendChild(div);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
+      }
+    }
+  });
+};
+
+StructuredDataEntry.prototype.bindYearInput = function(el) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
+    ev.stopPropagation();
+
+    let div = dom.find('[sde-select]');
+    if (div != null) div.remove();
+
+    const currYear = new Date().getFullYear();
+    const prevYear = currYear - 1;
+    const nextYear = currYear + 1;
+
+    let vals = [prevYear, currYear, nextYear];
+
     let rectThis = this.getBoundingClientRect();
     let rectParent = this.parentElement.getBoundingClientRect();
 
-    div = dom.create('div');
-    div.style.zIndex = 999999999;
-    div.setAttribute('sde-select', true);
-    div.style.position = 'absolute';
-    div.style.top = '0px';
-    div.style.overflowY = 'auto';
-    div.style.maxHeight = '300px';
-    div.style.left = (this.parentElement.offsetLeft + 60) + 'px';
-
-    let ul = dom.create('ul');
-    ul.style.backgroundColor = '#fefefe';
-    ul.style.border = '1px solid #ccc';
-    ul.style.listStyleType = 'none';
-    ul.style.padding = '0px';
-    ul.style.margin = '0px';
-
-    let trigger = this;
-    for (let i = 0; i < vals.length; i++) {
-      let li = dom.create('li');
-      li.style.padding = '0 10px';
-      li.style.color = '#666';
-      li.style.fontSize = '12px';
-      li.style.lineHeight = '2rem';
-      li.style.width = '100%';
-			li.style.whiteSpace='nowrap';
-
-      if (typeof vals[i] === 'string') {
-        li.innerText = vals[i];
-      } else {
-        dom.model(li, vals[i]);
-        li.innerText = vals[i][field];
+    div = self.createPopupSelect(this, vals);
+    this.parentElement.appendChild(div);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
       }
-      li.style.cursor = 'pointer';
-      dom.bind(li, 'click', function() {
-        trigger.innerText = li.innerText;
-        trigger.style.color = 'black';
-        var par = trigger.parentElement.parentElement;
-        par.dataset.nodata='false';
-        if (par.children.forEach) {
-          par.children.forEach(function (el, idx) {
-            let visible = el.getAttribute('data-sde-visible');
-            if (visible) {
-              let strs = visible.split('==');
-              if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
-                el.style.display = '';
-              } else {
-                el.style.display = 'none';
-              }
-            }
-          });
-        }
-        if (self.onInput) {
-          self.onInput(trigger.getAttribute('data-sde-name'), li.innerText, dom.model(li));
-        }
-        div.remove();
-      });
-      ul.appendChild(li);
     }
-		div.appendChild(ul);
-		this.parentElement.appendChild(div);
-    // 重新调整位置
-    let rectDiv = div.getBoundingClientRect();
-    let containerHeight = self.container.getBoundingClientRect().height;
-    let containerWidth = self.container.getBoundingClientRect().width;
-    if (containerHeight < (rectDiv.top + rectDiv.height)) {
-      // div.style.top = (containerHeight - rectDiv.height ) + 'px';
+  });
+};
+
+StructuredDataEntry.prototype.bindMonthInput = function(el) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
+    ev.stopPropagation();
+
+    let div = dom.find('[sde-select]');
+    if (div != null) div.remove();
+
+    let vals = [1,2,3,4,5,6,7,8,9,10,11,12];
+
+    let rectThis = this.getBoundingClientRect();
+    let rectParent = this.parentElement.getBoundingClientRect();
+
+    div = self.createPopupSelect(this, vals, '36px');
+    this.parentElement.appendChild(div);
+    const pos = self.positionPopup(ev);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
+      }
     }
-    if (containerWidth < (rectDiv.left)) {
-      div.style.left = (this.parentElement.offsetLeft) + 'px';
-    }
-		let rightbar = dom.find('.right-bar')
+  });
+};
+
+StructuredDataEntry.prototype.bindDayInput = function(el) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
+    ev.stopPropagation();
+
+    let div = dom.find('[sde-select]');
+    if (div != null) div.remove();
+
+    let vals = [];
+    for (let i = 1; i <= 31; i++)
+      vals.push(i);
+
+    let rectThis = this.getBoundingClientRect();
+    let rectParent = this.parentElement.getBoundingClientRect();
+
+    div = self.createPopupSelect(this, vals, '36px');
+    this.parentElement.appendChild(div);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
     if (rightbar != null) {
       let rect = rightbar.getBoundingClientRect();
       if (rect.right < rectDiv.right) {
@@ -25819,8 +25884,8 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       li.style.fontSize = '12px';
       li.style.lineHeight = '2rem';
       li.style.width = '100%';
-			li.style.cursor = 'pointer';
-			li.style.whiteSpace='nowrap';
+      li.style.cursor = 'pointer';
+      li.style.whiteSpace='nowrap';
       li.innerText = vals[i];
       for (let j = 0; j < strs.length; j++) {
         if (li.innerText === strs[j]) {
@@ -25882,8 +25947,8 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       });
       ul.appendChild(li);
     }
-		div.appendChild(ul);
-		this.parentElement.appendChild(div);
+    div.appendChild(ul);
+    this.parentElement.appendChild(div);
     // 重新调整位置
     let rectDiv = div.getBoundingClientRect();
     let containerHeight = dom.find('.right-bar').getBoundingClientRect().height;
@@ -25893,10 +25958,10 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       // console.log(div.style.top);
     }
     let _container=dom.find('.right-bar').getBoundingClientRect()
-		if(_container.right < rectDiv.right){
-			div.style.right ='0px';
-			div.style.left = 'auto';
-		}
+    if(_container.right < rectDiv.right){
+      div.style.right ='0px';
+      div.style.left = 'auto';
+    }
   });
 };
 
@@ -25920,6 +25985,128 @@ StructuredDataEntry.prototype.getParams = function () {
   }
   return ret;
 };
+
+StructuredDataEntry.prototype.autofill = function (name, value) {
+  let spans = this.container.querySelectorAll(`span[data-sde-name="${name}"]`);
+  for (let span of spans) {
+    span.innerText = '【' + (value || '') + '】';
+  }
+};
+
+StructuredDataEntry.prototype.createPopupSelect = function (el, vals, width) {
+  let label = el.getAttribute('data-sde-label');
+  let field = el.getAttribute('data-sde-field');
+  let self = this;
+  let ret = dom.create('div');
+  ret.style.zIndex = 999999999;
+  ret.setAttribute('sde-select', true);
+  ret.setAttribute('contenteditable', false);
+  ret.style.position = 'absolute';
+  ret.style.top = '0px';
+  ret.style.overflowY = 'auto';
+  ret.style.maxHeight = '300px';
+  ret.style.left = (el.parentElement.offsetLeft + 60) + 'px';
+
+  let ul = dom.create('ul');
+  ul.style.backgroundColor = '#fefefe';
+  ul.style.border = '1px solid #ccc';
+  ul.style.listStyleType = 'none';
+  ul.style.padding = '0px';
+  ul.style.margin = '0px';
+
+  if (width) {
+    ul.style.display = 'flex';
+    ul.style.flexDirection = 'row';
+    ul.style.flexWrap = 'wrap';
+    ul.style.width = '200px';
+  }
+
+  let trigger = el;
+  for (let i = 0; i < vals.length; i++) {
+    let li = dom.create('li');
+    li.style.padding = '0 10px';
+    li.style.color = '#666';
+    li.style.fontSize = '12px';
+    li.style.lineHeight = '2rem';
+    if (width) {
+      li.style.width = width;
+    } else {
+      li.style.width = '100%';
+    }
+    li.style.whiteSpace='nowrap';
+
+    if (typeof vals[i] === 'string' || typeof vals[i] === 'number') {
+      li.innerText = vals[i];
+    } else {
+      dom.model(li, vals[i]);
+      li.innerText = vals[i][field];
+    }
+    li.style.cursor = 'pointer';
+    dom.bind(li, 'click', function() {
+      trigger.innerText = li.innerText;
+      trigger.style.color = 'black';
+      let par = trigger.parentElement.parentElement;
+      par.dataset.nodata='false';
+      if (par.children.forEach) {
+        par.children.forEach(function (el, idx) {
+          let visible = el.getAttribute('data-sde-visible');
+          if (visible) {
+            let strs = visible.split('==');
+            if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
+              el.style.display = '';
+            } else {
+              el.style.display = 'none';
+            }
+          }
+        });
+      }
+      if (self.onInput) {
+        self.onInput(trigger.getAttribute('data-sde-name'), li.innerText, dom.model(li));
+      }
+      ret.remove();
+    });
+    ul.appendChild(li);
+  }
+  ret.appendChild(ul);
+  return ret;
+};
+
+StructuredDataEntry.prototype.positionPopup = function (trigger, tooltip) {
+  // let pageX = ev.pageX;
+  // let pageY = ev.pageY;
+  // if (pageY < 300) {
+  //   return {
+  //     top: pageY - 100 + 32,
+  //     left: pageX,
+  //   };
+  // }
+  //
+  // return {
+  //   top: pageY - 200 + 32,
+  //   left: pageX,
+  // }
+  if (this.popperInstance) {
+    this.popperInstance.destroy();
+    this.popperInstance = null;
+  }
+  this.popperInstance = Popper.createPopper(trigger, tooltip, {
+    placement: "auto",
+    modifiers: [{
+      name: "offset",
+      options: {
+        offset: [0, 8]
+      }
+    },{
+      name: "flip", //flips popper with allowed placements
+      options: {
+        allowedAutoPlacements: ["right", "left", "top", "bottom"],
+        rootBoundary: "viewport"
+      }
+    }]
+  });
+};
+
+
 
 
 

@@ -3,6 +3,12 @@ function StructuredDataEntry(opts) {
     this.container = dom.find(opts.container);
   }
   this.onInput = opts.onInput;
+
+  dom.bind(this.container, 'click', ev => {
+    this.container.querySelectorAll('[sde-select]').forEach(el => {
+      el.remove();
+    })
+  })
 }
 
 StructuredDataEntry.prototype.initialize = function(data) {
@@ -25,6 +31,15 @@ StructuredDataEntry.prototype.initialize = function(data) {
       self.bindSelectInput(el);
     } else if (input === 'date') {
 
+    } else if (input === 'year') {
+      el.classList.add('pointer');
+      self.bindYearInput(el);
+    } else if (input === 'month') {
+      el.classList.add('pointer');
+      self.bindMonthInput(el);
+    } else if (input === 'day') {
+      el.classList.add('pointer');
+      self.bindDayInput(el);
     } else if (input === 'multiselect') {
       el.classList.add('pointer');
       self.bindMultiselectInput(el);
@@ -153,7 +168,7 @@ StructuredDataEntry.prototype.bindNumberInput = function(el) {
   dom.bind(el, 'keypress', function(ev) {
     let charCode = (ev.which) ? ev.which : ev.keyCode;
     if (charCode != 46 && charCode > 31
-        && (charCode < 48 || charCode > 57)) {
+      && (charCode < 48 || charCode > 57)) {
       ev.preventDefault();
     }
   });
@@ -208,80 +223,98 @@ StructuredDataEntry.prototype.bindSelectInput = function(el) {
       vals = data;
     }
 
+    div = self.createPopupSelect(this, vals);
+    self.container.appendChild(div);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
+      }
+    }
+  });
+};
+
+StructuredDataEntry.prototype.bindYearInput = function(el) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
+    ev.stopPropagation();
+
+    let div = dom.find('[sde-select]');
+    if (div != null) div.remove();
+
+    const currYear = new Date().getFullYear();
+    const prevYear = currYear - 1;
+    const nextYear = currYear + 1;
+
+    let vals = [prevYear, currYear, nextYear];
+
     let rectThis = this.getBoundingClientRect();
     let rectParent = this.parentElement.getBoundingClientRect();
 
-    div = dom.create('div');
-    div.style.zIndex = 999999999;
-    div.setAttribute('sde-select', true);
-    div.style.position = 'absolute';
-    div.style.top = '0px';
-    div.style.overflowY = 'auto';
-    div.style.maxHeight = '300px';
-    div.style.left = (this.parentElement.offsetLeft + 60) + 'px';
-
-    let ul = dom.create('ul');
-    ul.style.backgroundColor = '#fefefe';
-    ul.style.border = '1px solid #ccc';
-    ul.style.listStyleType = 'none';
-    ul.style.padding = '0px';
-    ul.style.margin = '0px';
-
-    let trigger = this;
-    for (let i = 0; i < vals.length; i++) {
-      let li = dom.create('li');
-      li.style.padding = '0 10px';
-      li.style.color = '#666';
-      li.style.fontSize = '12px';
-      li.style.lineHeight = '2rem';
-      li.style.width = '100%';
-			li.style.whiteSpace='nowrap';
-
-      if (typeof vals[i] === 'string') {
-        li.innerText = vals[i];
-      } else {
-        dom.model(li, vals[i]);
-        li.innerText = vals[i][field];
+    div = self.createPopupSelect(this, vals);
+    this.parentElement.appendChild(div);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
       }
-      li.style.cursor = 'pointer';
-      dom.bind(li, 'click', function() {
-        trigger.innerText = li.innerText;
-        trigger.style.color = 'black';
-        var par = trigger.parentElement.parentElement;
-        par.dataset.nodata='false';
-        if (par.children.forEach) {
-          par.children.forEach(function (el, idx) {
-            let visible = el.getAttribute('data-sde-visible');
-            if (visible) {
-              let strs = visible.split('==');
-              if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
-                el.style.display = '';
-              } else {
-                el.style.display = 'none';
-              }
-            }
-          });
-        }
-        if (self.onInput) {
-          self.onInput(trigger.getAttribute('data-sde-name'), li.innerText, dom.model(li));
-        }
-        div.remove();
-      });
-      ul.appendChild(li);
     }
-		div.appendChild(ul);
-		this.parentElement.appendChild(div);
-    // 重新调整位置
-    let rectDiv = div.getBoundingClientRect();
-    let containerHeight = self.container.getBoundingClientRect().height;
-    let containerWidth = self.container.getBoundingClientRect().width;
-    if (containerHeight < (rectDiv.top + rectDiv.height)) {
-      // div.style.top = (containerHeight - rectDiv.height ) + 'px';
+  });
+};
+
+StructuredDataEntry.prototype.bindMonthInput = function(el) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
+    ev.stopPropagation();
+
+    let div = dom.find('[sde-select]');
+    if (div != null) div.remove();
+
+    let vals = [1,2,3,4,5,6,7,8,9,10,11,12];
+
+    let rectThis = this.getBoundingClientRect();
+    let rectParent = this.parentElement.getBoundingClientRect();
+
+    div = self.createPopupSelect(this, vals, '36px');
+    this.parentElement.appendChild(div);
+    const pos = self.positionPopup(ev);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
+    if (rightbar != null) {
+      let rect = rightbar.getBoundingClientRect();
+      if (rect.right < rectDiv.right) {
+        div.style.right = '0px';
+        div.style.left = 'auto';
+      }
     }
-    if (containerWidth < (rectDiv.left)) {
-      div.style.left = (this.parentElement.offsetLeft) + 'px';
-    }
-		let rightbar = dom.find('.right-bar')
+  });
+};
+
+StructuredDataEntry.prototype.bindDayInput = function(el) {
+  let self = this;
+  dom.bind(el, 'click', async function(ev) {
+    ev.stopPropagation();
+
+    let div = dom.find('[sde-select]');
+    if (div != null) div.remove();
+
+    let vals = [];
+    for (let i = 1; i <= 31; i++)
+      vals.push(i);
+
+    let rectThis = this.getBoundingClientRect();
+    let rectParent = this.parentElement.getBoundingClientRect();
+
+    div = self.createPopupSelect(this, vals, '36px');
+    this.parentElement.appendChild(div);
+    self.positionPopup(el, div);
+    let rightbar = dom.find('.right-bar')
     if (rightbar != null) {
       let rect = rightbar.getBoundingClientRect();
       if (rect.right < rectDiv.right) {
@@ -332,8 +365,8 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       li.style.fontSize = '12px';
       li.style.lineHeight = '2rem';
       li.style.width = '100%';
-			li.style.cursor = 'pointer';
-			li.style.whiteSpace='nowrap';
+      li.style.cursor = 'pointer';
+      li.style.whiteSpace='nowrap';
       li.innerText = vals[i];
       for (let j = 0; j < strs.length; j++) {
         if (li.innerText === strs[j]) {
@@ -395,8 +428,8 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       });
       ul.appendChild(li);
     }
-		div.appendChild(ul);
-		this.parentElement.appendChild(div);
+    div.appendChild(ul);
+    this.parentElement.appendChild(div);
     // 重新调整位置
     let rectDiv = div.getBoundingClientRect();
     let containerHeight = dom.find('.right-bar').getBoundingClientRect().height;
@@ -406,10 +439,10 @@ StructuredDataEntry.prototype.bindMultiselectInput = function(el) {
       // console.log(div.style.top);
     }
     let _container=dom.find('.right-bar').getBoundingClientRect()
-		if(_container.right < rectDiv.right){
-			div.style.right ='0px';
-			div.style.left = 'auto';
-		}
+    if(_container.right < rectDiv.right){
+      div.style.right ='0px';
+      div.style.left = 'auto';
+    }
   });
 };
 
@@ -433,4 +466,126 @@ StructuredDataEntry.prototype.getParams = function () {
   }
   return ret;
 };
+
+StructuredDataEntry.prototype.autofill = function (name, value) {
+  let spans = this.container.querySelectorAll(`span[data-sde-name="${name}"]`);
+  for (let span of spans) {
+    span.innerText = '【' + (value || '') + '】';
+  }
+};
+
+StructuredDataEntry.prototype.createPopupSelect = function (el, vals, width) {
+  let label = el.getAttribute('data-sde-label');
+  let field = el.getAttribute('data-sde-field');
+  let self = this;
+  let ret = dom.create('div');
+  ret.style.zIndex = 999999999;
+  ret.setAttribute('sde-select', true);
+  ret.setAttribute('contenteditable', false);
+  ret.style.position = 'absolute';
+  ret.style.top = '0px';
+  ret.style.overflowY = 'auto';
+  ret.style.maxHeight = '300px';
+  ret.style.left = (el.parentElement.offsetLeft + 60) + 'px';
+
+  let ul = dom.create('ul');
+  ul.style.backgroundColor = '#fefefe';
+  ul.style.border = '1px solid #ccc';
+  ul.style.listStyleType = 'none';
+  ul.style.padding = '0px';
+  ul.style.margin = '0px';
+
+  if (width) {
+    ul.style.display = 'flex';
+    ul.style.flexDirection = 'row';
+    ul.style.flexWrap = 'wrap';
+    ul.style.width = '200px';
+  }
+
+  let trigger = el;
+  for (let i = 0; i < vals.length; i++) {
+    let li = dom.create('li');
+    li.style.padding = '0 10px';
+    li.style.color = '#666';
+    li.style.fontSize = '12px';
+    li.style.lineHeight = '2rem';
+    if (width) {
+      li.style.width = width;
+    } else {
+      li.style.width = '100%';
+    }
+    li.style.whiteSpace='nowrap';
+
+    if (typeof vals[i] === 'string' || typeof vals[i] === 'number') {
+      li.innerText = vals[i];
+    } else {
+      dom.model(li, vals[i]);
+      li.innerText = vals[i][field];
+    }
+    li.style.cursor = 'pointer';
+    dom.bind(li, 'click', function() {
+      trigger.innerText = li.innerText;
+      trigger.style.color = 'black';
+      let par = trigger.parentElement.parentElement;
+      par.dataset.nodata='false';
+      if (par.children.forEach) {
+        par.children.forEach(function (el, idx) {
+          let visible = el.getAttribute('data-sde-visible');
+          if (visible) {
+            let strs = visible.split('==');
+            if (trigger.getAttribute('data-sde-name') == strs[0] && trigger.innerText == strs[1]) {
+              el.style.display = '';
+            } else {
+              el.style.display = 'none';
+            }
+          }
+        });
+      }
+      if (self.onInput) {
+        self.onInput(trigger.getAttribute('data-sde-name'), li.innerText, dom.model(li));
+      }
+      ret.remove();
+    });
+    ul.appendChild(li);
+  }
+  ret.appendChild(ul);
+  return ret;
+};
+
+StructuredDataEntry.prototype.positionPopup = function (trigger, tooltip) {
+  // let pageX = ev.pageX;
+  // let pageY = ev.pageY;
+  // if (pageY < 300) {
+  //   return {
+  //     top: pageY - 100 + 32,
+  //     left: pageX,
+  //   };
+  // }
+  //
+  // return {
+  //   top: pageY - 200 + 32,
+  //   left: pageX,
+  // }
+  if (this.popperInstance) {
+    this.popperInstance.destroy();
+    this.popperInstance = null;
+  }
+  this.popperInstance = Popper.createPopper(trigger, tooltip, {
+    placement: "auto",
+    modifiers: [{
+      name: "offset",
+      options: {
+        offset: [0, 8]
+      }
+    },{
+      name: "flip", //flips popper with allowed placements
+      options: {
+        allowedAutoPlacements: ["right", "left", "top", "bottom"],
+        rootBoundary: "viewport"
+      }
+    }]
+  });
+};
+
+
 
