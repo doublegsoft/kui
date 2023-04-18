@@ -1147,3 +1147,39 @@ ajax.tabs = function(opts) {
   container.appendChild(ul);
   container.appendChild(div);
 };
+
+ajax.download = (url, name) => {
+  fetch(url).then(res => res.blob()).then(blob => {
+    let a = document.createElement('a');
+    let url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name + '.docx';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  });
+};
+
+ajax.upload = params => {
+  let fileinput = dom.create('input');
+  fileinput.setAttribute('type', 'file');
+  fileinput.setAttribute('accept', params.accept || '*');
+  fileinput.style.display = 'none';
+  fileinput.onchange = async ev => {
+    let file = fileinput.files[0];
+    let res = await xhr.asyncUpload({
+      url: '/api/v3/common/upload',
+      params: {
+        directoryKey: params.directoryKey,
+      },
+      file: file,
+    });
+    if (params.success) {
+      params.success(res);
+    }
+  };
+  fileinput.click();
+  // let result = await xhr.promise({
+  //   url: '/api/v3/common/upload',
+  // });
+};

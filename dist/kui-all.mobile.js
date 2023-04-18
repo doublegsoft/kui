@@ -153,6 +153,56 @@ xhr.upload = function(opts) {
   req.send(formdata);
 };
 
+xhr.asyncUpload = async function (opts) {
+  return new Promise(function (resolve, reject) {
+    let url = opts.url;
+    let params = opts.data || opts.params;
+    let type = opts.type || 'json';
+    let success = opts.success;
+    let error = opts.error;
+
+    let formdata = new FormData();
+    for (let k in params) {
+      formdata.append(k, params[k]);
+    }
+    formdata.append('file', opts.file);
+
+    let req  = new XMLHttpRequest();
+    req.timeout = 10 * 1000;
+    req.onload = function () {
+      let resp = req.responseText;
+      if (type == 'json')
+        try {
+          resp = JSON.parse(resp);
+        } catch (err) {
+          if (error) error(resp);
+          return;
+        }
+      if (req.readyState == 4 && req.status == "200") {
+        resolve(resp);
+      } else {
+        if (error) resolve(resp);
+      }
+    };
+    if (opts.progress) {
+      req.onprogress = function(ev) {
+        opts.progress(ev.loaded, ev.total);
+      };
+    }
+    req.onerror = function () {
+      if (error) error({error: {code: -500, message: '网络访问错误！'}});
+    };
+    req.ontimeout = function () {
+      if (error) error({error: {code: -501, message: '网络请求超时！'}});
+    };
+    req.open('POST', url, true);
+    if (typeof APPTOKEN !== 'undefined') {
+      req.setRequestHeader("apptoken", APPTOKEN);
+    }
+    req.send(formdata);
+  });
+};
+
 xhr.chain = function(opts) {
   if (opts.length == 0) return;
   let xhrOpts = opts[0];
@@ -1500,6 +1550,42 @@ ajax.tabs = function(opts) {
   container.appendChild(buttons);
   container.appendChild(ul);
   container.appendChild(div);
+};
+
+ajax.download = (url, name) => {
+  fetch(url).then(res => res.blob()).then(blob => {
+    let a = document.createElement('a');
+    let url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name + '.docx';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  });
+};
+
+ajax.upload = params => {
+  let fileinput = dom.create('input');
+  fileinput.setAttribute('type', 'file');
+  fileinput.setAttribute('accept', params.accept || '*');
+  fileinput.style.display = 'none';
+  fileinput.onchange = async ev => {
+    let file = fileinput.files[0];
+    let res = await xhr.asyncUpload({
+      url: '/api/v3/common/upload',
+      params: {
+        directoryKey: params.directoryKey,
+      },
+      file: file,
+    });
+    if (params.success) {
+      params.success(res);
+    }
+  };
+  fileinput.click();
+  // let result = await xhr.promise({
+  //   url: '/api/v3/common/upload',
+  // });
 };
 var dom = {};
 

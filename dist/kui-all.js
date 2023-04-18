@@ -1976,6 +1976,42 @@ ajax.tabs = function(opts) {
   container.appendChild(ul);
   container.appendChild(div);
 };
+
+ajax.download = (url, name) => {
+  fetch(url).then(res => res.blob()).then(blob => {
+    let a = document.createElement('a');
+    let url = window.URL.createObjectURL(blob);
+    a.href = url;
+    a.download = name + '.docx';
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+  });
+};
+
+ajax.upload = params => {
+  let fileinput = dom.create('input');
+  fileinput.setAttribute('type', 'file');
+  fileinput.setAttribute('accept', params.accept || '*');
+  fileinput.style.display = 'none';
+  fileinput.onchange = async ev => {
+    let file = fileinput.files[0];
+    let res = await xhr.asyncUpload({
+      url: '/api/v3/common/upload',
+      params: {
+        directoryKey: params.directoryKey,
+      },
+      file: file,
+    });
+    if (params.success) {
+      params.success(res);
+    }
+  };
+  fileinput.click();
+  // let result = await xhr.promise({
+  //   url: '/api/v3/common/upload',
+  // });
+};
 /*!
  * Bootstrap v3.3.7 (http://getbootstrap.com)
  * Copyright 2011-2016 Twitter, Inc.
@@ -9132,6 +9168,56 @@ xhr.upload = function(opts) {
   req.send(formdata);
 };
 
+xhr.asyncUpload = async function (opts) {
+  return new Promise(function (resolve, reject) {
+    let url = opts.url;
+    let params = opts.data || opts.params;
+    let type = opts.type || 'json';
+    let success = opts.success;
+    let error = opts.error;
+
+    let formdata = new FormData();
+    for (let k in params) {
+      formdata.append(k, params[k]);
+    }
+    formdata.append('file', opts.file);
+
+    let req  = new XMLHttpRequest();
+    req.timeout = 10 * 1000;
+    req.onload = function () {
+      let resp = req.responseText;
+      if (type == 'json')
+        try {
+          resp = JSON.parse(resp);
+        } catch (err) {
+          if (error) error(resp);
+          return;
+        }
+      if (req.readyState == 4 && req.status == "200") {
+        resolve(resp);
+      } else {
+        if (error) resolve(resp);
+      }
+    };
+    if (opts.progress) {
+      req.onprogress = function(ev) {
+        opts.progress(ev.loaded, ev.total);
+      };
+    }
+    req.onerror = function () {
+      if (error) error({error: {code: -500, message: '网络访问错误！'}});
+    };
+    req.ontimeout = function () {
+      if (error) error({error: {code: -501, message: '网络请求超时！'}});
+    };
+    req.open('POST', url, true);
+    if (typeof APPTOKEN !== 'undefined') {
+      req.setRequestHeader("apptoken", APPTOKEN);
+    }
+    req.send(formdata);
+  });
+};
+
 xhr.chain = function(opts) {
   if (opts.length == 0) return;
   let xhrOpts = opts[0];
@@ -10804,7 +10890,6 @@ FormLayout.prototype.build = async function(persisted) {
   buttonSave.innerHTML = this.saveText;
 
   dom.bind(buttonSave, 'click', function(event) {
-    buttonSave.setAttribute('disabled', true);
     event.preventDefault();
     event.stopPropagation();
     if (self.confirmText !== '') {
@@ -10814,7 +10899,7 @@ FormLayout.prototype.build = async function(persisted) {
       }
       dialog.confirm(ct, () => {
         self.save();
-      })
+      });
     } else {
       self.save();
     }
@@ -10833,7 +10918,10 @@ FormLayout.prototype.build = async function(persisted) {
     if (rightbar != null) {
       if (rightBarBottom.parentElement.style.display !== 'none') {
         rightBarBottom.appendChild(buttonSave);
-        rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+        for (let action of self.actions) {
+          rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+          rightBarBottom.appendChild(self.createButton(action));
+        }
         rightBarBottom.appendChild(buttonClose);
       } else {
         containerButtons.appendChild(buttons);
@@ -11545,8 +11633,16 @@ FormLayout.prototype.createButton = function(action) {
     }
   }
   button.innerHTML = action.text;
-  if (action.click) {
-    button.addEventListener('click', action.click);
+  if (action.onClicked) {
+    button.onclick = (ev) => {
+      if (action.confirmText) {
+        dialog.confirm(action.confirmText, () => {
+          action.onClicked(dom.formdata(this.container));
+        });
+      } else {
+        action.onClicked(dom.formdata(this.container));
+      }
+    };
   }
   return button;
 };
@@ -11584,6 +11680,17 @@ FormLayout.prototype.success = function (message, callback) {
     dom.find('button', self.toast).click();
     if (callback) callback();
   }, 1000);
+};
+
+FormLayout.prototype.hideSidebar = function (message, callback) {
+  let rightbar = dom.find('div[widget-id=right-bar]')
+  // let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
+  if (rightbar != null) {
+    rightbar.children[0].classList.add('out');
+    setTimeout(function () {
+      rightbar.remove();
+    }, 300);
+  }
 };
 
 /**
@@ -11655,6 +11762,44 @@ FormLayout.validate = function(input) {
   } else {
     span.innerHTML = ICON_CORRECT;
   }
+};
+
+FormLayout.prototype.setInputValue = function (name, value) {
+  let foundField = null;
+  for (let field of this.fields) {
+    if (field.name === name) {
+      foundField = field;
+      break;
+    }
+  }
+  if (foundField == null) return;
+  if (foundField.input === 'bool') {
+    let elInput = dom.find(`input[name=${name}]`, this.container);
+    if (value === 'T' && !elInput.checked) {
+      elInput.click();
+      return;
+    }
+    if (value === 'F' && elInput.checked) {
+      elInput.click();
+      return;
+    }
+  }
+};
+
+FormLayout.prototype.getInputValue = function (name) {
+  let foundField = null;
+  for (let field of this.fields) {
+    if (field.name === name) {
+      foundField = field;
+      break;
+    }
+  }
+  if (foundField == null) return null;
+  if (foundField.input === 'bool') {
+    let elInput = dom.find(`input[name=${name}]`, this.container);
+    return elInput.checked ? 'T' : 'F';
+  }
+  return null;
 };
 
 FormLayout.prototype.input = function(nameAndValue) {
@@ -19070,22 +19215,28 @@ ImageUpload.prototype.fetch = function (containerId) {
 
 ImageUpload.prototype.append = function (item) {
   let ul = dom.find('ul', this.container);
-  let li = dom.create('li', 'list-group-item', 'list-group-item-input');
-  li.style.height = '100%';
-  let link = dom.create('a', 'btn', 'btn-link', 'text-info');
+  let li = dom.create('li', 'list-group-item', 'p-0');
+  li.style.height = '100px';
+  li.style.width = 'calc(98%/ 3)';
+  li.style.flexGrow = '0';
+  let link = dom.create('a', 'btn', 'btn-link', 'text-info', 'p-0');
 
   li.appendChild(link);
+  ul.appendChild(li);
+
+  let rect = li.getBoundingClientRect();
 
   let img = null;
   if (item.filepath) {
     let url = item.filepath.replace('/www/', '');
     link.setAttribute('data-img-url', url);
-    img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '" width="300">');
+    img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '">');
   } else {
-    img = dom.element('<img src="' + item.imgdata + '" width="300">');
+    img = dom.element('<img src="' + item.imgdata + '">');
   }
+  img.setAttribute('width', rect.width + 'px');
+  img.setAttribute('height', rect.height + 'px');
   link.appendChild(img);
-  ul.appendChild(li);
 
   dom.bind(link, 'click', function() {
     let url = link.getAttribute('data-img-url');
@@ -19177,6 +19328,9 @@ ImageUpload.prototype.render = function(containerId) {
   this.container.append(div);
 
   let ul = dom.create('ul', 'list-group', 'full-width', 'overflow-hidden');
+  ul.style.display = 'flex';
+  ul.style.flexWrap = 'wrap';
+  ul.style.flexDirection = 'row';
   this.container.appendChild(ul);
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];

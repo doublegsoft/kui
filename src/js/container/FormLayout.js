@@ -361,7 +361,7 @@ FormLayout.prototype.build = async function(persisted) {
       }
       dialog.confirm(ct, () => {
         self.save();
-      })
+      });
     } else {
       self.save();
     }
@@ -380,7 +380,10 @@ FormLayout.prototype.build = async function(persisted) {
     if (rightbar != null) {
       if (rightBarBottom.parentElement.style.display !== 'none') {
         rightBarBottom.appendChild(buttonSave);
-        rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+        for (let action of self.actions) {
+          rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+          rightBarBottom.appendChild(self.createButton(action));
+        }
         rightBarBottom.appendChild(buttonClose);
       } else {
         containerButtons.appendChild(buttons);
@@ -1092,8 +1095,16 @@ FormLayout.prototype.createButton = function(action) {
     }
   }
   button.innerHTML = action.text;
-  if (action.click) {
-    button.addEventListener('click', action.click);
+  if (action.onClicked) {
+    button.onclick = (ev) => {
+      if (action.confirmText) {
+        dialog.confirm(action.confirmText, () => {
+          action.onClicked(dom.formdata(this.container));
+        });
+      } else {
+        action.onClicked(dom.formdata(this.container));
+      }
+    };
   }
   return button;
 };
@@ -1131,6 +1142,17 @@ FormLayout.prototype.success = function (message, callback) {
     dom.find('button', self.toast).click();
     if (callback) callback();
   }, 1000);
+};
+
+FormLayout.prototype.hideSidebar = function (message, callback) {
+  let rightbar = dom.find('div[widget-id=right-bar]')
+  // let rightbar = dom.ancestor(self.container, 'div', 'right-bar');
+  if (rightbar != null) {
+    rightbar.children[0].classList.add('out');
+    setTimeout(function () {
+      rightbar.remove();
+    }, 300);
+  }
 };
 
 /**
@@ -1202,6 +1224,44 @@ FormLayout.validate = function(input) {
   } else {
     span.innerHTML = ICON_CORRECT;
   }
+};
+
+FormLayout.prototype.setInputValue = function (name, value) {
+  let foundField = null;
+  for (let field of this.fields) {
+    if (field.name === name) {
+      foundField = field;
+      break;
+    }
+  }
+  if (foundField == null) return;
+  if (foundField.input === 'bool') {
+    let elInput = dom.find(`input[name=${name}]`, this.container);
+    if (value === 'T' && !elInput.checked) {
+      elInput.click();
+      return;
+    }
+    if (value === 'F' && elInput.checked) {
+      elInput.click();
+      return;
+    }
+  }
+};
+
+FormLayout.prototype.getInputValue = function (name) {
+  let foundField = null;
+  for (let field of this.fields) {
+    if (field.name === name) {
+      foundField = field;
+      break;
+    }
+  }
+  if (foundField == null) return null;
+  if (foundField.input === 'bool') {
+    let elInput = dom.find(`input[name=${name}]`, this.container);
+    return elInput.checked ? 'T' : 'F';
+  }
+  return null;
 };
 
 FormLayout.prototype.input = function(nameAndValue) {

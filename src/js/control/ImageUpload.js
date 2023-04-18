@@ -23,22 +23,28 @@ ImageUpload.prototype.fetch = function (containerId) {
 
 ImageUpload.prototype.append = function (item) {
   let ul = dom.find('ul', this.container);
-  let li = dom.create('li', 'list-group-item', 'list-group-item-input');
-  li.style.height = '100%';
-  let link = dom.create('a', 'btn', 'btn-link', 'text-info');
+  let li = dom.create('li', 'list-group-item', 'p-0');
+  li.style.height = '100px';
+  li.style.width = 'calc(98%/ 3)';
+  li.style.flexGrow = '0';
+  let link = dom.create('a', 'btn', 'btn-link', 'text-info', 'p-0');
 
   li.appendChild(link);
+  ul.appendChild(li);
+
+  let rect = li.getBoundingClientRect();
 
   let img = null;
   if (item.filepath) {
     let url = item.filepath.replace('/www/', '');
     link.setAttribute('data-img-url', url);
-    img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '" width="300">');
+    img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '">');
   } else {
-    img = dom.element('<img src="' + item.imgdata + '" width="300">');
+    img = dom.element('<img src="' + item.imgdata + '">');
   }
+  img.setAttribute('width', rect.width + 'px');
+  img.setAttribute('height', rect.height + 'px');
   link.appendChild(img);
-  ul.appendChild(li);
 
   dom.bind(link, 'click', function() {
     let url = link.getAttribute('data-img-url');
@@ -130,6 +136,9 @@ ImageUpload.prototype.render = function(containerId) {
   this.container.append(div);
 
   let ul = dom.create('ul', 'list-group', 'full-width', 'overflow-hidden');
+  ul.style.display = 'flex';
+  ul.style.flexWrap = 'wrap';
+  ul.style.flexDirection = 'row';
   this.container.appendChild(ul);
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
