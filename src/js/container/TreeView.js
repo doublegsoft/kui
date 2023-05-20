@@ -9,7 +9,7 @@ function TreeView(opts) {
   }
   this.local = opts.local;
   // the level number
-  this.levels = opts.levels || 1;
+  this.levels = opts.levels || 99;
   let params = opts.params || {};
   this.rootParams = params.root || {};
   this.childParams = params.child || {};
@@ -17,6 +17,19 @@ function TreeView(opts) {
   this.fieldText = opts.fields.text;
   this.fieldValue = opts.fields.value;
   this.fieldParent = opts.fields.parent;
+
+  this.contextMenu = dom.element(`
+    <div class="context-menu" style="display: none; width: 200px;">
+      <ul class="menu">
+        <li><a widget-id="buttonAdd" href="#"><i class="fas fa-plus-circle position-relative" style="top: -2px;"></i>添加</a></li>
+        <li><a widget-id="buttonEdit" href="#"><i class="fas fa-edit position-relative" style="top: -2px;"></i>编辑</a></li>
+        <li><a widget-id="buttonCopy" href="#"><i class="fas fa-copy position-relative" style="top: -2px;"></i>复制</a></li>
+        <li class="trash"><a widget-id="buttonDelete" href="#"><i class="fas fa-trash position-relative" style="top: -2px;"></i>删除</a></li>
+      </ul>
+    </div>
+  `);
+
+  dom.init(this, this.contextMenu);
 
   this.onEditNode = opts.onEditNode;
   this.onRemoveNode = opts.onRemoveNode;
@@ -26,6 +39,38 @@ function TreeView(opts) {
   this.isNodeEditable = opts.isNodeEditable;
   this.isNodeRemovable = opts.isNodeRemovable;
   this.isNodeAppendable = opts.isNodeAppendable;
+
+  if (this.onEditNode) {
+    dom.bind(this.buttonEdit, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideContextMenu();
+      this.onEditNode(this.selectedLi, dom.model(this.selectedLi));
+    });
+  } else {
+    this.buttonEdit.remove();
+  }
+
+  if (this.onRemoveNode) {
+    dom.bind(this.buttonDelete, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideContextMenu();
+      this.onRemoveNode(this.selectedLi, dom.model(this.selectedLi));
+    });
+  } else {
+    this.buttonDelete.remove();
+  }
+  if (this.onAddNode) {
+    dom.bind(this.buttonAdd, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideContextMenu();
+      this.onAddNode(this.selectedLi, dom.model(this.selectedLi));
+    });
+  } else {
+    this.buttonAdd.remove();
+  }
 }
 
 TreeView.prototype.createNodeElement = function(data, level) {
@@ -46,59 +91,22 @@ TreeView.prototype.createNodeElement = function(data, level) {
           <div widget-id="widgetText" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
             <strong>{{text}}</strong>
           </div>
-          <div widget-id="widgetActions" class="ml-auto mr-2" style="line-height: 32px;">
-            <a widget-id="buttonEdit"
-               class="btn-link pointer mr-1 action">
-              <i class="fas fa-edit font-14 text-info" style="top: 4px;"></i>
-            </a>
-            <a widget-id="buttonAdd"
-               class="btn-link pointer mr-1 action">
-              <span class="material-icons text-info font-18" style="top: 4px;">add_circle_outline</span>
-            </a>
-            <a widget-id="buttonDelete"
-               class="btn-link pointer action">
-              <span class="material-icons text-danger font-18" style="top: 4px;">highlight_off</span>
-            </a>
-          </div>
         </div>
-        <ul class="list-group full-width border-less">
-        </ul>
+        <ul class="list-group full-width border-less" style="display: none;"></ul>
       </div>
     </li>
   `, viewModel);
   dom.model(ret, data);
   let buttonExpand = dom.find('[widget-id=buttonExpand]', ret);
-  let buttonEdit = dom.find('[widget-id=buttonEdit]', ret);
-  let buttonAdd = dom.find('[widget-id=buttonAdd]', ret);
-  let buttonDelete = dom.find('[widget-id=buttonDelete]', ret);
   if ((level + 1) == this.levels) {
     buttonExpand.style.visibility = 'hidden';
-    // buttonExpand.remove();
+  } else if (!data.children || data.children.length == 0) {
+    buttonExpand.style.visibility = 'hidden';
   } else {
     let model = {};
     model[this.fieldParent] = data[this.fieldValue];
-    dom.model(buttonExpand, model);
-    dom.bind(buttonExpand, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      let a = dom.ancestor(ev.target, 'a');
-      let div = a.parentElement.parentElement;
-      let ul = div.querySelector('ul');
-      let icon = a.children[0];
-      if (icon.classList.contains('fa-plus-square')) {
-        icon.classList.remove('fa-plus-square');
-        icon.classList.add('fa-minus-square');
-        ul.style.display = '';
-        // if (ul.children.length == 0)
-        ul.innerHTML = '';
-        this.fetchChildren(ret, dom.model(a), level + 1);
-      } else {
-        icon.classList.remove('fa-minus-square');
-        icon.classList.add('fa-plus-square');
-        ul.style.display = 'none';
-      }
-    });
   }
+  buttonExpand.onclick = this.collapseOrExpand;
 
   let model = {};
   model[this.fieldValue] = data[this.fieldValue];
@@ -106,112 +114,20 @@ TreeView.prototype.createNodeElement = function(data, level) {
   if (data[this.fieldParent])
     model[this.fieldParent] = data[this.fieldParent];
 
-  let widthActions = 0;
-  if (this.onEditNode) {
-    dom.model(buttonEdit, model);
-    dom.bind(buttonEdit, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      let a = dom.ancestor(ev.target, 'a');
-      this.onEditNode(a.parentElement.parentElement.parentElement.parentElement, dom.model(a));
-    });
-    widthActions += 22;
-  } else {
-    buttonEdit.remove();
-  }
-  if (!this.isNodeEditable || !this.isNodeEditable(ret, model))
-    buttonEdit.remove();
-  if (this.onRemoveNode) {
-    dom.model(buttonDelete, model);
-    dom.bind(buttonDelete, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      let a = dom.ancestor(ev.target, 'a');
-      this.onRemoveNode(a.parentElement.parentElement.parentElement.parentElement, dom.model(a));
-    });
-    widthActions += 22;
-  } else {
-    buttonDelete.remove();
-  }
-  if (!this.isNodeRemovable || !this.isNodeRemovable(ret, model))
-    buttonDelete.remove();
-
-  if (this.onAddNode) {
-    if ((level + 1) == this.levels) buttonAdd.remove();
-    else {
-      dom.model(buttonAdd, model);
-      dom.bind(buttonAdd, 'click', ev => {
-        let a = dom.ancestor(ev.target, 'a');
-        this.onAddNode(a.parentElement.parentElement.parentElement.parentElement, dom.model(a));
-      });
-    }
-    widthActions += 22;
-  } else {
-    buttonAdd.remove();
-  }
-  if (!this.isNodeAppendable || !this.isNodeAppendable(ret, model))
-    buttonAdd.remove();
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
       ev.preventDefault();
       ev.stopPropagation();
-      let li = dom.ancestor(ev.target, 'li');
-      let actives = this.container.querySelectorAll('.list-group-item-action.active');
-      actives.forEach((el, idx) => { el.classList.remove('active') });
-      let div = li.querySelector('.list-group-item-action');
-      if (div != null) {
-        div.classList.add('active');
-      }
+      this.hideContextMenu();
+      let li = this.activateListItem(ev);
       this.onSelectNode(li, dom.model(li));
     });
   }
 
   // 动态调整按钮宽度和文本宽度
   let widgetText = dom.find('[widget-id=widgetText]', ret);
-  let widgetActions = dom.find('[widget-id=widgetActions]', ret);
-  widgetActions.style.minWidth = widgetActions + 'px';
   widgetText.style.width = 'calc(100% - ' + widgetText + 'px)';
   return ret;
-};
-
-/**
- * 递归添加、渲染数据到树节点。
- *
- * @public
- */
-TreeView.prototype.appendNode = function(data, level, parentElement) {
-  parentElement = parentElement || this.container;
-  let ul = parentElement.querySelector('ul');
-  let li = this.createNodeElement(data, level);
-  ul.appendChild(li);
-
-  data.children = data.children || [];
-  for (let i = 0; i < data.children.length; i++) {
-    let childData = data.children[i];
-    childData.level = data.level + 1;
-    let childParentElement = li.querySelector('ul');
-    this.appendNode(childData, level + 1, childParentElement);
-  }
-};
-
-/**
- * 递归添加、渲染数据到树节点。
- *
- * @public
- */
-TreeView.prototype.insertNode = function(data, parentElement) {
-  parentElement = parentElement || this.container;
-  let ul = parentElement.querySelector('ul');
-  let li = this.createNodeElement(data, level);
-  ul.appendChild(li);
-
-  data.children = data.children || [];
-  for (let i = 0; i < data.children.length; i++) {
-    let childData = data.children[i];
-    childData.level = data.level + 1;
-    let childParentElement = li.querySelector('ul');
-    this.appendNode(childData, level + 1, childParentElement);
-  }
 };
 
 /**
@@ -273,35 +189,72 @@ TreeView.prototype.fetchChildren = async function(parentElement, params, level) 
   }
 };
 
-/**
- * @deprecated
- */
-TreeView.prototype.update = function (nodeData) {
-  let ul = this.container.querySelector('ul');
-  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
-  if (li != null) {
-    // update
-    li.querySelector('strong').innerText = nodeData[this.fieldText];
-    dom.model(li, nodeData);
-    return;
+TreeView.prototype.collapseOrExpand = function (ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  let a = dom.ancestor(ev.currentTarget, 'a');
+  let div = a.parentElement.parentElement;
+  let ul = div.querySelector('ul');
+
+  let icon = a.children[0];
+  if (icon.classList.contains('fa-plus-square')) {
+    icon.classList.remove('fa-plus-square');
+    icon.classList.add('fa-minus-square');
+    ul.style.display = '';
+    // if (ul.children.length == 0)
+    // ul.innerHTML = '';
+    // this.fetchChildren(ret, dom.model(a), level + 1);
+  } else {
+    icon.classList.remove('fa-minus-square');
+    icon.classList.add('fa-plus-square');
+    ul.style.display = 'none';
   }
-  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
-  let level = parseInt(li.getAttribute('widget-model-level'));
-  this.appendNode(li, nodeData, level + 1);
 };
 
-TreeView.prototype.updateNode = function (nodeData) {
-  let ul = this.container.querySelector('ul');
-  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
-  if (li != null) {
-    // update
-    li.querySelector('strong').innerText = nodeData[this.fieldText];
-    dom.model(li, nodeData);
-    return;
+TreeView.prototype.updateParent = function(parentElement) {
+  let ul = parentElement;
+  let div = ul.parentElement;
+  let buttonExpand = div.querySelector('[widget-id=buttonExpand]')
+  if (ul.children.length == 0) {
+    buttonExpand.style.visibility = 'hidden';
+  } else {
+    buttonExpand.style.visibility = '';
   }
-  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
-  let level = parseInt(li.getAttribute('widget-model-level'));
-  this.appendNode(li, nodeData, level + 1);
+  buttonExpand.onclick = this.collapseOrExpand;
+};
+
+/**
+ * 递归添加、渲染数据到树节点或者新增节点。
+ *
+ * @public
+ */
+TreeView.prototype.appendNode = function(nodeData, level, parentElement) {
+  parentElement = parentElement || this.container;
+  let ul = parentElement.querySelector('ul');
+  let lis = ul.querySelectorAll('li');
+  let li = this.createNodeElement(nodeData, level);
+
+  nodeData.children = nodeData.children || [];
+  let pos = null;
+  for (let li of lis) {
+    if (li.innerText.localeCompare(nodeData[this.fieldText]) == 1) {
+      pos = li;
+      break;
+    }
+  }
+  if (pos == null) {
+    ul.appendChild(li);
+    this.updateParent(li.parentElement);
+  } else {
+    ul.insertBefore(li, pos);
+  }
+  for (let i = 0; i < nodeData.children.length; i++) {
+    let childData = nodeData.children[i];
+    childData.level = nodeData.level + 1;
+    let childParentElement = li.children[0];
+    this.appendNode(childData, level + 1, childParentElement);
+  }
 };
 
 TreeView.prototype.appendOrUpdateNode = function (nodeData) {
@@ -321,6 +274,22 @@ TreeView.prototype.appendOrUpdateNode = function (nodeData) {
   }
   let level = parseInt(li.getAttribute('widget-model-level'));
   this.appendNode(nodeData, level + 1, li);
+};
+
+TreeView.prototype.removeNode = function (nodeData) {
+  let li = this.locateNode(nodeData);
+  if (li != null) {
+    let ul = li.parentElement;
+    li.remove();
+    this.updateParent(ul);
+  }
+};
+
+TreeView.prototype.insertNode = function (parentElement, nodeData) {
+  parentElement = parentElement || this.container;
+  let ul = dom.find('ul', parentElement);
+  let lis = ul.querySelectorAll('li');
+
 };
 
 TreeView.prototype.render = async function(containerId, params) {
@@ -346,5 +315,56 @@ TreeView.prototype.render = async function(containerId, params) {
     let row = data[i];
     this.appendNode(row, 0, this.container);
   }
+  this.container.appendChild(this.contextMenu);
 
+  this.container.oncontextmenu = ev => {
+    ev.preventDefault();
+    this.showContextMenu(ev);
+  };
+  this.container.onclick = ev => {
+    this.hideContextMenu();
+  };
 };
+
+/**
+ * 激活显示列表项目。
+ */
+TreeView.prototype.activateListItem = function (ev) {
+  let li = dom.ancestor(ev.target, 'li');
+  let actives = this.container.querySelectorAll('.list-group-item-action.active');
+  actives.forEach((el, idx) => { el.classList.remove('active') });
+  let div = li.querySelector('.list-group-item-action');
+  if (div != null) {
+    div.classList.add('active');
+  }
+  return li;
+};
+
+/**
+ * 显示右键菜单。
+ */
+TreeView.prototype.showContextMenu = function (ev) {
+  let rect = this.container.getBoundingClientRect();
+  if (ev.pageX < rect.left || ev.pageX > (rect.left + rect.width)) {
+    return;
+  }
+  if (ev.pageY < rect.top || ev.pageY > (rect.top + rect.height)) {
+    return;
+  }
+  this.contextMenu.style.display = 'block';
+  this.contextMenu.style.left = (ev.pageX - rect.left + 10) + "px";
+  this.contextMenu.style.top = (ev.pageY - rect.top + 25) + "px";
+  let closest = document.elementFromPoint(ev.clientX, ev.clientY);
+  let li = dom.ancestor(closest, 'li');
+  if (li == null) {
+    return;
+  }
+  this.selectedLi = li;
+  // 会触发TreeView的onSelectNode方法
+  this.activateListItem(ev);
+};
+
+TreeView.prototype.hideContextMenu = function (ev) {
+  this.contextMenu.style.display = 'none';
+};
+

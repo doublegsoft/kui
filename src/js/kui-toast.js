@@ -27,7 +27,8 @@ toast.success = function(selector, message) {
   toast.style.zIndex = 11000;
   dom.find('.toast-body', toast).innerHTML = message;
   dom.find('strong', toast).innerText = '成功';
-  toast.classList.add('bg-success', 'show', 'in');
+  toast.classList.add('show', 'in');
+  toast.style.backgroundColor = 'var(--color-success)';
 
   setTimeout(function() {
     toast.remove();

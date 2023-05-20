@@ -1319,7 +1319,7 @@ ajax.sidebar = function(opt) {
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto;"></div>
-            <div style="position: absolute; bottom: 8px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
+            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>
@@ -2659,6 +2659,26 @@ dom.height2 = function(selector, offset, parent) {
   element.style.overflowY = 'auto';
 };
 
+dom.autoheight = function (selector) {
+  let el = dom.find(selector);
+  let rectBody = document.body.getBoundingClientRect();
+  let height = rectBody.height;
+
+  let parent = el.parentElement;
+  let rect = parent.getBoundingClientRect();
+  let top = rect.top;
+  let bottom = 0;
+  while (parent !== document.body) {
+    let style = getComputedStyle(parent);
+    bottom += parseInt(style.paddingBottom);
+    bottom += parseInt(style.marginBottom);
+    parent = parent.parentElement;
+  }
+  console.log(height - top - bottom);
+  el.style.height = (height - top - bottom) + 'px';
+  el.style.overflowY = 'auto';
+};
+
 dom.templatize = function(template, model) {
   let tpl = Handlebars.compile(template);
   let html = tpl(model);
@@ -2758,6 +2778,13 @@ dom.init = function (owner, element) {
   }
   if (name && name != '') {
     owner[name] = element;
+  }
+  // 提示
+  let tooltip = element.getAttribute('widget-model-tooltip');
+  if (tooltip && tooltip != '') {
+    tippy(element, {
+      content: tooltip,
+    });
   }
   for (let i = 0; i < element.children.length; i++) {
     let child = element.children[i];
@@ -4576,7 +4603,7 @@ PaginationGrid.prototype.render = function (containerId, params) {
 
 PaginationGrid.prototype.actionbar = function() {
   let self = this;
-  let top = $('<div class="full-width d-flex overflow-hidden mb-3" style="height: 26px;"></div>');
+  let top = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
 
   if (this.queryFilter) {
     top.append(this.queryFilter.getRoot());

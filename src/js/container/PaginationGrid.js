@@ -238,7 +238,7 @@ PaginationGrid.prototype.render = function (containerId, params) {
 
 PaginationGrid.prototype.actionbar = function() {
   let self = this;
-  let top = $('<div class="full-width d-flex overflow-hidden mb-3" style="height: 26px;"></div>');
+  let top = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
 
   if (this.queryFilter) {
     top.append(this.queryFilter.getRoot());

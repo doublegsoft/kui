@@ -1744,7 +1744,7 @@ ajax.sidebar = function(opt) {
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto;"></div>
-            <div style="position: absolute; bottom: 8px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
+            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>
@@ -5701,6 +5701,26 @@ dom.height2 = function(selector, offset, parent) {
   element.style.overflowY = 'auto';
 };
 
+dom.autoheight = function (selector) {
+  let el = dom.find(selector);
+  let rectBody = document.body.getBoundingClientRect();
+  let height = rectBody.height;
+
+  let parent = el.parentElement;
+  let rect = parent.getBoundingClientRect();
+  let top = rect.top;
+  let bottom = 0;
+  while (parent !== document.body) {
+    let style = getComputedStyle(parent);
+    bottom += parseInt(style.paddingBottom);
+    bottom += parseInt(style.marginBottom);
+    parent = parent.parentElement;
+  }
+  console.log(height - top - bottom);
+  el.style.height = (height - top - bottom) + 'px';
+  el.style.overflowY = 'auto';
+};
+
 dom.templatize = function(template, model) {
   let tpl = Handlebars.compile(template);
   let html = tpl(model);
@@ -5800,6 +5820,13 @@ dom.init = function (owner, element) {
   }
   if (name && name != '') {
     owner[name] = element;
+  }
+  // 提示
+  let tooltip = element.getAttribute('widget-model-tooltip');
+  if (tooltip && tooltip != '') {
+    tippy(element, {
+      content: tooltip,
+    });
   }
   for (let i = 0; i < element.children.length; i++) {
     let child = element.children[i];
@@ -8091,7 +8118,8 @@ toast.success = function(selector, message) {
   toast.style.zIndex = 11000;
   dom.find('.toast-body', toast).innerHTML = message;
   dom.find('strong', toast).innerText = '成功';
-  toast.classList.add('bg-success', 'show', 'in');
+  toast.classList.add('show', 'in');
+  toast.style.backgroundColor = 'var(--color-success)';
 
   setTimeout(function() {
     toast.remove();
@@ -10689,6 +10717,7 @@ FormLayout.prototype.build = async function(persisted) {
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
+
       let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0', 'mb-2');
       if (pair.label != null) {
         pair.label.classList.add('pl-3');
@@ -10696,6 +10725,8 @@ FormLayout.prototype.build = async function(persisted) {
         labelAndInput.appendChild(pair.label);
       }
       labelAndInput.appendChild(pair.input);
+      // 指定字段的容器，以备不时只需。
+      field.container = labelAndInput;
       row.appendChild(labelAndInput);
     }
     form.appendChild(row);
@@ -10759,9 +10790,15 @@ FormLayout.prototype.build = async function(persisted) {
       } else {
         opts.selection = field.value;
       }
-      if (field.onInput) {
-        opts.onchange = field.onInput;
-      }
+      opts.onchange = val => {
+        for (let f of self.fields) {
+          self.hideOrShowField(f);
+        }
+        if (field.onInput) {
+          field.onInput(val);
+        }
+      };
+
       if (field.variables) {
         opts.variables = field.variables;
         for (let key in opts.variables) {
@@ -10803,9 +10840,11 @@ FormLayout.prototype.build = async function(persisted) {
       for (let key in this.params) {
         field.options.data[key] = this.params[key];
       }
-      new Checklist(field.options).render(dom.find('div[data-checklist-name=\'' + field.name + '\']', this.container), {
+      let container = dom.find('div[data-checklist-name=\'' + field.name + '\']', this.container);
+      new Checklist(field.options).render(container, {
         selections: persisted[field.name] || []
       });
+      field.container = container.parentElement.parentElement;
     } else if (field.input == 'checktree') {
       field.options.name = field.name;
       field.options.readonly = this.readonly;
@@ -10814,15 +10853,17 @@ FormLayout.prototype.build = async function(persisted) {
       for (let key in this.params) {
         field.options.data[key] = this.params[key];
       }
-      // new Checktree(field.options).render('#checktree_' + field.name);
+      let container = dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container);
       this[field.name] = new TreelikeList(field.options);
-      this[field.name].render(dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container), field.value);
-      // this[field.name].setValues(field.value);
+      this[field.name].render(container, field.value);
+      field.container = container.parentElement.parentElement;
     } else if (field.input == 'fileupload') {
+      let container = dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container);
       await new FileUpload({
         ...field.options,
         name: field.name,
-      }).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
+      }).render(container);
+      field.container = container.parentElement.parentElement;
     } else if (field.input == 'imageupload') {
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
@@ -10919,9 +10960,10 @@ FormLayout.prototype.build = async function(persisted) {
       if (rightBarBottom.parentElement.style.display !== 'none') {
         rightBarBottom.appendChild(buttonSave);
         for (let action of self.actions) {
-          rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+          rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 12px;"></span>'));
           rightBarBottom.appendChild(self.createButton(action));
         }
+        rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 12px;"></span>'));
         rightBarBottom.appendChild(buttonClose);
       } else {
         containerButtons.appendChild(buttons);
@@ -10937,6 +10979,10 @@ FormLayout.prototype.build = async function(persisted) {
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
 
+  // 根据字段不同值，显示或者隐藏其他字段
+  for (let f of self.fields) {
+    self.hideOrShowField(f);
+  }
   // 初始化显示
   this.onInit();
 };
@@ -11019,7 +11065,7 @@ FormLayout.prototype.read = function (params) {
 /**
  * Saves form data to remote data source.
  */
-FormLayout.prototype.save = async function () {
+FormLayout.prototype.save = async function (toasting) {
   let self = this;
   let awaitConvert = this.saveOpt.awaitConvert || false;
   let errors = Validation.validate($(this.containerId));
@@ -11065,6 +11111,7 @@ FormLayout.prototype.save = async function () {
       }
       if (self.saveOpt.callback) self.saveOpt.callback(resp.data);
       if (self.saveOpt.success) self.saveOpt.success(resp.data);
+      if (toasting === false) return;
       self.success(self.savePromptText || '数据保存成功！', () => {
         // 默认自动关闭
         if (self.saveOpt.autoClose !== false) {
@@ -11280,6 +11327,14 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
       group.append(radio);
+      radio.onchange = ev => {
+        if (field.onInput) {
+          field.onInput(field.values[i].value);
+        }
+        for (let f of self.fields) {
+          self.hideOrShowField(f);
+        }
+      };
     }
   } else if (field.input == 'longtext') {
     input = dom.create('textarea', 'form-control');
@@ -11456,10 +11511,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         file: fileinput.files[0],
         success: function(resp) {
           let item = resp.data;
+          if (!item) return;
           input.setAttribute('data-file-type', fileinput.files[0].type);
           input.setAttribute('data-file-size', fileinput.files[0].size);
           input.setAttribute('data-file-path', item.filepath);
           input.setAttribute('data-file-ext', ext);
+          input.setAttribute('data-file-name', item.filename);
+          input.setAttribute('data-web-path', item.webpath);
         }
       });
       FormLayout.validate(input);
@@ -11632,6 +11690,9 @@ FormLayout.prototype.createButton = function(action) {
       button.classList.add(action.classes[i]);
     }
   }
+  if (action.style) {
+    button.style = action.style;
+  }
   button.innerHTML = action.text;
   if (action.onClicked) {
     button.onclick = (ev) => {
@@ -11774,7 +11835,7 @@ FormLayout.prototype.setInputValue = function (name, value) {
   }
   if (foundField == null) return;
   if (foundField.input === 'bool') {
-    let elInput = dom.find(`input[name=${name}]`, this.container);
+    let elInput = dom.find(`input[name="${name}"]`, this.container);
     if (value === 'T' && !elInput.checked) {
       elInput.click();
       return;
@@ -11796,7 +11857,7 @@ FormLayout.prototype.getInputValue = function (name) {
   }
   if (foundField == null) return null;
   if (foundField.input === 'bool') {
-    let elInput = dom.find(`input[name=${name}]`, this.container);
+    let elInput = dom.find(`input[name="${name}"]`, this.container);
     return elInput.checked ? 'T' : 'F';
   }
   return null;
@@ -11827,20 +11888,37 @@ FormLayout.prototype.setVariables = function(vars){
   }
 };
 
+FormLayout.prototype.getField = function(name) {
+  for (let field of this.fields) {
+    if (field.name === name)
+      return field;
+  }
+  return {};
+};
+
 /**
  * 通过字段值判断其他字段显示与否。
+ *
+ * 添加：2023-04-19
  */
-// FormLayout.prototype.controlFields = function() {
-//   console.log('hello');
-//   let data = dom.formdata(this.container);
-//   for (let field of this.fields) {
-//     if (field.visible) {
-//       let input = this.container.querySelector('[name="' + field.name + '"]');
-//       if (input != null)
-//         field.visible(data, input.parentElement.parentElement);
-//     }
-//   }
-// };
+FormLayout.prototype.hideOrShowField = function(field) {
+  let data = dom.formdata(this.container);
+  if (typeof field.visible === 'function') {
+    if (field.visible(data) === true) {
+      if (field.required === true) {
+        let el = this.container.querySelector('[name="' + field.name + '"]');
+        el.setAttribute('data-required', field.title);
+      }
+      field.container.style.display = '';
+    } else {
+      if (field.required === true) {
+        let el = this.container.querySelector('[name="' + field.name + '"]');
+        el.setAttribute('data-required', '');
+      }
+      field.container.style.setProperty('display', 'none', 'important');
+    }
+  }
+};
 /**
  * 
  */
@@ -14449,7 +14527,7 @@ PaginationGrid.prototype.render = function (containerId, params) {
 
 PaginationGrid.prototype.actionbar = function() {
   let self = this;
-  let top = $('<div class="full-width d-flex overflow-hidden mb-3" style="height: 26px;"></div>');
+  let top = $('<div class="full-width d-flex overflow-hidden" style="height: 26px;"></div>');
 
   if (this.queryFilter) {
     top.append(this.queryFilter.getRoot());
@@ -14964,7 +15042,9 @@ PaginationTable.prototype.render = function (containerId, params) {
     this.container = containerId;
   }
   $(this.container).empty();  //tableTopActions
-  $(this.container).append(this.tableTopActions(params));
+  if (this.refreshable !== false) {
+    $(this.container).append(this.tableTopActions(params));
+  }
   if(this.widgetExcess){
     $(this.container).append(this.widgetExcess.template);
   }
@@ -17191,7 +17271,7 @@ function TreeView(opts) {
   }
   this.local = opts.local;
   // the level number
-  this.levels = opts.levels || 1;
+  this.levels = opts.levels || 99;
   let params = opts.params || {};
   this.rootParams = params.root || {};
   this.childParams = params.child || {};
@@ -17199,6 +17279,19 @@ function TreeView(opts) {
   this.fieldText = opts.fields.text;
   this.fieldValue = opts.fields.value;
   this.fieldParent = opts.fields.parent;
+
+  this.contextMenu = dom.element(`
+    <div class="context-menu" style="display: none; width: 200px;">
+      <ul class="menu">
+        <li><a widget-id="buttonAdd" href="#"><i class="fas fa-plus-circle position-relative" style="top: -2px;"></i>添加</a></li>
+        <li><a widget-id="buttonEdit" href="#"><i class="fas fa-edit position-relative" style="top: -2px;"></i>编辑</a></li>
+        <li><a widget-id="buttonCopy" href="#"><i class="fas fa-copy position-relative" style="top: -2px;"></i>复制</a></li>
+        <li class="trash"><a widget-id="buttonDelete" href="#"><i class="fas fa-trash position-relative" style="top: -2px;"></i>删除</a></li>
+      </ul>
+    </div>
+  `);
+
+  dom.init(this, this.contextMenu);
 
   this.onEditNode = opts.onEditNode;
   this.onRemoveNode = opts.onRemoveNode;
@@ -17208,6 +17301,38 @@ function TreeView(opts) {
   this.isNodeEditable = opts.isNodeEditable;
   this.isNodeRemovable = opts.isNodeRemovable;
   this.isNodeAppendable = opts.isNodeAppendable;
+
+  if (this.onEditNode) {
+    dom.bind(this.buttonEdit, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideContextMenu();
+      this.onEditNode(this.selectedLi, dom.model(this.selectedLi));
+    });
+  } else {
+    this.buttonEdit.remove();
+  }
+
+  if (this.onRemoveNode) {
+    dom.bind(this.buttonDelete, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideContextMenu();
+      this.onRemoveNode(this.selectedLi, dom.model(this.selectedLi));
+    });
+  } else {
+    this.buttonDelete.remove();
+  }
+  if (this.onAddNode) {
+    dom.bind(this.buttonAdd, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.hideContextMenu();
+      this.onAddNode(this.selectedLi, dom.model(this.selectedLi));
+    });
+  } else {
+    this.buttonAdd.remove();
+  }
 }
 
 TreeView.prototype.createNodeElement = function(data, level) {
@@ -17228,59 +17353,22 @@ TreeView.prototype.createNodeElement = function(data, level) {
           <div widget-id="widgetText" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
             <strong>{{text}}</strong>
           </div>
-          <div widget-id="widgetActions" class="ml-auto mr-2" style="line-height: 32px;">
-            <a widget-id="buttonEdit"
-               class="btn-link pointer mr-1 action">
-              <i class="fas fa-edit font-14 text-info" style="top: 4px;"></i>
-            </a>
-            <a widget-id="buttonAdd"
-               class="btn-link pointer mr-1 action">
-              <span class="material-icons text-info font-18" style="top: 4px;">add_circle_outline</span>
-            </a>
-            <a widget-id="buttonDelete"
-               class="btn-link pointer action">
-              <span class="material-icons text-danger font-18" style="top: 4px;">highlight_off</span>
-            </a>
-          </div>
         </div>
-        <ul class="list-group full-width border-less">
-        </ul>
+        <ul class="list-group full-width border-less" style="display: none;"></ul>
       </div>
     </li>
   `, viewModel);
   dom.model(ret, data);
   let buttonExpand = dom.find('[widget-id=buttonExpand]', ret);
-  let buttonEdit = dom.find('[widget-id=buttonEdit]', ret);
-  let buttonAdd = dom.find('[widget-id=buttonAdd]', ret);
-  let buttonDelete = dom.find('[widget-id=buttonDelete]', ret);
   if ((level + 1) == this.levels) {
     buttonExpand.style.visibility = 'hidden';
-    // buttonExpand.remove();
+  } else if (!data.children || data.children.length == 0) {
+    buttonExpand.style.visibility = 'hidden';
   } else {
     let model = {};
     model[this.fieldParent] = data[this.fieldValue];
-    dom.model(buttonExpand, model);
-    dom.bind(buttonExpand, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      let a = dom.ancestor(ev.target, 'a');
-      let div = a.parentElement.parentElement;
-      let ul = div.querySelector('ul');
-      let icon = a.children[0];
-      if (icon.classList.contains('fa-plus-square')) {
-        icon.classList.remove('fa-plus-square');
-        icon.classList.add('fa-minus-square');
-        ul.style.display = '';
-        // if (ul.children.length == 0)
-        ul.innerHTML = '';
-        this.fetchChildren(ret, dom.model(a), level + 1);
-      } else {
-        icon.classList.remove('fa-minus-square');
-        icon.classList.add('fa-plus-square');
-        ul.style.display = 'none';
-      }
-    });
   }
+  buttonExpand.onclick = this.collapseOrExpand;
 
   let model = {};
   model[this.fieldValue] = data[this.fieldValue];
@@ -17288,112 +17376,20 @@ TreeView.prototype.createNodeElement = function(data, level) {
   if (data[this.fieldParent])
     model[this.fieldParent] = data[this.fieldParent];
 
-  let widthActions = 0;
-  if (this.onEditNode) {
-    dom.model(buttonEdit, model);
-    dom.bind(buttonEdit, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      let a = dom.ancestor(ev.target, 'a');
-      this.onEditNode(a.parentElement.parentElement.parentElement.parentElement, dom.model(a));
-    });
-    widthActions += 22;
-  } else {
-    buttonEdit.remove();
-  }
-  if (!this.isNodeEditable || !this.isNodeEditable(ret, model))
-    buttonEdit.remove();
-  if (this.onRemoveNode) {
-    dom.model(buttonDelete, model);
-    dom.bind(buttonDelete, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      let a = dom.ancestor(ev.target, 'a');
-      this.onRemoveNode(a.parentElement.parentElement.parentElement.parentElement, dom.model(a));
-    });
-    widthActions += 22;
-  } else {
-    buttonDelete.remove();
-  }
-  if (!this.isNodeRemovable || !this.isNodeRemovable(ret, model))
-    buttonDelete.remove();
-
-  if (this.onAddNode) {
-    if ((level + 1) == this.levels) buttonAdd.remove();
-    else {
-      dom.model(buttonAdd, model);
-      dom.bind(buttonAdd, 'click', ev => {
-        let a = dom.ancestor(ev.target, 'a');
-        this.onAddNode(a.parentElement.parentElement.parentElement.parentElement, dom.model(a));
-      });
-    }
-    widthActions += 22;
-  } else {
-    buttonAdd.remove();
-  }
-  if (!this.isNodeAppendable || !this.isNodeAppendable(ret, model))
-    buttonAdd.remove();
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
       ev.preventDefault();
       ev.stopPropagation();
-      let li = dom.ancestor(ev.target, 'li');
-      let actives = this.container.querySelectorAll('.list-group-item-action.active');
-      actives.forEach((el, idx) => { el.classList.remove('active') });
-      let div = li.querySelector('.list-group-item-action');
-      if (div != null) {
-        div.classList.add('active');
-      }
+      this.hideContextMenu();
+      let li = this.activateListItem(ev);
       this.onSelectNode(li, dom.model(li));
     });
   }
 
   // 动态调整按钮宽度和文本宽度
   let widgetText = dom.find('[widget-id=widgetText]', ret);
-  let widgetActions = dom.find('[widget-id=widgetActions]', ret);
-  widgetActions.style.minWidth = widgetActions + 'px';
   widgetText.style.width = 'calc(100% - ' + widgetText + 'px)';
   return ret;
-};
-
-/**
- * 递归添加、渲染数据到树节点。
- *
- * @public
- */
-TreeView.prototype.appendNode = function(data, level, parentElement) {
-  parentElement = parentElement || this.container;
-  let ul = parentElement.querySelector('ul');
-  let li = this.createNodeElement(data, level);
-  ul.appendChild(li);
-
-  data.children = data.children || [];
-  for (let i = 0; i < data.children.length; i++) {
-    let childData = data.children[i];
-    childData.level = data.level + 1;
-    let childParentElement = li.querySelector('ul');
-    this.appendNode(childData, level + 1, childParentElement);
-  }
-};
-
-/**
- * 递归添加、渲染数据到树节点。
- *
- * @public
- */
-TreeView.prototype.insertNode = function(data, parentElement) {
-  parentElement = parentElement || this.container;
-  let ul = parentElement.querySelector('ul');
-  let li = this.createNodeElement(data, level);
-  ul.appendChild(li);
-
-  data.children = data.children || [];
-  for (let i = 0; i < data.children.length; i++) {
-    let childData = data.children[i];
-    childData.level = data.level + 1;
-    let childParentElement = li.querySelector('ul');
-    this.appendNode(childData, level + 1, childParentElement);
-  }
 };
 
 /**
@@ -17455,35 +17451,72 @@ TreeView.prototype.fetchChildren = async function(parentElement, params, level) 
   }
 };
 
-/**
- * @deprecated
- */
-TreeView.prototype.update = function (nodeData) {
-  let ul = this.container.querySelector('ul');
-  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
-  if (li != null) {
-    // update
-    li.querySelector('strong').innerText = nodeData[this.fieldText];
-    dom.model(li, nodeData);
-    return;
+TreeView.prototype.collapseOrExpand = function (ev) {
+  ev.preventDefault();
+  ev.stopPropagation();
+
+  let a = dom.ancestor(ev.currentTarget, 'a');
+  let div = a.parentElement.parentElement;
+  let ul = div.querySelector('ul');
+
+  let icon = a.children[0];
+  if (icon.classList.contains('fa-plus-square')) {
+    icon.classList.remove('fa-plus-square');
+    icon.classList.add('fa-minus-square');
+    ul.style.display = '';
+    // if (ul.children.length == 0)
+    // ul.innerHTML = '';
+    // this.fetchChildren(ret, dom.model(a), level + 1);
+  } else {
+    icon.classList.remove('fa-minus-square');
+    icon.classList.add('fa-plus-square');
+    ul.style.display = 'none';
   }
-  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
-  let level = parseInt(li.getAttribute('widget-model-level'));
-  this.appendNode(li, nodeData, level + 1);
 };
 
-TreeView.prototype.updateNode = function (nodeData) {
-  let ul = this.container.querySelector('ul');
-  let li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldValue] + '"]');
-  if (li != null) {
-    // update
-    li.querySelector('strong').innerText = nodeData[this.fieldText];
-    dom.model(li, nodeData);
-    return;
+TreeView.prototype.updateParent = function(parentElement) {
+  let ul = parentElement;
+  let div = ul.parentElement;
+  let buttonExpand = div.querySelector('[widget-id=buttonExpand]')
+  if (ul.children.length == 0) {
+    buttonExpand.style.visibility = 'hidden';
+  } else {
+    buttonExpand.style.visibility = '';
   }
-  li = ul.querySelector('[' + utils.nameAttr(this.fieldValue) + '="' + nodeData[this.fieldParent] + '"]');
-  let level = parseInt(li.getAttribute('widget-model-level'));
-  this.appendNode(li, nodeData, level + 1);
+  buttonExpand.onclick = this.collapseOrExpand;
+};
+
+/**
+ * 递归添加、渲染数据到树节点或者新增节点。
+ *
+ * @public
+ */
+TreeView.prototype.appendNode = function(nodeData, level, parentElement) {
+  parentElement = parentElement || this.container;
+  let ul = parentElement.querySelector('ul');
+  let lis = ul.querySelectorAll('li');
+  let li = this.createNodeElement(nodeData, level);
+
+  nodeData.children = nodeData.children || [];
+  let pos = null;
+  for (let li of lis) {
+    if (li.innerText.localeCompare(nodeData[this.fieldText]) == 1) {
+      pos = li;
+      break;
+    }
+  }
+  if (pos == null) {
+    ul.appendChild(li);
+    this.updateParent(li.parentElement);
+  } else {
+    ul.insertBefore(li, pos);
+  }
+  for (let i = 0; i < nodeData.children.length; i++) {
+    let childData = nodeData.children[i];
+    childData.level = nodeData.level + 1;
+    let childParentElement = li.children[0];
+    this.appendNode(childData, level + 1, childParentElement);
+  }
 };
 
 TreeView.prototype.appendOrUpdateNode = function (nodeData) {
@@ -17503,6 +17536,22 @@ TreeView.prototype.appendOrUpdateNode = function (nodeData) {
   }
   let level = parseInt(li.getAttribute('widget-model-level'));
   this.appendNode(nodeData, level + 1, li);
+};
+
+TreeView.prototype.removeNode = function (nodeData) {
+  let li = this.locateNode(nodeData);
+  if (li != null) {
+    let ul = li.parentElement;
+    li.remove();
+    this.updateParent(ul);
+  }
+};
+
+TreeView.prototype.insertNode = function (parentElement, nodeData) {
+  parentElement = parentElement || this.container;
+  let ul = dom.find('ul', parentElement);
+  let lis = ul.querySelectorAll('li');
+
 };
 
 TreeView.prototype.render = async function(containerId, params) {
@@ -17528,8 +17577,60 @@ TreeView.prototype.render = async function(containerId, params) {
     let row = data[i];
     this.appendNode(row, 0, this.container);
   }
+  this.container.appendChild(this.contextMenu);
 
+  this.container.oncontextmenu = ev => {
+    ev.preventDefault();
+    this.showContextMenu(ev);
+  };
+  this.container.onclick = ev => {
+    this.hideContextMenu();
+  };
 };
+
+/**
+ * 激活显示列表项目。
+ */
+TreeView.prototype.activateListItem = function (ev) {
+  let li = dom.ancestor(ev.target, 'li');
+  let actives = this.container.querySelectorAll('.list-group-item-action.active');
+  actives.forEach((el, idx) => { el.classList.remove('active') });
+  let div = li.querySelector('.list-group-item-action');
+  if (div != null) {
+    div.classList.add('active');
+  }
+  return li;
+};
+
+/**
+ * 显示右键菜单。
+ */
+TreeView.prototype.showContextMenu = function (ev) {
+  let rect = this.container.getBoundingClientRect();
+  if (ev.pageX < rect.left || ev.pageX > (rect.left + rect.width)) {
+    return;
+  }
+  if (ev.pageY < rect.top || ev.pageY > (rect.top + rect.height)) {
+    return;
+  }
+  this.contextMenu.style.display = 'block';
+  this.contextMenu.style.left = (ev.pageX - rect.left + 10) + "px";
+  this.contextMenu.style.top = (ev.pageY - rect.top + 25) + "px";
+  let closest = document.elementFromPoint(ev.clientX, ev.clientY);
+  let li = dom.ancestor(closest, 'li');
+  if (li == null) {
+    return;
+  }
+  this.selectedLi = li;
+  // 会触发TreeView的onSelectNode方法
+  this.activateListItem(ev);
+};
+
+TreeView.prototype.hideContextMenu = function (ev) {
+  this.contextMenu.style.display = 'none';
+};
+
+
 
 function TreelikeList(opts) {
   this.itemCount = opts.itemCount || 6;
@@ -23330,9 +23431,9 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       divProp.append(input);
     } else if (prop.input === 'array') {
       let plus = dom.element(`
-        <span class="material-icons pointer position-relative font-16" style="float: right; top: 1px;">playlist_add</span>
+        <a class="material-icons pointer position-relative font-16" style="top: 1px;">playlist_add</a>
       `);
-      labelProp.appendChild(plus);
+      // labelProp.appendChild(plus);
       let ul = dom.element(`
         <ul class="list-group properties-container">
         </ul>
@@ -23340,6 +23441,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       ul.setAttribute('property-model-name', prop.name);
       ul.setAttribute('properties-model', JSON.stringify(prop.properties));
       divProp.append(ul);
+      divProp.append(plus);
 
       dom.bind(plus, 'click', ev => {
         let ul = dom.ancestor(ev.target, 'div', 'group-item').children[1];
@@ -25676,6 +25778,7 @@ function StructuredDataEntry(opts) {
     this.container = dom.find(opts.container);
   }
   this.onInput = opts.onInput;
+  this.customs = opts.customs || {};
 
   dom.bind(this.container, 'click', ev => {
     this.container.querySelectorAll('[sde-select]').forEach(el => {
@@ -25688,7 +25791,7 @@ StructuredDataEntry.prototype.initialize = function(data) {
   data = data || {};
   let self = this;
   let children = this.container.querySelectorAll('[data-sde-name]');
-  children.forEach(function(el, idx) {
+  children.forEach((el, idx) => {
     dom.bind(el, 'keypress', function(ev) {
       let charCode = (ev.which) ? ev.which : ev.keyCode;
       if (charCode == 13) {
@@ -25716,17 +25819,21 @@ StructuredDataEntry.prototype.initialize = function(data) {
     } else if (input === 'multiselect') {
       el.classList.add('pointer');
       self.bindMultiselectInput(el);
+    } else if (this.customs[input]) {
+      el.classList.add('pointer');
+      self.bindCustomInput(el, this.customs[input]);
     } else {
       el.setAttribute('contenteditable', true);
       self.bindTextInput(el);
     }
-    if (data[el.getAttribute('data-sde-name')]) {
-      let _value=data[el.getAttribute('data-sde-name')];
+    let name = el.getAttribute('data-sde-name');
+    if (name !== '' && name != 'undefined' && data[name]) {
+      let _value = data[el.getAttribute('data-sde-name')];
       let selectvalue=el.getAttribute('data-sde-values');
       let trigger = el;
       let par = trigger.parentElement.parentElement;
       el.classList.remove('sde-input-default');
-      el.innerText = '【' + data[el.getAttribute('data-sde-name')] + '】';
+      el.innerText = '【' + data[name] + '】';
       // 非显示的引用值
       if (el.getAttribute('data-sde-param') != '') {
         el.setAttribute('data-sde-value', data[el.getAttribute('data-sde-param')]);
@@ -25919,13 +26026,8 @@ StructuredDataEntry.prototype.bindYearInput = function(el) {
     if (div != null) div.remove();
 
     const currYear = new Date().getFullYear();
-    const prevYear = currYear - 1;
-    const nextYear = currYear + 1;
 
-    let vals = [prevYear, currYear, nextYear];
-
-    let rectThis = this.getBoundingClientRect();
-    let rectParent = this.parentElement.getBoundingClientRect();
+    let vals = [currYear - 2, currYear - 1, currYear, currYear + 1, currYear + 2, currYear + 3, currYear + 4];
 
     div = self.createPopupSelect(this, vals);
     this.parentElement.appendChild(div);
@@ -25956,7 +26058,6 @@ StructuredDataEntry.prototype.bindMonthInput = function(el) {
 
     div = self.createPopupSelect(this, vals, '36px');
     this.parentElement.appendChild(div);
-    const pos = self.positionPopup(ev);
     self.positionPopup(el, div);
     let rightbar = dom.find('.right-bar')
     if (rightbar != null) {
@@ -25981,9 +26082,6 @@ StructuredDataEntry.prototype.bindDayInput = function(el) {
     for (let i = 1; i <= 31; i++)
       vals.push(i);
 
-    let rectThis = this.getBoundingClientRect();
-    let rectParent = this.parentElement.getBoundingClientRect();
-
     div = self.createPopupSelect(this, vals, '36px');
     this.parentElement.appendChild(div);
     self.positionPopup(el, div);
@@ -25995,6 +26093,12 @@ StructuredDataEntry.prototype.bindDayInput = function(el) {
         div.style.left = 'auto';
       }
     }
+  });
+};
+
+StructuredDataEntry.prototype.bindCustomInput = function(el, custom) {
+  dom.bind(el, 'click', ev => {
+    custom(el);
   });
 };
 
@@ -26140,8 +26244,8 @@ StructuredDataEntry.prototype.getParams = function () {
   return ret;
 };
 
-StructuredDataEntry.prototype.autofill = function (name, value) {
-  let spans = this.container.querySelectorAll(`span[data-sde-name="${name}"]`);
+StructuredDataEntry.prototype.autofill = function (selector, value) {
+  let spans = this.container.querySelectorAll(selector);
   for (let span of spans) {
     span.innerText = '【' + (value || '') + '】';
   }
@@ -26197,8 +26301,8 @@ StructuredDataEntry.prototype.createPopupSelect = function (el, vals, width) {
     }
     li.style.cursor = 'pointer';
     dom.bind(li, 'click', function() {
-      trigger.innerText = li.innerText;
-      trigger.style.color = 'black';
+      trigger.innerText = '【' + li.innerText + '】';
+      // trigger.style.color = 'black';
       let par = trigger.parentElement.parentElement;
       par.dataset.nodata='false';
       if (par.children.forEach) {
@@ -26226,19 +26330,6 @@ StructuredDataEntry.prototype.createPopupSelect = function (el, vals, width) {
 };
 
 StructuredDataEntry.prototype.positionPopup = function (trigger, tooltip) {
-  // let pageX = ev.pageX;
-  // let pageY = ev.pageY;
-  // if (pageY < 300) {
-  //   return {
-  //     top: pageY - 100 + 32,
-  //     left: pageX,
-  //   };
-  // }
-  //
-  // return {
-  //   top: pageY - 200 + 32,
-  //   left: pageX,
-  // }
   if (this.popperInstance) {
     this.popperInstance.destroy();
     this.popperInstance = null;

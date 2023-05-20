@@ -151,6 +151,7 @@ FormLayout.prototype.build = async function(persisted) {
     for (let j = 0; j < group.fields.length; j++) {
       let field = group.fields[j];
       let pair = this.createInput(field, columnCount);
+
       let labelAndInput = dom.create('div', 'd-flex', 'col-24-' + cols, 'mx-0', 'mb-2');
       if (pair.label != null) {
         pair.label.classList.add('pl-3');
@@ -158,6 +159,8 @@ FormLayout.prototype.build = async function(persisted) {
         labelAndInput.appendChild(pair.label);
       }
       labelAndInput.appendChild(pair.input);
+      // 指定字段的容器，以备不时只需。
+      field.container = labelAndInput;
       row.appendChild(labelAndInput);
     }
     form.appendChild(row);
@@ -221,9 +224,15 @@ FormLayout.prototype.build = async function(persisted) {
       } else {
         opts.selection = field.value;
       }
-      if (field.onInput) {
-        opts.onchange = field.onInput;
-      }
+      opts.onchange = val => {
+        for (let f of self.fields) {
+          self.hideOrShowField(f);
+        }
+        if (field.onInput) {
+          field.onInput(val);
+        }
+      };
+
       if (field.variables) {
         opts.variables = field.variables;
         for (let key in opts.variables) {
@@ -265,9 +274,11 @@ FormLayout.prototype.build = async function(persisted) {
       for (let key in this.params) {
         field.options.data[key] = this.params[key];
       }
-      new Checklist(field.options).render(dom.find('div[data-checklist-name=\'' + field.name + '\']', this.container), {
+      let container = dom.find('div[data-checklist-name=\'' + field.name + '\']', this.container);
+      new Checklist(field.options).render(container, {
         selections: persisted[field.name] || []
       });
+      field.container = container.parentElement.parentElement;
     } else if (field.input == 'checktree') {
       field.options.name = field.name;
       field.options.readonly = this.readonly;
@@ -276,15 +287,17 @@ FormLayout.prototype.build = async function(persisted) {
       for (let key in this.params) {
         field.options.data[key] = this.params[key];
       }
-      // new Checktree(field.options).render('#checktree_' + field.name);
+      let container = dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container);
       this[field.name] = new TreelikeList(field.options);
-      this[field.name].render(dom.find('div[data-checktree-name=\'' + field.name + '\']', this.container), field.value);
-      // this[field.name].setValues(field.value);
+      this[field.name].render(container, field.value);
+      field.container = container.parentElement.parentElement;
     } else if (field.input == 'fileupload') {
+      let container = dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container);
       await new FileUpload({
         ...field.options,
         name: field.name,
-      }).render(dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container));
+      }).render(container);
+      field.container = container.parentElement.parentElement;
     } else if (field.input == 'imageupload') {
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
@@ -381,9 +394,10 @@ FormLayout.prototype.build = async function(persisted) {
       if (rightBarBottom.parentElement.style.display !== 'none') {
         rightBarBottom.appendChild(buttonSave);
         for (let action of self.actions) {
-          rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 10px;"></span>'));
+          rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 12px;"></span>'));
           rightBarBottom.appendChild(self.createButton(action));
         }
+        rightBarBottom.appendChild(dom.element('<span style="display: inline-block;width: 12px;"></span>'));
         rightBarBottom.appendChild(buttonClose);
       } else {
         containerButtons.appendChild(buttons);
@@ -399,6 +413,10 @@ FormLayout.prototype.build = async function(persisted) {
   this.originalPosition = this.container.getBoundingClientRect();
   this.originalPositionTop = this.originalPosition.top;
 
+  // 根据字段不同值，显示或者隐藏其他字段
+  for (let f of self.fields) {
+    self.hideOrShowField(f);
+  }
   // 初始化显示
   this.onInit();
 };
@@ -481,7 +499,7 @@ FormLayout.prototype.read = function (params) {
 /**
  * Saves form data to remote data source.
  */
-FormLayout.prototype.save = async function () {
+FormLayout.prototype.save = async function (toasting) {
   let self = this;
   let awaitConvert = this.saveOpt.awaitConvert || false;
   let errors = Validation.validate($(this.containerId));
@@ -527,6 +545,7 @@ FormLayout.prototype.save = async function () {
       }
       if (self.saveOpt.callback) self.saveOpt.callback(resp.data);
       if (self.saveOpt.success) self.saveOpt.success(resp.data);
+      if (toasting === false) return;
       self.success(self.savePromptText || '数据保存成功！', () => {
         // 默认自动关闭
         if (self.saveOpt.autoClose !== false) {
@@ -742,6 +761,14 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
       group.append(radio);
+      radio.onchange = ev => {
+        if (field.onInput) {
+          field.onInput(field.values[i].value);
+        }
+        for (let f of self.fields) {
+          self.hideOrShowField(f);
+        }
+      };
     }
   } else if (field.input == 'longtext') {
     input = dom.create('textarea', 'form-control');
@@ -918,10 +945,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         file: fileinput.files[0],
         success: function(resp) {
           let item = resp.data;
+          if (!item) return;
           input.setAttribute('data-file-type', fileinput.files[0].type);
           input.setAttribute('data-file-size', fileinput.files[0].size);
           input.setAttribute('data-file-path', item.filepath);
           input.setAttribute('data-file-ext', ext);
+          input.setAttribute('data-file-name', item.filename);
+          input.setAttribute('data-web-path', item.webpath);
         }
       });
       FormLayout.validate(input);
@@ -1094,6 +1124,9 @@ FormLayout.prototype.createButton = function(action) {
       button.classList.add(action.classes[i]);
     }
   }
+  if (action.style) {
+    button.style = action.style;
+  }
   button.innerHTML = action.text;
   if (action.onClicked) {
     button.onclick = (ev) => {
@@ -1236,7 +1269,7 @@ FormLayout.prototype.setInputValue = function (name, value) {
   }
   if (foundField == null) return;
   if (foundField.input === 'bool') {
-    let elInput = dom.find(`input[name=${name}]`, this.container);
+    let elInput = dom.find(`input[name="${name}"]`, this.container);
     if (value === 'T' && !elInput.checked) {
       elInput.click();
       return;
@@ -1258,7 +1291,7 @@ FormLayout.prototype.getInputValue = function (name) {
   }
   if (foundField == null) return null;
   if (foundField.input === 'bool') {
-    let elInput = dom.find(`input[name=${name}]`, this.container);
+    let elInput = dom.find(`input[name="${name}"]`, this.container);
     return elInput.checked ? 'T' : 'F';
   }
   return null;
@@ -1289,17 +1322,34 @@ FormLayout.prototype.setVariables = function(vars){
   }
 };
 
+FormLayout.prototype.getField = function(name) {
+  for (let field of this.fields) {
+    if (field.name === name)
+      return field;
+  }
+  return {};
+};
+
 /**
  * 通过字段值判断其他字段显示与否。
+ *
+ * 添加：2023-04-19
  */
-// FormLayout.prototype.controlFields = function() {
-//   console.log('hello');
-//   let data = dom.formdata(this.container);
-//   for (let field of this.fields) {
-//     if (field.visible) {
-//       let input = this.container.querySelector('[name="' + field.name + '"]');
-//       if (input != null)
-//         field.visible(data, input.parentElement.parentElement);
-//     }
-//   }
-// };
+FormLayout.prototype.hideOrShowField = function(field) {
+  let data = dom.formdata(this.container);
+  if (typeof field.visible === 'function') {
+    if (field.visible(data) === true) {
+      if (field.required === true) {
+        let el = this.container.querySelector('[name="' + field.name + '"]');
+        el.setAttribute('data-required', field.title);
+      }
+      field.container.style.display = '';
+    } else {
+      if (field.required === true) {
+        let el = this.container.querySelector('[name="' + field.name + '"]');
+        el.setAttribute('data-required', '');
+      }
+      field.container.style.setProperty('display', 'none', 'important');
+    }
+  }
+};

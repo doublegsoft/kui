@@ -500,6 +500,19 @@ ListView.prototype.activate = function(li) {
   li.classList.add('active');
 };
 
+ListView.prototype.getCheckedValues = function () {
+  if (!this.onCheck) return [];
+  let checkboxes = this.container.querySelectorAll('input.checkbox');
+  let ret = [];
+  for (let checkbox of checkboxes) {
+    if (checkbox.checked === true) {
+      let li = dom.ancestor(checkbox, 'li');
+      ret.push(dom.model(li));
+    }
+  }
+  return ret;
+};
+
 ListView.prototype.expandSlidingActions = function (li) {
   let width = li.children[1].getBoundingClientRect().width;
   if (width >= this.slidingActions[0].width.width) return;

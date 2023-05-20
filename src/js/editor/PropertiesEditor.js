@@ -337,9 +337,9 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       divProp.append(input);
     } else if (prop.input === 'array') {
       let plus = dom.element(`
-        <span class="material-icons pointer position-relative font-16" style="float: right; top: 1px;">playlist_add</span>
+        <a class="material-icons pointer position-relative font-16" style="top: 1px;">playlist_add</a>
       `);
-      labelProp.appendChild(plus);
+      // labelProp.appendChild(plus);
       let ul = dom.element(`
         <ul class="list-group properties-container">
         </ul>
@@ -347,6 +347,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       ul.setAttribute('property-model-name', prop.name);
       ul.setAttribute('properties-model', JSON.stringify(prop.properties));
       divProp.append(ul);
+      divProp.append(plus);
 
       dom.bind(plus, 'click', ev => {
         let ul = dom.ancestor(ev.target, 'div', 'group-item').children[1];

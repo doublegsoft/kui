@@ -222,7 +222,9 @@ PaginationTable.prototype.render = function (containerId, params) {
     this.container = containerId;
   }
   $(this.container).empty();  //tableTopActions
-  $(this.container).append(this.tableTopActions(params));
+  if (this.refreshable !== false) {
+    $(this.container).append(this.tableTopActions(params));
+  }
   if(this.widgetExcess){
     $(this.container).append(this.widgetExcess.template);
   }

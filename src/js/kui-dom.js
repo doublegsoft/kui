@@ -825,6 +825,25 @@ dom.height2 = function(selector, offset, parent) {
   element.style.overflowY = 'auto';
 };
 
+dom.autoheight = function (selector) {
+  let el = dom.find(selector);
+  let rectBody = document.body.getBoundingClientRect();
+  let height = rectBody.height;
+
+  let parent = el.parentElement;
+  let rect = parent.getBoundingClientRect();
+  let top = rect.top;
+  let bottom = 0;
+  while (parent !== document.body) {
+    let style = getComputedStyle(parent);
+    bottom += parseInt(style.paddingBottom);
+    bottom += parseInt(style.marginBottom);
+    parent = parent.parentElement;
+  }
+  el.style.height = (height - top - bottom) + 'px';
+  el.style.overflowY = 'auto';
+};
+
 dom.templatize = function(template, model) {
   let tpl = Handlebars.compile(template);
   let html = tpl(model);
@@ -924,6 +943,13 @@ dom.init = function (owner, element) {
   }
   if (name && name != '') {
     owner[name] = element;
+  }
+  // 提示
+  let tooltip = element.getAttribute('widget-model-tooltip');
+  if (tooltip && tooltip != '') {
+    tippy(element, {
+      content: tooltip,
+    });
   }
   for (let i = 0; i < element.children.length; i++) {
     let child = element.children[i];

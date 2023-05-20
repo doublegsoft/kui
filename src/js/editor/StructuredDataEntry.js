@@ -3,6 +3,7 @@ function StructuredDataEntry(opts) {
     this.container = dom.find(opts.container);
   }
   this.onInput = opts.onInput;
+  this.customs = opts.customs || {};
 
   dom.bind(this.container, 'click', ev => {
     this.container.querySelectorAll('[sde-select]').forEach(el => {
@@ -15,7 +16,7 @@ StructuredDataEntry.prototype.initialize = function(data) {
   data = data || {};
   let self = this;
   let children = this.container.querySelectorAll('[data-sde-name]');
-  children.forEach(function(el, idx) {
+  children.forEach((el, idx) => {
     dom.bind(el, 'keypress', function(ev) {
       let charCode = (ev.which) ? ev.which : ev.keyCode;
       if (charCode == 13) {
@@ -43,17 +44,21 @@ StructuredDataEntry.prototype.initialize = function(data) {
     } else if (input === 'multiselect') {
       el.classList.add('pointer');
       self.bindMultiselectInput(el);
+    } else if (this.customs[input]) {
+      el.classList.add('pointer');
+      self.bindCustomInput(el, this.customs[input]);
     } else {
       el.setAttribute('contenteditable', true);
       self.bindTextInput(el);
     }
-    if (data[el.getAttribute('data-sde-name')]) {
-      let _value=data[el.getAttribute('data-sde-name')];
+    let name = el.getAttribute('data-sde-name');
+    if (name !== '' && name != 'undefined' && data[name]) {
+      let _value = data[el.getAttribute('data-sde-name')];
       let selectvalue=el.getAttribute('data-sde-values');
       let trigger = el;
       let par = trigger.parentElement.parentElement;
       el.classList.remove('sde-input-default');
-      el.innerText = '【' + data[el.getAttribute('data-sde-name')] + '】';
+      el.innerText = '【' + data[name] + '】';
       // 非显示的引用值
       if (el.getAttribute('data-sde-param') != '') {
         el.setAttribute('data-sde-value', data[el.getAttribute('data-sde-param')]);
@@ -246,13 +251,8 @@ StructuredDataEntry.prototype.bindYearInput = function(el) {
     if (div != null) div.remove();
 
     const currYear = new Date().getFullYear();
-    const prevYear = currYear - 1;
-    const nextYear = currYear + 1;
 
-    let vals = [prevYear, currYear, nextYear];
-
-    let rectThis = this.getBoundingClientRect();
-    let rectParent = this.parentElement.getBoundingClientRect();
+    let vals = [currYear - 2, currYear - 1, currYear, currYear + 1, currYear + 2, currYear + 3, currYear + 4];
 
     div = self.createPopupSelect(this, vals);
     this.parentElement.appendChild(div);
@@ -283,7 +283,6 @@ StructuredDataEntry.prototype.bindMonthInput = function(el) {
 
     div = self.createPopupSelect(this, vals, '36px');
     this.parentElement.appendChild(div);
-    const pos = self.positionPopup(ev);
     self.positionPopup(el, div);
     let rightbar = dom.find('.right-bar')
     if (rightbar != null) {
@@ -308,9 +307,6 @@ StructuredDataEntry.prototype.bindDayInput = function(el) {
     for (let i = 1; i <= 31; i++)
       vals.push(i);
 
-    let rectThis = this.getBoundingClientRect();
-    let rectParent = this.parentElement.getBoundingClientRect();
-
     div = self.createPopupSelect(this, vals, '36px');
     this.parentElement.appendChild(div);
     self.positionPopup(el, div);
@@ -322,6 +318,12 @@ StructuredDataEntry.prototype.bindDayInput = function(el) {
         div.style.left = 'auto';
       }
     }
+  });
+};
+
+StructuredDataEntry.prototype.bindCustomInput = function(el, custom) {
+  dom.bind(el, 'click', ev => {
+    custom(el);
   });
 };
 
@@ -467,8 +469,8 @@ StructuredDataEntry.prototype.getParams = function () {
   return ret;
 };
 
-StructuredDataEntry.prototype.autofill = function (name, value) {
-  let spans = this.container.querySelectorAll(`span[data-sde-name="${name}"]`);
+StructuredDataEntry.prototype.autofill = function (selector, value) {
+  let spans = this.container.querySelectorAll(selector);
   for (let span of spans) {
     span.innerText = '【' + (value || '') + '】';
   }
@@ -524,8 +526,8 @@ StructuredDataEntry.prototype.createPopupSelect = function (el, vals, width) {
     }
     li.style.cursor = 'pointer';
     dom.bind(li, 'click', function() {
-      trigger.innerText = li.innerText;
-      trigger.style.color = 'black';
+      trigger.innerText = '【' + li.innerText + '】';
+      // trigger.style.color = 'black';
       let par = trigger.parentElement.parentElement;
       par.dataset.nodata='false';
       if (par.children.forEach) {
@@ -553,19 +555,6 @@ StructuredDataEntry.prototype.createPopupSelect = function (el, vals, width) {
 };
 
 StructuredDataEntry.prototype.positionPopup = function (trigger, tooltip) {
-  // let pageX = ev.pageX;
-  // let pageY = ev.pageY;
-  // if (pageY < 300) {
-  //   return {
-  //     top: pageY - 100 + 32,
-  //     left: pageX,
-  //   };
-  // }
-  //
-  // return {
-  //   top: pageY - 200 + 32,
-  //   left: pageX,
-  // }
   if (this.popperInstance) {
     this.popperInstance.destroy();
     this.popperInstance = null;

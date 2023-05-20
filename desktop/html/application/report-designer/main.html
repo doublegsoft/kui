@@ -29,9 +29,13 @@
 
 var designerContainer = document.getElementById('designer_container');
 var canvasContainer = document.getElementById('canvas_container');
-var height = 900;// document.body.clientHeight - 100;
-designerContainer.style.height = height + 'px';
-canvasContainer.style.height = height + 'px';
+
+// var height = 900;// document.body.clientHeight - 100;
+// designerContainer.style.height = height + 'px';
+// canvasContainer.style.height = height + 'px';
+
+dom.autoheight(canvasContainer);
+dom.autoheight('#properties_container');
 
 var propertiesEditor = new PropertiesEditor({
   containerId: '#properties_container',
@@ -42,7 +46,7 @@ var propertiesEditor = new PropertiesEditor({
 
 window.designer = new ReportDesigner({
   containerId: '#canvas_container',
-  canvasHeight: height,
+  // canvasHeight: 800,
   propertiesEditor: propertiesEditor
 });
 

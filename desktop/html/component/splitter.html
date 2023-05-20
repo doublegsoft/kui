@@ -1,4 +1,4 @@
-<div id="formTest" class="card b-a-0">
+<div id="formTest" class="card mb-0 b-a-0">
   <div id="splitterMain" class="card-body height-300 p-0" style="display: flex;">
     <div id="splitterLeft" class="p-3" style="flex: 300px;">左侧</div>
     <div id="splitterRight" class="p-3" style="flex: calc(100% - 300px);">右侧</div>
@@ -6,5 +6,6 @@
 </div>
 
 <script>
+dom.autoheight('#splitterMain');
 split.vertical('#splitterMain', '#splitterLeft', '#splitterRight', 300);
 </script>
