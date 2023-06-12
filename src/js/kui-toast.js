@@ -11,18 +11,18 @@ TOAST_HTML = `
   </div>
 `;
 
-toast.success = function(selector, message) {
+toast.success = function(selector, message, duration) {
   let container = null;
   if (typeof selector === 'string') {
     container = dom.find(selector);
   } else {
     container = selector;
   }
-  let toast = dom.find('.toast', container);
-  if (toast == null) {
-    toast = dom.element(TOAST_HTML);
+  // let toast = dom.find('.toast', container);
+  // if (toast == null) {
+    let toast = dom.element(TOAST_HTML);
     container.appendChild(toast);
-  }
+  // }
 
   toast.style.zIndex = 11000;
   dom.find('.toast-body', toast).innerHTML = message;
@@ -32,7 +32,7 @@ toast.success = function(selector, message) {
 
   setTimeout(function() {
     toast.remove();
-  }, 500);
+  }, duration || 500);
 };
 
 toast.info = function(selector, message) {

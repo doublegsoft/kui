@@ -72,8 +72,8 @@ $.fn.searchselect = function (opts) {
   let value;
   let text;
   if (opts.values) {
-    value = 'value';
-    text = 'text';
+    value = opts.fields && opts.fields.value ? opts.fields.value : 'value';
+    text = opts.fields && opts.fields.text ? opts.fields.text : 'text';
   } else {
     value = opts.fields.value;
     text = opts.fields.text;

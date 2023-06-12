@@ -258,7 +258,13 @@ utils.textSize = (text, font) => {
   const context = canvas.getContext("2d");
   context.font = font;
   const metrics = context.measureText(text);
-  console.log(metrics);
   canvas.remove();
   return {width: metrics.width, height: metrics.height};
 };
+
+utils.base64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+});

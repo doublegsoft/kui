@@ -9,6 +9,7 @@ function FormLayout(opts) {
   this.readonly = opts.readonly || false;
   // 判断是否保存前提示，此处是提示语
   this.confirmText = opts.confirmText || '';
+  this.confirm = opts.confirm;
   this.actions = opts.actions || [];
   this.actionable = (typeof opts.actionable === 'undefined') ? true : false;
   this.columnCount = opts.columnCount || 2;
@@ -367,7 +368,9 @@ FormLayout.prototype.build = async function(persisted) {
   dom.bind(buttonSave, 'click', function(event) {
     event.preventDefault();
     event.stopPropagation();
-    if (self.confirmText !== '') {
+    if (self.confirm) {
+      self.confirm();
+    } else if (self.confirmText !== '') {
       let ct = self.confirmText;
       if (typeof self.confirmText === 'function') {
         ct = self.confirmText();
@@ -1351,5 +1354,35 @@ FormLayout.prototype.hideOrShowField = function(field) {
       }
       field.container.style.setProperty('display', 'none', 'important');
     }
+  }
+};
+
+FormLayout.prototype.hideFields = function (names) {
+  let hide = (name) => {
+    let input = dom.find('[name="' + name + '"]', this.container);
+    input.style.display = 'none';
+    input.parentElement.parentElement.style.setProperty('display', 'none', 'important');
+  };
+  if (Array.isArray(names)) {
+    for (let name of names) {
+      hide(name);
+    }
+  } else {
+    hide(names);
+  }
+};
+
+FormLayout.prototype.showFields = function (names) {
+  let show = (name) => {
+    let input = dom.find('[name="' + name + '"]', this.container);
+    input.style.display = '';
+    input.parentElement.parentElement.style.display = '';
+  };
+  if (Array.isArray(names)) {
+    for (let name of names) {
+      show(name);
+    }
+  } else {
+    show(names);
   }
 };

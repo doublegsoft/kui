@@ -923,39 +923,6 @@ ajax.shade = function(opts) {
   }
 };
 
-ajax.shade = function(opts) {
-  if (typeof schedule !== 'undefined')
-    schedule.stop();
-  let url = opts.url;
-  let callback = opts.success;
-
-  let shade = document.querySelector('.page.full');
-  if (shade != null) shade.parentElement.remove();
-  if (url.indexOf(':') === -1) {
-    xhr.get({
-      url: url,
-      success: function (resp) {
-        let fragment = utils.append(document.body, resp);
-        if (callback)
-          callback(opts.title || '', fragment);
-      }
-    });
-  } else {
-    xhr.post({
-      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
-      data: {
-        customWindowId: url.substring(1)
-      },
-      success: function (resp) {
-        let script = resp.data.script;
-        let fragment = utils.append(document.body, script);
-        if (callback)
-          callback(opts.title || '', fragment);
-      }
-    });
-  }
-};
-
 ajax.shade2 = function(opts) {
   if (typeof schedule !== 'undefined')
     schedule.stop();
@@ -970,6 +937,31 @@ ajax.shade2 = function(opts) {
         callback(opts.title || '', fragment);
     }
   });
+};
+
+ajax.overlay = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let html = opts.html;
+  let callback = opts.success;
+
+  let shade = document.querySelector('.page.overlay');
+  if (shade != null) shade.parentElement.remove();
+  if (url) {
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let fragment = utils.append(document.body, resp);
+        if (callback)
+          callback(opts.title || '', fragment);
+      }
+    });
+  } else {
+    let fragment = utils.append(document.body, html);
+    if (callback)
+      callback(opts.title || '', fragment);
+  }
 };
 
 /**
@@ -1130,7 +1122,7 @@ ajax.template = function(opts) {
 
 /**
  * 直接打开页面窗口。
- * 
+ *
  * @param {object} opts - 配置项，包括title, url, params, success, end
  */
 // ajax.dialog = function(opts) {
@@ -1173,15 +1165,16 @@ ajax.template = function(opts) {
 /**
  * 支持shade close。
  */
-ajax.dialog = function(opts) {
+ajax.dialog = async function(opts) {
   let title = opts.title || '';
-  let url = opts.url || '';
+  let url = opts.url;
+  let html = opts.html;
   let data = opts.params || {};
   let callback = opts.success;
   let end = opts.end;
   let shadeClose = opts.shadeClose === false ?  false : true;
   let allowClose = opts.allowClose === true;
-  let width=opts.width || '80%';
+  let width = opts.width || '80%';
   let height = opts.height || '';
   let offset=opts.offset || 'auto'
 
@@ -1190,29 +1183,55 @@ ajax.dialog = function(opts) {
       window.parameters[key] = data[key];
     }
   }
-  $.ajax({
-    url : url,
-    data : data,
-    async : true,
-    success : function(html) {
-      layer.open({
-        type : 1,
-        offset: offset,
-        title : title,
-        closeBtn: (allowClose === true) ? 1: 0,
-        shade: 0.5,
-        shadeClose : shadeClose,
-        area : [width, height],
-        content : html,
-        success: function (layero, index) {
-          let layerContent = document.querySelector('.layui-layer-content');
-          layerContent.style += '; overflow: hidden;';
-          if (callback) callback();
-        },
-        end: end || function () {}
-      });
-    }
+  if (url) {
+    html = await xhr.asyncGet({
+      url: url,
+    });
+  }
+
+  layer.open({
+    type : 1,
+    offset: offset,
+    title : title,
+    closeBtn: (allowClose === true) ? 1: 0,
+    shade: 0.5,
+    shadeClose : shadeClose,
+    area : [width, height],
+    content : html,
+    success: function (layero, index) {
+      let layerContent = document.querySelector('.layui-layer-content');
+      layerContent.style.overflow = 'hidden';
+      if (title != '') {
+        layerContent.style.height = 'calc(100% - 42px);';
+      }
+      if (callback) callback();
+    },
+    end: end || function () {}
   });
+
+  // $.ajax({
+  //   url : url,
+  //   data : data,
+  //   async : true,
+  //   success : function(html) {
+  //     layer.open({
+  //       type : 1,
+  //       offset: offset,
+  //       title : title,
+  //       closeBtn: (allowClose === true) ? 1: 0,
+  //       shade: 0.5,
+  //       shadeClose : shadeClose,
+  //       area : [width, height],
+  //       content : html,
+  //       success: function (layero, index) {
+  //         let layerContent = document.querySelector('.layui-layer-content');
+  //         layerContent.style += '; overflow: hidden;';
+  //         if (callback) callback();
+  //       },
+  //       end: end || function () {}
+  //     });
+  //   }
+  // });
 };
 
 /**
@@ -1300,7 +1319,7 @@ ajax.upload = function(opts) {
   });
 };
 
-ajax.sidebar = function(opt) {
+ajax.sidebar = async function(opt) {
   let container = dom.find(opt.containerId);
   let success = opt.success || function(title, fragment) {};
   // only one instance
@@ -1319,7 +1338,7 @@ ajax.sidebar = function(opt) {
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto;"></div>
-            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
+            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none; z-index: 99999999;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>
@@ -1328,7 +1347,7 @@ ajax.sidebar = function(opt) {
     </div>
   `);
   if (opt.showBottom === true) {
-    dom.find('.modal-body', sidebar).style.marginBottom = '36px';
+    dom.find('.modal-body', sidebar).style.marginBottom = '48px';
     dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
   }
   // dom.height(sidebar, 0, document.body);
@@ -1343,65 +1362,36 @@ ajax.sidebar = function(opt) {
   });
   container.appendChild(sidebar);
   // get page id and reset url to null
-  if (opt.url.indexOf(':') == 0) {
+  if (opt.url && opt.url.indexOf(':') == 0) {
     opt.page = opt.url.substring(1);
     opt.url = null;
   }
+  let html = '';
   if (opt.url) {
-    xhr.get({
+    html = await xhr.asyncGet({
       url: opt.url,
-      success: function (resp) {
-        dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
-        dom.find('.modal-body', sidebar).innerHTML = '';
-        if (!allowClose && !opt.close) {
-          dom.find('button.close', sidebar).classList.add('hidden');
-        }
-        dom.find('button.close', sidebar).addEventListener('click', function () {
-          //关闭弹窗
-          sidebar.children[0].classList.add('out');
-          sidebar.remove();
-          if (opt.close)
-            opt.close();
-        });
-        let fragment = utils.append(dom.find('.modal-body', sidebar), resp);
-        if (success) success(opt.title || '', fragment);
-        setTimeout(function () {
-          sidebar.children[0].classList.remove('out');
-          sidebar.children[0].classList.add('in');
-        }, 300);
-      }
     });
-  } else {
-    xhr.post({
-      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
-      params: {
-        customWindowId: opt.page
-      },
-      success: function (resp) {
-        let script = resp.data.script;
-        dom.find('.modal-body', sidebar).innerHTML = '';
-        let fragment = utils.append(dom.find('.modal-body', sidebar), script);
-        dom.find('.modal-title', sidebar).innerHTML = opt.title || '&nbsp;';
-        if (!allowClose && !opt.close) {
-          dom.find('button.close', sidebar).classList.add('hidden');
-        }
-        dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('.right-bar').classList.add('out');
-          setTimeout(function () {
-            sidebar.remove();
-          }, 300);
-          // 关闭回调
-          if (opt.close)
-            opt.close();
-        });
-        if (success) success(opt.title || '', fragment);
-        setTimeout(function () {
-          sidebar.children[0].classList.remove('out');
-          sidebar.children[0].classList.add('in');
-        }, 300);
-      }
-    });
+  } else if (opt.html) {
+    html = opt.html;
   }
+  dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
+  dom.find('.modal-body', sidebar).innerHTML = '';
+  if (!allowClose && !opt.close) {
+    dom.find('button.close', sidebar).classList.add('hidden');
+  }
+  dom.find('button.close', sidebar).addEventListener('click', function () {
+    //关闭弹窗
+    sidebar.children[0].classList.add('out');
+    sidebar.remove();
+    if (opt.close)
+      opt.close();
+  });
+  let fragment = utils.append(dom.find('.modal-body', sidebar), html);
+  if (success) success(opt.title || '', fragment);
+  setTimeout(function () {
+    sidebar.children[0].classList.remove('out');
+    sidebar.children[0].classList.add('in');
+  }, 300);
 };
 
 ajax.bottombar = function(opt) {
@@ -1588,6 +1578,41 @@ ajax.upload = params => {
   // });
 };
 var dom = {};
+
+/*
+**************************************************
+** Animations.
+**************************************************
+*/
+dom.slideInFromRight = (element, timeout) => {
+  element.classList.remove('out');
+  element.classList.add('in');
+  setTimeout(() => {
+    element.style.right = '0';
+  }, timeout);
+};
+
+dom.slideOutToRight = (element, timeout, right) => {
+  if (!element.classList.contains('in')) return;
+  if (element.classList.contains('out')) return;
+  element.classList.remove('in');
+  element.classList.add('out');
+  setTimeout(() => {
+    element.style.right = right;
+  }, timeout);
+};
+
+/*
+**************************************************
+** Performance
+**************************************************
+*/
+dom.delayTo = what => {
+  clearTimeout(dom.timeoutDelayTo);
+  dom.timeoutDelayTo = setTimeout(() => {
+
+  }, 600);
+};
 
 dom.value = function(selector, val) {
   const elm = document.querySelector(selector);
@@ -2414,23 +2439,33 @@ dom.height2 = function(selector, offset, parent) {
   element.style.overflowY = 'auto';
 };
 
-dom.autoheight = function (selector) {
+dom.autoheight = function (selector, ancestor, bottomOffset) {
+  bottomOffset = bottomOffset || 0;
   let el = dom.find(selector);
-  let rectBody = document.body.getBoundingClientRect();
-  let height = rectBody.height;
+  ancestor = ancestor || document.body;
+  let rectAncestor = ancestor.getBoundingClientRect();
+
+  let height = rectAncestor.height;
 
   let parent = el.parentElement;
   let rect = parent.getBoundingClientRect();
+
   let top = rect.top;
   let bottom = 0;
-  while (parent !== document.body) {
+  while (parent !== ancestor) {
     let style = getComputedStyle(parent);
     bottom += parseInt(style.paddingBottom);
     bottom += parseInt(style.marginBottom);
     parent = parent.parentElement;
   }
-  console.log(height - top - bottom);
-  el.style.height = (height - top - bottom) + 'px';
+  // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
+  let offsetTop = parseInt(el.offsetTop);
+  if (ancestor === document.body) {
+    el.style.height = (height - bottom - bottomOffset - top) + 'px';
+  } else {
+    // 对话框
+    el.style.height = (height - bottom - bottomOffset - offsetTop) + 'px';
+  }
   el.style.overflowY = 'auto';
 };
 
@@ -2806,10 +2841,16 @@ utils.textSize = (text, font) => {
   const context = canvas.getContext("2d");
   context.font = font;
   const metrics = context.measureText(text);
-  console.log(metrics);
   canvas.remove();
   return {width: metrics.width, height: metrics.height};
 };
+
+utils.base64 = file => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+});
 
 if (typeof dialog === 'undefined') dialog = {};
 
@@ -2900,9 +2941,10 @@ dialog.confirm = function (message, callback) {
   layer.confirm(message, {
     title: '确认',
     btn: ['确定', '取消'] //按钮
-  }, function (index) {
+  }, function (index, content) {
+    let data = dom.formdata(content[0]);
     layer.close(index);
-    callback();
+    callback(data);
   }, function () {
 
   });
@@ -3138,7 +3180,7 @@ ListView.prototype.fetch = async function (params) {
   }
   if (self.local.length == 0) {
     if (this.emptyHtml) {
-      this.container.innerHTML = this.emptyHtml;
+      this.contentContainer.innerHTML = this.emptyHtml;
     }
   } else {
     self.append(this.local);
@@ -3200,6 +3242,7 @@ ListView.prototype.render = function(containerId, loading) {
     this.container.appendChild(topbar);
   }
 
+  this.contentContainer = dom.create('div', 'full-width');
   let ul = dom.create('ul', 'list-group', 'full-width');
   if (this.borderless) {
     ul.classList.add('b-a-0');
@@ -3210,12 +3253,12 @@ ListView.prototype.render = function(containerId, loading) {
     ulContainer.style.overflowY = 'auto';
     ulContainer.style.border = '1px solid rgba(0, 0, 0, 0.125)';
     ulContainer.style.borderTop = '';
-
     ulContainer.appendChild(ul);
-    this.container.appendChild(ulContainer);
+    this.contentContainer.appendChild(ulContainer);
   } else {
-    this.container.appendChild(ul);
+    this.contentContainer.appendChild(ul);
   }
+  this.container.appendChild(this.contentContainer);
 
   if (loading !== false && this.lazy !== true)
     this.reload();
@@ -3452,6 +3495,38 @@ ListView.prototype.append = function(data, index) {
   }
 };
 
+ListView.prototype.setLocal = function(data) {
+  if (!data || data.length == 0) {
+    this.contentContainer.innerHTML = '';
+    if (this.emptyHtml) {
+      this.contentContainer.innerHTML = this.emptyHtml;
+    }
+    return;
+  } else {
+    this.contentContainer.innerHTML = '';
+  }
+  let ul = dom.find('ul', this.contentContainer);
+  if (ul == null) {
+    let ul = dom.create('ul', 'list-group', 'full-width');
+    if (this.borderless) {
+      ul.classList.add('b-a-0');
+    }
+    let ulContainer = dom.create('div');
+    let ulHeight = this.height - 37;
+    ulContainer.style.height = ulHeight + 'px';
+    ulContainer.style.overflowY = 'auto';
+    ulContainer.style.border = '1px solid rgba(0, 0, 0, 0.125)';
+    ulContainer.style.borderTop = '';
+    ulContainer.appendChild(ul);
+    this.contentContainer.appendChild(ulContainer);
+  } else {
+    ul.innerHTML = '';
+  }
+  for (let row of data) {
+    this.append(row);
+  }
+};
+
 ListView.prototype.replace = function(data) {
   let ul = this.container.querySelector('ul');
   for (let i = 0; i < ul.children.length; i++) {
@@ -3556,6 +3631,19 @@ ListView.prototype.activate = function(li) {
     ul.children[i].classList.remove('active');
   }
   li.classList.add('active');
+};
+
+ListView.prototype.getCheckedValues = function () {
+  if (!this.onCheck) return [];
+  let checkboxes = this.container.querySelectorAll('input.checkbox');
+  let ret = [];
+  for (let checkbox of checkboxes) {
+    if (checkbox.checked === true) {
+      let li = dom.ancestor(checkbox, 'li');
+      ret.push(dom.model(li));
+    }
+  }
+  return ret;
 };
 
 ListView.prototype.expandSlidingActions = function (li) {
@@ -5040,6 +5128,14 @@ MobileForm.prototype.root = async function() {
     let el = null;
     if (field.input === 'date') {
       el = this.buildDate(field);
+    } else if (field.input === 'time') {
+      el = this.buildTime(field);
+    } else if (field.input === 'bool') {
+      el = this.buildSwitch(field);
+    } else if (field.input === 'radio') {
+      el = await this.buildRadio(field);
+    } else if (field.input === 'check') {
+      el = await this.buildCheck(field);
     } else if (field.input === 'select') {
       el = await this.buildSelect(field);
     } else if (field.input === 'hidden') {
@@ -5052,12 +5148,32 @@ MobileForm.prototype.root = async function() {
       el = this.buildId(field);
     } else if (field.input === 'district') {
       el = this.buildDistrict(field);
-    } else {
+    } else if (field.input === 'ruler') {
+      el = this.buildRuler(field);
+    } else if (field.input === 'images') {
+      el = this.buildImages(field);
+    } else if (field.input === 'longtext') {
       el = dom.templatize(`
         <div class="form-group row">
           <label class="col-form-label col-24-06">{{title}}</label>
           <div class="col-24-18">
+            <textarea type="text" name="{{name}}" class="form-control" placeholder="请填写"></textarea>
+          </div>
+        </div>
+      `, field);
+      if (this.readonly === true) {
+        dom.find('textarea', el).setAttribute('placeholder', '');
+        dom.find('textarea', el).setAttribute('readonly', true);
+      }
+    } else {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18 d-flex">
             <input type="text" name="{{name}}" class="form-control" placeholder="请填写">
+            {{#if unit}}
+            <span class="ml-auto text-muted small mr-2 mt-2">{{unit}}</span>
+            {{/if}}
           </div>
         </div>
       `, field);
@@ -5100,6 +5216,102 @@ MobileForm.prototype.buildDate = function (field) {
   return ret;
 };
 
+MobileForm.prototype.buildTime = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" class="form-control" readonly placeholder="请选择...">
+        <input type="hidden" name="{{name}}">
+        <span class="ml-auto material-icons font-16 position-relative" style="top: 5px; left: -2px;">schedule</span>
+      </div>
+    </div>
+  `, field);
+  if (this.readonly === true) {
+    ret.querySelectorAll('input')[0].setAttribute('placeholder', '');
+    return ret;
+  }
+  dom.bind(ret, 'click', ev => {
+    let rd = new Rolldate({
+      title: field.title,
+      confirm: date => {
+        let row = dom.ancestor(ev.target, 'div', 'col-24-18');
+        dom.find('input[type=text]', row).value = moment(date).format('YYYY年MM月DD日');
+        dom.find('input[type=hidden]', row).value = moment(date).format('YYYY-MM-DD HH:mm:ss');
+      },
+    });
+    rd.show();
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildSwitch = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex pr-3 pl-3">
+        <label class="c-switch c-switch-label c-switch-pill c-switch-info mt-1" style="min-width: 48px;">
+        <input class="c-switch-input" value="T" name="{{name}}" type="checkbox">
+        <span class="c-switch-slider" data-checked="是" data-unchecked="否"></span>
+      </label>
+      </div>
+    </div>
+  `, field);
+  return ret;
+};
+
+MobileForm.prototype.buildRadio = async function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 input-group pr-3 pl-3"></div>
+    </div>
+  `, field);
+
+  if (this.readonly === true) {
+    ret.children[1].innerText = field.text || '';
+    return ret;
+  }
+
+  for (let row of field.options.values) {
+    row.checked = row.checked || false;
+    let el = dom.templatize(`
+      <div class="form-check form-check-inline">
+        <input name="{{name}}" value="{{value}}" {{#if checked}}checked{{/if}} type="radio" class="form-check-input radio color-primary is-outline">
+        <label class="form-check-label" for="">{{text}}</label>
+      </div>
+    `, {...row, name: field.name});
+    ret.children[1].appendChild(el);
+  }
+  return ret;
+};
+
+MobileForm.prototype.buildCheck = async function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 input-group pr-3 pl-3"></div>
+    </div>
+  `, field);
+
+  if (this.readonly === true) {
+    ret.children[1].innerText = field.text || '';
+    return ret;
+  }
+
+  for (let row of field.options.values) {
+    row.checked = row.checked || false;
+    let el = dom.templatize(`
+      <div class="form-check form-check-inline">
+        <input name="{{name}}" value="{{value}}" {{#if checked}}checked{{/if}} type="checkbox" class="form-check-input checkbox color-primary is-outline">
+        <label class="form-check-label" for="">{{text}}</label>
+      </div>
+    `, {...row, name: field.name});
+    ret.children[1].appendChild(el);
+  }
+  return ret;
+};
+
 MobileForm.prototype.buildSelect = async function (field) {
   let ret = dom.templatize(`
     <div class="form-group row">
@@ -5137,7 +5349,6 @@ MobileForm.prototype.buildSelect = async function (field) {
       values: values,
       confirm: data => {
         let row = dom.ancestor(ev.target, 'div', 'col-24-18');
-        console.log(row);
         dom.find('input[type=text]', row).value = data.text;
         dom.find('input[type=hidden]', row).value = data.value;
       },
@@ -5203,6 +5414,7 @@ MobileForm.prototype.buildDistrict = function (field) {
       <label class="col-form-label col-24-06">{{title}}</label>
       <div class="col-24-18 d-flex">
         <input type="text" name="{{name}}" class="form-control" readonly placeholder="请选择...">
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">expand_more</span>
       </div>
     </div>
   `, field);
@@ -5233,6 +5445,45 @@ MobileForm.prototype.buildDistrict = function (field) {
       }
     }).show(document.body);
   });
+  return ret;
+};
+
+MobileForm.prototype.buildRuler = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <input type="text" name="{{name}}" class="form-control" readonly placeholder="请选择...">
+        {{#if unit}}
+        <span class="ml-auto text-muted small mr-2 mt-2">{{unit}}</span>
+        {{/if}}
+        <span class="ml-auto material-icons font-20 position-relative" style="top: 3px;">straighten</span>
+      </div>
+    </div>
+  `, field);
+  let input = dom.find('input', ret);
+  if (this.readonly === true) {
+    input.setAttribute('placeholder', '');
+    return ret;
+  }
+  dom.bind(ret, 'click', ev => {
+
+  });
+  return ret;
+};
+
+MobileForm.prototype.buildImages = function (field) {
+  let ret = dom.templatize(`
+    <div class="form-group row pb-2">
+      <label class="col-form-label col-24-06">{{title}}</label>
+      <div class="col-24-18 d-flex">
+        <div class="d-flex align-items-center justify-content-center" 
+             style="height: 80px; width: 80px; border: 1px solid #eee;">
+          <i class="fas fa-plus" style="color: #bbb;"></i>
+        </div>
+      </div>
+    </div>
+  `, field);
   return ret;
 };
 

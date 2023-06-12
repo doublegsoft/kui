@@ -80,7 +80,7 @@ ListView.prototype.fetch = async function (params) {
   }
   if (self.local.length == 0) {
     if (this.emptyHtml) {
-      this.container.innerHTML = this.emptyHtml;
+      this.contentContainer.innerHTML = this.emptyHtml;
     }
   } else {
     self.append(this.local);
@@ -142,6 +142,7 @@ ListView.prototype.render = function(containerId, loading) {
     this.container.appendChild(topbar);
   }
 
+  this.contentContainer = dom.create('div', 'full-width');
   let ul = dom.create('ul', 'list-group', 'full-width');
   if (this.borderless) {
     ul.classList.add('b-a-0');
@@ -152,12 +153,12 @@ ListView.prototype.render = function(containerId, loading) {
     ulContainer.style.overflowY = 'auto';
     ulContainer.style.border = '1px solid rgba(0, 0, 0, 0.125)';
     ulContainer.style.borderTop = '';
-
     ulContainer.appendChild(ul);
-    this.container.appendChild(ulContainer);
+    this.contentContainer.appendChild(ulContainer);
   } else {
-    this.container.appendChild(ul);
+    this.contentContainer.appendChild(ul);
   }
+  this.container.appendChild(this.contentContainer);
 
   if (loading !== false && this.lazy !== true)
     this.reload();
@@ -391,6 +392,38 @@ ListView.prototype.append = function(data, index) {
 
       });
     }
+  }
+};
+
+ListView.prototype.setLocal = function(data) {
+  if (!data || data.length == 0) {
+    this.contentContainer.innerHTML = '';
+    if (this.emptyHtml) {
+      this.contentContainer.innerHTML = this.emptyHtml;
+    }
+    return;
+  } else {
+    this.contentContainer.innerHTML = '';
+  }
+  let ul = dom.find('ul', this.contentContainer);
+  if (ul == null) {
+    let ul = dom.create('ul', 'list-group', 'full-width');
+    if (this.borderless) {
+      ul.classList.add('b-a-0');
+    }
+    let ulContainer = dom.create('div');
+    let ulHeight = this.height - 37;
+    ulContainer.style.height = ulHeight + 'px';
+    ulContainer.style.overflowY = 'auto';
+    ulContainer.style.border = '1px solid rgba(0, 0, 0, 0.125)';
+    ulContainer.style.borderTop = '';
+    ulContainer.appendChild(ul);
+    this.contentContainer.appendChild(ulContainer);
+  } else {
+    ul.innerHTML = '';
+  }
+  for (let row of data) {
+    this.append(row);
   }
 };
 

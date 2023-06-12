@@ -303,25 +303,46 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
           <a class="btn-link text-white pointer">选择瓦片</a>
         </div>
       `, templateData);
-      dom.bind(dom.find('a', input), 'click', ev => {
-        dialog.view({
-          url: prop.url,
-          success: prop.success,
-          onClosed: (data) => {
-            tile.innerHTML = data;
-            let emit = {};
-            emit[prop.name] = data;
-            this.notifyPropertyChangedListeners(emit);
-          }
-        });
-      });
-      labelProp.append(input);
       let tile = dom.templatize(`
-        <div style="position: relative; left: -100px; min-height: 64px; width: 400px; 
-                    -moz-transform: scale(0.6);  zoom: 0.6; margin-top: 12px;"
+        <div style="position: relative; left: -100px; min-height: 48px; width: 400px; 
+                    -moz-transform: scale(0.6);  zoom: 0.6;"
              property-model-name="{{name}}">
         </div>
       `, prop);
+      if (prop[prop.name]) {
+        tile.innerHTML = prop[prop.name].html || '<div></div>';
+      }
+      let link = dom.find('a', input);
+      dom.bind(link, 'click', ev => {
+        ajax.dialog({
+          url: prop.url,
+          title: prop.title,
+          allowClose: true,
+          shadeClose: false,
+          width: '50%',
+          height: '500px',
+          success: () => {
+            let value = tile.getAttribute('properties-model');
+            if (value && value != '') {
+              value = JSON.parse(value);
+            } else {
+              value = {};
+            }
+            window[prop.pageId].show({
+              value: value,
+              onSave: (values) => {
+                // 重点注意
+                let emit = {};
+                emit[prop.name] = values;
+                self.notifyPropertyChangedListeners(emit);
+                link.setAttribute('properties-model', JSON.stringify(values));
+                tile.innerHTML = values.html;
+              }
+            });
+          },
+        });
+      });
+      labelProp.append(input);
       divProp.appendChild(tile);
     } else if (prop.display) {
       //
@@ -362,6 +383,40 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         };
         this.notifyPropertyChangedListeners(appended);
       });
+    } else if (prop.input === 'dialog') {
+      let btn = dom.templatize(`
+          <a property-model-input="dialog" property-model-name="{{name}}"
+             class="material-symbols-outlined pointer position-relative font-20" style="top: 4px; left: 8px;">open_in_new</a>
+      `, prop);
+      divProp.append(btn);
+      dom.bind(btn, 'click', ev => {
+        ajax.dialog({
+          url: prop.url,
+          title: prop.title,
+          allowClose: true,
+          shadeClose: false,
+          width: '50%',
+          height: '500px',
+          success: () => {
+            let value = btn.getAttribute('properties-model');
+            if (value && value != '') {
+              value = JSON.parse(value);
+            } else {
+              value = {};
+            }
+            window[prop.pageId].show({
+              value: value,
+              onSave: (values) => {
+                // 重点注意
+                let emit = {};
+                emit[prop.name] = values;
+                self.notifyPropertyChangedListeners(emit);
+                btn.setAttribute('properties-model', JSON.stringify(values));
+              }
+            });
+          },
+        });
+      });
     } else {
       // 文本框
       let input = document.createElement('input');
@@ -400,7 +455,10 @@ PropertiesEditor.prototype.appendPropertyItem = function (ul, propertiesModel, v
     <li class="list-group-item p-0" style="background-color: #383b61;"></li>
   `);
   for (let m = 0; m < propertiesModel.length; m++) {
-    propertiesModel[m].value = values[propertiesModel[m].name] || '';
+    // 存在用户至才设置，不存在则用配置里的默认值
+    if (values[propertiesModel[m].name]) {
+      propertiesModel[m].value = values[propertiesModel[m].name]
+    }
   }
   this.renderProperties(li, propertiesModel);
   let buttons = dom.element(`
@@ -469,6 +527,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
   let inputs = container.querySelectorAll('input');
   let selects = container.querySelectorAll('select');
   let textareas = container.querySelectorAll('textarea');
+  let dialogs = container.querySelectorAll('a[property-model-input=dialog]');
   let divs = container.querySelectorAll('div[property-model-name]');
   let uls = container.querySelectorAll('ul[properties-model]');
 
@@ -504,8 +563,14 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
   for (let i = 0; i < divs.length; i++) {
     let div = divs[i];
     let dataId = div.getAttribute('property-model-name');
-    if (data[dataId])
-      div.innerHTML = data[dataId];
+    if (data[dataId]) {
+      if (data[dataId].html) {
+        div.innerHTML = data[dataId].html;
+      } else {
+        div.innerHTML = data[dataId];
+      }
+      div.setAttribute('properties-model', JSON.stringify(data[dataId]))
+    }
   }
 
   // 特殊列表显示
@@ -517,5 +582,11 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
     for (let j = 0; j < values.length; j++) {
       this.appendPropertyItem(ul, propertiesModel, values[j]);
     }
+  }
+  for (let i = 0; i < dialogs.length; i++) {
+    let dialog = dialogs[i];
+    let propName = dialog.getAttribute('property-model-name');
+    let values = data[propName] || {};
+    dialog.setAttribute('properties-model', JSON.stringify(values));
   }
 };

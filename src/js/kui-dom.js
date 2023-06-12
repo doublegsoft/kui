@@ -1,5 +1,40 @@
 var dom = {};
 
+/*
+**************************************************
+** Animations.
+**************************************************
+*/
+dom.slideInFromRight = (element, timeout) => {
+  element.classList.remove('out');
+  element.classList.add('in');
+  setTimeout(() => {
+    element.style.right = '0';
+  }, timeout);
+};
+
+dom.slideOutToRight = (element, timeout, right) => {
+  if (!element.classList.contains('in')) return;
+  if (element.classList.contains('out')) return;
+  element.classList.remove('in');
+  element.classList.add('out');
+  setTimeout(() => {
+    element.style.right = right;
+  }, timeout);
+};
+
+/*
+**************************************************
+** Performance
+**************************************************
+*/
+dom.delayTo = what => {
+  clearTimeout(dom.timeoutDelayTo);
+  dom.timeoutDelayTo = setTimeout(() => {
+
+  }, 600);
+};
+
 dom.value = function(selector, val) {
   const elm = document.querySelector(selector);
   if (val) {
@@ -825,22 +860,33 @@ dom.height2 = function(selector, offset, parent) {
   element.style.overflowY = 'auto';
 };
 
-dom.autoheight = function (selector) {
+dom.autoheight = function (selector, ancestor, bottomOffset) {
+  bottomOffset = bottomOffset || 0;
   let el = dom.find(selector);
-  let rectBody = document.body.getBoundingClientRect();
-  let height = rectBody.height;
+  ancestor = ancestor || document.body;
+  let rectAncestor = ancestor.getBoundingClientRect();
+
+  let height = rectAncestor.height;
 
   let parent = el.parentElement;
   let rect = parent.getBoundingClientRect();
+
   let top = rect.top;
   let bottom = 0;
-  while (parent !== document.body) {
+  while (parent !== ancestor) {
     let style = getComputedStyle(parent);
     bottom += parseInt(style.paddingBottom);
     bottom += parseInt(style.marginBottom);
     parent = parent.parentElement;
   }
-  el.style.height = (height - top - bottom) + 'px';
+  // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
+  let offsetTop = parseInt(el.offsetTop);
+  if (ancestor === document.body) {
+    el.style.height = (height - bottom - bottomOffset - top) + 'px';
+  } else {
+    // 对话框
+    el.style.height = (height - bottom - bottomOffset - offsetTop) + 'px';
+  }
   el.style.overflowY = 'auto';
 };
 

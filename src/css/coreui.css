@@ -1750,7 +1750,7 @@ pre code {
 
 .table .thead-light th {
   color: #333;
-  background-color: #ffffff;
+  background-color: var(--color-light);
   border-color: #f2f2f2;
   font-weight: 600;
   font-size: 14px;

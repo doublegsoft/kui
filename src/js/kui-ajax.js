@@ -519,39 +519,6 @@ ajax.shade = function(opts) {
   }
 };
 
-ajax.shade = function(opts) {
-  if (typeof schedule !== 'undefined')
-    schedule.stop();
-  let url = opts.url;
-  let callback = opts.success;
-
-  let shade = document.querySelector('.page.full');
-  if (shade != null) shade.parentElement.remove();
-  if (url.indexOf(':') === -1) {
-    xhr.get({
-      url: url,
-      success: function (resp) {
-        let fragment = utils.append(document.body, resp);
-        if (callback)
-          callback(opts.title || '', fragment);
-      }
-    });
-  } else {
-    xhr.post({
-      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
-      data: {
-        customWindowId: url.substring(1)
-      },
-      success: function (resp) {
-        let script = resp.data.script;
-        let fragment = utils.append(document.body, script);
-        if (callback)
-          callback(opts.title || '', fragment);
-      }
-    });
-  }
-};
-
 ajax.shade2 = function(opts) {
   if (typeof schedule !== 'undefined')
     schedule.stop();
@@ -566,6 +533,31 @@ ajax.shade2 = function(opts) {
         callback(opts.title || '', fragment);
     }
   });
+};
+
+ajax.overlay = function(opts) {
+  if (typeof schedule !== 'undefined')
+    schedule.stop();
+  let url = opts.url;
+  let html = opts.html;
+  let callback = opts.success;
+
+  let shade = document.querySelector('.page.overlay');
+  if (shade != null) shade.parentElement.remove();
+  if (url) {
+    xhr.get({
+      url: url,
+      success: function (resp) {
+        let fragment = utils.append(document.body, resp);
+        if (callback)
+          callback(opts.title || '', fragment);
+      }
+    });
+  } else {
+    let fragment = utils.append(document.body, html);
+    if (callback)
+      callback(opts.title || '', fragment);
+  }
 };
 
 /**
@@ -726,7 +718,7 @@ ajax.template = function(opts) {
 
 /**
  * 直接打开页面窗口。
- * 
+ *
  * @param {object} opts - 配置项，包括title, url, params, success, end
  */
 // ajax.dialog = function(opts) {
@@ -769,15 +761,16 @@ ajax.template = function(opts) {
 /**
  * 支持shade close。
  */
-ajax.dialog = function(opts) {
+ajax.dialog = async function(opts) {
   let title = opts.title || '';
-  let url = opts.url || '';
+  let url = opts.url;
+  let html = opts.html;
   let data = opts.params || {};
   let callback = opts.success;
   let end = opts.end;
   let shadeClose = opts.shadeClose === false ?  false : true;
   let allowClose = opts.allowClose === true;
-  let width=opts.width || '80%';
+  let width = opts.width || '80%';
   let height = opts.height || '';
   let offset=opts.offset || 'auto'
 
@@ -786,29 +779,55 @@ ajax.dialog = function(opts) {
       window.parameters[key] = data[key];
     }
   }
-  $.ajax({
-    url : url,
-    data : data,
-    async : true,
-    success : function(html) {
-      layer.open({
-        type : 1,
-        offset: offset,
-        title : title,
-        closeBtn: (allowClose === true) ? 1: 0,
-        shade: 0.5,
-        shadeClose : shadeClose,
-        area : [width, height],
-        content : html,
-        success: function (layero, index) {
-          let layerContent = document.querySelector('.layui-layer-content');
-          layerContent.style += '; overflow: hidden;';
-          if (callback) callback();
-        },
-        end: end || function () {}
-      });
-    }
+  if (url) {
+    html = await xhr.asyncGet({
+      url: url,
+    });
+  }
+
+  layer.open({
+    type : 1,
+    offset: offset,
+    title : title,
+    closeBtn: (allowClose === true) ? 1: 0,
+    shade: 0.5,
+    shadeClose : shadeClose,
+    area : [width, height],
+    content : html,
+    success: function (layero, index) {
+      let layerContent = document.querySelector('.layui-layer-content');
+      layerContent.style.overflow = 'hidden';
+      if (title != '') {
+        layerContent.style.height = 'calc(100% - 42px);';
+      }
+      if (callback) callback();
+    },
+    end: end || function () {}
   });
+
+  // $.ajax({
+  //   url : url,
+  //   data : data,
+  //   async : true,
+  //   success : function(html) {
+  //     layer.open({
+  //       type : 1,
+  //       offset: offset,
+  //       title : title,
+  //       closeBtn: (allowClose === true) ? 1: 0,
+  //       shade: 0.5,
+  //       shadeClose : shadeClose,
+  //       area : [width, height],
+  //       content : html,
+  //       success: function (layero, index) {
+  //         let layerContent = document.querySelector('.layui-layer-content');
+  //         layerContent.style += '; overflow: hidden;';
+  //         if (callback) callback();
+  //       },
+  //       end: end || function () {}
+  //     });
+  //   }
+  // });
 };
 
 /**
@@ -896,7 +915,7 @@ ajax.upload = function(opts) {
   });
 };
 
-ajax.sidebar = function(opt) {
+ajax.sidebar = async function(opt) {
   let container = dom.find(opt.containerId);
   let success = opt.success || function(title, fragment) {};
   // only one instance
@@ -915,7 +934,7 @@ ajax.sidebar = function(opt) {
               </button>
             </div>
             <div class="modal-body" style="overflow-y: auto;"></div>
-            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none;">
+            <div style="position: absolute; bottom: 24px; left: 0; width: 100%; height: 48px; border-top: 1px solid lightgrey; background: white; display:none; z-index: 99999999;">
               <div widget-id="right-bar-bottom" class="mh-10 mt-2" style="float: right;"></div>
             </div>
           </div>
@@ -924,7 +943,7 @@ ajax.sidebar = function(opt) {
     </div>
   `);
   if (opt.showBottom === true) {
-    dom.find('.modal-body', sidebar).style.marginBottom = '36px';
+    dom.find('.modal-body', sidebar).style.marginBottom = '48px';
     dom.find('[widget-id=right-bar-bottom]', sidebar).parentElement.style.display = '';
   }
   // dom.height(sidebar, 0, document.body);
@@ -939,65 +958,36 @@ ajax.sidebar = function(opt) {
   });
   container.appendChild(sidebar);
   // get page id and reset url to null
-  if (opt.url.indexOf(':') == 0) {
+  if (opt.url && opt.url.indexOf(':') == 0) {
     opt.page = opt.url.substring(1);
     opt.url = null;
   }
+  let html = '';
   if (opt.url) {
-    xhr.get({
+    html = await xhr.asyncGet({
       url: opt.url,
-      success: function (resp) {
-        dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
-        dom.find('.modal-body', sidebar).innerHTML = '';
-        if (!allowClose && !opt.close) {
-          dom.find('button.close', sidebar).classList.add('hidden');
-        }
-        dom.find('button.close', sidebar).addEventListener('click', function () {
-          //关闭弹窗
-          sidebar.children[0].classList.add('out');
-          sidebar.remove();
-          if (opt.close)
-            opt.close();
-        });
-        let fragment = utils.append(dom.find('.modal-body', sidebar), resp);
-        if (success) success(opt.title || '', fragment);
-        setTimeout(function () {
-          sidebar.children[0].classList.remove('out');
-          sidebar.children[0].classList.add('in');
-        }, 300);
-      }
     });
-  } else {
-    xhr.post({
-      url: '/api/v3/common/script/stdbiz/uxd/custom_window/read',
-      params: {
-        customWindowId: opt.page
-      },
-      success: function (resp) {
-        let script = resp.data.script;
-        dom.find('.modal-body', sidebar).innerHTML = '';
-        let fragment = utils.append(dom.find('.modal-body', sidebar), script);
-        dom.find('.modal-title', sidebar).innerHTML = opt.title || '&nbsp;';
-        if (!allowClose && !opt.close) {
-          dom.find('button.close', sidebar).classList.add('hidden');
-        }
-        dom.find('button.close', sidebar).addEventListener('click', function () {
-          dom.find('.right-bar').classList.add('out');
-          setTimeout(function () {
-            sidebar.remove();
-          }, 300);
-          // 关闭回调
-          if (opt.close)
-            opt.close();
-        });
-        if (success) success(opt.title || '', fragment);
-        setTimeout(function () {
-          sidebar.children[0].classList.remove('out');
-          sidebar.children[0].classList.add('in');
-        }, 300);
-      }
-    });
+  } else if (opt.html) {
+    html = opt.html;
   }
+  dom.find('.modal-title', sidebar).innerHTML = opt.title || '';
+  dom.find('.modal-body', sidebar).innerHTML = '';
+  if (!allowClose && !opt.close) {
+    dom.find('button.close', sidebar).classList.add('hidden');
+  }
+  dom.find('button.close', sidebar).addEventListener('click', function () {
+    //关闭弹窗
+    sidebar.children[0].classList.add('out');
+    sidebar.remove();
+    if (opt.close)
+      opt.close();
+  });
+  let fragment = utils.append(dom.find('.modal-body', sidebar), html);
+  if (success) success(opt.title || '', fragment);
+  setTimeout(function () {
+    sidebar.children[0].classList.remove('out');
+    sidebar.children[0].classList.add('in');
+  }, 300);
 };
 
 ajax.bottombar = function(opt) {

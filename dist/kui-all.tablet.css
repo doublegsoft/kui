@@ -1750,7 +1750,7 @@ pre code {
 
 .table .thead-light th {
   color: #333;
-  background-color: #ffffff;
+  background-color: var(--color-light);
   border-color: #f2f2f2;
   font-weight: 600;
   font-size: 14px;
@@ -14822,6 +14822,7 @@ html:not([dir=rtl]) .mfe-3 {
   --color-dark: #636f83;
   --color-border: #d8dbe0;
   --color-white: #fff;
+  --color-black: #000;
   --color-orange: rgb(240,108,53);
 
   --color-text-primary: rgba(0, 0, 0, 0.87);
@@ -15158,17 +15159,20 @@ main {
 */
 
 .page {
-  height: 100% !important;
-  margin: 0!important;
+  height: 100%;
+  margin: 0;
   overflow-x: hidden;
   position: relative;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
   flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
   min-width: 0;
   word-wrap: break-word;
   background-clip: border-box;
+  background: var(--color-white);
   /*border: 1px solid #c8ced3;*/
   /*border-radius: .25rem;*/
   /*margin-bottom: 1.5rem;*/
@@ -15206,12 +15210,6 @@ main {
 
 }
 
-.page.sidebar {
-  width: 100% !important;
-  border: none !important;
-  padding: 0 10px!important;
-}
-
 .page.overlay {
   position: absolute;
   top: 0;
@@ -15226,7 +15224,8 @@ main {
 }
 
 .page.dialog {
-
+  overflow: hidden;
+  padding: 12px;
 }
 
 .col-left {
@@ -15251,10 +15250,6 @@ main {
 
 .hidden {
   display: none!important;
-}
-
-.page.dialog {
-  margin: 20px 20px 0 10px;
 }
 
 .circle {
@@ -16279,6 +16274,10 @@ h6, .h6 {
 }
 
 .font-24 {
+  font-size: 22px !important;
+}
+
+.font-24 {
   font-size: 24px !important;
 }
 
@@ -17082,7 +17081,7 @@ div.search:hover > a {
   visibility:hidden;
   right:-600px;
   overflow:hidden;
-  transition:0.3s;
+  transition: 0.3s;
   -webkit-transition:0.3s;
 }
 
@@ -17837,6 +17836,43 @@ a.disabled {
 }
 .context-menu > .menu > li.trash > a:hover {
   color: var(--color-danger);
+}
+
+/**
+ * Animations
+ */
+.slide-from-right.in {
+  -webkit-animation: slide-from-right-in 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-right-in 0.3s linear;
+  animation-delay: 0s;
+}
+
+.slide-from-right.out {
+  -webkit-animation: slide-from-right-out 0.5s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-right-out 0.5s linear;
+  animation-delay: 0s;
+}
+
+@-webkit-keyframes slide-from-right-in {
+  100% {
+    right: 0;
+  }
+}
+
+@keyframes slide-from-right-in {
+  100% {
+    right: 0;
+  }
+}
+
+@-webkit-keyframes slide-from-right-out {
+  100% { right: -100%; }
+}
+
+@keyframes slide-from-right-out {
+  100% { right: -100%; }
 }
 :root {
   /* main colors */
