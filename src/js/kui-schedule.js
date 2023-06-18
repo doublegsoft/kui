@@ -21,4 +21,5 @@ schedule.start = function (name, handle, interval) {
   schedule.names[name] = setInterval(function() {
     handle();
   }, interval);
+  handle();
 };

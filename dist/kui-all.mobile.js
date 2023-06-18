@@ -3715,22 +3715,23 @@ GridView.prototype.fetch = async function (error) {
 GridView.prototype.root = async function () {
   let ret = dom.element(`
     <div class="row mx-0">
-      <div class="col-24-12 pr-1"></div>
-      <div class="col-24-12 pl-1"></div>
     </div>
   `);
-  let first = ret.children[0];
-  let second = ret.children[1];
-
+  let cols = 24 / this.columnCount;
+  if (cols < 10) {
+    cols = '0' + cols;
+  }
+  for (let i = 0; i < this.columnCount; i++) {
+    let el = dom.element(`<div class="col-24-${cols}"></div>`);
+    ret.appendChild(el);
+  }
+  let index = 0;
   this.local = await this.fetch();
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
     let el = this.create(i, item);
-    if (i % 2 == 0) {
-      first.appendChild(el);
-    } else {
-      second.appendChild(el);
-    }
+    index = i % this.columnCount;
+    ret.children[index].appendChild(el);
   }
   return ret;
 };
@@ -3738,6 +3739,12 @@ GridView.prototype.root = async function () {
 GridView.prototype.render = async function (containerId) {
   this.container = dom.find(containerId);
   this.container.appendChild(await this.root());
+};
+
+GridView.prototype.appendElement = function (el) {
+  for (let i = 0; i < this.columnCount; i++) {
+
+  }
 };
 
 function Timeline(opt) {
@@ -3842,12 +3849,18 @@ function Tabs(opts) {
 }
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
-  let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  let contentPage = dom.find(`div[data-tab-content-id="${id}"]`);
+  if (contentPage == null) {
+    contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  } else {
+    contentPage.innerHTML = '';
+  }
   if (typeof url !== 'undefined') {
     ajax.view({
       url: url,
       containerId: contentPage,
       success: success || function () {
+
       }
     });
   }
@@ -3855,6 +3868,23 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
     contentPage.style.display = 'none';
   }
   this.content.appendChild(contentPage);
+};
+
+Tabs.prototype.reload = function (params) {
+  let index = 0;
+  let nav = this.navigator.children[index];
+  for (let i = 1; i < this.navigator.children.length; i++) {
+    let child = this.navigator.children[i];
+    if (child.classList.contains(this.tabActiveClass)) {
+      index = i - 1;
+      nav = child;
+      break;
+    }
+  }
+  this.loadPage(nav.getAttribute('data-tab-id'), nav.getAttribute('data-tab-url'),
+    false, params => {
+      this.tabs[index].success(params);
+    });
 };
 
 Tabs.prototype.render = function() {
@@ -6386,9 +6416,11 @@ PopupRuler.prototype.close = function() {
     this.bottom.parentElement.remove();
   }, 300);
 };
-Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
-  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
+if (typeof Handlebars !== "undefined") {
+  Handlebars.registerHelper('ifeq', function (arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+  });
+}
 
 if (typeof kuim === 'undefined') kuim = {};
 

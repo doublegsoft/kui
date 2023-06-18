@@ -1,6 +1,8 @@
-Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
-  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
+if (typeof Handlebars !== 'undefined') {
+  Handlebars.registerHelper('ifeq', function (arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+  });
+}
 
 kuit = {
 

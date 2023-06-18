@@ -9,12 +9,18 @@ function Tabs(opts) {
 }
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
-  let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  let contentPage = dom.find(`div[data-tab-content-id="${id}"]`);
+  if (contentPage == null) {
+    contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  } else {
+    contentPage.innerHTML = '';
+  }
   if (typeof url !== 'undefined') {
     ajax.view({
       url: url,
       containerId: contentPage,
       success: success || function () {
+
       }
     });
   }
@@ -22,6 +28,23 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
     contentPage.style.display = 'none';
   }
   this.content.appendChild(contentPage);
+};
+
+Tabs.prototype.reload = function (params) {
+  let index = 0;
+  let nav = this.navigator.children[index];
+  for (let i = 1; i < this.navigator.children.length; i++) {
+    let child = this.navigator.children[i];
+    if (child.classList.contains(this.tabActiveClass)) {
+      index = i - 1;
+      nav = child;
+      break;
+    }
+  }
+  this.loadPage(nav.getAttribute('data-tab-id'), nav.getAttribute('data-tab-url'),
+    false, params => {
+      this.tabs[index].success(params);
+    });
 };
 
 Tabs.prototype.render = function() {

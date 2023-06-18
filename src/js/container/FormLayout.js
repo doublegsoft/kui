@@ -459,6 +459,8 @@ FormLayout.prototype.fetch = async function (params) {
   if (self.readOpt.convert) {
     data = self.readOpt.convert(data);
   }
+  // 保存表单旧值的变量。
+  self.oldValues = data;
   if (utils.isEmpty(data)) {
     self.build(params);
     if (self.readOpt.callback) {
@@ -1385,4 +1387,51 @@ FormLayout.prototype.showFields = function (names) {
   } else {
     show(names);
   }
+};
+
+/**
+ * 新的输入值和旧的值比较形成结果。
+ */
+FormLayout.prototype.compare = function (data) {
+  let oldValues = data || this.oldValues || {};
+  let newValues = dom.formdata(this.containerId);
+  // if (this.saveOpt.convert) {
+  //   newValues = this.saveOpt.convert(newValues);
+  // }
+  let ret = [];
+  for (let i = 0; i < this.fields.length; i++) {
+    let field = this.fields[i];
+    let oldValue = oldValues[field.name];
+    let oldText = oldValues[field.name];
+    let newValue = newValues[field.name];
+    let newText = newValues[field.name];
+    if (field.input == 'date') {
+      oldText = moment(oldValue).format('YYYY-MM-DD');
+    } else if (field.input == 'select') {
+      if (field.options.values) {
+        for (let val of field.options.values) {
+          if (val.value === oldValue) {
+            oldText = val.text;
+          }
+          if (val.value === newValue) {
+            newText = val.text;
+          }
+        }
+      }
+    }
+    newValue = newValue ? newValue.toString() : '';
+    oldValue = oldValue ? oldValue.toString() : '';
+    newText = newText ? newText.toString() : '';
+    oldText = oldText ? oldText.toString() : '';
+    if (newValue !== oldValue) {
+      ret.push({
+        name: field.name,
+        oldValue: oldValue,
+        oldText: oldText,
+        newValue: newValue,
+        newText: newText,
+      });
+    }
+  }
+  return ret;
 };

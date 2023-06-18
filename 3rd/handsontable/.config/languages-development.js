@@ -100,7 +100,7 @@ module.exports.create = function create() {
           }
         });
 
-        // copy from `languages/all.js` to `languages/index.js`
+        // copy from `languages/all.js` to `languages/index.js.ftl`
         if (filesInOutputLanguagesDirectory.includes(allLanguagesFileName)) {
           fsExtra.copySync(`${OUTPUT_LANGUAGES_DIRECTORY}/${allLanguagesFileName}`, `${OUTPUT_LANGUAGES_DIRECTORY}/${indexFileName}`);
         }

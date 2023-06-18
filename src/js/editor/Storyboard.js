@@ -141,10 +141,12 @@ Storyboard.prototype.drawGrids = function() {
 };
 
 Storyboard.prototype.drawPage = function(page) {
-  this.context.strokeStyle = 'black';
+  this.context.strokeStyle = '#eee';
+  this.context.fillStyle = 'white';
   this.context.beginPath();
   this.context.rect(page.x, page.y, page.width, page.height);
   this.context.stroke();
+  this.context.fill();
 
   if (page.screenshot) {
     if (!page.image) {
@@ -158,6 +160,7 @@ Storyboard.prototype.drawPage = function(page) {
     }
   }
 
+  this.context.fillStyle = 'black';
   this.context.font = 'bold 10px 黑体';
   let metrics = this.context.measureText(page.title);
   this.context.fillText(page.title, page.x + (page.width - metrics.width) / 2, page.y - 8);
@@ -255,6 +258,8 @@ Storyboard.prototype.connect = function(startPage, finishPage) {
 
   if (!cp1) return;
 
+  this.context.strokeStyle = '#aaa';
+  this.context.fillStyle = '#aaa';
   this.context.beginPath();
   this.context.arc(firstMidX, firstMidY, 2, 0, 2 * Math.PI, false);
   this.context.fill();

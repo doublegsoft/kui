@@ -258,6 +258,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       //
       let input = document.createElement('input');
       input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
       input.setAttribute('property-model-name', prop.name);
       input.classList.add('group-item-input');
       divProp.appendChild(input);
@@ -344,6 +345,8 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       });
       labelProp.append(input);
       divProp.appendChild(tile);
+    } else if (prop.inpuut === 'image') {
+
     } else if (prop.display) {
       //
       // 【自定义】

@@ -7114,6 +7114,7 @@ schedule.start = function (name, handle, interval) {
   schedule.names[name] = setInterval(function() {
     handle();
   }, interval);
+  handle();
 };
 
 $.fn.searchbox = function(options) {
@@ -9487,9 +9488,11 @@ xhr.asyncPost = function (opts) {
 if (typeof module !== 'undefined') {
   module.exports = { xhr };
 }
-Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
-  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
+if (typeof Handlebars !== "undefined") {
+  Handlebars.registerHelper('ifeq', function (arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+  });
+}
 
 if (typeof kuim === 'undefined') kuim = {};
 
@@ -9970,9 +9973,11 @@ document.addEventListener("touchend", ev => {
     }
   }
 }, false);
-Handlebars.registerHelper('ifeq', function(arg1, arg2, options) {
-  return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
-});
+if (typeof Handlebars !== 'undefined') {
+  Handlebars.registerHelper('ifeq', function (arg1, arg2, options) {
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+  });
+}
 
 kuit = {
 
@@ -11067,6 +11072,8 @@ FormLayout.prototype.fetch = async function (params) {
   if (self.readOpt.convert) {
     data = self.readOpt.convert(data);
   }
+  // 保存表单旧值的变量。
+  self.oldValues = data;
   if (utils.isEmpty(data)) {
     self.build(params);
     if (self.readOpt.callback) {
@@ -11994,6 +12001,51 @@ FormLayout.prototype.showFields = function (names) {
     show(names);
   }
 };
+
+/**
+ * 新的输入值和旧的值比较形成结果。
+ */
+FormLayout.prototype.compare = function (data) {
+  let oldValues = data || this.oldValues || {};
+  let newValues = dom.formdata(this.containerId);
+  // if (this.saveOpt.convert) {
+  //   newValues = this.saveOpt.convert(newValues);
+  // }
+  let ret = [];
+  for (let i = 0; i < this.fields.length; i++) {
+    let field = this.fields[i];
+    let oldValue = oldValues[field.name];
+    let oldText = oldValues[field.name];
+    let newValue = newValues[field.name];
+    let newText = newValues[field.name];
+    if (field.input == 'date') {
+      oldText = moment(oldValue).format('YYYY-MM-DD');
+    } else if (field.input == 'select') {
+      if (field.options.values) {
+        for (let val of field.options.values) {
+          if (val.value === oldValue) {
+            oldText = val.text;
+          }
+          if (val.value === newValue) {
+            newText = val.text;
+          }
+        }
+      }
+    }
+    newValue = newValue ? newValue.toString() : '';
+    oldValue = oldValue ? oldValue.toString() : '';
+    if (newValue !== oldValue) {
+      ret.push({
+        name: field.name,
+        oldValue: oldValue,
+        oldText: oldText,
+        newValue: newValue,
+        newText: newText,
+      });
+    }
+  }
+  return ret;
+};
 /**
  * 
  */
@@ -12787,22 +12839,23 @@ GridView.prototype.fetch = async function (error) {
 GridView.prototype.root = async function () {
   let ret = dom.element(`
     <div class="row mx-0">
-      <div class="col-24-12 pr-1"></div>
-      <div class="col-24-12 pl-1"></div>
     </div>
   `);
-  let first = ret.children[0];
-  let second = ret.children[1];
-
+  let cols = 24 / this.columnCount;
+  if (cols < 10) {
+    cols = '0' + cols;
+  }
+  for (let i = 0; i < this.columnCount; i++) {
+    let el = dom.element(`<div class="col-24-${cols}"></div>`);
+    ret.appendChild(el);
+  }
+  let index = 0;
   this.local = await this.fetch();
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
     let el = this.create(i, item);
-    if (i % 2 == 0) {
-      first.appendChild(el);
-    } else {
-      second.appendChild(el);
-    }
+    index = i % this.columnCount;
+    ret.children[index].appendChild(el);
   }
   return ret;
 };
@@ -12810,6 +12863,12 @@ GridView.prototype.root = async function () {
 GridView.prototype.render = async function (containerId) {
   this.container = dom.find(containerId);
   this.container.appendChild(await this.root());
+};
+
+GridView.prototype.appendElement = function (el) {
+  for (let i = 0; i < this.columnCount; i++) {
+
+  }
 };
 
 function GroupingBox(opt) {
@@ -17043,12 +17102,18 @@ function Tabs(opts) {
 }
 
 Tabs.prototype.loadPage = function(id, url, hidden, success) {
-  let contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  let contentPage = dom.find(`div[data-tab-content-id="${id}"]`);
+  if (contentPage == null) {
+    contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+  } else {
+    contentPage.innerHTML = '';
+  }
   if (typeof url !== 'undefined') {
     ajax.view({
       url: url,
       containerId: contentPage,
       success: success || function () {
+
       }
     });
   }
@@ -17056,6 +17121,23 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
     contentPage.style.display = 'none';
   }
   this.content.appendChild(contentPage);
+};
+
+Tabs.prototype.reload = function (params) {
+  let index = 0;
+  let nav = this.navigator.children[index];
+  for (let i = 1; i < this.navigator.children.length; i++) {
+    let child = this.navigator.children[i];
+    if (child.classList.contains(this.tabActiveClass)) {
+      index = i - 1;
+      nav = child;
+      break;
+    }
+  }
+  this.loadPage(nav.getAttribute('data-tab-id'), nav.getAttribute('data-tab-url'),
+    false, params => {
+      this.tabs[index].success(params);
+    });
 };
 
 Tabs.prototype.render = function() {
@@ -23636,6 +23718,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       //
       let input = document.createElement('input');
       input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
       input.setAttribute('property-model-name', prop.name);
       input.classList.add('group-item-input');
       divProp.appendChild(input);
@@ -23722,6 +23805,8 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       });
       labelProp.append(input);
       divProp.appendChild(tile);
+    } else if (prop.inpuut === 'image') {
+
     } else if (prop.display) {
       //
       // 【自定义】
@@ -25891,10 +25976,12 @@ Storyboard.prototype.drawGrids = function() {
 };
 
 Storyboard.prototype.drawPage = function(page) {
-  this.context.strokeStyle = 'black';
+  this.context.strokeStyle = '#eee';
+  this.context.fillStyle = 'white';
   this.context.beginPath();
   this.context.rect(page.x, page.y, page.width, page.height);
   this.context.stroke();
+  this.context.fill();
 
   if (page.screenshot) {
     if (!page.image) {
@@ -25908,6 +25995,7 @@ Storyboard.prototype.drawPage = function(page) {
     }
   }
 
+  this.context.fillStyle = 'black';
   this.context.font = 'bold 10px 黑体';
   let metrics = this.context.measureText(page.title);
   this.context.fillText(page.title, page.x + (page.width - metrics.width) / 2, page.y - 8);
@@ -26005,6 +26093,8 @@ Storyboard.prototype.connect = function(startPage, finishPage) {
 
   if (!cp1) return;
 
+  this.context.strokeStyle = '#aaa';
+  this.context.fillStyle = '#aaa';
   this.context.beginPath();
   this.context.arc(firstMidX, firstMidY, 2, 0, 2 * Math.PI, false);
   this.context.fill();
