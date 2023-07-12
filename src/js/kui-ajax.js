@@ -198,7 +198,7 @@ ajax.view = function(opt) {
         if (container) {
           fragment = utils.append(container, resp, empty);
         }
-        if (fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
+        if (fragment && fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
         }
         if (callback)

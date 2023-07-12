@@ -1,0 +1,40 @@
+
+.button-outlined {
+  cursor: pointer;
+  display: inline-block;
+  font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+  border-radius: 8px;
+  box-sizing: border-box;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
+  user-select: none;
+  -webkit-user-select: none;
+  margin: 0;
+  outline: none;
+  padding: 13px 23px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  width: auto;
+}
+
+.button-outlined.primary {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+.button-outlined.error {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.button-outlined.warning {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning);
+}

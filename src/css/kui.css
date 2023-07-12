@@ -143,8 +143,24 @@
   color: var(--color-primary)!important;
 }
 
+.color-secondary {
+  color: var(--color-secondary)!important;
+}
+
+.color-info {
+  color: var(--color-info)!important;
+}
+
 .color-error {
   color: var(--color-danger)!important;
+}
+
+.color-success {
+  color: var(--color-success)!important;
+}
+
+.color-warning {
+  color: var(--color-warning)!important;
 }
 
 body {
@@ -3046,41 +3062,4 @@ a.disabled {
 }
 .context-menu > .menu > li.trash > a:hover {
   color: var(--color-danger);
-}
-
-/**
- * Animations
- */
-.slide-from-right.in {
-  -webkit-animation: slide-from-right-in 0.3s linear;
-  -webkit-animation-delay: 0s;
-  animation: slide-from-right-in 0.3s linear;
-  animation-delay: 0s;
-}
-
-.slide-from-right.out {
-  -webkit-animation: slide-from-right-out 0.5s linear;
-  -webkit-animation-delay: 0s;
-  animation: slide-from-right-out 0.5s linear;
-  animation-delay: 0s;
-}
-
-@-webkit-keyframes slide-from-right-in {
-  100% {
-    right: 0;
-  }
-}
-
-@keyframes slide-from-right-in {
-  100% {
-    right: 0;
-  }
-}
-
-@-webkit-keyframes slide-from-right-out {
-  100% { right: -100%; }
-}
-
-@keyframes slide-from-right-out {
-  100% { right: -100%; }
 }

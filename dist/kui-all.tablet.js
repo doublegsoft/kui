@@ -602,7 +602,7 @@ ajax.view = function(opt) {
         if (container) {
           fragment = utils.append(container, resp, empty);
         }
-        if (fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
+        if (fragment && fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
         }
         if (callback)
@@ -1830,22 +1830,28 @@ var dom = {};
 ** Animations.
 **************************************************
 */
-dom.slideInFromRight = (element, timeout) => {
+dom.slideInFromRight = (element, mask) => {
   element.classList.remove('out');
   element.classList.add('in');
   setTimeout(() => {
     element.style.right = '0';
-  }, timeout);
+  }, 300 /* 与CSS中动画定义一致 */);
+  if (mask) {
+    mask.style.display = '';
+  }
 };
 
-dom.slideOutToRight = (element, timeout, right) => {
+dom.slideOutToRight = (element, right, mask) => {
   if (!element.classList.contains('in')) return;
   if (element.classList.contains('out')) return;
   element.classList.remove('in');
   element.classList.add('out');
   setTimeout(() => {
     element.style.right = right;
-  }, timeout);
+  }, 300 /* 与CSS中动画定义一致 */);
+  if (mask) {
+    mask.style.display = 'none';
+  }
 };
 
 /*
@@ -2704,13 +2710,18 @@ dom.autoheight = function (selector, ancestor, bottomOffset) {
     bottom += parseInt(style.marginBottom);
     parent = parent.parentElement;
   }
+
   // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
   let offsetTop = parseInt(el.offsetTop);
   if (ancestor === document.body) {
     el.style.height = (height - bottom - bottomOffset - top) + 'px';
   } else {
+    let style = getComputedStyle(parent);
+    // 元素自己的offsetTop就已经决定不需要计算padding-top
+    let paddingTop = parseInt(style.paddingTop);
+    let paddingBottom = parseInt(style.paddingBottom);
     // 对话框
-    el.style.height = (height - bottom - bottomOffset - offsetTop) + 'px';
+    el.style.height = (height - bottom - bottomOffset - offsetTop - paddingBottom) + 'px';
   }
   el.style.overflowY = 'auto';
 };
@@ -2826,6 +2837,29 @@ dom.init = function (owner, element) {
     let child = element.children[i];
     dom.init(owner, child);
   }
+};
+
+/**
+ * 判断模型数据是否已经存在于载有模型的DOM元素中。
+ *
+ * @param elements
+ *        元素数组
+ *
+ * @param model
+ *        数据模型
+ *
+ * @param id
+ *        标识字段名称
+ *
+ * @returns {boolean}
+ */
+dom.exists = (elements, model, id) => {
+  for (let i = 0; i < elements.length; i++) {
+    let el = elements[i];
+    let m = dom.model(el);
+    if (m[id] === model[id]) return true;
+  }
+  return false;
 };
 var NO_ERRORS = 0;
 var REQUIRED_ERROR = 1;

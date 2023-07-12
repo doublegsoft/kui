@@ -18,6 +18,7 @@
  * @since 1.0
  */
 function PropertiesEditor(options) {
+  this.timeout = 500;
   this.containerId = options.containerId;
   this.confirm = options.confirm || function () {};
   this.propertyChangedListeners = [];
@@ -211,14 +212,19 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       //
       let input = document.createElement('input');
       input.setAttribute('property-model-name', prop.name);
-      input.value = parseInt(prop.value);
+      if (prop.value)
+        input.value = parseInt(prop.value);
+      input.type = "number";
+      if (prop.min) {
+        input.setAttribute("min", prop.min);
+      }
       input.classList.add('group-item-input');
       divProp.append(input);
 
-      input.addEventListener('input', function(evt) {
-        if (isNaN(parseFloat(this.value))) return;
+      input.addEventListener('change', function(evt) {
+        if (isNaN(parseInt(this.value))) return;
         let changed = {};
-        changed[prop.name] = parseFloat(this.value);
+        changed[prop.name] = parseInt(this.value);
         self.notifyPropertyChangedListeners(changed);
       });
     } else if (prop.input == 'color') {
@@ -232,7 +238,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       input.classList.add('group-item-input');
       divProp.append(input);
 
-      input.addEventListener('input', function(evt) {
+      input.addEventListener('change', function(evt) {
         // let changed = {};
         // changed[prop.name] = input.value;
         // self.notifyPropertyChangedListeners(changed);
@@ -264,7 +270,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       divProp.appendChild(input);
       input.value = prop.value || '';
 
-      input.addEventListener('input', function(evt) {
+      input.addEventListener('change', function(evt) {
         let reader = new FileReader();
         reader.onloadend = function () {
           let changed = {};
@@ -345,8 +351,49 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       });
       labelProp.append(input);
       divProp.appendChild(tile);
-    } else if (prop.inpuut === 'image') {
+    } else if (prop.input === 'image') {
+      let input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
+      input.setAttribute('property-model-name', prop.name);
+      input.classList.add('group-item-input');
+      divProp.appendChild(input);
+      input.value = prop.value || '';
 
+      input.addEventListener('change', function(evt) {
+        let reader = new FileReader();
+        reader.onloadend = function () {
+          let changed = {};
+          changed[prop.name] = reader.result;
+          self.notifyPropertyChangedListeners(changed);
+        };
+        reader.readAsDataURL(this.files[0]);
+      });
+    } else if (prop.input === 'offset') {
+      let table = dom.templatize(`
+        <table property-model-name="{{name}}">
+          <tr><td width="33.33%"></td><td width="33.33%"><input name="top" type="number" value="0" style="width: 45px;"></td><td width="33.33%"></td></tr>
+          <tr><td width="33.33%"><input name="left" type="number" value="0" style="width: 45px;"></td><td width="33.33%"></td><td width="33.33%"><input name="right" type="number" value="0" style="width: 45px;"></td></tr>
+          <tr><td width="33.33%"></td><td width="33.33%"><input name="bottom" type="number" value="0" style="width: 45px;"></td><td width="33.33%"></td></tr>
+        </table>
+      `, prop);
+      divProp.appendChild(table);
+      table.querySelectorAll('input').forEach(el => {
+        // 设置初始值
+        prop.value = prop.value || {};
+        el.value = prop.value[el.getAttribute('name')] || 0;
+        dom.bind(el, 'change', ev => {
+          let inputs = table.querySelectorAll('input');
+          let value = {};
+          for (let i = 0; i < inputs.length; i++) {
+            let name = inputs[i].getAttribute('name');
+            value[name] = inputs[i].value;
+          }
+          let changed = {};
+          changed[prop.name] = value;
+          self.notifyPropertyChangedListeners(changed);
+        })
+      })
     } else if (prop.display) {
       //
       // 【自定义】
@@ -532,6 +579,7 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
   let textareas = container.querySelectorAll('textarea');
   let dialogs = container.querySelectorAll('a[property-model-input=dialog]');
   let divs = container.querySelectorAll('div[property-model-name]');
+  let tables = container.querySelectorAll('table[property-model-name]');
   let uls = container.querySelectorAll('ul[properties-model]');
 
   for (let i = 0; i < inputs.length; i++) {
@@ -549,6 +597,9 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
       // FIXME
       let label = dom.find('label', input.parentElement);
       label.textContent = label.textContent.replace('undefined', data[dataId])
+    }
+    if (input.type === 'number') {
+      input.value = parseInt(data[dataId]);
     }
   }
   for (let i = 0; i < selects.length; i++) {
@@ -573,6 +624,17 @@ PropertiesEditor.prototype.setPropertiesValues = function (data) {
         div.innerHTML = data[dataId];
       }
       div.setAttribute('properties-model', JSON.stringify(data[dataId]))
+    }
+  }
+
+  for (let i = 0; i < tables.length; i++) {
+    let table = tables[i];
+    let dataId = table.getAttribute('property-model-name');
+    if (data[dataId]) {
+      let inputs = table.querySelectorAll('input');
+      for (let j = 0; j < inputs.length; j++) {
+        inputs[j].value = data[dataId][inputs[j].getAttribute('name')];
+      }
     }
   }
 

@@ -14933,8 +14933,24 @@ html:not([dir=rtl]) .mfe-3 {
   color: var(--color-primary)!important;
 }
 
+.color-secondary {
+  color: var(--color-secondary)!important;
+}
+
+.color-info {
+  color: var(--color-info)!important;
+}
+
 .color-error {
   color: var(--color-danger)!important;
+}
+
+.color-success {
+  color: var(--color-success)!important;
+}
+
+.color-warning {
+  color: var(--color-warning)!important;
 }
 
 body {
@@ -17837,43 +17853,6 @@ a.disabled {
 .context-menu > .menu > li.trash > a:hover {
   color: var(--color-danger);
 }
-
-/**
- * Animations
- */
-.slide-from-right.in {
-  -webkit-animation: slide-from-right-in 0.3s linear;
-  -webkit-animation-delay: 0s;
-  animation: slide-from-right-in 0.3s linear;
-  animation-delay: 0s;
-}
-
-.slide-from-right.out {
-  -webkit-animation: slide-from-right-out 0.5s linear;
-  -webkit-animation-delay: 0s;
-  animation: slide-from-right-out 0.5s linear;
-  animation-delay: 0s;
-}
-
-@-webkit-keyframes slide-from-right-in {
-  100% {
-    right: 0;
-  }
-}
-
-@keyframes slide-from-right-in {
-  100% {
-    right: 0;
-  }
-}
-
-@-webkit-keyframes slide-from-right-out {
-  100% { right: -100%; }
-}
-
-@keyframes slide-from-right-out {
-  100% { right: -100%; }
-}
 .bell{
   display:block;
   color: #db2828;
@@ -18265,6 +18244,40 @@ a.disabled {
     transform: scale(1)
   }
 }
+
+.slide-from-right.in {
+  -webkit-animation: slide-from-right-in 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-right-in 0.3s linear;
+  animation-delay: 0s;
+}
+
+.slide-from-right.out {
+  -webkit-animation: slide-from-right-out 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-right-out 0.3s linear;
+  animation-delay: 0s;
+}
+
+@-webkit-keyframes slide-from-right-in {
+  100% {
+    right: 0;
+  }
+}
+
+@keyframes slide-from-right-in {
+  100% {
+    right: 0;
+  }
+}
+
+@-webkit-keyframes slide-from-right-out {
+  100% { right: -100%; }
+}
+
+@keyframes slide-from-right-out {
+  100% { right: -100%; }
+}
 .autocomplete {
   position: relative;
   display: inline-block;
@@ -18448,6 +18461,46 @@ a.disabled {
   gap: 1rem;
 }
 
+
+.button-outlined {
+  cursor: pointer;
+  display: inline-block;
+  font-family: Circular,-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+  border-radius: 8px;
+  box-sizing: border-box;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  touch-action: manipulation;
+  transition: box-shadow .2s,-ms-transform .1s,-webkit-transform .1s,transform .1s;
+  user-select: none;
+  -webkit-user-select: none;
+  margin: 0;
+  outline: none;
+  padding: 13px 23px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 20px;
+  width: auto;
+}
+
+.button-outlined.primary {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+}
+
+.button-outlined.error {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+}
+
+.button-outlined.warning {
+  background-color: var(--color-light);
+  border: 1px solid var(--color-warning);
+  color: var(--color-warning);
+}
 
 .calendar {
 	width: 100%;
