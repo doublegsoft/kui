@@ -1499,7 +1499,7 @@ h6, .h6 {
   font-size: 20px !important;
 }
 
-.font-24 {
+.font-22 {
   font-size: 22px !important;
 }
 
@@ -2959,6 +2959,21 @@ input.border-less:focus {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
   max-width: 100%;
+}
+
+/**
+ * special column width
+ */
+.col-21-03 {
+  -ms-flex: 0 0 14.285714%;
+  flex: 0 0 14.285714%;
+  max-width: 14.285714%;
+}
+
+.col-20-04 {
+  -ms-flex: 0 0 20%;
+  flex: 0 0 20%;
+  max-width: 20%;
 }
 
 a.disabled {

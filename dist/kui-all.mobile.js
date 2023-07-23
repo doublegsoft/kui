@@ -1608,6 +1608,48 @@ dom.slideOutToRight = (element, right, mask) => {
   }
 };
 
+dom.slideInFromLeft = (element, mask) => {
+  element.classList.remove('out');
+  element.classList.add('in');
+  setTimeout(() => {
+    element.style.left = '0';
+  }, 300 /* 与CSS中动画定义一致 */);
+  if (mask) {
+    mask.style.display = '';
+  }
+};
+
+dom.slideOutToLeft = (element, left, mask) => {
+  if (!element.classList.contains('in')) return;
+  if (element.classList.contains('out')) return;
+  element.classList.remove('in');
+  element.classList.add('out');
+  setTimeout(() => {
+    element.style.left = left;
+  }, 300 /* 与CSS中动画定义一致 */);
+  if (mask) {
+    mask.style.display = 'none';
+  }
+};
+
+/*
+**************************************************
+** Operations.
+**************************************************
+*/
+dom.toggle = (clazz, element) => {
+  if (Array.isArray(element)) {
+    for (let i = 0; i < element.length; i++)
+      dom.toggle(clazz, element[i]);
+  } else {
+    if (element.classList.contains(clazz)) {
+      element.classList.remove(clazz);
+    } else {
+      element.classList.add(clazz);
+    }
+  }
+};
+
 /*
 **************************************************
 ** Performance
@@ -1918,7 +1960,7 @@ dom.propagate = function (container, data, name, creator) {
   container.appendChild(element);
 };
 
-dom.toggle = function (selector, resolve) {
+dom.toggle2 = function (selector, resolve) {
   let elements = document.querySelectorAll(selector);
   for (let i = 0; i < elements.length; i++) {
     let element = elements[i];
@@ -2455,8 +2497,10 @@ dom.autoheight = function (selector, ancestor, bottomOffset) {
 
   let parent = el.parentElement;
   let rect = parent.getBoundingClientRect();
+  let parentOffsetTop = parseInt(parent.offsetTop);
 
   let top = rect.top;
+  // 计算底部的高度
   let bottom = 0;
   while (parent !== ancestor) {
     let style = getComputedStyle(parent);
@@ -2468,7 +2512,12 @@ dom.autoheight = function (selector, ancestor, bottomOffset) {
   // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
   let offsetTop = parseInt(el.offsetTop);
   if (ancestor === document.body) {
-    el.style.height = (height - bottom - bottomOffset - top) + 'px';
+    if (el.offsetParent.tagName !== el.parentElement.tagName) offsetTop = 0;
+    else offsetTop = offsetTop - parentOffsetTop;
+    console.log(offsetTop);
+    console.log(el.offsetParent);
+    console.log('parentOffsetTop', parentOffsetTop);
+    el.style.height = (height - bottom - bottomOffset - top - offsetTop) + 'px';
   } else {
     let style = getComputedStyle(parent);
     // 元素自己的offsetTop就已经决定不需要计算padding-top
@@ -3100,7 +3149,7 @@ dialog.html = function(opt) {
     closeBtn: 1,
     offset: '150px',
     shade: 0.5,
-    area : ['50%', ''],
+    area : [opt.width || '50%', ''],
     shadeClose: true,
     title: opt.title || '&nbsp;',
     content: opt.html,
@@ -3110,7 +3159,12 @@ dialog.html = function(opt) {
     },
     yes: function (index) {
       layer.close(index);
-      opt.success();
+      let layerContent = dom.find('.layui-layer-content');
+      if (layerContent.children.length == 1) {
+        opt.success(dom.find('.layui-layer-content').children[0]);
+      } else {
+        opt.success(dom.find('.layui-layer-content').children);
+      }
     },
     btn1: function () {
 
@@ -3131,7 +3185,7 @@ dialog.iframe = function(opt) {
     shade: false,
     success: opt.success || function(layro, index) {},
   });
-}
+};
 /**
  * Encapsulates all functions of list view container.
  * <p>
@@ -3158,7 +3212,13 @@ function ListView(opt) {
   this.itemClass = opt.itemClass || [];
   this.slidingActions = opt.slidingActions || [];
 
-  this.emptyHtml = opt.emptyHtml;
+  this.emptyHtml = opt.emptyHtml || `
+    <div class="d-flex flex-wrap mt-2">
+      <img class="m-auto" src="img/nodata.png" width="60%">
+      <div style="flex-basis: 100%; height: 0;"></div>
+      <div class="text-muted m-auto mt-2" style="font-weight: bold;">没有任何数据</div>
+    </div>
+  `;
   this.idField = opt.idField;
 
   /*!

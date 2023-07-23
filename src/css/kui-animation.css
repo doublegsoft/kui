@@ -247,3 +247,37 @@
 @keyframes slide-from-right-out {
   100% { right: -100%; }
 }
+
+.slide-from-left.in {
+  -webkit-animation: slide-from-left-in 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-left-in 0.3s linear;
+  animation-delay: 0s;
+}
+
+.slide-from-left.out {
+  -webkit-animation: slide-from-left-out 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-left-out 0.3s linear;
+  animation-delay: 0s;
+}
+
+@-webkit-keyframes slide-from-left-in {
+  100% {
+    left: 0;
+  }
+}
+
+@keyframes slide-from-left-in {
+  100% {
+    left: 0;
+  }
+}
+
+@-webkit-keyframes slide-from-left-out {
+  100% { left: -100%; }
+}
+
+@keyframes slide-from-left-out {
+  100% { left: -100%; }
+}

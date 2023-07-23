@@ -212,7 +212,7 @@ dialog.html = function(opt) {
     closeBtn: 1,
     offset: '150px',
     shade: 0.5,
-    area : ['50%', ''],
+    area : [opt.width || '50%', ''],
     shadeClose: true,
     title: opt.title || '&nbsp;',
     content: opt.html,
@@ -222,7 +222,12 @@ dialog.html = function(opt) {
     },
     yes: function (index) {
       layer.close(index);
-      opt.success();
+      let layerContent = dom.find('.layui-layer-content');
+      if (layerContent.children.length == 1) {
+        opt.success(dom.find('.layui-layer-content').children[0]);
+      } else {
+        opt.success(dom.find('.layui-layer-content').children);
+      }
     },
     btn1: function () {
 
@@ -243,4 +248,4 @@ dialog.iframe = function(opt) {
     shade: false,
     success: opt.success || function(layro, index) {},
   });
-}
+};

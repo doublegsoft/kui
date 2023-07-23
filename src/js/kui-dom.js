@@ -29,6 +29,48 @@ dom.slideOutToRight = (element, right, mask) => {
   }
 };
 
+dom.slideInFromLeft = (element, mask) => {
+  element.classList.remove('out');
+  element.classList.add('in');
+  setTimeout(() => {
+    element.style.left = '0';
+  }, 300 /* 与CSS中动画定义一致 */);
+  if (mask) {
+    mask.style.display = '';
+  }
+};
+
+dom.slideOutToLeft = (element, left, mask) => {
+  if (!element.classList.contains('in')) return;
+  if (element.classList.contains('out')) return;
+  element.classList.remove('in');
+  element.classList.add('out');
+  setTimeout(() => {
+    element.style.left = left;
+  }, 300 /* 与CSS中动画定义一致 */);
+  if (mask) {
+    mask.style.display = 'none';
+  }
+};
+
+/*
+**************************************************
+** Operations.
+**************************************************
+*/
+dom.toggle = (clazz, element) => {
+  if (Array.isArray(element)) {
+    for (let i = 0; i < element.length; i++)
+      dom.toggle(clazz, element[i]);
+  } else {
+    if (element.classList.contains(clazz)) {
+      element.classList.remove(clazz);
+    } else {
+      element.classList.add(clazz);
+    }
+  }
+};
+
 /*
 **************************************************
 ** Performance
@@ -339,7 +381,7 @@ dom.propagate = function (container, data, name, creator) {
   container.appendChild(element);
 };
 
-dom.toggle = function (selector, resolve) {
+dom.toggle2 = function (selector, resolve) {
   let elements = document.querySelectorAll(selector);
   for (let i = 0; i < elements.length; i++) {
     let element = elements[i];
@@ -876,8 +918,10 @@ dom.autoheight = function (selector, ancestor, bottomOffset) {
 
   let parent = el.parentElement;
   let rect = parent.getBoundingClientRect();
+  let parentOffsetTop = parseInt(parent.offsetTop);
 
   let top = rect.top;
+  // 计算底部的高度
   let bottom = 0;
   while (parent !== ancestor) {
     let style = getComputedStyle(parent);
@@ -889,7 +933,12 @@ dom.autoheight = function (selector, ancestor, bottomOffset) {
   // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
   let offsetTop = parseInt(el.offsetTop);
   if (ancestor === document.body) {
-    el.style.height = (height - bottom - bottomOffset - top) + 'px';
+    if (el.offsetParent.tagName !== el.parentElement.tagName) offsetTop = 0;
+    else offsetTop = offsetTop - parentOffsetTop;
+    // console.log(offsetTop);
+    // console.log(el.offsetParent);
+    // console.log('parentOffsetTop', parentOffsetTop);
+    el.style.height = (height - bottom - bottomOffset - top - offsetTop) + 'px';
   } else {
     let style = getComputedStyle(parent);
     // 元素自己的offsetTop就已经决定不需要计算padding-top

@@ -16289,7 +16289,7 @@ h6, .h6 {
   font-size: 20px !important;
 }
 
-.font-24 {
+.font-22 {
   font-size: 22px !important;
 }
 
@@ -17751,6 +17751,21 @@ input.border-less:focus {
   max-width: 100%;
 }
 
+/**
+ * special column width
+ */
+.col-21-03 {
+  -ms-flex: 0 0 14.285714%;
+  flex: 0 0 14.285714%;
+  max-width: 14.285714%;
+}
+
+.col-20-04 {
+  -ms-flex: 0 0 20%;
+  flex: 0 0 20%;
+  max-width: 20%;
+}
+
 a.disabled {
   pointer-events: none;
   opacity: 0.25;
@@ -18277,6 +18292,40 @@ a.disabled {
 
 @keyframes slide-from-right-out {
   100% { right: -100%; }
+}
+
+.slide-from-left.in {
+  -webkit-animation: slide-from-left-in 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-left-in 0.3s linear;
+  animation-delay: 0s;
+}
+
+.slide-from-left.out {
+  -webkit-animation: slide-from-left-out 0.3s linear;
+  -webkit-animation-delay: 0s;
+  animation: slide-from-left-out 0.3s linear;
+  animation-delay: 0s;
+}
+
+@-webkit-keyframes slide-from-left-in {
+  100% {
+    left: 0;
+  }
+}
+
+@keyframes slide-from-left-in {
+  100% {
+    left: 0;
+  }
+}
+
+@-webkit-keyframes slide-from-left-out {
+  100% { left: -100%; }
+}
+
+@keyframes slide-from-left-out {
+  100% { left: -100%; }
 }
 .autocomplete {
   position: relative;
@@ -20607,14 +20656,16 @@ input[type=radio].radio.is-large {
 .editor-toolbar {
   border-bottom: 1px solid #d1d1d1;
   background: #f8f8f8;
-  padding: 2px 8px 6px 3px;
+  padding: 2px;
   white-space: normal;
+  height: 32px;
+  line-height: 32px;
 }
 
 .editor-toolbar .button-group {
   border: 0;
-  margin: 1px 2px 6px 0;
-  padding-right: 3px;
+  /*margin: 1px 2px 6px 0;*/
+  /*padding-right: 3px;*/
 }
 
 .editor-toolbar .button-group .button {

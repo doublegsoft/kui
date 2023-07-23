@@ -14,6 +14,8 @@ function TreeView(opts) {
   this.rootParams = params.root || {};
   this.childParams = params.child || {};
 
+  this.styles = opts.styles || {};
+
   this.fieldText = opts.fields.text;
   this.fieldValue = opts.fields.value;
   this.fieldParent = opts.fields.parent;
@@ -82,11 +84,11 @@ TreeView.prototype.createNodeElement = function(data, level) {
     text: data[this.fieldText],
   };
   let ret = dom.templatize(`
-    <li widget-model-level="{{level}}" class="list-group-item p-0 b-a-0">
+    <li widget-model-level="{{level}}" class="list-group-item p-0 b-a-0 list-group-item-action">
       <div class="full-width">
-        <div class="d-flex full-width list-group-item-action" style="line-height: 32px; padding-left: {{paddingLeft}}px!important;">
+        <div class="d-flex full-width" style="line-height: 32px; padding-left: {{paddingLeft}}px!important;">
           <a widget-id="buttonExpand" class="btn-link pointer ml-2 mr-2">
-            <i class="far text-success font-14 fa-plus-square"></i>
+            <i widget-id="widgetIcon" class="far text-success font-14 fa-plus-square"></i>
           </a>
           <div widget-id="widgetText" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
             <strong>{{text}}</strong>
@@ -96,6 +98,10 @@ TreeView.prototype.createNodeElement = function(data, level) {
       </div>
     </li>
   `, viewModel);
+  if (this.styles.node) {
+    ret.style += ';' + this.styles.node;
+    dom.find('[widget-id=widgetIcon]', ret).style += ';' + this.styles.node;
+  }
   dom.model(ret, data);
   let buttonExpand = dom.find('[widget-id=buttonExpand]', ret);
   if ((level + 1) == this.levels) {
@@ -215,7 +221,8 @@ TreeView.prototype.collapseOrExpand = function (ev) {
 TreeView.prototype.updateParent = function(parentElement) {
   let ul = parentElement;
   let div = ul.parentElement;
-  let buttonExpand = div.querySelector('[widget-id=buttonExpand]')
+  let buttonExpand = div.querySelector('[widget-id=buttonExpand]');
+  if (div == this.container) return;
   if (ul.children.length == 0) {
     buttonExpand.style.visibility = 'hidden';
   } else {
