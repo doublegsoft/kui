@@ -2487,16 +2487,20 @@ dom.height2 = function(selector, offset, parent) {
   element.style.overflowY = 'auto';
 };
 
-dom.autoheight = function (selector, ancestor, bottomOffset) {
-  bottomOffset = bottomOffset || 0;
+dom.autoheight = function (selector, ancestor, customOffset) {
+  customOffset = customOffset || 0;
   let el = dom.find(selector);
   ancestor = ancestor || document.body;
   let rectAncestor = ancestor.getBoundingClientRect();
 
   let height = rectAncestor.height;
+  if (ancestor === document.body) {
+    height = window.innerHeight;
+  }
 
   let parent = el.parentElement;
-  let rect = parent.getBoundingClientRect();
+  let rectParent = parent.getBoundingClientRect();
+  let rect = el.getBoundingClientRect();
   let parentOffsetTop = parseInt(parent.offsetTop);
 
   let top = rect.top;
@@ -2506,26 +2510,32 @@ dom.autoheight = function (selector, ancestor, bottomOffset) {
     let style = getComputedStyle(parent);
     bottom += parseInt(style.paddingBottom);
     bottom += parseInt(style.marginBottom);
+    bottom += parseInt(style.borderBottomWidth);
     parent = parent.parentElement;
   }
+  let style = getComputedStyle(el);
+  bottom += parseInt(style.borderBottomWidth);
 
   // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
-  let offsetTop = parseInt(el.offsetTop);
-  if (ancestor === document.body) {
-    if (el.offsetParent.tagName !== el.parentElement.tagName) offsetTop = 0;
-    else offsetTop = offsetTop - parentOffsetTop;
-    console.log(offsetTop);
-    console.log(el.offsetParent);
-    console.log('parentOffsetTop', parentOffsetTop);
-    el.style.height = (height - bottom - bottomOffset - top - offsetTop) + 'px';
-  } else {
-    let style = getComputedStyle(parent);
-    // 元素自己的offsetTop就已经决定不需要计算padding-top
-    let paddingTop = parseInt(style.paddingTop);
-    let paddingBottom = parseInt(style.paddingBottom);
-    // 对话框
-    el.style.height = (height - bottom - bottomOffset - offsetTop - paddingBottom) + 'px';
-  }
+  // let offsetTop = parseInt(el.offsetTop);
+  // if (ancestor === document.body) {
+  //   // if (el.offsetParent.tagName !== el.parentElement.tagName) offsetTop = 0;
+  //   // if (el.offsetParent !== el.parentElement) offsetTop = 0;
+  //   // else offsetTop = offsetTop - parentOffsetTop; /* relative offset to parent */
+  //   console.log(offsetTop);
+  //   console.log(el.offsetParent);
+  //   console.log('parentOffsetTop', parentOffsetTop);
+  //   el.style.height = (height - bottom - bottomOffset - top) + 'px';
+  // } else {
+  //   let style = getComputedStyle(parent);
+  //   // 元素自己的offsetTop就已经决定不需要计算padding-top
+  //   let paddingTop = parseInt(style.paddingTop);
+  //   let paddingBottom = parseInt(style.paddingBottom);
+  //   // 对话框
+  //   el.style.height = (height - bottom - bottomOffset - offsetTop - paddingBottom) + 'px';
+  // }
+  // console.log(window.innerHeight, height, bottom, customOffset, top);
+  el.style.height = (height - bottom - customOffset - top) + 'px';
   el.style.overflowY = 'auto';
 };
 
