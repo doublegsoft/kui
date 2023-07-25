@@ -9198,7 +9198,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         <div widget-id="widgetCustom_${name}" class="full-width"></div>
       `);
       field.create(addnew, custom, field);
-      if (field.readonly !== true) {
+      if (field.readonly !== true && this.readonly !== true) {
         group.appendChild(addnew);
       }
       group.appendChild(custom);
