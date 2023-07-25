@@ -15253,6 +15253,8 @@ function TreeView(opts) {
   this.rootParams = params.root || {};
   this.childParams = params.child || {};
 
+  this.contextable = opts.contextable !== false;
+
   let self = this;
   this.doCreateNode = opts.doCreateNode || function (row) {
     return dom.templatize(`
@@ -15278,7 +15280,6 @@ function TreeView(opts) {
       </ul>
     </div>
   `);
-
   dom.init(this, this.contextMenu);
 
   this.onEditNode = opts.onEditNode;
@@ -15327,21 +15328,21 @@ TreeView.prototype.createNodeElement = function(data, level) {
   level = level || 0;
   let viewModel = {
     ...data,
-    paddingLeft: 16 * (level),
+    left: 12 * (level),
     level: level,
     text: data[this.fieldText],
   };
   let ret = dom.templatize(`
     <li widget-model-level="{{level}}" class="list-group-item p-0 b-a-0 list-group-item-action">
       <div class="full-width">
-        <div class="d-flex full-width" style="line-height: 32px; padding-left: {{paddingLeft}}px!important;">
-          <a widget-id="buttonExpand" class="btn-link pointer ml-2 mr-2">
+        <div class="d-flex full-width" style="line-height: 32px; margin-left: {{left}}px!important;">
+          <a widget-id="buttonExpand" class="btn-link pointer ml-2 mr-1">
             <i widget-id="widgetIcon" class="far text-success font-14 fa-plus-square"></i>
           </a>
           <div widget-id="widgetText" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
           </div>
         </div>
-        <ul class="list-group full-width border-less" style="display: none;"></ul>
+        <ul class="list-group full-width border-less" style="display: none; margin-left: {{left}}px!important;"></ul>
       </div>
     </li>
   `, viewModel);
@@ -15573,15 +15574,17 @@ TreeView.prototype.render = async function(containerId, params) {
     let row = data[i];
     this.appendNode(row, 0, this.container);
   }
-  this.container.appendChild(this.contextMenu);
 
-  this.container.oncontextmenu = ev => {
-    ev.preventDefault();
-    this.showContextMenu(ev);
-  };
-  this.container.onclick = ev => {
-    this.hideContextMenu();
-  };
+  if (this.contextable !== false) {
+    this.container.appendChild(this.contextMenu);
+    this.container.oncontextmenu = ev => {
+      ev.preventDefault();
+      this.showContextMenu(ev);
+    };
+    this.container.onclick = ev => {
+      this.hideContextMenu();
+    };
+  }
 };
 
 /**
