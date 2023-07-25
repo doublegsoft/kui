@@ -3332,25 +3332,6 @@ dom.autoheight = function (selector, ancestor, customOffset) {
   let style = getComputedStyle(el);
   bottom += parseInt(style.borderBottomWidth);
 
-  // 相对于父节点的位移量，因为存在姐妹节点，比如前面有节点
-  // let offsetTop = parseInt(el.offsetTop);
-  // if (ancestor === document.body) {
-  //   // if (el.offsetParent.tagName !== el.parentElement.tagName) offsetTop = 0;
-  //   // if (el.offsetParent !== el.parentElement) offsetTop = 0;
-  //   // else offsetTop = offsetTop - parentOffsetTop; /* relative offset to parent */
-  //   console.log(offsetTop);
-  //   console.log(el.offsetParent);
-  //   console.log('parentOffsetTop', parentOffsetTop);
-  //   el.style.height = (height - bottom - bottomOffset - top) + 'px';
-  // } else {
-  //   let style = getComputedStyle(parent);
-  //   // 元素自己的offsetTop就已经决定不需要计算padding-top
-  //   let paddingTop = parseInt(style.paddingTop);
-  //   let paddingBottom = parseInt(style.paddingBottom);
-  //   // 对话框
-  //   el.style.height = (height - bottom - bottomOffset - offsetTop - paddingBottom) + 'px';
-  // }
-  // console.log(window.innerHeight, height, bottom, customOffset, top);
   el.style.height = (height - bottom - customOffset - top) + 'px';
   el.style.overflowY = 'auto';
 };
@@ -9020,8 +9001,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请输入...');
     input.innerHTML = field.value || '';
-    if (this.readonly)
+    if (this.readonly === true || field.readonly === true) {
       input.setAttribute('disabled', true);
+    }
   } else if (field.input == 'selecttext') {
     let div = dom.create('div', 'full-width', 'position-relative');
     div.style.height = '120px';
@@ -9057,7 +9039,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         field.onSelect(input);
       }
     });
-    if (this.readonly)
+    if (this.readonly === true || field.readonly === true)
       input.setAttribute('disabled', true);
     else
       div.appendChild(select);

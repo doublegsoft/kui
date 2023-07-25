@@ -786,8 +786,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请输入...');
     input.innerHTML = field.value || '';
-    if (this.readonly)
+    if (this.readonly === true || field.readonly === true) {
       input.setAttribute('disabled', true);
+    }
   } else if (field.input == 'selecttext') {
     let div = dom.create('div', 'full-width', 'position-relative');
     div.style.height = '120px';
@@ -823,7 +824,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         field.onSelect(input);
       }
     });
-    if (this.readonly)
+    if (this.readonly === true || field.readonly === true)
       input.setAttribute('disabled', true);
     else
       div.appendChild(select);
