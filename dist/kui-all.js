@@ -15253,6 +15253,15 @@ function TreeView(opts) {
   this.rootParams = params.root || {};
   this.childParams = params.child || {};
 
+  let self = this;
+  this.doCreateNode = opts.doCreateNode || function (row) {
+    return dom.templatize(`
+      <strong>{{text}}</strong>
+    `, {
+      text: row[self.fieldText],
+    });
+  };
+
   this.styles = opts.styles || {};
 
   this.fieldText = opts.fields.text;
@@ -15330,13 +15339,16 @@ TreeView.prototype.createNodeElement = function(data, level) {
             <i widget-id="widgetIcon" class="far text-success font-14 fa-plus-square"></i>
           </a>
           <div widget-id="widgetText" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
-            <strong>{{text}}</strong>
           </div>
         </div>
         <ul class="list-group full-width border-less" style="display: none;"></ul>
       </div>
     </li>
   `, viewModel);
+  // 自定义节点
+  let nodeEl = this.doCreateNode(data);
+  let widgetText = dom.find('[widget-id=widgetText]', ret);
+  widgetText.appendChild(nodeEl);
   if (this.styles.node) {
     ret.style += ';' + this.styles.node;
     dom.find('[widget-id=widgetIcon]', ret).style += ';' + this.styles.node;
@@ -15370,7 +15382,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
   }
 
   // 动态调整按钮宽度和文本宽度
-  let widgetText = dom.find('[widget-id=widgetText]', ret);
+  widgetText = dom.find('[widget-id=widgetText]', ret);
   widgetText.style.width = 'calc(100% - ' + widgetText + 'px)';
   return ret;
 };
