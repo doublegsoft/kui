@@ -3937,6 +3937,7 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
   let contentPage = dom.find(`div[data-tab-content-id="${id}"]`);
   if (contentPage == null) {
     contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+    this.content.appendChild(contentPage);
   } else {
     contentPage.innerHTML = '';
   }
@@ -3952,7 +3953,6 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
   if (hidden === true) {
     contentPage.style.display = 'none';
   }
-  this.content.appendChild(contentPage);
 };
 
 Tabs.prototype.reload = function (params) {

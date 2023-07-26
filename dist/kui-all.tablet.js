@@ -3090,8 +3090,9 @@ Validation = {
           checked = true;
         }
       });
-      if (!checked && $(elm).prop('required')) {
+      if (checked === false && $(elm).prop('required')) {
         var msg = label + '必须选择！';
+        console.log(msg);
         msg = $(elm).attr('data-required-message') ? $(elm).attr('data-required-message') : msg;
         ret.push({
           element: $(elm),
@@ -4378,6 +4379,7 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
   let contentPage = dom.find(`div[data-tab-content-id="${id}"]`);
   if (contentPage == null) {
     contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+    this.content.appendChild(contentPage);
   } else {
     contentPage.innerHTML = '';
   }
@@ -4393,7 +4395,6 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
   if (hidden === true) {
     contentPage.style.display = 'none';
   }
-  this.content.appendChild(contentPage);
 };
 
 Tabs.prototype.reload = function (params) {

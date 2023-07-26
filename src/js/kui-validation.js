@@ -182,8 +182,9 @@ Validation = {
           checked = true;
         }
       });
-      if (!checked && $(elm).prop('required')) {
+      if (checked === false && $(elm).prop('required')) {
         var msg = label + '必须选择！';
+        // console.log(msg);
         msg = $(elm).attr('data-required-message') ? $(elm).attr('data-required-message') : msg;
         ret.push({
           element: $(elm),

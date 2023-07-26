@@ -6263,8 +6263,9 @@ Validation = {
           checked = true;
         }
       });
-      if (!checked && $(elm).prop('required')) {
+      if (checked === false && $(elm).prop('required')) {
         var msg = label + '必须选择！';
+        console.log(msg);
         msg = $(elm).attr('data-required-message') ? $(elm).attr('data-required-message') : msg;
         ret.push({
           element: $(elm),
@@ -8839,12 +8840,14 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('autocomplete', 'off');
     input.setAttribute('name', field.name);
+    input.setAttribute('label', field.title);
   } else if (field.input == 'select') {
     input = dom.create('select', 'form-control');
     input.style = '-moz-appearance:none';
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请选择...');
+    input.setAttribute('label', field.title);
   } else if (field.input == 'bool') {
     input = dom.element(`
       <div class="d-flex full-width">
@@ -8866,6 +8869,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     if (field.disabled === true) {
       elInput.disabled = true;
     }
+    elInput.setAttribute('label', field.title);
     let select = dom.find('select', input);
 
     if (!field.options) {
@@ -8926,6 +8930,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
           checked = true;
         }
       }
+      if (field.required === true) {
+        dom.find('input', radio).setAttribute('required', true);
+        dom.find('input', radio).setAttribute('data-required', field.title);
+      }
       dom.find('input', radio).value = val.value;
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
       // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
@@ -8980,6 +8988,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       dom.find('input', radio).disabled = this.readonly || field.readonly || false;
       // dom.find('label', radio).setAttribute('for', 'radio_' + val.value);
       dom.find('label', radio).textContent = val.text;
+      if (field.required === true) {
+        dom.find('input', radio).setAttribute('required', true);
+        dom.find('input', radio).setAttribute('data-required', field.title);
+      }
       group.append(radio);
       radio.onchange = ev => {
         if (field.onInput) {
@@ -14716,6 +14728,7 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
   let contentPage = dom.find(`div[data-tab-content-id="${id}"]`);
   if (contentPage == null) {
     contentPage = dom.templatize('<div data-tab-content-id="{{id}}"></div>', {id: id});
+    this.content.appendChild(contentPage);
   } else {
     contentPage.innerHTML = '';
   }
@@ -14731,7 +14744,6 @@ Tabs.prototype.loadPage = function(id, url, hidden, success) {
   if (hidden === true) {
     contentPage.style.display = 'none';
   }
-  this.content.appendChild(contentPage);
 };
 
 Tabs.prototype.reload = function (params) {
