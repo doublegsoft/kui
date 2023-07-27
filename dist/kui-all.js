@@ -6265,7 +6265,7 @@ Validation = {
       });
       if (checked === false && $(elm).prop('required')) {
         var msg = label + '必须选择！';
-        console.log(msg);
+        // console.log(msg);
         msg = $(elm).attr('data-required-message') ? $(elm).attr('data-required-message') : msg;
         ret.push({
           element: $(elm),
@@ -10846,7 +10846,7 @@ ListView.prototype.render = function(containerId, loading) {
   }
 
   this.contentContainer = dom.create('div', 'full-width');
-  let ul = dom.create('ul', 'list-group', 'full-width');
+  let ul = dom.create('ul', 'list-group', 'full-width', 'overflow-hidden');
   if (this.borderless) {
     ul.classList.add('b-a-0');
   }

@@ -3328,7 +3328,7 @@ ListView.prototype.render = function(containerId, loading) {
   }
 
   this.contentContainer = dom.create('div', 'full-width');
-  let ul = dom.create('ul', 'list-group', 'full-width');
+  let ul = dom.create('ul', 'list-group', 'full-width', 'overflow-hidden');
   if (this.borderless) {
     ul.classList.add('b-a-0');
   }
