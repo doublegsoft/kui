@@ -15264,8 +15264,24 @@ main {
   padding-right: 0px!important;
 }
 
+.hide {
+  display: none!important;
+}
+
 .hidden {
   display: none!important;
+}
+
+.shown {
+  display: block!important;
+}
+
+.invisible {
+  visibility: hidden;
+}
+
+.visible {
+  visibility: visible;
 }
 
 .circle {
@@ -15450,10 +15466,6 @@ main {
 
 .icon-gap {
   padding-right: 4px;
-}
-
-.hide {
-  display: none;
 }
 
 .btn-more {
