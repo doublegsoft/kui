@@ -2466,6 +2466,14 @@ dom.toggle = (clazz, element) => {
   }
 };
 
+dom.exclusive = (clazz, element, container) => {
+  let els = container.querySelectorAll(element.tagName + '.' + clazz);
+  for (let el of els) {
+    el.classList.remove(clazz);
+  }
+  element.classList.add(clazz);
+};
+
 /*
 **************************************************
 ** Performance
@@ -15351,7 +15359,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
           <a widget-id="buttonExpand" class="btn-link pointer ml-2 mr-1">
             <i widget-id="widgetIcon" class="far text-success font-14 fa-plus-square"></i>
           </a>
-          <div widget-id="widgetText" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
+          <div widget-id="widgetText" class="full-width" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
           </div>
         </div>
         <ul class="list-group full-width border-less" style="display: none; margin-left: {{left}}px!important;"></ul>

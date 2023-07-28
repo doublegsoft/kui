@@ -1901,6 +1901,14 @@ dom.toggle = (clazz, element) => {
   }
 };
 
+dom.exclusive = (clazz, element, container) => {
+  let els = container.querySelectorAll(element.tagName + '.' + clazz);
+  for (let el of els) {
+    el.classList.remove(clazz);
+  }
+  element.classList.add(clazz);
+};
+
 /*
 **************************************************
 ** Performance
