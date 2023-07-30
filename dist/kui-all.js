@@ -15408,7 +15408,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
 
   if (this.dndable === true) {
     dnd.setDraggable(ret, model, (x, y, target) => {
-      this.dragingNode = target;
+      this.draggingNode = target;
     });
   }
 
@@ -15604,13 +15604,13 @@ TreeView.prototype.render = async function(containerId, params) {
       if (droppingNode == null) {
         return;
       }
-      let ul = dom.find('ul', droppingNode);
-      this.appendNode(dom.model(this.dragingNode), parseInt(droppingNode.getAttribute('widget-model-level')) + 1, droppingNode);
+      let draggingModel = dom.model(this.draggingNode);
+      this.appendNode(draggingModel, parseInt(droppingNode.getAttribute('widget-model-level')) + 1, droppingNode);
       if (this.onDropNode) {
-        this.onDropNode(this.dragableNode, droppingNode);
+        this.onDropNode(draggingModel, dom.model(droppingNode));
       }
-      this.dragingNode.remove();
-      this.dragableNode = null;
+      this.draggingNode.remove();
+      this.draggingNode = null;
     });
   }
   this.container.appendChild(ul);
