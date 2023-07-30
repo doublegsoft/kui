@@ -2340,8 +2340,8 @@ dnd.setDraggable = function (selector, payload, callback) {
   element.ondragstart = function(ev) {
     let li = element;// dom.ancestor(ev.target, 'li');
     let dragImage = li.getAttribute('widget-drag-image');
-    let x = event.layerX;
-    let y = event.layerY;
+    let x = event.clientX;
+    let y = event.clientY;
     for (let key in payload)
       ev.dataTransfer.setData(key, payload[key]);
     if (dragImage && dragImage != '') {
@@ -2392,7 +2392,6 @@ dnd.setDroppable = function (selector, callback) {
     }
   };
 };
-
 var dom = {};
 
 /*
@@ -15274,6 +15273,7 @@ function TreeView(opts) {
   this.childParams = params.child || {};
 
   this.contextable = opts.contextable !== false;
+  this.dndable = opts.dndable === true;
 
   let self = this;
   this.doCreateNode = opts.doCreateNode || function (row) {
@@ -15306,6 +15306,7 @@ function TreeView(opts) {
   this.onRemoveNode = opts.onRemoveNode;
   this.onSelectNode = opts.onSelectNode;
   this.onAddNode = opts.onAddNode;
+  this.onDropNode = opts.onDropNode;
 
   this.isNodeEditable = opts.isNodeEditable;
   this.isNodeRemovable = opts.isNodeRemovable;
@@ -15348,21 +15349,21 @@ TreeView.prototype.createNodeElement = function(data, level) {
   level = level || 0;
   let viewModel = {
     ...data,
-    left: 12 * (level),
+    left: 16 * (level),
     level: level,
     text: data[this.fieldText],
   };
   let ret = dom.templatize(`
-    <li widget-model-level="{{level}}" class="list-group-item p-0 b-a-0 list-group-item-action">
+    <li widget-model-level="{{level}}" class="list-group-item p-0 b-a-0">
       <div class="full-width">
-        <div class="d-flex full-width" style="line-height: 32px; margin-left: {{left}}px!important;">
+        <div class="d-flex full-width" style="line-height: 32px; margin-left: {{left}}px;">
           <a widget-id="buttonExpand" class="btn-link pointer ml-2 mr-1">
             <i widget-id="widgetIcon" class="far text-success font-14 fa-plus-square"></i>
           </a>
           <div widget-id="widgetText" class="full-width" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-height: 32px;">
           </div>
         </div>
-        <ul class="list-group full-width border-less" style="display: none; margin-left: {{left}}px!important;"></ul>
+        <ul class="list-group full-width border-less" style="display: none; /*margin-left: {{left}}px!important;*/"></ul>
       </div>
     </li>
   `, viewModel);
@@ -15394,8 +15395,7 @@ TreeView.prototype.createNodeElement = function(data, level) {
 
   if (this.onSelectNode) {
     dom.bind(ret, 'click', ev => {
-      ev.preventDefault();
-      ev.stopPropagation();
+      // ev.stopPropagation();
       this.hideContextMenu();
       let li = this.activateListItem(ev);
       this.onSelectNode(li, dom.model(li));
@@ -15405,6 +15405,13 @@ TreeView.prototype.createNodeElement = function(data, level) {
   // 动态调整按钮宽度和文本宽度
   widgetText = dom.find('[widget-id=widgetText]', ret);
   widgetText.style.width = 'calc(100% - ' + widgetText + 'px)';
+
+  if (this.dndable === true) {
+    dnd.setDraggable(ret, model, (x, y, target) => {
+      this.dragingNode = target;
+    });
+  }
+
   return ret;
 };
 
@@ -15589,6 +15596,23 @@ TreeView.prototype.render = async function(containerId, params) {
 
   // the root ul
   let ul = dom.create('ul', 'list-group');
+  if (this.dndable === true) {
+    dnd.setDroppable(ul, (x, y, data) => {
+      let rect = this.container.getBoundingClientRect();
+      let closest = document.elementFromPoint(rect.left + x, rect.top + y);
+      let droppingNode = dom.ancestor(closest, 'li');
+      if (droppingNode == null) {
+        return;
+      }
+      let ul = dom.find('ul', droppingNode);
+      this.appendNode(dom.model(this.dragingNode), parseInt(droppingNode.getAttribute('widget-model-level')) + 1, droppingNode);
+      if (this.onDropNode) {
+        this.onDropNode(this.dragableNode, droppingNode);
+      }
+      this.dragingNode.remove();
+      this.dragableNode = null;
+    });
+  }
   this.container.appendChild(ul);
   for (let i = 0; i < data.length; i++) {
     let row = data[i];
@@ -15642,7 +15666,10 @@ TreeView.prototype.showContextMenu = function (ev) {
   }
   this.selectedLi = li;
   // 会触发TreeView的onSelectNode方法
-  this.activateListItem(ev);
+  if (this.onSelectNode) {
+    this.onSelectNode(this.selectedLi, dom.model(this.selectedLi));
+  }
+  // this.activateListItem(ev);
 };
 
 TreeView.prototype.hideContextMenu = function (ev) {
