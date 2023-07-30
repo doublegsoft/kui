@@ -2762,7 +2762,7 @@ dom.autoheight = function (selector, ancestor, customOffset) {
   let rect = el.getBoundingClientRect();
   let parentOffsetTop = parseInt(parent.offsetTop);
 
-  let top = rect.top;
+  let top = rect.top - rectAncestor.top;
   // 计算底部的高度
   let bottom = 0;
   while (parent !== ancestor) {
@@ -2775,6 +2775,7 @@ dom.autoheight = function (selector, ancestor, customOffset) {
   let style = getComputedStyle(el);
   bottom += parseInt(style.borderBottomWidth);
 
+  console.log((height, bottom, customOffset, top))
   el.style.height = (height - bottom - customOffset - top) + 'px';
   el.style.overflowY = 'auto';
 };
