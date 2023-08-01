@@ -945,7 +945,6 @@ dom.autoheight = function (selector, ancestor, customOffset) {
   let style = getComputedStyle(el);
   bottom += parseInt(style.borderBottomWidth);
 
-  console.log((height, bottom, customOffset, top))
   el.style.height = (height - bottom - customOffset - top) + 'px';
   el.style.overflowY = 'auto';
 };

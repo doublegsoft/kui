@@ -2775,7 +2775,6 @@ dom.autoheight = function (selector, ancestor, customOffset) {
   let style = getComputedStyle(el);
   bottom += parseInt(style.borderBottomWidth);
 
-  console.log((height, bottom, customOffset, top))
   el.style.height = (height - bottom - customOffset - top) + 'px';
   el.style.overflowY = 'auto';
 };
@@ -4377,6 +4376,7 @@ DataSheet.prototype.getRowHeaderColumnCount = function(rowHeaders) {
 
 function Tabs(opts) {
   this.navigator = dom.find(opts.navigatorId);
+  this.navigator.classList.add('d-flex', 'align-items-center');
   this.content = dom.find(opts.contentId);
   this.tabActiveClass = opts.tabActiveClass;
   this.tabs = opts.tabs;

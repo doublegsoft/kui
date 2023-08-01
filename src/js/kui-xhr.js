@@ -19,7 +19,9 @@ xhr.request = function (opts, method) {
 
   let params = utils.getParameters(opts.url);
   data = {...params, ...data};
-
+  if (window && window.user) {
+    data['_current_user'] = window.user.userId;
+  }
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();

@@ -2379,6 +2379,7 @@ dnd.setDroppable = function (selector, callback) {
   };
   element.ondrop = function (event) {
     event.preventDefault();
+    event.stopPropagation();
     let rect = element.getBoundingClientRect();
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
@@ -3339,7 +3340,6 @@ dom.autoheight = function (selector, ancestor, customOffset) {
   let style = getComputedStyle(el);
   bottom += parseInt(style.borderBottomWidth);
 
-  console.log((height, bottom, customOffset, top))
   el.style.height = (height - bottom - customOffset - top) + 'px';
   el.style.overflowY = 'auto';
 };
@@ -14725,6 +14725,7 @@ Report.prototype.render = function () {
 
 function Tabs(opts) {
   this.navigator = dom.find(opts.navigatorId);
+  this.navigator.classList.add('d-flex', 'align-items-center');
   this.content = dom.find(opts.contentId);
   this.tabActiveClass = opts.tabActiveClass;
   this.tabs = opts.tabs;

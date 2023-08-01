@@ -1,6 +1,7 @@
 
 function Tabs(opts) {
   this.navigator = dom.find(opts.navigatorId);
+  this.navigator.classList.add('d-flex', 'align-items-center');
   this.content = dom.find(opts.contentId);
   this.tabActiveClass = opts.tabActiveClass;
   this.tabs = opts.tabs;

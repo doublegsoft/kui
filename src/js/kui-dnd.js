@@ -51,6 +51,7 @@ dnd.setDroppable = function (selector, callback) {
   };
   element.ondrop = function (event) {
     event.preventDefault();
+    event.stopPropagation();
     let rect = element.getBoundingClientRect();
     let x = event.clientX - rect.left;
     let y = event.clientY - rect.top;
