@@ -61,8 +61,8 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
-    if (tab.width) {
-      tab.style += 'min-width: ' + tab.width + ';text-align: center;';
+    if (tab.style) {
+      tab.style = tab.style;
     } else {
       tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
     }
