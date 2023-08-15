@@ -19,7 +19,9 @@ xhr.request = function (opts, method) {
 
   let params = utils.getParameters(opts.url);
   data = {...params, ...data};
-
+  if (window && window.user) {
+    data['_current_user'] = window.user.userId;
+  }
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
@@ -3994,7 +3996,11 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
-    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
+    if (tab.width) {
+      tab.style += 'min-width: ' + tab.width + ';text-align: center;';
+    } else {
+      tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
+    }
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"
@@ -4867,6 +4873,15 @@ Sparkline.prototype.render = function (containerId) {
   this.container.appendChild(canvas);
 
   let ctx = canvas.getContext('2d');
+
+  let dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  canvas.style = "width: 100%; height: 100%;";
+
+  ctx.scale(dpr, dpr);
+
   if (this.type == 'line') {
     this.line(ctx, max, min, width, height);
   } else if (this.type == 'bar') {

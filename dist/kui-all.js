@@ -6716,7 +6716,9 @@ xhr.request = function (opts, method) {
 
   let params = utils.getParameters(opts.url);
   data = {...params, ...data};
-
+  if (window && window.user) {
+    data['_current_user'] = window.user.userId;
+  }
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
@@ -14785,7 +14787,11 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
-    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
+    if (tab.width) {
+      tab.style += 'min-width: ' + tab.width + ';text-align: center;';
+    } else {
+      tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
+    }
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"
@@ -20866,6 +20872,7 @@ MobileDesigner.GridButtons.prototype.placeholder = function() {
 
 function NetworkTopology(opts) {
   this.onCellDoubleClicked = opts.onCellDoubleClicked;
+  this.readonly = opts.readonly === true;
 }
 
 NetworkTopology.prototype.addItem2Graph = function (graph, toolbar, prototype, image)
@@ -20961,6 +20968,16 @@ NetworkTopology.prototype.setup = function() {
   let model = new mxGraphModel();
   this.graph = new mxGraph(container, model);
 
+  if (this.readonly === true) {
+    this.graph.setCellsLocked(true);
+    this.graph.setConnectable(false);
+  } else {
+    this.graph.setConnectable(true);
+    this.graph.setCellsLocked(false);
+    this.graph.setCellsEditable(false);
+  }
+  this.graph.setMultigraph(false);
+
   let style = this.graph.getStylesheet().getDefaultEdgeStyle();
   style[mxConstants.STYLE_ROUNDED] = true;
   style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
@@ -20980,10 +20997,7 @@ NetworkTopology.prototype.setup = function() {
   });
 
   // Enables new connections in the graph
-  this.graph.setConnectable(true);
-  this.graph.setMultigraph(false);
-  this.graph.setCellsLocked(false);
-  this.graph.setCellsEditable(false);
+
   this.graph.convertValueToString = function(cell)
   {
     if (cell.value && cell.value.label) {
@@ -21005,23 +21019,25 @@ NetworkTopology.prototype.setup = function() {
     cellLabelChanged.apply(this, arguments);
   };
 
-  let addItem2Toolbar = function(type, w, h) {
-    let style = 'verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=' + self.getImage(type);
-    let vertex = new mxCell({type: type}, new mxGeometry(0, 0, w, h), style);
-    vertex.setVertex(true);
+  if (this.readonly !== true) {
+    let addItem2Toolbar = function (type, w, h) {
+      let style = 'verticalLabelPosition=bottom;verticalAlign=top;shape=image;image=' + self.getImage(type);
+      let vertex = new mxCell({type: type}, new mxGeometry(0, 0, w, h), style);
+      vertex.setVertex(true);
 
-    let img = self.addItem2Graph(self.graph, toolbar, vertex, self.getImage(type));
-    img.enabled = true;
-  };
+      let img = self.addItem2Graph(self.graph, toolbar, vertex, self.getImage(type));
+      img.enabled = true;
+    };
 
-  addItem2Toolbar('pc', 33, 33,);
-  addItem2Toolbar('server',28, 40);
-  addItem2Toolbar('database', 42, 33);
-  addItem2Toolbar('router', 49, 33);
-  addItem2Toolbar('switch-l2', 65, 32);
-  addItem2Toolbar('switch-l3', 63, 63);
-  addItem2Toolbar('ups',51, 33);
-  addItem2Toolbar('cloud',109, 63);
+    addItem2Toolbar('pc', 33, 33,);
+    addItem2Toolbar('server', 28, 40);
+    addItem2Toolbar('database', 42, 33);
+    addItem2Toolbar('router', 49, 33);
+    addItem2Toolbar('switch-l2', 65, 32);
+    addItem2Toolbar('switch-l3', 63, 63);
+    addItem2Toolbar('ups', 51, 33);
+    addItem2Toolbar('cloud', 109, 63);
+  }
 
   this.bindEvents();
 };
@@ -21037,15 +21053,15 @@ NetworkTopology.prototype.bindEvents = function() {
   });
 
   this.graph.addListener(mxEvent.CELLS_MOVED, function(sender, evt) {
-    console.log(self.getData());
+    // console.log(self.getData());
   });
 
   this.graph.addListener(mxEvent.CELLS_ADDED, function(sender, evt) {
-    console.log(self.getData());
+    // console.log(self.getData());
   });
 
   this.graph.addListener(mxEvent.CELLS_REMOVED, function(sender, evt) {
-    console.log(self.getData());
+    // console.log(self.getData());
   });
 
   // this.graph.addListener(mxEvent.LABEL_CHANGED, function(sender, evt) {
@@ -27000,6 +27016,15 @@ Sparkline.prototype.render = function (containerId) {
   this.container.appendChild(canvas);
 
   let ctx = canvas.getContext('2d');
+
+  let dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  canvas.style = "width: 100%; height: 100%;";
+
+  ctx.scale(dpr, dpr);
+
   if (this.type == 'line') {
     this.line(ctx, max, min, width, height);
   } else if (this.type == 'bar') {
@@ -27105,6 +27130,7 @@ TwoLine.prototype.renderTo = function(container) {
   }
   container.appendChild(el);
 };
+
 
 function Swimlane(opt) {
   this.lanes = opt.lanes || [];

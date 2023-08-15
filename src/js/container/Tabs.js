@@ -61,7 +61,11 @@ Tabs.prototype.render = function() {
 
   this.tabs.forEach((tab, idx) => {
     tab.style = tab.style || 'padding: 0 16px;';
-    tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
+    if (tab.width) {
+      tab.style += 'min-width: ' + tab.width + ';text-align: center;';
+    } else {
+      tab.style += 'min-width: ' + (tab.text.length * 16 + 32) + 'px;text-align: center;';
+    }
     let nav = dom.templatize(`
       <div class="nav-item font-weight-bold mr-0 pointer" style="{{style}}"
            data-tab-url="{{{url}}}"

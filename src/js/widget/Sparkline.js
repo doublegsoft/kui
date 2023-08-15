@@ -35,6 +35,15 @@ Sparkline.prototype.render = function (containerId) {
   this.container.appendChild(canvas);
 
   let ctx = canvas.getContext('2d');
+
+  let dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  canvas.style = "width: 100%; height: 100%;";
+
+  ctx.scale(dpr, dpr);
+
   if (this.type == 'line') {
     this.line(ctx, max, min, width, height);
   } else if (this.type == 'bar') {
