@@ -211,13 +211,15 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       // 【数字】
       //
       let input = document.createElement('input');
+      input.setAttribute('inputmode', 'numeric');
+      input.setAttribute('pattern', "[0-9]*");
       input.setAttribute('property-model-name', prop.name);
-      if (prop.value)
-        input.value = parseInt(prop.value);
-      input.type = "number";
+      input.type = "text";
       if (prop.min) {
         input.setAttribute("min", prop.min);
       }
+      if (prop.value)
+        input.defaultValue = "" + parseInt(prop.value);
       input.classList.add('group-item-input');
       divProp.append(input);
 
