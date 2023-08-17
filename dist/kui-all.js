@@ -6087,6 +6087,23 @@ utils.base64 = file => new Promise((resolve, reject) => {
   reader.onerror = reject;
 });
 
+utils.randomId = () => {
+  let result = '';
+  const characters = 'abcdefghijklmnopqrstuvwxyz';
+  const charactersLength = characters.length;
+  const length = 6;
+  let counter = 0;
+  for (let i = 0; i < 2; i++) {
+    counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    result += '_';
+  }
+  return result.substring(0, result.length - 1);
+};
+
 var NO_ERRORS = 0;
 var REQUIRED_ERROR = 1;
 var FORMAT_ERROR = 2;
