@@ -285,3 +285,12 @@ utils.randomId = () => {
   }
   return result.substring(0, result.length - 1);
 };
+
+utils.camelcaseAttribute = (objname, attrname) => {
+  objname = objname.toLowerCase();
+  attrname = attrname.toLowerCase();
+  if (attrname == 'id' || attrname == 'name' || attrname == 'type') {
+    attrname = objname + '_' + attrname;
+  }
+  return utils.camelcase(attrname);
+};

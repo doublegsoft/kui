@@ -929,7 +929,7 @@ ajax.sidebar = async function(opt) {
           <div class="modal-content">
             <div class="card-header pl-3">
               <h5 class="modal-title"></h5>
-              <button type="button" class="close text-danger">
+              <button type="button" class="close text-danger position-relative">
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -974,6 +974,16 @@ ajax.sidebar = async function(opt) {
   dom.find('.modal-body', sidebar).innerHTML = '';
   if (!allowClose && !opt.close) {
     dom.find('button.close', sidebar).classList.add('hidden');
+  }
+  if (allowClose === true) {
+    // 自动调整关闭按钮为居中显示
+    let button = dom.find('button.close', sidebar);
+    let header = dom.find('.card-header', sidebar);
+    let rectButton = button.getBoundingClientRect();
+    let rectHeader = header.getBoundingClientRect();
+    let gap = (rectHeader.height - rectButton.height) / 2;
+    button.style.top = gap + 'px';
+    button.style.right = gap + 'px';
   }
   dom.find('button.close', sidebar).addEventListener('click', function () {
     //关闭弹窗
