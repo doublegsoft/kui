@@ -9252,10 +9252,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
 
     if (field.input == 'custom' || field.input == 'select') {
       let name = field.name;
-      let custom = dom.element(`
+      field.widgetCustom = dom.element(`
         <div widget-id="widgetCustom_${name}" class="full-width"></div>
       `);
-      field.create(addnew, custom, field);
+      field.create(addnew, field.widgetCustom, field);
       if (field.readonly !== true && this.readonly !== true) {
         group.appendChild(addnew);
       }
@@ -9312,8 +9312,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     });
   }
 
-  if (field.create) {
-    group.appendChild(custom);
+  if (field.widgetCustom) {
+    group.appendChild(field.widgetCustom);
   }
 
   if (!this.readonly &&

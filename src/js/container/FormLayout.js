@@ -993,7 +993,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       field.widgetCustom = dom.element(`
         <div widget-id="widgetCustom_${name}" class="full-width"></div>
       `);
-      field.create(addnew, custom, field);
+      field.create(addnew, field.widgetCustom, field);
       if (field.readonly !== true && this.readonly !== true) {
         group.appendChild(addnew);
       }
