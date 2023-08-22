@@ -6120,7 +6120,7 @@ utils.camelcaseAttribute = (objname, attrname) => {
   if (attrname == 'id' || attrname == 'name' || attrname == 'type') {
     attrname = objname + '_' + attrname;
   }
-  return utils.camelcase(attrname);
+  return utils.camelcase(attrname, '_');
 };
 
 var NO_ERRORS = 0;
@@ -9259,7 +9259,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       if (field.readonly !== true && this.readonly !== true) {
         group.appendChild(addnew);
       }
-      group.appendChild(custom);
     } else {
       group.appendChild(addnew);
     }
@@ -9312,6 +9311,11 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }, 2000);
     });
   }
+
+  if (field.create) {
+    group.appendChild(custom);
+  }
+
   if (!this.readonly &&
     field.input !== 'bool' &&
     field.input !== 'radio' &&
@@ -21641,8 +21645,8 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
           title: prop.title,
           allowClose: true,
           shadeClose: false,
-          width: '50%',
-          height: '500px',
+          width: '80%',
+          height: '750px',
           success: () => {
             let value = btn.getAttribute('properties-model');
             if (value && value != '') {

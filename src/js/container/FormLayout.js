@@ -990,14 +990,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
 
     if (field.input == 'custom' || field.input == 'select') {
       let name = field.name;
-      let custom = dom.element(`
+      field.widgetCustom = dom.element(`
         <div widget-id="widgetCustom_${name}" class="full-width"></div>
       `);
       field.create(addnew, custom, field);
       if (field.readonly !== true && this.readonly !== true) {
         group.appendChild(addnew);
       }
-      group.appendChild(custom);
     } else {
       group.appendChild(addnew);
     }
@@ -1050,6 +1049,11 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }, 2000);
     });
   }
+
+  if (field.widgetCustom) {
+    group.appendChild(field.widgetCustom);
+  }
+
   if (!this.readonly &&
     field.input !== 'bool' &&
     field.input !== 'radio' &&

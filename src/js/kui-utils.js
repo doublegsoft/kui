@@ -292,5 +292,5 @@ utils.camelcaseAttribute = (objname, attrname) => {
   if (attrname == 'id' || attrname == 'name' || attrname == 'type') {
     attrname = objname + '_' + attrname;
   }
-  return utils.camelcase(attrname);
+  return utils.camelcase(attrname, '_');
 };

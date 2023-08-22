@@ -447,8 +447,8 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
           title: prop.title,
           allowClose: true,
           shadeClose: false,
-          width: '50%',
-          height: '500px',
+          width: '80%',
+          height: '750px',
           success: () => {
             let value = btn.getAttribute('properties-model');
             if (value && value != '') {

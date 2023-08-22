@@ -22869,6 +22869,96 @@ ul.thread > li:before {
 	color: rgba(0, 0, 0, 0.85);
 	background-color: transparent;
 }
+.line-tree,
+.line-tree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.line-tree ul {
+  position: relative;
+}
+
+.line-tree ul ul:before {
+  content: "";
+  display: block;
+  width: 0;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-left: 1px solid rgba(0,0,0,0.3);
+  height: calc(100% - 20px);
+}
+
+.line-tree li {
+  margin: 0;
+  line-height: 36px;
+  color: #555;
+  font-weight: 700;
+  position: relative;
+}
+
+.line-tree ul ul li:before {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 0;
+  border-top: 1px solid rgba(0,0,0,0.3);
+  margin-top: 0px;
+  position: absolute;
+  top: 16px;
+  left: 0px;
+}
+
+.line-tree ul ul li:last-child:before {
+  height: auto;
+  top: 18px;
+  bottom: 0;
+  left: 0px;
+  margin-top: -1px;
+}
+
+.line-tree ul ul {
+  margin-left: 10px;
+}
+
+.line-tree ul ul li > div > div {
+  margin-left: 16px!important;
+}
+
+.line-tree ul ul ul {
+  margin-left: 24px;
+}
+
+.line-tree ul ul ul li > div > div {
+  margin-left: 16px!important;
+}
+
+.line-tree ul ul ul ul {
+  margin-left: 24px;
+}
+
+.line-tree ul ul ul ul li > div > div {
+  margin-left: 16px!important;
+}
+
+.line-tree ul ul ul ul ul {
+  margin-left: 24px;
+}
+
+.line-tree ul ul ul ul ul li > div > div {
+  margin-left: 16px;
+}
+
+.line-tree ul ul ul ul ul ul {
+  margin-left: 24px;
+}
+
+.line-tree ul ul ul ul ul ul li > div > div {
+  margin-left: 16px;
+}
 .wizard {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
