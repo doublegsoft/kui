@@ -9312,10 +9312,6 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     });
   }
 
-  if (field.widgetCustom) {
-    group.appendChild(field.widgetCustom);
-  }
-
   if (!this.readonly &&
     field.input !== 'bool' &&
     field.input !== 'radio' &&
@@ -9385,6 +9381,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
         FormLayout.validate(this);
       });
     });
+  }
+
+  if (field.widgetCustom) {
+    group.appendChild(field.widgetCustom);
   }
 
   return {label: label, input: group};
