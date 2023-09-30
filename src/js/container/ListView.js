@@ -26,7 +26,7 @@ function ListView(opt) {
 
   this.emptyHtml = opt.emptyHtml || `
     <div class="d-flex flex-wrap mt-2">
-      <img class="m-auto" src="img/nodata.png" width="60%">
+      <img class="m-auto" src="/img/nodata.png" width="60%">
       <div style="flex-basis: 100%; height: 0;"></div>
       <div class="text-muted m-auto mt-2" style="font-weight: bold;">没有任何数据</div>
     </div>

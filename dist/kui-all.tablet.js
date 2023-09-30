@@ -1811,14 +1811,14 @@ dialog.html = function(opt) {
     success: function(layero, index) {
       if (opt.load) opt.load(layero, index);
     },
-    yes: function (index) {
-      layer.close(index);
-      let layerContent = dom.find('.layui-layer-content');
+    yes: function (index, layers) {
+      let layerContent = dom.find('div.layui-layer-content', layers[0]);
       if (layerContent.children.length == 1) {
-        opt.success(dom.find('.layui-layer-content').children[0]);
+        opt.success(layerContent.children[0]);
       } else {
-        opt.success(dom.find('.layui-layer-content').children);
+        opt.success(layerContent.children);
       }
+      layer.close(index);
     },
     btn1: function () {
 
@@ -4018,6 +4018,29 @@ utils.camelcaseAttribute = (objname, attrname) => {
   return utils.camelcase(attrname, '_');
 };
 
+utils.nameAttribute = (objname, attrname, domainType) => {
+  domainType = domainType || '';
+  let domainObjectType = '';
+  let domainObjectId = '';
+  if (domainType.startsWith('&')) {
+    domainObjectType = domainType.substring(1, domainType.indexOf('('));
+    domainObjectId = domainType.substring(domainType.indexOf('(') + 1, domainType.indexOf(')'))
+  }
+  objname = objname.toLowerCase();
+  attrname = attrname.toLowerCase();
+  if (domainObjectType !== '') {
+    if (attrname === domainObjectType) {
+      attrname = domainObjectType + '_' + domainObjectId;
+    } else {
+      attrname = attrname + '_' + domainObjectType + '_' + domainObjectId;
+    }
+  }
+  if (attrname == 'id' || attrname == 'name' || attrname == 'type') {
+    attrname = objname + '_' + attrname;
+  }
+  return attrname;
+};
+
 
 function DataSheet(opt) {
   // 输入的数据列
@@ -4684,7 +4707,7 @@ PaginationGrid.prototype.request = function (params) {
         let tbody = self.rootBody;
         tbody.innerHTML = ('' +
           '<div class="text-center pt-4 full-width">' +
-          '  <img width="48" height="48" src="img/kui/nodata.png" class="mb-2" style="opacity: 25%;">' +
+          '  <img width="48" height="48" src="/img/kui/nodata.png" class="mb-2" style="opacity: 25%;">' +
           '  <p style="opacity: 40%; color: black;">没有匹配的数据</p>' +
           '</div>');
         return;
@@ -5210,7 +5233,7 @@ function ListView(opt) {
 
   this.emptyHtml = opt.emptyHtml || `
     <div class="d-flex flex-wrap mt-2">
-      <img class="m-auto" src="img/nodata.png" width="60%">
+      <img class="m-auto" src="/img/nodata.png" width="60%">
       <div style="flex-basis: 100%; height: 0;"></div>
       <div class="text-muted m-auto mt-2" style="font-weight: bold;">没有任何数据</div>
     </div>

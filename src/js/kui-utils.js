@@ -294,3 +294,26 @@ utils.camelcaseAttribute = (objname, attrname) => {
   }
   return utils.camelcase(attrname, '_');
 };
+
+utils.nameAttribute = (objname, attrname, domainType) => {
+  domainType = domainType || '';
+  let domainObjectType = '';
+  let domainObjectId = '';
+  if (domainType.startsWith('&')) {
+    domainObjectType = domainType.substring(1, domainType.indexOf('('));
+    domainObjectId = domainType.substring(domainType.indexOf('(') + 1, domainType.indexOf(')'))
+  }
+  objname = objname.toLowerCase();
+  attrname = attrname.toLowerCase();
+  if (domainObjectType !== '') {
+    if (attrname === domainObjectType) {
+      attrname = domainObjectType + '_' + domainObjectId;
+    } else {
+      attrname = attrname + '_' + domainObjectType + '_' + domainObjectId;
+    }
+  }
+  if (attrname == 'id' || attrname == 'name' || attrname == 'type') {
+    attrname = objname + '_' + attrname;
+  }
+  return attrname;
+};

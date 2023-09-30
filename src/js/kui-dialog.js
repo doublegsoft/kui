@@ -220,14 +220,14 @@ dialog.html = function(opt) {
     success: function(layero, index) {
       if (opt.load) opt.load(layero, index);
     },
-    yes: function (index) {
-      layer.close(index);
-      let layerContent = dom.find('.layui-layer-content');
+    yes: function (index, layers) {
+      let layerContent = dom.find('div.layui-layer-content', layers[0]);
       if (layerContent.children.length == 1) {
-        opt.success(dom.find('.layui-layer-content').children[0]);
+        opt.success(layerContent.children[0]);
       } else {
-        opt.success(dom.find('.layui-layer-content').children);
+        opt.success(layerContent.children);
       }
+      layer.close(index);
     },
     btn1: function () {
 

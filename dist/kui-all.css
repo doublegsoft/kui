@@ -4734,7 +4734,7 @@ input[type="button"].btn-block {
   margin-left: -1px;
   line-height: 1.25;
   color: #2A70FF;
-  background-color: #fff;
+  /*background-color: #fff;*/
   border: 1px solid #c8ced3;
 }
 
@@ -4780,7 +4780,7 @@ input[type="button"].btn-block {
   color: #73818f;
   pointer-events: none;
   cursor: auto;
-  background-color: #fff;
+  /*background-color: #fff;*/
   border-color: #c8ced3;
 }
 
