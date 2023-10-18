@@ -15,7 +15,15 @@ ImageUpload.prototype.fetch = function (containerId) {
     url: this.fetchUrl,
     data: this.params || {},
     success: function (resp) {
-      self.local = resp.data;
+      if (resp.error) {
+        self.local = [];
+      } else {
+        self.local = resp.data;
+      }
+      self.render(containerId);
+    },
+    error: function () {
+      self.local = [];
       self.render(containerId);
     }
   });

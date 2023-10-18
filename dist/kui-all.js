@@ -8587,7 +8587,7 @@ FormLayout.prototype.build = async function(persisted) {
     } else if (field.input == 'imageupload') {
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
-
+      new ImageUpload(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -9145,6 +9145,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'imageupload') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
+  } else if (field.input == 'images') {
+    input = dom.create('div', 'full-width');
+    input.setAttribute('data-images-name', field.name);
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
     input.setAttribute('data-avatar-name', field.name);
@@ -9342,7 +9345,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     field.input !== 'longtext' &&
     field.input !== 'checktree' &&
     field.input !== 'fileupload' &&
-    field.input !== 'imageupload')
+    field.input !== 'imageupload' &&
+    field.input !== 'images' &&
+    field.input !== 'files')
     group.append(tooltip);
 
   // user input
@@ -17425,7 +17430,15 @@ ImageUpload.prototype.fetch = function (containerId) {
     url: this.fetchUrl,
     data: this.params || {},
     success: function (resp) {
-      self.local = resp.data;
+      if (resp.error) {
+        self.local = [];
+      } else {
+        self.local = resp.data;
+      }
+      self.render(containerId);
+    },
+    error: function () {
+      self.local = [];
       self.render(containerId);
     }
   });
