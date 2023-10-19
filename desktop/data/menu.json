@@ -10,36 +10,40 @@
       "text": "应用程序",
       "icon": "nav-icon fa fa-cubes",
       "items": [{
+        "text": "首页自助",
+        "icon": "nav-icon icon-note font-16",
+        "url": "javascript:ajax.view({url: 'html/application/mobile/home.html', containerId: 'container'});"
+      },{
         "text": "随访设计",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/survey/design.html', containerId: 'container'});"
       },{
         "text": "报表设计",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/report-designer/main.html', containerId: 'container'});"
       },{
         "text": "工作流设计",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/workflow/main.html', containerId: 'container'});"
       },{
         "text": "桌面应用设计",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/kesigner/desktop.html', containerId: 'container'});"
       },{
         "text": "手机应用设计",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/kesigner/mobile.html', containerId: 'container'});"
       },{
         "text": "叫号屏幕",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/loudtalk/screen.html', containerId: 'container'});"
       },{
         "text": "网络拓扑",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/network/dashboard.html', containerId: 'container'});"
       },{
         "text": "故事板",
-        "icon": "nav-icon icon-note",
+        "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/storyboard/storyboard.html', containerId: 'container'});"
       }]
     }]

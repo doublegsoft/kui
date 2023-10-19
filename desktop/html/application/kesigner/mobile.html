@@ -65,7 +65,7 @@
     </div>
     <div class="col-md-7 m-0 p-0 d-flex">
       <img widget-id="imagePhone" src="img/emulator/iphone-full.png" class="m-auto" style="width: 365px; height: 750px;">
-      <iframe widget-id="framePhone" class="position-absolute" style="width: 314px; height: 612px; background-color: white; left: 33px; top: 78px;" src="/mobile/index.html" frameborder="0"></iframe>
+      <iframe widget-id="framePhone" class="position-absolute" style="width: 317px; height: 610px; background-color: white; left: 33px; top: 78px;" src="/mobile/index.html" frameborder="0"></iframe>
     </div>
     <div id="widgetProperties" class="col-md-3 properties-container">
     </div>
@@ -83,8 +83,8 @@ function PageMobileDesigner() {
 }
 
 PageMobileDesigner.prototype.initialize = async function(params) {
-  this.framePhone.style.left = (this.imagePhone.offsetLeft + 26) + 'px';
-  this.framePhone.style.top = (this.imagePhone.offsetTop + 112) + 'px';
+  this.framePhone.style.left = (this.imagePhone.offsetLeft + 24) + 'px';
+  this.framePhone.style.top = (this.imagePhone.offsetTop + 80) + 'px';
   dom.height(this.widgetDesigner, 12, document.body);
 
   for (let i = 0; i < this.widgetComponents.children.length; i++) {

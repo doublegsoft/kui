@@ -1,5 +1,21 @@
-## 如何运行Demo
+## Build althttpd from Source
 
-点击mongoose-free-6.5.exe
+```bash
+gcc server/althttpd.c -o bin/althttpd
+```
 
-然后再浏览器中点击demo/文件夹的链接。
+## Run althttpd Web Server
+
+```bash 
+bin/start &
+```
+
+## Screenshots
+
+### Topology
+
+![](img/README/topology-01.png)
+
+### Report Design
+
+![](img/README/report-01.png)
