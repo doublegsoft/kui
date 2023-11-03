@@ -8577,7 +8577,7 @@ FormLayout.prototype.build = async function(persisted) {
       this[field.name] = new TreelikeList(field.options);
       this[field.name].render(container, field.value);
       field.container = container.parentElement.parentElement;
-    } else if (field.input == 'fileupload') {
+    } else if (field.input == 'fileupload' || field.input == 'files') {
       let container = dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container);
       await new FileUpload({
         ...field.options,
@@ -8585,9 +8585,10 @@ FormLayout.prototype.build = async function(persisted) {
       }).render(container);
       field.container = container.parentElement.parentElement;
     } else if (field.input == 'imageupload') {
+      // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
-      new ImageUpload(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
+      new Images(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -9146,7 +9147,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
   } else if (field.input == 'images') {
-    input = dom.create('div', 'full-width');
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
     input.setAttribute('data-images-name', field.name);
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
@@ -9740,6 +9741,30 @@ FormLayout.prototype.compare = function (data) {
     }
   }
   return ret;
+};
+
+FormLayout.prototype.getData = function () {
+  let ret = dom.formdata(this.container);
+  for (let i = 0; i < this.fields.length; i++) {
+    let field = this.fields[i];
+    if (field.input === 'images') {
+      ret[field.name] = [];
+      let container = dom.find('div[data-images-name="' + field.name + '"]', this.container);
+      let imgs = container.querySelectorAll('img');
+      imgs.forEach(img => {
+        let model = dom.model(img);
+        ret[field.name].push({
+          ...model,
+          src: img.src,
+        });
+      });
+    }
+  }
+  return ret;
+};
+
+FormLayout.prototype.setData = function (data) {
+
 };
 /**
  * 
@@ -17566,6 +17591,66 @@ ImageUpload.prototype.render = function(containerId) {
   for (let i = 0; i < this.local.length; i++) {
     let item = this.local[i];
     this.append(item);
+  }
+};
+function Images(opts) {
+  // 只读
+  this.readonly = opts.readonly === true;
+  this.width = opts.width || '80';
+}
+
+Images.prototype.render = function (containerId) {
+  this.container = dom.find(containerId);
+
+  if (this.readonly === false) {
+    let plus = this.createPlusElement();
+    this.container.appendChild(plus);
+  }
+};
+
+Images.prototype.createPlusElement = function () {
+  this.plus = dom.templatize(`
+    <div class="d-flex align-items-center justify-content-center pointer" 
+                style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
+      <i class="fas fa-plus" style="color: #bbb;"></i>
+      <input type="file" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+             style="display: none">
+    </div>
+  `, this);
+  let input = dom.find('input', this.plus);
+  input.onchange = ev => {
+    if (!input.files || input.files.length == 0) return;
+    let img = input.files[0];
+    let reader = new FileReader();
+    reader.onload = () => {
+      this.appendImage({
+        url: reader.result,
+      })
+    };
+    reader.readAsDataURL(img);
+  };
+  dom.bind(this.plus, 'click', ev => {
+    input.click();
+  });
+  return this.plus;
+};
+
+Images.prototype.appendImage = function (img) {
+  let elData = {
+    width: this.width,
+    src: img.url,
+  };
+  let el = dom.templatize(`
+    <div class="d-flex align-items-center justify-content-center pointer" 
+                style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
+      <img src="{{src}}" style="width: 100%; height: 100%;">
+    </div>
+  `, elData);
+
+  if (this.readonly === false) {
+    this.container.insertBefore(el, this.plus);
+  } else {
+    this.container.appendChild(el);
   }
 };
 

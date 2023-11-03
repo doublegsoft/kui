@@ -178,7 +178,9 @@
 <script src="/src/js/control/FileUpload.js"></script>
 <script src="/src/js/control/Checklist.js"></script>
 <script src="/src/js/control/Checktree.js"></script>
-<script src="/src/js/editor/QuestionnaireDesigner.js"></script>
+<script src="/src/js/control/ImageUpload.js"></script>
+<script src="/src/js/control/Images.js"></script>
+
 
 <script src="/src/js/kui-mainframe.js"></script> 
 <script src="/src/js/kui-bootstrap.js"></script> 
@@ -230,6 +232,7 @@
 <script src="/src/js/widget/BMI.js"></script>
 <script src="/src/js/widget/Kanban.js"></script>
 
+<script src="/src/js/editor/QuestionnaireDesigner.js"></script>
 <script src="/src/js/editor/Canvas.js"></script>
 <script src="/src/js/editor/CanvasElement.js"></script>
 <script src="/src/js/editor/CanvasElementRenderer.js"></script>
@@ -245,6 +248,7 @@
 <script src="/src/js/editor/MobileDesigner.js"></script>
 <script src="/src/js/editor/DataSheet.js"></script>
 <script src="/src/js/editor/Storyboard.js"></script>
+<script src="/src/js/editor/MobileCanvas.js"></script>
 <script src="/src/js/diagram/Swimlane.js"></script>
 </body>
 </html>
@@ -348,10 +352,10 @@ click.subscribe(event => {
   let query = dom.ancestor(target, 'div', 'widget-query');
   if (query != null) return false;
 
-  rightbar = dom.find('.right-bar');
-  if (rightbar != null && !rightbar.classList.contains('out')) {
-    rightbar.classList.add('out');
-  }
+  // rightbar = dom.find('.right-bar');
+  // if (rightbar != null && !rightbar.classList.contains('out')) {
+  //   rightbar.classList.add('out');
+  // }
   query = dom.find('.widget-query');
   if (query != null && query.classList.contains('show')) {
     query.classList.remove('show');

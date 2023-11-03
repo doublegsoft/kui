@@ -292,7 +292,7 @@ FormLayout.prototype.build = async function(persisted) {
       this[field.name] = new TreelikeList(field.options);
       this[field.name].render(container, field.value);
       field.container = container.parentElement.parentElement;
-    } else if (field.input == 'fileupload') {
+    } else if (field.input == 'fileupload' || field.input == 'files') {
       let container = dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container);
       await new FileUpload({
         ...field.options,
@@ -300,9 +300,10 @@ FormLayout.prototype.build = async function(persisted) {
       }).render(container);
       field.container = container.parentElement.parentElement;
     } else if (field.input == 'imageupload') {
+      // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
-      new ImageUpload(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
+      new Images(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -861,7 +862,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
   } else if (field.input == 'images') {
-    input = dom.create('div', 'full-width');
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
     input.setAttribute('data-images-name', field.name);
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
@@ -1455,4 +1456,28 @@ FormLayout.prototype.compare = function (data) {
     }
   }
   return ret;
+};
+
+FormLayout.prototype.getData = function () {
+  let ret = dom.formdata(this.container);
+  for (let i = 0; i < this.fields.length; i++) {
+    let field = this.fields[i];
+    if (field.input === 'images') {
+      ret[field.name] = [];
+      let container = dom.find('div[data-images-name="' + field.name + '"]', this.container);
+      let imgs = container.querySelectorAll('img');
+      imgs.forEach(img => {
+        let model = dom.model(img);
+        ret[field.name].push({
+          ...model,
+          src: img.src,
+        });
+      });
+    }
+  }
+  return ret;
+};
+
+FormLayout.prototype.setData = function (data) {
+
 };

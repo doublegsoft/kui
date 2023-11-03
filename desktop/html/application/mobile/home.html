@@ -1,0 +1,73 @@
+<div id="pageMobileHome" class="page view">
+  <div class="row mx-0">
+    <div widget-id="widgetMobile"
+         class="col-24-12 full-height d-flex align-items-center justify-content-center">
+      <div class="position-absolute" style="width: 64px; top: 0; left: 0;">
+        <a class="btn btn-link d-flex align-items-center justify-content-center"
+           style="width: 64px; height: 64px;
+                  border-top: 1px solid;
+                  border-left: 1px solid;
+                  border-right: 1px solid;
+                  border-radius: unset;">
+          <i class="fas fa-heading font-36"></i>
+        </a>
+        <a class="btn btn-link d-flex align-items-center justify-content-center"
+           style="width: 64px; height: 64px;
+                  border-top: 1px solid;
+                  border-left: 1px solid;
+                  border-right: 1px solid;
+                  border-radius: unset;">
+          <i class="fas fa-align-left font-36"></i>
+        </a>
+        <a class="btn btn-link d-flex align-items-center justify-content-center"
+           style="width: 64px; height: 64px;
+                  border-top: 1px solid;
+                  border-left: 1px solid;
+                  border-right: 1px solid;
+                  border-radius: unset;">
+          <i class="fas fa-chart-bar font-36"></i>
+        </a>
+        <a class="btn btn-link d-flex align-items-center justify-content-center"
+           style="width: 64px; height: 64px;
+                  border-top: 1px solid;
+                  border-left: 1px solid;
+                  border-right: 1px solid;
+                  border-radius: unset;">
+          <i class="fas fa-icons font-36"></i>
+        </a>
+        <a class="btn btn-link d-flex align-items-center justify-content-center"
+           style="width: 64px; height: 64px;
+                  border-top: 1px solid;
+                  border-left: 1px solid;
+                  border-right: 1px solid;
+                  border-bottom: 1px solid;
+                  border-radius: unset;">
+          <i class="far fa-image font-36"></i>
+        </a>
+      </div>
+    </div>
+    <div class="col-24-12"></div>
+  </div>
+</div>
+<script>
+function PageMobileHome() {
+  this.page = dom.find('#pageMobileHome')
+}
+
+PageMobileHome.prototype.initialize = function () {
+  dom.init(this, this.page);
+
+  dom.autoheight(this.widgetMobile);
+  this.mobile = new MobileCanvas({});
+  this.mobile.render(this.widgetMobile);
+
+  this.mobile.drawImage('/img/any/0002.jpg', 0, 0);
+  this.mobile.drawParagraph(150);
+};
+
+PageMobileHome.prototype.show = function () {
+  this.initialize();
+};
+
+pageMobileHome = new PageMobileHome();
+</script>

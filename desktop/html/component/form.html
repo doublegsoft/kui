@@ -1,5 +1,14 @@
 <div class="card">
   <div class="card-header pl-3 pr-3">
+    <strong>示例：侧边表单</strong>
+    <div class="card-header-actions">
+      <button id="buttonWithImages" class="btn btn-primary btn-add mr-2">含有图片字段</button>
+    </div>
+  </div>
+  <div class="card-body">
+    点击上列按钮显示示例。
+  </div>
+  <div class="card-header pl-3 pr-3">
     <strong>示例：动态表单1</strong>
   </div>
   <div id="formDynamic1" class="card-body">
@@ -601,6 +610,19 @@ new FormLayout({
   anySelect: '5',
   departmentId: {id: '2', name: '市场部'},
   employeeId: {id: '4', name: '热苏斯'}
+});
+
+
+dom.bind(dom.find('#buttonWithImages'), 'click', ev => {
+  ajax.sidebar({
+    containerId: document.body,
+    title: '表单含有图片',
+    url: 'html/component/form/form_with_images.html',
+    showBottom: true,
+    success: () => {
+      pageFormWidthImagesEdit.show();
+    }
+  });
 });
 </script>
 
