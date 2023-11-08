@@ -1,0 +1,127 @@
+<div id="pageFormWithVideosEdit" class="page side">
+  <div class="card card-body row mx-0">
+    <div class="col-24-24">
+      <div widget-id="widgetFormWithVideos">
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function PageFormWithVideosEdit() {
+  this.page = dom.find('#pageFormWithVideosEdit');
+}
+
+PageFormWithVideosEdit.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  // 页面高度设置
+  dom.autoheight(this.page, document.body, 64);
+
+  this.courseId = params.courseId;
+
+  this.formFormWithVideos = new FormLayout({
+    columnCount: 1,
+    confirm: () => {
+      dialog.confirm('确定保存数据？', () => {
+        this.saveFormWithVideos();
+      });
+    },
+    fields: [{
+      title: '对象标识',
+      name: 'FormWithVideosId',
+      input: 'hidden',
+    },{
+      title: '名称',
+      name: 'name',
+      required: true,
+      input: 'text',
+    },{
+      title: '数字',
+      name: 'cost',
+      required: true,
+      input: 'number',
+    },{
+      title: '视频',
+      name: 'videos',
+      required: false,
+      input: 'videos',
+      options: {
+        width: 90,
+      },
+    },{
+      title: '文件',
+      name: 'docs',
+      required: false,
+      input: 'fileupload',
+      options: {
+        url: {
+          fetch: '/',
+        }
+      },
+    },{
+      title: '备注',
+      name: 'note',
+      required: false,
+      input: 'longtext',
+    }],
+  });
+  if (!this.FormWithVideosId) {
+    this.formFormWithVideos.render(this.widgetFormWithVideos);
+  } else {
+    this.readFormWithVideos();
+  }
+};
+
+/**
+ * 执行【线上课程编辑】数据的保存操作。
+ */
+PageFormWithVideosEdit.prototype.saveFormWithVideos = async function () {
+  let errors = Validation.validate(this.widgetFormWithVideos);
+  if (errors.length > 0) {
+    dialog.error(utils.message(errors));
+    return;
+  }
+  let data = this.formFormWithVideos.getData();
+  console.log(data);
+  // let FormWithVideos = dom.formdata(this.widgetFormWithVideos);
+  // let data = await xhr.promise({
+  //   url: '/api/v3/common/script/stdbiz/etm/course/merge',
+  //   params: {
+  //     ...FormWithVideos,
+  //   }
+  // });
+  // // 回写标识
+  // this.FormWithVideosId = data.FormWithVideosId;
+  // // 发布消息
+  // PubSub.publish('ylsj/etm/course/saved', data);
+  // // 关闭滑窗
+  // this.formFormWithVideos.hideSidebar();
+};
+
+/**
+ * 执行【线上课程编辑】已有数据的读取操作。
+ */
+PageFormWithVideosEdit.prototype.readFormWithVideos = async function () {
+  let data = await xhr.promise({
+    url: '/api/v3/common/script/stdbiz/etm/course/find',
+    params: {
+      courseId: this.courseId,
+      '_left_join': `
+    `,
+    }
+  });
+  if (data.length > 0) {
+    this.formFormWithVideos.render(this.widgetFormWithVideos, data[0]);
+  }
+};
+
+PageFormWithVideosEdit.prototype.destroy = function () {
+  delete pageFormWithVideosEdit;
+};
+
+PageFormWithVideosEdit.prototype.show = function (params) {
+  params = params || {};
+  this.initialize(params);
+};
+
+pageFormWithVideosEdit = new PageFormWithVideosEdit();
+</script>
