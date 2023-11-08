@@ -62,7 +62,9 @@ PageMobileHome.prototype.initialize = function () {
   this.mobile.render(this.widgetMobile);
 
   this.mobile.drawImage('/img/any/0002.jpg', 0, 0);
-  this.mobile.drawParagraph(150);
+  this.mobile.drawParagraph(400);
+
+  this.mobile.drawGrids(200, 2, 4);
 };
 
 PageMobileHome.prototype.show = function () {

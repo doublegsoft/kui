@@ -290,7 +290,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
           </label>
         </div>
       `);
-      if (prop.value == 'T') {
+      if (prop.value === 'T' || prop.value === true) {
         input.children[0].children[0].checked = true;
       }
       dom.find('input', input).setAttribute('property-model-name', prop.name);

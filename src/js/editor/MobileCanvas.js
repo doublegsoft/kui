@@ -1,3 +1,20 @@
+function HeadingElement() {
+  this.defaults = {
+    text: '这里是标题',
+  };
+  this.x = 0;
+  this.y = 0;
+  this.width = 0;
+  this.height = 0;
+}
+
+function ParagraphElement() {
+
+}
+
+function ImageElement() {
+
+}
 
 function MobileCanvas(opts) {
   this.background = 'white';
@@ -53,6 +70,8 @@ function MobileCanvas(opts) {
   this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
   this.safeAreaHeight = this.safeAreaBotRightY - this.safeAreaTopRightY;
 
+  this.paddingLeft = 12;
+  this.paddingRight = 12;
 }
 
 MobileCanvas.prototype.render = function (containerId) {
@@ -123,13 +142,23 @@ MobileCanvas.prototype.drawImage = function (url, y) {
 };
 
 MobileCanvas.prototype.drawParagraph = function (y) {
-  this.fillStyle = 'rgba(0, 0, 0, 0.17)';
-  let startY = y;
+  this.context.fillStyle = 'rgba(0,0,0,0.17)';
   let startX = this.safeAreaTopLeftX;
+  let startY = y;
   for (let i = 0; i < 4; i++) {
-    this.context.fillRect(startX, startY, this.safeAreaWidth, 15);
-    startY += 20;
+    this.context.fillRect(startX + this.paddingLeft, startY, this.safeAreaWidth - this.paddingRight - this.paddingLeft, 20);
+    startY += 28;
   }
+  this.context.fillRect(startX + this.paddingLeft, startY, this.safeAreaWidth * 0.68, 20);
+};
 
-  this.context.fillRect(startX, startY, this.safeAreaWidth * 0.68, 15);
+MobileCanvas.prototype.drawGrids = function (y, rows, cols) {
+  this.context.fillStyle = 'rgba(0,0,0,0.17)';
+  let startX = 10 + 10;
+  let startY = y;
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      this.context.fillRect(startX + j * 80, startY + i * 80, 60, 60);
+    }
+  }
 };

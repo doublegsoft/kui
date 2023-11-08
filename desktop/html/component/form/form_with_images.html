@@ -1,33 +1,33 @@
-<div id="pageFormWidthImagesEdit" class="page side">
+<div id="pageFormWithImagesEdit" class="page side">
   <div class="card card-body row mx-0">
     <div class="col-24-24">
-      <div widget-id="widgetFormWidthImages">
+      <div widget-id="widgetFormWithImages">
       </div>
     </div>
   </div>
 </div>
 <script>
-function PageFormWidthImagesEdit() {
-  this.page = dom.find('#pageFormWidthImagesEdit');
+function PageFormWithImagesEdit() {
+  this.page = dom.find('#pageFormWithImagesEdit');
 }
 
-PageFormWidthImagesEdit.prototype.initialize = async function (params) {
+PageFormWithImagesEdit.prototype.initialize = async function (params) {
   dom.init(this, this.page);
   // 页面高度设置
   dom.autoheight(this.page, document.body, 64);
 
   this.courseId = params.courseId;
 
-  this.formFormWidthImages = new FormLayout({
+  this.formFormWithImages = new FormLayout({
     columnCount: 1,
     confirm: () => {
       dialog.confirm('确定保存数据？', () => {
-        this.saveFormWidthImages();
+        this.saveFormWithImages();
       });
     },
     fields: [{
       title: '对象标识',
-      name: 'FormWidthImagesId',
+      name: 'FormWithImagesId',
       input: 'hidden',
     },{
       title: '名称',
@@ -64,43 +64,43 @@ PageFormWidthImagesEdit.prototype.initialize = async function (params) {
       input: 'longtext',
     }],
   });
-  if (!this.FormWidthImagesId) {
-    this.formFormWidthImages.render(this.widgetFormWidthImages);
+  if (!this.FormWithImagesId) {
+    this.formFormWithImages.render(this.widgetFormWithImages);
   } else {
-    this.readFormWidthImages();
+    this.readFormWithImages();
   }
 };
 
 /**
  * 执行【线上课程编辑】数据的保存操作。
  */
-PageFormWidthImagesEdit.prototype.saveFormWidthImages = async function () {
-  let errors = Validation.validate(this.widgetFormWidthImages);
+PageFormWithImagesEdit.prototype.saveFormWithImages = async function () {
+  let errors = Validation.validate(this.widgetFormWithImages);
   if (errors.length > 0) {
     dialog.error(utils.message(errors));
     return;
   }
-  let data = this.formFormWidthImages.getData();
+  let data = this.formFormWithImages.getData();
   console.log(data);
-  // let FormWidthImages = dom.formdata(this.widgetFormWidthImages);
+  // let FormWithImages = dom.formdata(this.widgetFormWithImages);
   // let data = await xhr.promise({
   //   url: '/api/v3/common/script/stdbiz/etm/course/merge',
   //   params: {
-  //     ...FormWidthImages,
+  //     ...FormWithImages,
   //   }
   // });
   // // 回写标识
-  // this.FormWidthImagesId = data.FormWidthImagesId;
+  // this.FormWithImagesId = data.FormWithImagesId;
   // // 发布消息
   // PubSub.publish('ylsj/etm/course/saved', data);
   // // 关闭滑窗
-  // this.formFormWidthImages.hideSidebar();
+  // this.formFormWithImages.hideSidebar();
 };
 
 /**
  * 执行【线上课程编辑】已有数据的读取操作。
  */
-PageFormWidthImagesEdit.prototype.readFormWidthImages = async function () {
+PageFormWithImagesEdit.prototype.readFormWithImages = async function () {
   let data = await xhr.promise({
     url: '/api/v3/common/script/stdbiz/etm/course/find',
     params: {
@@ -110,18 +110,18 @@ PageFormWidthImagesEdit.prototype.readFormWidthImages = async function () {
     }
   });
   if (data.length > 0) {
-    this.formFormWidthImages.render(this.widgetFormWidthImages, data[0]);
+    this.formFormWithImages.render(this.widgetFormWithImages, data[0]);
   }
 };
 
-PageFormWidthImagesEdit.prototype.destroy = function () {
-  delete pageFormWidthImagesEdit;
+PageFormWithImagesEdit.prototype.destroy = function () {
+  delete pageFormWithImagesEdit;
 };
 
-PageFormWidthImagesEdit.prototype.show = function (params) {
+PageFormWithImagesEdit.prototype.show = function (params) {
   params = params || {};
   this.initialize(params);
 };
 
-pageFormWidthImagesEdit = new PageFormWidthImagesEdit();
+pageFormWithImagesEdit = new PageFormWithImagesEdit();
 </script>

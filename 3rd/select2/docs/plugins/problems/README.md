@@ -46,7 +46,7 @@ You should now have all the plugin files under
 | `bin/*` executable                      | Checks that all the files in the `bin/` folder are exectuable.                                            |
 | Cache                                   | Checks the `/cache` folder's existence and verifies that it is writeable.                                 |
 | Logs                                    | Checks the `/logs` folder's existence and verifies that it is writeable.                                  |
-| Images                                  | Checks the `/images` folder's existence and verifies that it is writeable.                                |
+| Medias                                  | Checks the `/images` folder's existence and verifies that it is writeable.                                |
 | Assets                                  | Checks the `/assets` folder's existence and verifies that it is writeable.                                |
 | System                                  | Checks the `/system` folder's existence.                                                                  |
 | Data                                    | Checks the `/user/data` folder's existence and verifies that it is writeable.                             |

@@ -8587,8 +8587,28 @@ FormLayout.prototype.build = async function(persisted) {
     } else if (field.input == 'imageupload') {
       // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'image') {
+      new Medias({
+        ...field.options,
+        mediaType: 'image',
+        multiple: false,
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
-      new Images(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
+      new Medias({
+        ...field.options,
+        mediaType: 'image',
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'video') {
+      new Medias({
+        ...field.options,
+        mediaType: 'video',
+        multiple: false,
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'videos') {
+      new Medias({
+        ...field.options,
+        mediaType: 'video',
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -9146,9 +9166,18 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'imageupload') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
+  } else if (field.input == 'image') {
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
+    input.setAttribute('data-medias-name', field.name);
   } else if (field.input == 'images') {
     input = dom.create('div', 'full-width', 'row', 'mx-0');
-    input.setAttribute('data-images-name', field.name);
+    input.setAttribute('data-medias-name', field.name);
+  } else if (field.input == 'video') {
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
+    input.setAttribute('data-medias-name', field.name);
+  } else if (field.input == 'videos') {
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
+    input.setAttribute('data-medias-name', field.name);
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
     input.setAttribute('data-avatar-name', field.name);
@@ -9347,7 +9376,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     field.input !== 'checktree' &&
     field.input !== 'fileupload' &&
     field.input !== 'imageupload' &&
+    field.input !== 'image' &&
     field.input !== 'images' &&
+    field.input !== 'video' &&
+    field.input !== 'videos' &&
     field.input !== 'files')
     group.append(tooltip);
 
@@ -9749,7 +9781,7 @@ FormLayout.prototype.getData = function () {
     let field = this.fields[i];
     if (field.input === 'images') {
       ret[field.name] = [];
-      let container = dom.find('div[data-images-name="' + field.name + '"]', this.container);
+      let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
       let imgs = container.querySelectorAll('img');
       imgs.forEach(img => {
         let model = dom.model(img);
@@ -16820,6 +16852,9 @@ TreelikeTable.prototype.getRowAt = function(x, y) {
   let ret = document.elementFromPoint(x, y + top + dom.top(this.container));
   return ret;
 };
+function WeeklyTable(opts) {
+
+}
 
 function Wizard(opt) {
   let self = this;
@@ -17593,41 +17628,58 @@ ImageUpload.prototype.render = function(containerId) {
     this.append(item);
   }
 };
-function Images(opts) {
+function Medias(opts) {
+  this.params = opts.params || {};
   // 只读
   this.readonly = opts.readonly === true;
   this.width = opts.width || '80';
+  // 多个还是单个
+  this.multiple = opts.multiple !== false;
+  // 上传的链接路径
+  this.url = opts.url;
+  // 读取已上传的图片的配置项
+  this.fetch = opts.fetch;
+  // 单个删除已上传的图片的配置项
+  this.remove = opts.remove;
+  // 媒体类型
+  this.mediaType = opts.mediaType || 'image';
 }
 
-Images.prototype.render = function (containerId) {
+Medias.prototype.render = function (containerId) {
   this.container = dom.find(containerId);
-
   if (this.readonly === false) {
     let plus = this.createPlusElement();
     this.container.appendChild(plus);
   }
 };
 
-Images.prototype.createPlusElement = function () {
-  this.plus = dom.templatize(`
-    <div class="d-flex align-items-center justify-content-center pointer" 
-                style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
-      <i class="fas fa-plus" style="color: #bbb;"></i>
-      <input type="file" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
-             style="display: none">
-    </div>
-  `, this);
+Medias.prototype.createPlusElement = function () {
+  if (this.mediaType == 'image') {
+    this.plus = dom.templatize(`
+      <div class="d-flex align-items-center justify-content-center pointer" 
+                  style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
+        <i class="fas fa-plus" style="color: #bbb;"></i>
+        <input type="file" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*"
+               style="display: none">
+      </div>
+    `, this);
+  } else {
+    this.plus = dom.templatize(`
+      <div class="d-flex align-items-center justify-content-center pointer" 
+                  style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
+        <i class="fas fa-plus" style="color: #bbb;"></i>
+        <input type="file" accept="video/mp4,video/x-m4v,video/*" style="display: none">
+      </div>
+    `, this);
+  }
   let input = dom.find('input', this.plus);
   input.onchange = ev => {
     if (!input.files || input.files.length == 0) return;
-    let img = input.files[0];
-    let reader = new FileReader();
-    reader.onload = () => {
-      this.appendImage({
-        url: reader.result,
-      })
-    };
-    reader.readAsDataURL(img);
+    if (!this.url) {
+      this.readImageAsLocal(input.files[0]);
+    } else {
+      this.readImageAsRemote(input.files[0]);
+    }
   };
   dom.bind(this.plus, 'click', ev => {
     input.click();
@@ -17635,23 +17687,123 @@ Images.prototype.createPlusElement = function () {
   return this.plus;
 };
 
-Images.prototype.appendImage = function (img) {
+Medias.prototype.readImageAsLocal = function (file) {
+  let img = file;
+  let reader = new FileReader();
+  reader.onload = () => {
+    if (this.mediaType === 'image') {
+      this.appendImage({
+        url: reader.result,
+      })
+    } else {
+      this.appendVideoImage(file, 2);
+    }
+  };
+  reader.readAsDataURL(img);
+};
+
+Medias.prototype.readImageAsRemote = function (file) {
+  xhr.upload({
+    url: '/api/v3/common/upload',
+    params: {
+      ...this.params,
+      file: file,
+    },
+    success: res => {
+      this.appendImage({
+        url: res.uri,
+      })
+    },
+  })
+};
+
+Medias.prototype.appendImage = function (img) {
   let elData = {
     width: this.width,
     src: img.url,
+    thumbnail: img.url,
   };
   let el = dom.templatize(`
-    <div class="d-flex align-items-center justify-content-center pointer" 
+    <div class="d-flex align-items-center justify-content-center pointer position-relative" 
                 style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
       <img src="{{src}}" style="width: 100%; height: 100%;">
+      <a widget-images-id="{{id}}" class="btn-link position-absolute" style="bottom: 0; right: 4px;">
+        <i class="fas fa-trash-alt text-danger"></i>
+      </a>
     </div>
   `, elData);
 
+  let image = dom.find('img', el);
+  dom.bind(image, 'click', ev => {
+    ev.stopPropagation();
+    ev.preventDefault();
+    if (this.mediaType == 'image') {
+      let viewer = new Viewer(image, {
+        toolbar: false,
+        navbar: false,
+        tooltip: false,
+        title: false,
+      });
+      viewer.show();
+    } else if (this.mediaType == 'video') {
+
+    }
+  });
+  let buttonDelete = dom.find('a', el);
   if (this.readonly === false) {
     this.container.insertBefore(el, this.plus);
+    dom.bind(buttonDelete, 'click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (this.remove) {
+
+      } else {
+        el.remove();
+      }
+      if (this.multiple === false) {
+        let plus = this.createPlusElement();
+        this.container.appendChild(plus);
+      }
+    });
   } else {
+    buttonDelete.remove();
     this.container.appendChild(el);
   }
+  if (this.multiple === false) {
+    this.plus.remove();
+  }
+};
+
+Medias.prototype.appendVideoImage = function (file, secs) {
+  let canvas = document.createElement('canvas');
+  let me = this, video = document.createElement('video');
+  video.onloadedmetadata = () => {
+    if ('function' === typeof secs) {
+      secs = secs(this.duration);
+    }
+    this.currentTime = Math.min(Math.max(0, (secs < 0 ? this.duration : 0) + secs), this.duration);
+  };
+  video.onseeked = ev => {
+    let height = video.videoHeight;
+    let width = video.videoWidth;
+    let ratio = height / width;
+    let ctx = canvas.getContext('2d');
+    if (ratio < 1) {
+      ctx.drawImage(video, 0, (canvas.height - canvas.width * ratio) / 2, canvas.width, canvas.width * ratio);
+    } else {
+      ratio = width / height;
+      ctx.drawImage(video, (canvas.height - canvas.width * ratio) / 2, 0, canvas.width * ratio, canvas.height);
+    }
+    this.appendImage({
+      url: canvas.toDataURL('image/png'),
+    });
+  };
+  video.onerror = function(e) {
+
+  };
+  let url = URL.createObjectURL(file);
+  console.log(url);
+  video.src = url;
 };
 
 /**
@@ -20991,6 +21143,170 @@ Kesigner.Chart.prototype.properties = function () {
     }]
   }]
 };
+function HeadingElement() {
+  this.defaults = {
+    text: '这里是标题',
+  };
+  this.x = 0;
+  this.y = 0;
+  this.width = 0;
+  this.height = 0;
+}
+
+function ParagraphElement() {
+
+}
+
+function ImageElement() {
+
+}
+
+function MobileCanvas(opts) {
+  this.background = 'white';
+  const MOBILE_AREA_ASPECT_RATIO = 1284 / 2778;
+  const MOBILE_IMAGE_WIDTH = 462;
+  const MOBILE_IMAGE_HEIGHT = 900;
+  const MOBILE_SAFE_AREA_TOP_LEFT_X = 15;
+  const MOBILE_SAFE_AREA_TOP_LEFT_Y = 60;
+  const MOBILE_SAFE_AREA_TOP_RIGHT_X = 446;
+  const MOBILE_SAFE_AREA_TOP_RIGHT_Y = 60;
+  const MOBILE_SAFE_AREA_BOT_LEFT_X = 15;
+  const MOBILE_SAFE_AREA_BOT_LEFT_Y = 836;
+  const MOBILE_SAFE_AREA_BOT_RIGHT_X = 446;
+  const MOBILE_SAFE_AREA_BOT_RIGHT_Y = 836;
+  const MOBILE_TOP_BAR_LEFT_X = 60;
+  const MOBILE_TOP_BAR_LEFT_Y = 10;
+  const MOBILE_TOP_BAR_RIGHT_X = 398;
+  const MOBILE_TOP_BAR_RIGHT_Y = 10;
+
+  const MOBILE_BOT_BAR_LEFT_X = 60;
+  const MOBILE_BOT_BAR_LEFT_Y = 890;
+  const MOBILE_BOT_BAR_RIGHT_X = 398;
+  const MOBILE_BOT_BAR_RIGHT_Y = 890;
+
+  const MOBILE_IMAGE_ASPECT_RATIO = MOBILE_IMAGE_WIDTH / MOBILE_IMAGE_HEIGHT;
+
+  this.width = opts.width || 360;
+  this.height = this.width / MOBILE_IMAGE_ASPECT_RATIO;
+
+  this.scaleRatio = this.width / MOBILE_IMAGE_WIDTH;
+  
+  this.safeAreaTopLeftX = MOBILE_SAFE_AREA_TOP_LEFT_X * this.scaleRatio;
+  this.safeAreaTopLeftY = MOBILE_SAFE_AREA_TOP_LEFT_Y * this.scaleRatio;
+  this.safeAreaTopRightX = MOBILE_SAFE_AREA_TOP_RIGHT_X * this.scaleRatio;
+  this.safeAreaTopRightY = MOBILE_SAFE_AREA_TOP_RIGHT_Y * this.scaleRatio;
+  this.safeAreaBotLeftX = MOBILE_SAFE_AREA_BOT_LEFT_X * this.scaleRatio;
+  this.safeAreaBotLeftY = MOBILE_SAFE_AREA_BOT_LEFT_Y * this.scaleRatio;
+  this.safeAreaBotRightX = MOBILE_SAFE_AREA_BOT_RIGHT_X * this.scaleRatio;
+  this.safeAreaBotRightY = MOBILE_SAFE_AREA_BOT_RIGHT_Y * this.scaleRatio;
+  this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
+  this.safeAreaHeight = this.safeAreaBotLeftY - this.safeAreaTopLeftY;
+
+  this.topBarLeftX = MOBILE_TOP_BAR_LEFT_X * this.scaleRatio;
+  this.topBarLeftY = MOBILE_TOP_BAR_LEFT_Y * this.scaleRatio;
+  this.topBarRightX = MOBILE_TOP_BAR_RIGHT_X * this.scaleRatio;
+  this.topBarRightY = MOBILE_TOP_BAR_RIGHT_Y * this.scaleRatio;
+
+  this.botBarLeftX = MOBILE_BOT_BAR_LEFT_X * this.scaleRatio;
+  this.botBarLeftY = MOBILE_BOT_BAR_LEFT_Y * this.scaleRatio;
+  this.botBarRightX = MOBILE_BOT_BAR_RIGHT_X * this.scaleRatio;
+  this.botBarRightY = MOBILE_BOT_BAR_RIGHT_Y * this.scaleRatio;
+
+  this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
+  this.safeAreaHeight = this.safeAreaBotRightY - this.safeAreaTopRightY;
+
+  this.paddingLeft = 12;
+  this.paddingRight = 12;
+}
+
+MobileCanvas.prototype.render = function (containerId) {
+  this.container = dom.find(containerId);
+  this.canvas = document.createElement('canvas');
+  this.canvas.style.width = this.width + 'px';
+  this.canvas.style.height = this.height + 'px';
+
+  let dpr = window.devicePixelRatio || 1;
+  this.canvas.width = this.width * dpr;
+  this.canvas.height = this.height * dpr;
+  this.context = this.canvas.getContext('2d');
+  // Scale all drawing operations by the dpr, so you
+  // don't have to worry about the difference.
+  this.context.scale(dpr, dpr);
+  const img = new Image(); // Create new img element
+  img.addEventListener("load", () => {
+    this.context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, this.width, this.height);
+  }, false);
+  img.src = "/img/emulator/iphone-bg.png";
+
+  this.container.appendChild(this.canvas);
+
+  this.buildSafeArea();
+  this.buildTopBar();
+  this.buildBotBar();
+};
+
+MobileCanvas.prototype.buildSafeArea = function () {
+  this.context.fillStyle = this.background;
+  this.context.fillRect(this.safeAreaTopLeftX, this.safeAreaTopLeftY, this.safeAreaWidth, this.safeAreaHeight);
+};
+
+MobileCanvas.prototype.buildTopBar = function () {
+  this.context.beginPath();
+  this.context.fillStyle = this.background;
+  this.context.moveTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY);
+  this.context.arcTo(0, 0, this.topBarLeftX, this.topBarLeftY, 30);
+  this.context.lineTo(this.topBarRightX, this.topBarRightY);
+  this.context.arcTo(this.width, 0, this.safeAreaBotRightX, this.safeAreaTopRightY, 30);
+  this.context.lineTo(this.safeAreaTopRightX, this.safeAreaTopRightY + 1 /* there is a bug what i have no idea*/);
+  this.context.lineTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY + 1 /* there is a bug what i have no idea*/);
+  this.context.fill();
+  this.context.closePath();
+};
+
+MobileCanvas.prototype.buildBotBar = function () {
+  this.context.beginPath();
+  this.context.fillStyle = this.background;
+  this.context.moveTo(this.safeAreaBotLeftX, this.safeAreaBotLeftY);
+  this.context.arcTo(0, this.height, this.botBarLeftX, this.botBarLeftY, 30);
+  this.context.lineTo(this.botBarRightX, this.botBarRightY);
+  this.context.arcTo(this.width - 10, this.height - 10, this.safeAreaBotRightX, this.safeAreaTopRightY, 30);
+  this.context.lineTo(this.safeAreaBotRightX, this.safeAreaBotRightY - 1);
+  this.context.lineTo(this.safeAreaBotLeftX, this.safeAreaBotLeftY - 1);
+  this.context.fill();
+  this.context.closePath();
+};
+
+MobileCanvas.prototype.drawImage = function (url, y) {
+  const img = new Image();
+  img.addEventListener("load", () => {
+    let width = this.safeAreaTopRightX - this.safeAreaTopLeftX;
+    let height = 120;
+    this.context.drawImage(img, this.safeAreaTopLeftX, this.safeAreaTopLeftY, width, height);
+  }, false);
+  img.src = url;
+};
+
+MobileCanvas.prototype.drawParagraph = function (y) {
+  this.context.fillStyle = 'rgba(0,0,0,0.17)';
+  let startX = this.safeAreaTopLeftX;
+  let startY = y;
+  for (let i = 0; i < 4; i++) {
+    this.context.fillRect(startX + this.paddingLeft, startY, this.safeAreaWidth - this.paddingRight - this.paddingLeft, 20);
+    startY += 28;
+  }
+  this.context.fillRect(startX + this.paddingLeft, startY, this.safeAreaWidth * 0.68, 20);
+};
+
+MobileCanvas.prototype.drawGrids = function (y, rows, cols) {
+  this.context.fillStyle = 'rgba(0,0,0,0.17)';
+  let startX = 10 + 10;
+  let startY = y;
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      this.context.fillRect(startX + j * 80, startY + i * 80, 60, 60);
+    }
+  }
+};
 
 function MobileDesigner(opt) {
 
@@ -21609,7 +21925,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
           </label>
         </div>
       `);
-      if (prop.value == 'T') {
+      if (prop.value === 'T' || prop.value === true) {
         input.children[0].children[0].checked = true;
       }
       dom.find('input', input).setAttribute('property-model-name', prop.name);

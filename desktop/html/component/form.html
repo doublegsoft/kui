@@ -2,7 +2,8 @@
   <div class="card-header pl-3 pr-3">
     <strong>示例：侧边表单</strong>
     <div class="card-header-actions">
-      <button id="buttonWithImages" class="btn btn-primary btn-add mr-2">含有图片字段</button>
+      <button id="buttonWithImages" class="btn btn-primary btn-add mr-2">含有多个图片</button>
+      <button id="buttonWithVideos" class="btn btn-primary btn-add mr-2">含有多个视频</button>
     </div>
   </div>
   <div class="card-body">
@@ -620,7 +621,19 @@ dom.bind(dom.find('#buttonWithImages'), 'click', ev => {
     url: 'html/component/form/form_with_images.html',
     showBottom: true,
     success: () => {
-      pageFormWidthImagesEdit.show();
+      pageFormWithImagesEdit.show();
+    }
+  });
+});
+
+dom.bind(dom.find('#buttonWithVideos'), 'click', ev => {
+  ajax.sidebar({
+    containerId: document.body,
+    title: '表单含有图片',
+    url: 'html/component/form/form_with_videos.html',
+    showBottom: true,
+    success: () => {
+      pageFormWithVideosEdit.show();
     }
   });
 });

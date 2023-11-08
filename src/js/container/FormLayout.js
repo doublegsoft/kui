@@ -302,8 +302,28 @@ FormLayout.prototype.build = async function(persisted) {
     } else if (field.input == 'imageupload') {
       // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'image') {
+      new Medias({
+        ...field.options,
+        mediaType: 'image',
+        multiple: false,
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'images') {
-      new Images(field.options).render(dom.find('div[data-images-name=\'' + field.name + '\']', this.container));
+      new Medias({
+        ...field.options,
+        mediaType: 'image',
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'video') {
+      new Medias({
+        ...field.options,
+        mediaType: 'video',
+        multiple: false,
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+    } else if (field.input == 'videos') {
+      new Medias({
+        ...field.options,
+        mediaType: 'video',
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -861,9 +881,18 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'imageupload') {
     input = dom.create('div', 'full-width');
     input.setAttribute('data-imageupload-name', field.name);
+  } else if (field.input == 'image') {
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
+    input.setAttribute('data-medias-name', field.name);
   } else if (field.input == 'images') {
     input = dom.create('div', 'full-width', 'row', 'mx-0');
-    input.setAttribute('data-images-name', field.name);
+    input.setAttribute('data-medias-name', field.name);
+  } else if (field.input == 'video') {
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
+    input.setAttribute('data-medias-name', field.name);
+  } else if (field.input == 'videos') {
+    input = dom.create('div', 'full-width', 'row', 'mx-0');
+    input.setAttribute('data-medias-name', field.name);
   } else if (field.input == 'avatar') {
     input = dom.create('div', 'full-width','avatar-img');
     input.setAttribute('data-avatar-name', field.name);
@@ -1062,7 +1091,10 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     field.input !== 'checktree' &&
     field.input !== 'fileupload' &&
     field.input !== 'imageupload' &&
+    field.input !== 'image' &&
     field.input !== 'images' &&
+    field.input !== 'video' &&
+    field.input !== 'videos' &&
     field.input !== 'files')
     group.append(tooltip);
 
@@ -1464,7 +1496,7 @@ FormLayout.prototype.getData = function () {
     let field = this.fields[i];
     if (field.input === 'images') {
       ret[field.name] = [];
-      let container = dom.find('div[data-images-name="' + field.name + '"]', this.container);
+      let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
       let imgs = container.querySelectorAll('img');
       imgs.forEach(img => {
         let model = dom.model(img);
