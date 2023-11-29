@@ -1,5 +1,6 @@
 
-flutter = {};
+if (typeof flutter === 'undefined')
+  flutter = {};
 
 flutter.log = (data) => {
   if (!window.print) return;
@@ -2405,6 +2406,15 @@ dnd.setDroppable = function (selector, callback) {
 };
 var dom = {};
 
+dom.closeRightBar = () => {
+  let rightbar = dom.find('div[widget-id=right-bar]')
+  if (rightbar != null) {
+    rightbar.children[0].classList.add('out');
+    setTimeout(function () {
+      rightbar.remove();
+    }, 300);
+  }
+};
 /*
 **************************************************
 ** Animations.
@@ -3465,6 +3475,34 @@ dom.init = function (owner, element) {
     let child = element.children[i];
     dom.init(owner, child);
   }
+};
+
+dom.makeUpload = function (el, fi, params, cb) {
+  fi.onchange = ev => {
+    if (!fi.files || fi.files.length == 0) return;
+    // let img = fi.files[0];
+    // let reader = new FileReader();
+    // reader.onload = () => {
+    //   cb(reader.result);
+    // };
+    // reader.readAsDataURL(img);
+    xhr.upload({
+      url: '/api/v3/common/upload',
+      params: {
+        ...params,
+        file: fi.files[0],
+      },
+      success: res => {
+        if (res.data) {
+          res = res.data;
+        }
+        cb(res.webpath);
+      },
+    })
+  };
+  el.onclick = ev => {
+    fi.click();
+  };
 };
 
 /**
@@ -9780,16 +9818,28 @@ FormLayout.prototype.getData = function () {
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
     if (field.input === 'images') {
-      ret[field.name] = [];
+      let values = [];
       let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
       let imgs = container.querySelectorAll('img');
       imgs.forEach(img => {
-        let model = dom.model(img);
-        ret[field.name].push({
+        let pel = img.parentElement;
+        let model = dom.model(pel);
+        values.push({
           ...model,
-          src: img.src,
         });
       });
+      this.assignValue2Name(ret, field.name, values);
+    } else if (field.input === 'image') {
+      let values = [];
+      let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
+      let img = container.querySelector('img');
+      if (img == null) continue;
+      let model = dom.model(img.parentElement);
+      this.assignValue2Name(ret, field.name, model);
+    } else if (field.input === 'video') {
+
+    } else if (field.input === 'videos') {
+
     }
   }
   return ret;
@@ -9797,6 +9847,20 @@ FormLayout.prototype.getData = function () {
 
 FormLayout.prototype.setData = function (data) {
 
+};
+
+/**
+ * @private
+ */
+FormLayout.prototype.assignValue2Name = function (owner, name, value) {
+  let dotIndex = name.indexOf('.');
+  if (dotIndex == -1) {
+    owner[name] = value;
+    return;
+  }
+  let hierarchy = name.substring(0, dotIndex);
+  owner[hierarchy] = {};
+  this.assignValue2Name(owner[hierarchy], name.substring(dotIndex + 1), value);;
 };
 /**
  * 
@@ -11049,6 +11113,11 @@ ListView.prototype.remove = function(model) {
 ListView.prototype.append = function(data, index) {
   let self = this;
   let ul = this.container.querySelector('ul');
+  if (ul == null) {
+    this.container.innerHTML = '';
+    ul = dom.create('ul', 'list-group', 'full-width');
+    this.container.appendChild(ul);
+  }
   let len = ul.querySelectorAll('li').length;
 
   if (Array.isArray(data)) {
@@ -16852,9 +16921,19 @@ TreelikeTable.prototype.getRowAt = function(x, y) {
   let ret = document.elementFromPoint(x, y + top + dom.top(this.container));
   return ret;
 };
-function WeeklyTable(opts) {
 
+function WeeklyTable(opts) {
+  this.datable = opts.datable !== false;
+
+  this.now = moment();
+  this.weekday = this.now.day();
 }
+
+WeeklyTable.prototype.render = function(containerId) {
+  this.container = dom.find(containerId);
+};
+
+
 
 function Wizard(opt) {
   let self = this;
@@ -17633,10 +17712,11 @@ function Medias(opts) {
   // 只读
   this.readonly = opts.readonly === true;
   this.width = opts.width || '80';
+  this.height = this.width;
   // 多个还是单个
   this.multiple = opts.multiple !== false;
   // 上传的链接路径
-  this.url = opts.url;
+  this.url = opts.url || '/api/v3/common/upload';
   // 读取已上传的图片的配置项
   this.fetch = opts.fetch;
   // 单个删除已上传的图片的配置项
@@ -17704,34 +17784,39 @@ Medias.prototype.readImageAsLocal = function (file) {
 
 Medias.prototype.readImageAsRemote = function (file) {
   xhr.upload({
-    url: '/api/v3/common/upload',
+    url: this.url,
     params: {
       ...this.params,
       file: file,
     },
     success: res => {
-      this.appendImage({
-        url: res.uri,
-      })
+      if (res.data) {
+        res = res.data;
+      }
+      if (this.mediaType === 'image') {
+        this.appendImage({
+          imagePath: res.webpath,
+        });
+      } else {
+        this.appendVideoImage({
+          videoPath: res.webpath,
+        }, 2);
+      }
     },
   })
 };
 
 Medias.prototype.appendImage = function (img) {
-  let elData = {
-    width: this.width,
-    src: img.url,
-    thumbnail: img.url,
-  };
   let el = dom.templatize(`
     <div class="d-flex align-items-center justify-content-center pointer position-relative" 
-                style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
-      <img src="{{src}}" style="width: 100%; height: 100%;">
-      <a widget-images-id="{{id}}" class="btn-link position-absolute" style="bottom: 0; right: 4px;">
+         style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
+      <img src="{{imagePath}}" style="width: 100%; height: 100%;">
+      <a widget-media-id="{{id}}" class="btn-link position-absolute" style="bottom: 0; right: 4px;">
         <i class="fas fa-trash-alt text-danger"></i>
       </a>
     </div>
-  `, elData);
+  `, {...img, width: this.width});
+  dom.model(el, img);
 
   let image = dom.find('img', el);
   dom.bind(image, 'click', ev => {
@@ -17746,7 +17831,7 @@ Medias.prototype.appendImage = function (img) {
       });
       viewer.show();
     } else if (this.mediaType == 'video') {
-
+      this.play(img.videoPath);
     }
   });
   let buttonDelete = dom.find('a', el);
@@ -17776,34 +17861,56 @@ Medias.prototype.appendImage = function (img) {
 
 Medias.prototype.appendVideoImage = function (file, secs) {
   let canvas = document.createElement('canvas');
+  canvas.style.width = this.width + 'px';
+  canvas.style.height = this.width + 'px';
+  canvas.width = this.width * window.devicePixelRatio;
+  canvas.height = this.width * window.devicePixelRatio;
+  canvas.getContext("2d").scale(window.devicePixelRatio, window.devicePixelRatio);
   let me = this, video = document.createElement('video');
   video.onloadedmetadata = () => {
     if ('function' === typeof secs) {
-      secs = secs(this.duration);
+      secs = secs(video.duration);
     }
-    this.currentTime = Math.min(Math.max(0, (secs < 0 ? this.duration : 0) + secs), this.duration);
+    video.currentTime = Math.min(Math.max(0, (secs < 0 ? video.duration : 0) + secs), video.duration);
   };
   video.onseeked = ev => {
     let height = video.videoHeight;
     let width = video.videoWidth;
     let ratio = height / width;
     let ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'black';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (ratio < 1) {
-      ctx.drawImage(video, 0, (canvas.height - canvas.width * ratio) / 2, canvas.width, canvas.width * ratio);
+      ctx.drawImage(video, 0, (this.height - this.width * ratio) / 2, this.width, this.width * ratio);
     } else {
       ratio = width / height;
-      ctx.drawImage(video, (canvas.height - canvas.width * ratio) / 2, 0, canvas.width * ratio, canvas.height);
+      ctx.drawImage(video, (this.height - this.width * ratio) / 2, 0, this.width * ratio, this.height);
     }
     this.appendImage({
-      url: canvas.toDataURL('image/png'),
+      imagePath: canvas.toDataURL('image/png'),
+      videoPath: file.videoPath,
     });
+    canvas.remove();
+    video.remove();
   };
   video.onerror = function(e) {
 
   };
-  let url = URL.createObjectURL(file);
-  console.log(url);
-  video.src = url;
+  // let url = URL.createObjectURL(file);
+  // video.src = url;
+  video.src = file.videoPath;
+};
+
+Medias.prototype.play = function (path) {
+  ajax.shade({
+    url: 'html/misc/video/player.html?path=' + path,
+    containerId: document.body,
+    success: () => {
+      pagePlayer.show({
+        path: path,
+      });
+    }
+  });
 };
 
 /**
@@ -21143,26 +21250,10 @@ Kesigner.Chart.prototype.properties = function () {
     }]
   }]
 };
-function HeadingElement() {
-  this.defaults = {
-    text: '这里是标题',
-  };
-  this.x = 0;
-  this.y = 0;
-  this.width = 0;
-  this.height = 0;
-}
-
-function ParagraphElement() {
-
-}
-
-function ImageElement() {
-
-}
-
 function MobileCanvas(opts) {
-  this.background = 'white';
+  /*!
+  ** 常量设置，和手机背景图片密切相关。
+  */
   const MOBILE_AREA_ASPECT_RATIO = 1284 / 2778;
   const MOBILE_IMAGE_WIDTH = 462;
   const MOBILE_IMAGE_HEIGHT = 900;
@@ -21175,9 +21266,9 @@ function MobileCanvas(opts) {
   const MOBILE_SAFE_AREA_BOT_RIGHT_X = 446;
   const MOBILE_SAFE_AREA_BOT_RIGHT_Y = 836;
   const MOBILE_TOP_BAR_LEFT_X = 60;
-  const MOBILE_TOP_BAR_LEFT_Y = 10;
+  const MOBILE_TOP_BAR_LEFT_Y = 13;
   const MOBILE_TOP_BAR_RIGHT_X = 398;
-  const MOBILE_TOP_BAR_RIGHT_Y = 10;
+  const MOBILE_TOP_BAR_RIGHT_Y = 13;
 
   const MOBILE_BOT_BAR_LEFT_X = 60;
   const MOBILE_BOT_BAR_LEFT_Y = 890;
@@ -21186,11 +21277,32 @@ function MobileCanvas(opts) {
 
   const MOBILE_IMAGE_ASPECT_RATIO = MOBILE_IMAGE_WIDTH / MOBILE_IMAGE_HEIGHT;
 
+  /*!
+  ** 背景色，明亮模式和暗黑模式。
+  */
+  this.background = opts.background || 'white';
+  this.skeletonBackground = 'rgba(0,0,0,0.17)';
+  this.skeletonStroke = 'rgba(235,235,235)';
+  this.propertiesEditor = opts.propertiesEditor;
+  this.onSelectedElement = opts.onSelectedElement;
+  /*!
+  ** 用户设置的宽度。
+  */
   this.width = opts.width || 360;
   this.height = this.width / MOBILE_IMAGE_ASPECT_RATIO;
 
+  /*!
+  ** 背景图片和绘图区域的实际比例。
+  */
   this.scaleRatio = this.width / MOBILE_IMAGE_WIDTH;
-  
+
+  /*!
+  ** 已经画上的元素。
+  */
+  this.drawnElements = [];
+  this.images = {};
+  this.mode = opts.mode || 'design';
+
   this.safeAreaTopLeftX = MOBILE_SAFE_AREA_TOP_LEFT_X * this.scaleRatio;
   this.safeAreaTopLeftY = MOBILE_SAFE_AREA_TOP_LEFT_Y * this.scaleRatio;
   this.safeAreaTopRightX = MOBILE_SAFE_AREA_TOP_RIGHT_X * this.scaleRatio;
@@ -21215,8 +21327,8 @@ function MobileCanvas(opts) {
   this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
   this.safeAreaHeight = this.safeAreaBotRightY - this.safeAreaTopRightY;
 
-  this.paddingLeft = 12;
-  this.paddingRight = 12;
+  this.paddingLeft = 12 * this.scaleRatio;
+  this.paddingRight = 12 * this.scaleRatio;
 }
 
 MobileCanvas.prototype.render = function (containerId) {
@@ -21232,40 +21344,127 @@ MobileCanvas.prototype.render = function (containerId) {
   // Scale all drawing operations by the dpr, so you
   // don't have to worry about the difference.
   this.context.scale(dpr, dpr);
-  const img = new Image(); // Create new img element
-  img.addEventListener("load", () => {
-    this.context.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight, 0, 0, this.width, this.height);
+  this.backgroundImage = new Image(); // Create new img element
+  this.backgroundImage.addEventListener("load", () => {
+    this.redraw();
   }, false);
-  img.src = "/img/emulator/iphone-bg.png";
+  this.backgroundImage.src = "/img/emulator/iphone-bg.png";
 
   this.container.appendChild(this.canvas);
 
-  this.buildSafeArea();
-  this.buildTopBar();
-  this.buildBotBar();
+  this.initialize();
 };
 
+MobileCanvas.prototype.redraw = function () {
+  this.context.clearRect(0, 0, this.width, this.height);
+
+  this.buildSafeArea();
+
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    this.drawElement(this.drawnElements[i]);
+  }
+
+  // this.buildTopBar();
+  // this.buildBotBar();
+
+
+  this.buildOuter();
+  // background image
+  this.context.drawImage(this.backgroundImage,
+    0, 0,
+    this.backgroundImage.naturalWidth, this.backgroundImage.naturalHeight,
+    0, 0,
+    this.width, this.height);
+};
+
+/*!
+** 初始渲染安全区域。
+*/
 MobileCanvas.prototype.buildSafeArea = function () {
   this.context.fillStyle = this.background;
   this.context.fillRect(this.safeAreaTopLeftX, this.safeAreaTopLeftY, this.safeAreaWidth, this.safeAreaHeight);
 };
 
+/*!
+** 初始渲染安全区域上方。
+*/
 MobileCanvas.prototype.buildTopBar = function () {
   this.context.beginPath();
   this.context.fillStyle = this.background;
+  this.context.strokeStyle = this.background;
   this.context.moveTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY);
-  this.context.arcTo(0, 0, this.topBarLeftX, this.topBarLeftY, 30);
-  this.context.lineTo(this.topBarRightX, this.topBarRightY);
-  this.context.arcTo(this.width, 0, this.safeAreaBotRightX, this.safeAreaTopRightY, 30);
-  this.context.lineTo(this.safeAreaTopRightX, this.safeAreaTopRightY + 1 /* there is a bug what i have no idea*/);
-  this.context.lineTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY + 1 /* there is a bug what i have no idea*/);
+  // this.context.arcTo(0, 0, this.topBarLeftX, this.topBarLeftY, 30);
+  this.context.fillStyle = 'black';
+  this.context.arc(this.safeAreaTopLeftX + 35, this.safeAreaTopLeftY, 35, Math.PI, Math.PI * 1.5);
+  // this.context.lineTo(this.topBarRightX, this.topBarRightY);
+  // this.context.arcTo(this.width, 0, this.safeAreaBotRightX, this.safeAreaTopRightY, 30);
+  // this.context.lineTo(this.safeAreaTopRightX, this.safeAreaTopRightY + 1 /* there is a bug what i have no idea*/);
+  // this.context.lineTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY + 1 /* there is a bug what i have no idea*/);
   this.context.fill();
   this.context.closePath();
 };
 
+MobileCanvas.prototype.buildOuter = function () {
+
+  this.context.beginPath();
+  this.context.strokeStyle = 'white';
+  this.context.lineWidth = 8;
+  this.context.moveTo(0, 0);
+  this.context.lineTo(0, this.height);
+  this.context.stroke();
+
+  this.context.moveTo(this.width, 0);
+  this.context.lineTo(this.width, this.height);
+  this.context.stroke();
+  this.context.closePath();
+
+  // top-left
+  this.context.beginPath();
+  this.context.fillStyle = 'white';
+  this.context.lineWidth = 2;
+  this.context.arc(75, 75, 75, Math.PI, Math.PI * 1.5);
+  this.context.lineTo(0, 0);
+  this.context.fill();
+  this.context.closePath();
+
+  // top-right
+  this.context.beginPath();
+  this.context.fillStyle = 'white';
+  this.context.lineWidth = 2;
+  this.context.arc(this.width - 75, 75, 75, Math.PI * 1.5, Math.PI * 2);
+  this.context.lineTo(this.width, 0);
+  this.context.fill();
+  this.context.closePath();
+
+  // bottom-left
+  this.context.beginPath();
+  this.context.fillStyle = 'white';
+  this.context.lineWidth = 2;
+  this.context.arc(75, this.height - 75, 75, Math.PI / 2, Math.PI);
+  this.context.lineTo(0, this.height);
+  this.context.fill();
+  this.context.closePath();
+
+  // bottom-right
+  this.context.beginPath();
+  this.context.fillStyle = 'white';
+  this.context.lineWidth = 2;
+  this.context.arc(this.width - 75, this.height - 75, 75, 0, Math.PI / 2);
+  this.context.lineTo(this.width, this.height);
+  this.context.fill();
+  this.context.closePath();
+
+  // bottom-right
+
+};
+
+/*!
+** 初始渲染安全区域下方。
+*/
 MobileCanvas.prototype.buildBotBar = function () {
   this.context.beginPath();
   this.context.fillStyle = this.background;
+  this.context.strokeStyle = this.background;
   this.context.moveTo(this.safeAreaBotLeftX, this.safeAreaBotLeftY);
   this.context.arcTo(0, this.height, this.botBarLeftX, this.botBarLeftY, 30);
   this.context.lineTo(this.botBarRightX, this.botBarRightY);
@@ -21276,36 +21475,380 @@ MobileCanvas.prototype.buildBotBar = function () {
   this.context.closePath();
 };
 
-MobileCanvas.prototype.drawImage = function (url, y) {
-  const img = new Image();
-  img.addEventListener("load", () => {
-    let width = this.safeAreaTopRightX - this.safeAreaTopLeftX;
-    let height = 120;
-    this.context.drawImage(img, this.safeAreaTopLeftX, this.safeAreaTopLeftY, width, height);
-  }, false);
-  img.src = url;
+/*!
+** 初始化设置。
+*/
+MobileCanvas.prototype.initialize = function () {
+  dnd.setDroppable(this.canvas, (x, y, data) => {
+    if (this.mode == 'simulate') return;
+    this.drawNewElement(x, y, data);
+  });
+
+  dom.bind(this.canvas, 'mousedown', ev => {
+    if (this.mode == 'simulate') return;
+    let found = this.findElementByXY(ev.layerX - this.canvas.offsetLeft, ev.layerY - this.canvas.offsetTop);
+    this.clearSelected();
+    if (found != null) {
+      this.canvas.style.cursor = 'move';
+      let ox = ev.layerX - this.canvas.offsetLeft;
+      let oy = ev.layerY - this.canvas.offsetTop;
+      found.selected = true;
+      this.movingElement = found;
+      this.movingOffsetX = ox - found.x;
+      this.movingOffsetY = oy - found.y;
+      this.redraw();
+      if (this.propertiesEditor) {
+        this.propertiesEditor.render(this.getElementProperties(this.movingElement));
+      }
+      if (this.onSelectedElement) {
+        this.onSelectedElement(this.movingElement);
+      }
+    } else {
+      this.propertiesEditor.render({groups: []});
+      for (let i = 0; i < this.drawnElements.length; i++) {
+        this.drawnElements[i].selected = false;
+      }
+      this.redraw();
+    }
+  });
+  dom.bind(this.canvas, 'mouseup', ev => {
+    if (this.mode == 'simulate') return;
+    this.canvas.style.cursor = 'default';
+    this.movingElement = null;
+  });
+  dom.bind(this.canvas, 'mousemove', ev => {
+    if (this.mode == 'simulate') return;
+    if (this.movingElement != null) {
+      let ox = ev.layerX - this.canvas.offsetLeft;
+      let oy = ev.layerY - this.canvas.offsetTop;
+      this.movingElement.x = ox - this.movingOffsetX;
+      this.movingElement.y = oy - this.movingOffsetY;
+      this.movingElement.rx = (this.movingElement.x - this.safeAreaTopLeftX) / this.scaleRatio;
+      this.movingElement.ry = (this.movingElement.y - this.topBarLeftY) / this.scaleRatio;
+      if (this.propertiesEditor) {
+        this.propertiesEditor.render(this.getElementProperties(this.movingElement));
+      }
+      this.redraw();
+    }
+  });
 };
 
-MobileCanvas.prototype.drawParagraph = function (y) {
-  this.context.fillStyle = 'rgba(0,0,0,0.17)';
-  let startX = this.safeAreaTopLeftX;
-  let startY = y;
+MobileCanvas.prototype.drawParagraph = function (el) {
+  this.context.fillStyle = this.skeletonBackground;
+  this.context.beginPath();
+  let startX = el.x;
+  let startY = el.y;
   for (let i = 0; i < 4; i++) {
-    this.context.fillRect(startX + this.paddingLeft, startY, this.safeAreaWidth - this.paddingRight - this.paddingLeft, 20);
+    this.context.fillRect(startX, startY, el.w, 20);
     startY += 28;
   }
-  this.context.fillRect(startX + this.paddingLeft, startY, this.safeAreaWidth * 0.68, 20);
+  this.context.fillRect(startX, startY, el.w * 0.68, 20);
+  this.context.closePath();
 };
 
-MobileCanvas.prototype.drawGrids = function (y, rows, cols) {
-  this.context.fillStyle = 'rgba(0,0,0,0.17)';
-  let startX = 10 + 10;
-  let startY = y;
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      this.context.fillRect(startX + j * 80, startY + i * 80, 60, 60);
+MobileCanvas.prototype.drawImage = function (el) {
+  if (el.url) {
+    let img = this.images[el.url];
+    if (img == null) {
+      img = new Image();
+      img.addEventListener("load", () => {
+        this.context.drawImage(img, el.x, el.y, el.w, el.h);
+      }, false);
+      img.src = el.url;
+      this.images[el.url] = img;
+    } else {
+      this.context.drawImage(img, el.x, el.y, el.w, el.h);
+    }
+  } else {
+    this.drawImageSkeleton(el);
+  }
+};
+
+MobileCanvas.prototype.drawImageSkeleton = function (el) {
+  this.context.fillStyle = this.skeletonBackground;
+  this.context.fillRect(el.x, el.y, el.w, el.h);
+  let iw = 0;
+  if (el.w > el.h)
+    iw = el.h * 0.80;
+  else
+    iw = el.w * 0.80;
+
+  let ih = iw * 0.68;
+
+  let x = el.x + (el.w - iw) / 2;
+  let y = el.y + (el.h - ih) / 2;
+
+  const lw = 8;
+  this.context.beginPath();
+  this.context.lineWidth = 8;
+  this.context.strokeStyle = this.skeletonStroke;
+  this.context.moveTo(x, y);
+  this.context.lineTo(x + iw, y);
+  this.context.lineTo(x + iw, y + ih);
+  this.context.lineTo(x, y + ih);
+  this.context.lineTo(x, y - lw / 2);
+  this.context.stroke();
+  this.context.closePath();
+
+  this.context.fillStyle = this.skeletonStroke;
+  // SUN
+  this.context.beginPath();
+  let cx = x + iw / 4;
+  let cy = y + ih / 3;
+  this.context.arc(cx, cy, ih / 6, 0, 2 * Math.PI);
+  this.context.fill();
+  this.context.closePath();
+
+  // HILLS
+  this.context.beginPath();
+  let hx = x + iw / 4 - ih / 6;
+  let hy = y + ih - lw * 1.5;
+  let hw = iw / 4;
+  let hh = ih / 3;
+  this.context.moveTo(hx, hy);
+  this.context.lineTo(hx + hw, hy - hh);
+  this.context.lineTo(hx + hw * 2, hy);
+  this.context.lineTo(hx, hy);
+  this.context.fill();
+
+  hx = x + iw / 4;
+  hy = y + ih - lw * 1.5;
+  hw = iw / 3;
+  hh = ih / 2;
+  this.context.moveTo(hx, hy);
+  this.context.lineTo(hx + hw, hy - hh);
+  this.context.lineTo(hx + hw * 2, hy);
+  this.context.lineTo(hx, hy);
+  this.context.fill();
+  this.context.closePath();
+};
+
+MobileCanvas.prototype.drawAvatar = function (el) {
+  this.context.fillStyle = this.skeletonBackground;
+
+  let cx = el.x + el.w / 2;
+  let cy = el.y + el.w / 2;
+
+  this.context.beginPath();
+  this.context.arc(cx, cy, el.w / 2, 0, 2 * Math.PI);
+  this.context.fill();
+  this.context.closePath();
+};
+
+MobileCanvas.prototype.drawText = function (el) {
+  this.context.fillStyle = this.skeletonBackground;
+  this.context.fillRect(el.x, el.y, el.w, el.h);
+};
+
+MobileCanvas.prototype.drawBlock = function (el) {
+  this.context.fillStyle = this.skeletonBackground;
+  this.context.fillRect(el.x, el.y, el.w, el.h);
+};
+
+MobileCanvas.prototype.drawElement = function (el) {
+  this.context.fillStyle = this.skeletonBackground;
+  if (el.type == 'title') {
+    if (!el.w) {
+      el.rw = 120;
+      el.rh = 32;
+      el.w = el.rw * this.scaleRatio;
+      el.h = el.rh * this.scaleRatio;
+    }
+    this.drawText(el);
+  } else if (el.type == 'paragraph') {
+    el.w = el.w || this.safeAreaWidth;
+    el.h = 132;
+    el.rw = el.w / this.scaleRatio;
+    el.rh = el.h / this.scaleRatio;
+    this.drawParagraph(el);
+  } else if (el.type == 'block') {
+    if (!el.w) {
+      el.w = el.h = 60;
+      el.rw = el.w / this.scaleRatio;
+      el.rh = el.h / this.scaleRatio;
+    }
+    this.drawBlock(el);
+  } else if (el.type == 'image') {
+    el.w = el.w || this.safeAreaWidth;
+    el.h = 120;
+    el.rw = el.w / this.scaleRatio;
+    el.rh = el.h / this.scaleRatio;
+    this.drawImage(el);
+  } else if (el.type == 'avatar') {
+    if (!el.w) {
+      el.w = el.h = 60;
+      el.rw = el.w / this.scaleRatio;
+      el.rh = el.h / this.scaleRatio;
+    }
+    this.drawAvatar(el);
+  }
+  if (el.selected === true) {
+    let lw = 2;
+    this.context.beginPath();
+    this.context.strokeStyle = '#39f';
+    this.context.lineWidth = lw;
+    let x = el.x + lw; y = el.y + lw / 2, w = el.w - lw * 2, h = el.h - lw;
+    this.context.moveTo(x, y);
+    this.context.lineTo(x + w, y);
+    this.context.lineTo(x + w, y + h);
+    this.context.lineTo(x, y + h);
+    this.context.lineTo(x, y);
+    this.context.stroke();
+    this.context.closePath();
+  }
+};
+
+MobileCanvas.prototype.drawNewElement = function (x, y, data, translated/*坐标是否已经转换*/) {
+  translated = translated === true;
+  let el;
+  if (!translated) {
+    // 通过拖拽实际Canvas的坐标
+    let ox = x;
+    let oy = y;
+    if (MobileCanvas.offsetX) {
+      ox -= MobileCanvas.offsetX;
+    }
+    if (MobileCanvas.offsetY) {
+      oy -= MobileCanvas.offsetY;
+    }
+
+    el = {
+      x: ox, y: oy, ...data,
+      rx: (ox - this.safeAreaTopLeftX) / this.scaleRatio,
+      ry: (oy - this.topBarLeftY) / this.scaleRatio,
+    };
+  } else {
+    // 用户通过参数传入的用户可读的坐标
+    let rx = x;
+    let ry = y;
+
+    x = rx * this.scaleRatio + this.safeAreaTopLeftX;
+    y = ry * this.scaleRatio + this.topBarLeftY;
+    el = {
+      x: x, y: y, ...data,
+      rx: rx,
+      ry: ry,
+    };
+  }
+
+  this.drawnElements.push(el);
+  this.drawElement(el);
+
+  // 保证图层的顺序，必须重绘
+  this.redraw();
+};
+
+MobileCanvas.prototype.findElementByXY = function (x, y) {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (x > el.x && x < el.x + el.w && y > el.y && y < el.y + el.h) {
+      return el;
     }
   }
+  return null;
+};
+
+MobileCanvas.prototype.findElementById = function (id) {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.id === id) {
+      return el;
+    }
+  }
+  return null;
+};
+
+MobileCanvas.prototype.clearSelected = function () {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    this.drawnElements[i].selected = false;
+  }
+};
+
+MobileCanvas.prototype.removeElement = function () {
+  let found = -1;
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    if (this.drawnElements[i].selected === true) {
+      found = i;
+      break;
+    }
+  }
+  if (found == -1) return;
+  this.drawnElements.splice(found, 1);
+  this.redraw();
+};
+
+MobileCanvas.prototype.switchMode = function () {
+  if (this.mode == 'design') {
+    this.mode = 'simulate';
+    this.clearSelected();
+    this.redraw();
+  } else {
+    this.mode = 'design';
+  }
+};
+
+MobileCanvas.prototype.changeElement = function (prop) {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.selected === true) {
+      for (let key in prop) {
+        if (key === 'rx') {
+          el.x = (parseInt(prop[key]) * this.scaleRatio + this.safeAreaTopLeftX) ;
+        } else if (key === 'ry') {
+          el.y = (parseInt(prop[key]) * this.scaleRatio + this.topBarLeftY);
+        } else if (key === 'rw') {
+          el.w = parseInt(prop[key]) * this.scaleRatio;
+        } else if (key === 'rh') {
+          el.h = parseInt(prop[key]) * this.scaleRatio;
+        }
+        el[key] = prop[key];
+      }
+      this.redraw();
+      break;
+    }
+  }
+};
+
+MobileCanvas.prototype.clear = function () {
+  this.drawnElements = [];
+  this.redraw();
+};
+
+MobileCanvas.prototype.getElementProperties = function (el) {
+  let ret = {
+    groups: [{
+      title: '位置',
+      properties: [{
+        title: 'X',
+        name: 'rx',
+        input: 'number',
+        value: el.rx,
+      },{
+        title: 'Y',
+        name: 'ry',
+        input: 'number',
+        value: el.ry,
+      },{
+        title: '宽度',
+        name: 'rw',
+        input: 'number',
+        value: el.rw,
+      },{
+        title: '高度',
+        name: 'rh',
+        input: 'number',
+        value: el.rh,
+      }]
+    },{
+      title: '其他',
+      properties: [{
+        title: '备注',
+        name: 'note',
+        input: 'longtext',
+      }],
+    }]
+  };
+  return ret;
 };
 
 function MobileDesigner(opt) {
@@ -21853,7 +22396,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       if (prop.min) {
         input.setAttribute("min", prop.min);
       }
-      if (prop.value)
+      if (prop.value || prop.value === 0)
         input.defaultValue = "" + parseInt(prop.value);
       input.classList.add('group-item-input');
       divProp.append(input);

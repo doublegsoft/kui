@@ -1591,6 +1591,15 @@ ajax.upload = params => {
 };
 var dom = {};
 
+dom.closeRightBar = () => {
+  let rightbar = dom.find('div[widget-id=right-bar]')
+  if (rightbar != null) {
+    rightbar.children[0].classList.add('out');
+    setTimeout(function () {
+      rightbar.remove();
+    }, 300);
+  }
+};
 /*
 **************************************************
 ** Animations.
@@ -2653,6 +2662,34 @@ dom.init = function (owner, element) {
   }
 };
 
+dom.makeUpload = function (el, fi, params, cb) {
+  fi.onchange = ev => {
+    if (!fi.files || fi.files.length == 0) return;
+    // let img = fi.files[0];
+    // let reader = new FileReader();
+    // reader.onload = () => {
+    //   cb(reader.result);
+    // };
+    // reader.readAsDataURL(img);
+    xhr.upload({
+      url: '/api/v3/common/upload',
+      params: {
+        ...params,
+        file: fi.files[0],
+      },
+      success: res => {
+        if (res.data) {
+          res = res.data;
+        }
+        cb(res.webpath);
+      },
+    })
+  };
+  el.onclick = ev => {
+    fi.click();
+  };
+};
+
 /**
  * 判断模型数据是否已经存在于载有模型的DOM元素中。
  *
@@ -3465,6 +3502,11 @@ ListView.prototype.remove = function(model) {
 ListView.prototype.append = function(data, index) {
   let self = this;
   let ul = this.container.querySelector('ul');
+  if (ul == null) {
+    this.container.innerHTML = '';
+    ul = dom.create('ul', 'list-group', 'full-width');
+    this.container.appendChild(ul);
+  }
   let len = ul.querySelectorAll('li').length;
 
   if (Array.isArray(data)) {
@@ -7070,7 +7112,8 @@ document.addEventListener("touchend", ev => {
   }
 }, false);
 
-flutter = {};
+if (typeof flutter === 'undefined')
+  flutter = {};
 
 flutter.log = (data) => {
   if (!window.print) return;

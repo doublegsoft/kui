@@ -1495,16 +1495,28 @@ FormLayout.prototype.getData = function () {
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
     if (field.input === 'images') {
-      ret[field.name] = [];
+      let values = [];
       let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
       let imgs = container.querySelectorAll('img');
       imgs.forEach(img => {
-        let model = dom.model(img);
-        ret[field.name].push({
+        let pel = img.parentElement;
+        let model = dom.model(pel);
+        values.push({
           ...model,
-          src: img.src,
         });
       });
+      this.assignValue2Name(ret, field.name, values);
+    } else if (field.input === 'image') {
+      let values = [];
+      let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
+      let img = container.querySelector('img');
+      if (img == null) continue;
+      let model = dom.model(img.parentElement);
+      this.assignValue2Name(ret, field.name, model);
+    } else if (field.input === 'video') {
+
+    } else if (field.input === 'videos') {
+
     }
   }
   return ret;
@@ -1512,4 +1524,18 @@ FormLayout.prototype.getData = function () {
 
 FormLayout.prototype.setData = function (data) {
 
+};
+
+/**
+ * @private
+ */
+FormLayout.prototype.assignValue2Name = function (owner, name, value) {
+  let dotIndex = name.indexOf('.');
+  if (dotIndex == -1) {
+    owner[name] = value;
+    return;
+  }
+  let hierarchy = name.substring(0, dotIndex);
+  owner[hierarchy] = {};
+  this.assignValue2Name(owner[hierarchy], name.substring(dotIndex + 1), value);;
 };

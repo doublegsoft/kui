@@ -82,19 +82,6 @@ PageFormWithImagesEdit.prototype.saveFormWithImages = async function () {
   }
   let data = this.formFormWithImages.getData();
   console.log(data);
-  // let FormWithImages = dom.formdata(this.widgetFormWithImages);
-  // let data = await xhr.promise({
-  //   url: '/api/v3/common/script/stdbiz/etm/course/merge',
-  //   params: {
-  //     ...FormWithImages,
-  //   }
-  // });
-  // // 回写标识
-  // this.FormWithImagesId = data.FormWithImagesId;
-  // // 发布消息
-  // PubSub.publish('ylsj/etm/course/saved', data);
-  // // 关闭滑窗
-  // this.formFormWithImages.hideSidebar();
 };
 
 /**

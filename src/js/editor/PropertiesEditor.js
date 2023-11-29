@@ -218,7 +218,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       if (prop.min) {
         input.setAttribute("min", prop.min);
       }
-      if (prop.value)
+      if (prop.value || prop.value === 0)
         input.defaultValue = "" + parseInt(prop.value);
       input.classList.add('group-item-input');
       divProp.append(input);

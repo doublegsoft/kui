@@ -217,6 +217,11 @@ ListView.prototype.remove = function(model) {
 ListView.prototype.append = function(data, index) {
   let self = this;
   let ul = this.container.querySelector('ul');
+  if (ul == null) {
+    this.container.innerHTML = '';
+    ul = dom.create('ul', 'list-group', 'full-width');
+    this.container.appendChild(ul);
+  }
   let len = ul.querySelectorAll('li').length;
 
   if (Array.isArray(data)) {

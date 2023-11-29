@@ -1,0 +1,65 @@
+<style data-fullcalendar=""></style>
+<div id="pageScheduleCourse" class="page view overflow-hidden">
+  <div class="row mx-0">
+    <div widget-id="widgetCourse" class="col-24-04">
+      <ul class="list-group-item">
+        <li class="list-group-item fc-event">
+          <div class='fc-event-main'>编程课</div>
+        </li>
+        <li class="list-group-item fc-event">
+          <div class='fc-event-main'>游泳课</div>
+        </li>
+        <li class="list-group-item fc-event">
+          <div class='fc-event-main'>足球课</div>
+        </li>
+        <li class="list-group-item fc-event">
+          <div class='fc-event-main'>音乐课</div>
+        </li>
+        <li class="list-group-item fc-event">
+          <div class='fc-event-main'>体育课</div>
+        </li>
+      </ul>
+    </div>
+    <div widget-id="widgetCalendar" class="col-24-20"></div>
+  </div>
+</div>
+<script>
+function PageScheduleCourse() {
+  this.page = dom.find('#pageScheduleCourse')
+}
+
+PageScheduleCourse.prototype.initialize = function () {
+  dom.init(this, this.page);
+  dom.autoheight(this.widgetCalendar);
+
+  new FullCalendar.Draggable(this.widgetCourse, {
+    itemSelector: '.fc-event',
+    eventData: function(eventEl) {
+      return {
+        title: eventEl.innerText
+      };
+    }
+  });
+
+  this.calendar = new FullCalendar.Calendar(this.widgetCalendar, {
+    // plugins: [timeGridPlugin],
+    initialView: 'timeGridWeek',
+    locale: 'zh-cn',
+    editable: true,
+    allDaySlot: false,
+    headerToolbar: {
+      center: 'title',
+    },
+    eventClick: info => {
+      console.log(info);
+    },
+  });
+  this.calendar.render();
+};
+
+PageScheduleCourse.prototype.show = function () {
+  this.initialize();
+};
+
+pageScheduleCourse = new PageScheduleCourse();
+</script>

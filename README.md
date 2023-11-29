@@ -1,3 +1,9 @@
+## Run node web server (Recommended)
+
+```bash
+npm run dev
+```
+
 ## Build althttpd from Source
 
 ```bash

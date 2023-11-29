@@ -1,0 +1,38 @@
+<div id="pagePlayer" class="background-shade page d-flex" style="background: #222!important;z-index:9999999;">
+  <div widget-id="buttonClose" class="position-absolute pointer" style="top: 6px; right: 12px">
+    <i class="fas fa-times font-36 text-danger"></i>
+  </div>
+  <div widget-id="widgetPlayer" class="m-auto"></div>
+</div>
+<script>
+function PagePlayer() {
+  this.page = dom.find('#pagePlayer');
+}
+
+PagePlayer.prototype.show = function (params) {
+  this.initialize(params);
+};
+
+PagePlayer.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  dom.height(this.page, 0, document.body);
+  dom.bind(this.buttonClose, 'click', ev => {
+    this.page.parentElement.remove();
+  });
+
+  let player = new Clappr.Player({
+    source: params.path,
+    poster: '',
+    height: 480,
+    width: 480 * 16 / 9,
+  });
+
+  player.attachTo(this.widgetPlayer);
+};
+
+PagePlayer.prototype.destroy = async function (params) {
+
+};
+
+pagePlayer = new PagePlayer();
+</script>

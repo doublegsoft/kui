@@ -10,9 +10,17 @@
       "text": "应用程序",
       "icon": "nav-icon fa fa-cubes",
       "items": [{
-        "text": "首页自助",
+        "text": "手机页面",
         "icon": "nav-icon icon-note font-16",
-        "url": "javascript:ajax.view({url: 'html/application/mobile/home.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/application/mobile/design.html', containerId: 'container'});"
+      },{
+        "text": "桌面页面",
+        "icon": "nav-icon icon-note font-16",
+        "url": "javascript:ajax.view({url: 'html/application/desktop/design.html', containerId: 'container'});"
+      },{
+        "text": "培训排课",
+        "icon": "nav-icon icon-note font-16",
+        "url": "javascript:ajax.view({url: 'html/application/schedule/course.html', containerId: 'container'});"
       },{
         "text": "随访设计",
         "icon": "nav-icon icon-note font-16",

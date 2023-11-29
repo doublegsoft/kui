@@ -19,7 +19,7 @@ gulp.task('dist', function() {
     'src/js/editor/*.js', 'src/js/widget/*.js', 'src/js/diagram/*.js'])
     // .pipe(babel({presets: ['es2015']}))
     .pipe(babel({
-      presets: ['@babel/env']
+      presets: [['@babel/preset-env', {modules: false}]]
     }))
     .pipe(concat('./kui-all.min.js'))
     .pipe(uglify({}))
@@ -38,7 +38,7 @@ gulp.task('dist', function() {
     'src/js/application/Chat.js',
     'src/js/kuit.js'])
     .pipe(babel({
-      presets: ['@babel/env']
+      presets: [['@babel/preset-env', {modules: false}]]
     }))
     .pipe(concat('./kui-all.tablet.min.js'))
     .pipe(uglify({}))
@@ -64,7 +64,7 @@ gulp.task('dist', function() {
     'src/js/mobile/PopupRuler.js',
     'src/js/kuim.js', 'src/js/flutter.js'])
     .pipe(babel({
-      presets: ['@babel/env']
+      presets: [['@babel/preset-env', {modules: false}]]
     }))
     .pipe(concat('./kui-all.mobile.min.js'))
     .pipe(uglify({}))

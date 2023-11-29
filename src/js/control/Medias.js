@@ -7,7 +7,7 @@ function Medias(opts) {
   // 多个还是单个
   this.multiple = opts.multiple !== false;
   // 上传的链接路径
-  this.url = opts.url;
+  this.url = opts.url || '/api/v3/common/upload';
   // 读取已上传的图片的配置项
   this.fetch = opts.fetch;
   // 单个删除已上传的图片的配置项
@@ -75,34 +75,39 @@ Medias.prototype.readImageAsLocal = function (file) {
 
 Medias.prototype.readImageAsRemote = function (file) {
   xhr.upload({
-    url: '/api/v3/common/upload',
+    url: this.url,
     params: {
       ...this.params,
       file: file,
     },
     success: res => {
-      this.appendImage({
-        url: res.uri,
-      })
+      if (res.data) {
+        res = res.data;
+      }
+      if (this.mediaType === 'image') {
+        this.appendImage({
+          imagePath: res.webpath,
+        });
+      } else {
+        this.appendVideoImage({
+          videoPath: res.webpath,
+        }, 2);
+      }
     },
   })
 };
 
 Medias.prototype.appendImage = function (img) {
-  let elData = {
-    width: this.width,
-    src: img.url,
-    thumbnail: img.url,
-  };
   let el = dom.templatize(`
     <div class="d-flex align-items-center justify-content-center pointer position-relative" 
-                style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
-      <img src="{{src}}" style="width: 100%; height: 100%;">
-      <a widget-images-id="{{id}}" class="btn-link position-absolute" style="bottom: 0; right: 4px;">
+         style="height: {{width}}px; width: {{width}}px; border: 1px solid #eee;">
+      <img src="{{imagePath}}" style="width: 100%; height: 100%;">
+      <a widget-media-id="{{id}}" class="btn-link position-absolute" style="bottom: 0; right: 4px;">
         <i class="fas fa-trash-alt text-danger"></i>
       </a>
     </div>
-  `, elData);
+  `, {...img, width: this.width});
+  dom.model(el, img);
 
   let image = dom.find('img', el);
   dom.bind(image, 'click', ev => {
@@ -117,7 +122,7 @@ Medias.prototype.appendImage = function (img) {
       });
       viewer.show();
     } else if (this.mediaType == 'video') {
-
+      this.play(img.videoPath);
     }
   });
   let buttonDelete = dom.find('a', el);
@@ -173,12 +178,28 @@ Medias.prototype.appendVideoImage = function (file, secs) {
       ctx.drawImage(video, (this.height - this.width * ratio) / 2, 0, this.width * ratio, this.height);
     }
     this.appendImage({
-      url: canvas.toDataURL('image/png'),
+      imagePath: canvas.toDataURL('image/png'),
+      videoPath: file.videoPath,
     });
+    canvas.remove();
+    video.remove();
   };
   video.onerror = function(e) {
 
   };
-  let url = URL.createObjectURL(file);
-  video.src = url;
+  // let url = URL.createObjectURL(file);
+  // video.src = url;
+  video.src = file.videoPath;
+};
+
+Medias.prototype.play = function (path) {
+  ajax.shade({
+    url: 'html/misc/video/player.html?path=' + path,
+    containerId: document.body,
+    success: () => {
+      pagePlayer.show({
+        path: path,
+      });
+    }
+  });
 };

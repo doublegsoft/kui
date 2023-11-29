@@ -1,29 +1,28 @@
-function MobileCanvas(opts) {
+function DesktopCanvas(opts) {
   /*!
   ** 常量设置，和手机背景图片密切相关。
   */
-  const MOBILE_AREA_ASPECT_RATIO = 1284 / 2778;
-  const MOBILE_IMAGE_WIDTH = 462;
-  const MOBILE_IMAGE_HEIGHT = 900;
-  const MOBILE_SAFE_AREA_TOP_LEFT_X = 15;
-  const MOBILE_SAFE_AREA_TOP_LEFT_Y = 60;
-  const MOBILE_SAFE_AREA_TOP_RIGHT_X = 446;
-  const MOBILE_SAFE_AREA_TOP_RIGHT_Y = 60;
-  const MOBILE_SAFE_AREA_BOT_LEFT_X = 15;
-  const MOBILE_SAFE_AREA_BOT_LEFT_Y = 836;
-  const MOBILE_SAFE_AREA_BOT_RIGHT_X = 446;
-  const MOBILE_SAFE_AREA_BOT_RIGHT_Y = 836;
-  const MOBILE_TOP_BAR_LEFT_X = 60;
-  const MOBILE_TOP_BAR_LEFT_Y = 13;
-  const MOBILE_TOP_BAR_RIGHT_X = 398;
-  const MOBILE_TOP_BAR_RIGHT_Y = 13;
+  const DESKTOP_IMAGE_WIDTH = 2788;
+  const DESKTOP_IMAGE_HEIGHT = 2300;
+  const DESKTOP_SAFE_AREA_TOP_LEFT_X = 15;
+  const DESKTOP_SAFE_AREA_TOP_LEFT_Y = 60;
+  const DESKTOP_SAFE_AREA_TOP_RIGHT_X = 446;
+  const DESKTOP_SAFE_AREA_TOP_RIGHT_Y = 60;
+  const DESKTOP_SAFE_AREA_BOT_LEFT_X = 15;
+  const DESKTOP_SAFE_AREA_BOT_LEFT_Y = 836;
+  const DESKTOP_SAFE_AREA_BOT_RIGHT_X = 446;
+  const DESKTOP_SAFE_AREA_BOT_RIGHT_Y = 836;
+  const DESKTOP_TOP_BAR_LEFT_X = 60;
+  const DESKTOP_TOP_BAR_LEFT_Y = 13;
+  const DESKTOP_TOP_BAR_RIGHT_X = 398;
+  const DESKTOP_TOP_BAR_RIGHT_Y = 13;
 
-  const MOBILE_BOT_BAR_LEFT_X = 60;
-  const MOBILE_BOT_BAR_LEFT_Y = 890;
-  const MOBILE_BOT_BAR_RIGHT_X = 398;
-  const MOBILE_BOT_BAR_RIGHT_Y = 890;
+  const DESKTOP_BOT_BAR_LEFT_X = 60;
+  const DESKTOP_BOT_BAR_LEFT_Y = 890;
+  const DESKTOP_BOT_BAR_RIGHT_X = 398;
+  const DESKTOP_BOT_BAR_RIGHT_Y = 890;
 
-  const MOBILE_IMAGE_ASPECT_RATIO = MOBILE_IMAGE_WIDTH / MOBILE_IMAGE_HEIGHT;
+  const DESKTOP_IMAGE_ASPECT_RATIO = DESKTOP_IMAGE_WIDTH / DESKTOP_IMAGE_HEIGHT;
 
   /*!
   ** 背景色，明亮模式和暗黑模式。
@@ -36,14 +35,14 @@ function MobileCanvas(opts) {
   /*!
   ** 用户设置的宽度。
   */
-  this.width = opts.width || 360;
-  this.height = this.width / MOBILE_IMAGE_ASPECT_RATIO;
+  this.width = opts.width || 960;
+  this.height = this.width / DESKTOP_IMAGE_ASPECT_RATIO;
   this.wheelDeltaY = 0;
 
   /*!
   ** 背景图片和绘图区域的实际比例。
   */
-  this.scaleRatio = this.width / MOBILE_IMAGE_WIDTH;
+  this.scaleRatio = this.width / DESKTOP_IMAGE_WIDTH;
 
   /*!
   ** 已经画上的元素。
@@ -52,26 +51,26 @@ function MobileCanvas(opts) {
   this.images = {};
   this.mode = opts.mode || 'design';
 
-  this.safeAreaTopLeftX = MOBILE_SAFE_AREA_TOP_LEFT_X * this.scaleRatio;
-  this.safeAreaTopLeftY = MOBILE_SAFE_AREA_TOP_LEFT_Y * this.scaleRatio;
-  this.safeAreaTopRightX = MOBILE_SAFE_AREA_TOP_RIGHT_X * this.scaleRatio;
-  this.safeAreaTopRightY = MOBILE_SAFE_AREA_TOP_RIGHT_Y * this.scaleRatio;
-  this.safeAreaBotLeftX = MOBILE_SAFE_AREA_BOT_LEFT_X * this.scaleRatio;
-  this.safeAreaBotLeftY = MOBILE_SAFE_AREA_BOT_LEFT_Y * this.scaleRatio;
-  this.safeAreaBotRightX = MOBILE_SAFE_AREA_BOT_RIGHT_X * this.scaleRatio;
-  this.safeAreaBotRightY = MOBILE_SAFE_AREA_BOT_RIGHT_Y * this.scaleRatio;
+  this.safeAreaTopLeftX = DESKTOP_SAFE_AREA_TOP_LEFT_X * this.scaleRatio;
+  this.safeAreaTopLeftY = DESKTOP_SAFE_AREA_TOP_LEFT_Y * this.scaleRatio;
+  this.safeAreaTopRightX = DESKTOP_SAFE_AREA_TOP_RIGHT_X * this.scaleRatio;
+  this.safeAreaTopRightY = DESKTOP_SAFE_AREA_TOP_RIGHT_Y * this.scaleRatio;
+  this.safeAreaBotLeftX = DESKTOP_SAFE_AREA_BOT_LEFT_X * this.scaleRatio;
+  this.safeAreaBotLeftY = DESKTOP_SAFE_AREA_BOT_LEFT_Y * this.scaleRatio;
+  this.safeAreaBotRightX = DESKTOP_SAFE_AREA_BOT_RIGHT_X * this.scaleRatio;
+  this.safeAreaBotRightY = DESKTOP_SAFE_AREA_BOT_RIGHT_Y * this.scaleRatio;
   this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
   this.safeAreaHeight = this.safeAreaBotLeftY - this.safeAreaTopLeftY;
 
-  this.topBarLeftX = MOBILE_TOP_BAR_LEFT_X * this.scaleRatio;
-  this.topBarLeftY = MOBILE_TOP_BAR_LEFT_Y * this.scaleRatio;
-  this.topBarRightX = MOBILE_TOP_BAR_RIGHT_X * this.scaleRatio;
-  this.topBarRightY = MOBILE_TOP_BAR_RIGHT_Y * this.scaleRatio;
+  this.topBarLeftX = DESKTOP_TOP_BAR_LEFT_X * this.scaleRatio;
+  this.topBarLeftY = DESKTOP_TOP_BAR_LEFT_Y * this.scaleRatio;
+  this.topBarRightX = DESKTOP_TOP_BAR_RIGHT_X * this.scaleRatio;
+  this.topBarRightY = DESKTOP_TOP_BAR_RIGHT_Y * this.scaleRatio;
 
-  this.botBarLeftX = MOBILE_BOT_BAR_LEFT_X * this.scaleRatio;
-  this.botBarLeftY = MOBILE_BOT_BAR_LEFT_Y * this.scaleRatio;
-  this.botBarRightX = MOBILE_BOT_BAR_RIGHT_X * this.scaleRatio;
-  this.botBarRightY = MOBILE_BOT_BAR_RIGHT_Y * this.scaleRatio;
+  this.botBarLeftX = DESKTOP_BOT_BAR_LEFT_X * this.scaleRatio;
+  this.botBarLeftY = DESKTOP_BOT_BAR_LEFT_Y * this.scaleRatio;
+  this.botBarRightX = DESKTOP_BOT_BAR_RIGHT_X * this.scaleRatio;
+  this.botBarRightY = DESKTOP_BOT_BAR_RIGHT_Y * this.scaleRatio;
 
   this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
   this.safeAreaHeight = this.safeAreaBotRightY - this.safeAreaTopRightY;
@@ -80,7 +79,7 @@ function MobileCanvas(opts) {
   this.paddingRight = 12 * this.scaleRatio;
 }
 
-MobileCanvas.prototype.render = function (containerId) {
+DesktopCanvas.prototype.render = function (containerId) {
   this.container = dom.find(containerId);
   this.canvas = document.createElement('canvas');
   this.canvas.style.width = this.width + 'px';
@@ -97,14 +96,14 @@ MobileCanvas.prototype.render = function (containerId) {
   this.backgroundImage.addEventListener("load", () => {
     this.redraw();
   }, false);
-  this.backgroundImage.src = "/img/emulator/iphone-bg.png";
+  this.backgroundImage.src = "/img/emulator/iMac.png";
 
   this.container.appendChild(this.canvas);
 
   this.initialize();
 };
 
-MobileCanvas.prototype.restore = function () {
+DesktopCanvas.prototype.restore = function () {
   let oldWheelDeltaY = this.wheelDeltaY;
   for (let i = 0; i < this.drawnElements.length; i++) {
     let el = this.drawnElements[i];
@@ -115,7 +114,7 @@ MobileCanvas.prototype.restore = function () {
   this.redraw();
 };
 
-MobileCanvas.prototype.redraw = function () {
+DesktopCanvas.prototype.redraw = function () {
   this.context.clearRect(0, 0, this.width, this.height);
 
   this.buildSafeArea();
@@ -153,7 +152,7 @@ MobileCanvas.prototype.redraw = function () {
 /*!
 ** 初始渲染安全区域。
 */
-MobileCanvas.prototype.buildSafeArea = function () {
+DesktopCanvas.prototype.buildSafeArea = function () {
   this.context.fillStyle = this.background;
   this.context.fillRect(this.safeAreaTopLeftX, this.safeAreaTopLeftY, this.safeAreaWidth, this.safeAreaHeight);
 };
@@ -161,7 +160,7 @@ MobileCanvas.prototype.buildSafeArea = function () {
 /*!
 ** 初始渲染安全区域上方。
 */
-MobileCanvas.prototype.buildTopBar = function () {
+DesktopCanvas.prototype.buildTopBar = function () {
   this.context.beginPath();
   this.context.fillStyle = this.background;
   this.context.strokeStyle = this.background;
@@ -177,7 +176,7 @@ MobileCanvas.prototype.buildTopBar = function () {
   this.context.closePath();
 };
 
-MobileCanvas.prototype.buildOuter = function () {
+DesktopCanvas.prototype.buildOuter = function () {
 
   this.context.beginPath();
   this.context.strokeStyle = 'white';
@@ -234,7 +233,7 @@ MobileCanvas.prototype.buildOuter = function () {
 /*!
 ** 初始渲染安全区域下方。
 */
-MobileCanvas.prototype.buildBotBar = function () {
+DesktopCanvas.prototype.buildBotBar = function () {
   this.context.beginPath();
   this.context.fillStyle = this.background;
   this.context.strokeStyle = this.background;
@@ -251,7 +250,7 @@ MobileCanvas.prototype.buildBotBar = function () {
 /*!
 ** 初始化设置。
 */
-MobileCanvas.prototype.initialize = function () {
+DesktopCanvas.prototype.initialize = function () {
   dnd.setDroppable(this.canvas, (x, y, data) => {
     if (this.mode == 'simulate') return;
     this.drawNewElement(x, y, data);
@@ -336,7 +335,7 @@ MobileCanvas.prototype.initialize = function () {
   });
 };
 
-MobileCanvas.prototype.drawParagraph = function (el) {
+DesktopCanvas.prototype.drawParagraph = function (el) {
   this.context.fillStyle = this.skeletonBackground;
   this.context.beginPath();
   let startX = el.x;
@@ -349,7 +348,7 @@ MobileCanvas.prototype.drawParagraph = function (el) {
   this.context.closePath();
 };
 
-MobileCanvas.prototype.drawImage = function (el) {
+DesktopCanvas.prototype.drawImage = function (el) {
   if (el.url) {
     let img = this.images[el.url];
     if (img == null) {
@@ -367,7 +366,7 @@ MobileCanvas.prototype.drawImage = function (el) {
   }
 };
 
-MobileCanvas.prototype.drawImageSkeleton = function (el) {
+DesktopCanvas.prototype.drawImageSkeleton = function (el) {
   this.context.fillStyle = this.skeletonBackground;
   this.context.fillRect(el.x, el.y, el.w, el.h);
   let iw = 0;
@@ -427,7 +426,7 @@ MobileCanvas.prototype.drawImageSkeleton = function (el) {
   this.context.closePath();
 };
 
-MobileCanvas.prototype.drawAvatar = function (el) {
+DesktopCanvas.prototype.drawAvatar = function (el) {
   this.context.fillStyle = this.skeletonBackground;
 
   let cx = el.x + el.w / 2;
@@ -439,17 +438,17 @@ MobileCanvas.prototype.drawAvatar = function (el) {
   this.context.closePath();
 };
 
-MobileCanvas.prototype.drawText = function (el) {
+DesktopCanvas.prototype.drawText = function (el) {
   this.context.fillStyle = this.skeletonBackground;
   this.context.fillRect(el.x, el.y, el.w, el.h);
 };
 
-MobileCanvas.prototype.drawBlock = function (el) {
+DesktopCanvas.prototype.drawBlock = function (el) {
   this.context.fillStyle = this.skeletonBackground;
   this.context.fillRect(el.x, el.y, el.w, el.h);
 };
 
-MobileCanvas.prototype.drawElement = function (el) {
+DesktopCanvas.prototype.drawElement = function (el) {
   this.context.fillStyle = this.skeletonBackground;
   if (el.type == 'title') {
     if (!el.w) {
@@ -503,18 +502,18 @@ MobileCanvas.prototype.drawElement = function (el) {
   }
 };
 
-MobileCanvas.prototype.drawNewElement = function (x, y, data, translated/*坐标是否已经转换*/) {
+DesktopCanvas.prototype.drawNewElement = function (x, y, data, translated/*坐标是否已经转换*/) {
   translated = translated === true;
   let el;
   if (!translated) {
     // 通过拖拽实际Canvas的坐标
     let ox = x;
     let oy = y;
-    if (MobileCanvas.offsetX) {
-      ox -= MobileCanvas.offsetX;
+    if (DesktopCanvas.offsetX) {
+      ox -= DesktopCanvas.offsetX;
     }
-    if (MobileCanvas.offsetY) {
-      oy -= MobileCanvas.offsetY;
+    if (DesktopCanvas.offsetY) {
+      oy -= DesktopCanvas.offsetY;
     }
 
     el = {
@@ -542,7 +541,7 @@ MobileCanvas.prototype.drawNewElement = function (x, y, data, translated/*坐标
   this.redraw();
 };
 
-MobileCanvas.prototype.findElementByXY = function (x, y) {
+DesktopCanvas.prototype.findElementByXY = function (x, y) {
   for (let i = 0; i < this.drawnElements.length; i++) {
     let el = this.drawnElements[i];
     if (x > el.x && x < el.x + el.w && y > el.y && y < el.y + el.h) {
@@ -552,7 +551,7 @@ MobileCanvas.prototype.findElementByXY = function (x, y) {
   return null;
 };
 
-MobileCanvas.prototype.findElementById = function (id) {
+DesktopCanvas.prototype.findElementById = function (id) {
   for (let i = 0; i < this.drawnElements.length; i++) {
     let el = this.drawnElements[i];
     if (el.id === id) {
@@ -562,7 +561,7 @@ MobileCanvas.prototype.findElementById = function (id) {
   return null;
 };
 
-MobileCanvas.prototype.findTopmostElement = function () {
+DesktopCanvas.prototype.findTopmostElement = function () {
   let minY = 100000;
   let ret = null;
   for (let i = 0; i < this.drawnElements.length; i++) {
@@ -575,13 +574,13 @@ MobileCanvas.prototype.findTopmostElement = function () {
   return ret;
 };
 
-MobileCanvas.prototype.clearSelected = function () {
+DesktopCanvas.prototype.clearSelected = function () {
   for (let i = 0; i < this.drawnElements.length; i++) {
     this.drawnElements[i].selected = false;
   }
 };
 
-MobileCanvas.prototype.removeElement = function () {
+DesktopCanvas.prototype.removeElement = function () {
   let found = -1;
   for (let i = 0; i < this.drawnElements.length; i++) {
     if (this.drawnElements[i].selected === true) {
@@ -594,7 +593,7 @@ MobileCanvas.prototype.removeElement = function () {
   this.redraw();
 };
 
-MobileCanvas.prototype.switchMode = function () {
+DesktopCanvas.prototype.switchMode = function () {
   if (this.mode == 'design') {
     this.mode = 'simulate';
     this.clearSelected();
@@ -604,7 +603,7 @@ MobileCanvas.prototype.switchMode = function () {
   }
 };
 
-MobileCanvas.prototype.changeElement = function (prop) {
+DesktopCanvas.prototype.changeElement = function (prop) {
   for (let i = 0; i < this.drawnElements.length; i++) {
     let el = this.drawnElements[i];
     if (el.selected === true) {
@@ -626,12 +625,12 @@ MobileCanvas.prototype.changeElement = function (prop) {
   }
 };
 
-MobileCanvas.prototype.clear = function () {
+DesktopCanvas.prototype.clear = function () {
   this.drawnElements = [];
   this.redraw();
 };
 
-MobileCanvas.prototype.getElementProperties = function (el) {
+DesktopCanvas.prototype.getElementProperties = function (el) {
   let ret = {
     groups: [{
       title: '位置',
