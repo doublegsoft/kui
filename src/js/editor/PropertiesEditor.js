@@ -410,7 +410,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       divProp.append(input);
     } else if (prop.input === 'array') {
       let plus = dom.element(`
-        <a class="material-icons pointer position-relative font-16" style="top: 1px;">playlist_add</a>
+        <a class="material-icons pointer position-relative font-16 text-white" style="top: 1px;">playlist_add</a>
       `);
       // labelProp.appendChild(plus);
       let ul = dom.element(`
@@ -438,7 +438,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
     } else if (prop.input === 'dialog') {
       let btn = dom.templatize(`
           <a property-model-input="dialog" property-model-name="{{name}}"
-             class="material-symbols-outlined pointer position-relative font-20" style="top: 4px; left: 8px;">open_in_new</a>
+             class="material-symbols-outlined pointer position-relative font-20 text-white" style="top: 4px; left: 8px;">open_in_new</a>
       `, prop);
       divProp.append(btn);
       dom.bind(btn, 'click', ev => {
