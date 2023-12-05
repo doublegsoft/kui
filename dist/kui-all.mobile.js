@@ -2712,6 +2712,28 @@ dom.exists = (elements, model, id) => {
   }
   return false;
 };
+
+dom.getDataFromChildren = (parent, childrenSelector, attrs) => {
+  let ret = [];
+  let children = parent.querySelectorAll(childrenSelector);
+  for (let i = 0; i < children.length; i++) {
+    let child = children[i];
+    if (typeof attrs === 'undefined') {
+      ret.push(dom.model(child));
+    } else if (Array.isArray(attrs)) {
+      let row = {};
+      for (let j = 0; j < attrs.length; j++) {
+        row[attrs[j]] = child.getAttribute(attrs[j]);
+      }
+      ret.push(row);
+    } else if (typeof attrs === 'string') {
+      let row = {};
+      row[attrs] = child.getAttribute(attrs);
+      ret.push(row);
+    }
+  }
+  return ret;
+};
 utils = {};
 
 /**
