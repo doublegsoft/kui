@@ -303,27 +303,28 @@ FormLayout.prototype.build = async function(persisted) {
       // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'image') {
+      console.log(field);
       new Medias({
         ...field.options,
         mediaType: 'image',
         multiple: false,
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'images') {
       new Medias({
         ...field.options,
         mediaType: 'image',
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'video') {
       new Medias({
         ...field.options,
         mediaType: 'video',
         multiple: false,
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'videos') {
       new Medias({
         ...field.options,
         mediaType: 'video',
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');

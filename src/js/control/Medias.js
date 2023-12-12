@@ -16,8 +16,18 @@ function Medias(opts) {
   this.mediaType = opts.mediaType || 'image';
 }
 
-Medias.prototype.render = function (containerId) {
+Medias.prototype.render = function (containerId, value) {
+  this.value = value;
   this.container = dom.find(containerId);
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      let row = value[i];
+      // row is object
+      this.appendMedia(row);
+    }
+  } else  {
+    this.appendMedia(value);
+  }
   if (this.readonly === false) {
     let plus = this.createPlusElement();
     this.container.appendChild(plus);
@@ -97,6 +107,24 @@ Medias.prototype.readImageAsRemote = function (file) {
   })
 };
 
+Medias.prototype.appendMedia = function (media) {
+  if (this.mediaType === 'image') {
+    if (typeof media === 'string') {
+      media = {
+        imagePath: media,
+      }
+    }
+    this.appendImage(media);
+  } else {
+    if (typeof media === 'string') {
+      media = {
+        videoPath: media,
+      }
+    }
+    this.appendVideoImage(media, 2);
+  }
+};
+
 Medias.prototype.appendImage = function (img) {
   let el = dom.templatize(`
     <div class="d-flex align-items-center justify-content-center pointer position-relative" 
@@ -145,7 +173,7 @@ Medias.prototype.appendImage = function (img) {
     buttonDelete.remove();
     this.container.appendChild(el);
   }
-  if (this.multiple === false) {
+  if (this.multiple === false && this.plus) {
     this.plus.remove();
   }
 };

@@ -8662,27 +8662,28 @@ FormLayout.prototype.build = async function(persisted) {
       // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'image') {
+      console.log(field);
       new Medias({
         ...field.options,
         mediaType: 'image',
         multiple: false,
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'images') {
       new Medias({
         ...field.options,
         mediaType: 'image',
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'video') {
       new Medias({
         ...field.options,
         mediaType: 'video',
         multiple: false,
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'videos') {
       new Medias({
         ...field.options,
         mediaType: 'video',
-      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container));
+      }).render(dom.find('div[data-medias-name=\'' + field.name + '\']', this.container), field.value);
     } else if (field.input == 'longtext') {
       if (field.language === 'javascript') {
         let textarea = dom.find(containerId + ' textarea[name=\'' + field.name + '\']');
@@ -17764,8 +17765,18 @@ function Medias(opts) {
   this.mediaType = opts.mediaType || 'image';
 }
 
-Medias.prototype.render = function (containerId) {
+Medias.prototype.render = function (containerId, value) {
+  this.value = value;
   this.container = dom.find(containerId);
+  if (Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      let row = value[i];
+      // row is object
+      this.appendMedia(row);
+    }
+  } else  {
+    this.appendMedia(value);
+  }
   if (this.readonly === false) {
     let plus = this.createPlusElement();
     this.container.appendChild(plus);
@@ -17845,6 +17856,24 @@ Medias.prototype.readImageAsRemote = function (file) {
   })
 };
 
+Medias.prototype.appendMedia = function (media) {
+  if (this.mediaType === 'image') {
+    if (typeof media === 'string') {
+      media = {
+        imagePath: media,
+      }
+    }
+    this.appendImage(media);
+  } else {
+    if (typeof media === 'string') {
+      media = {
+        videoPath: media,
+      }
+    }
+    this.appendVideoImage(media, 2);
+  }
+};
+
 Medias.prototype.appendImage = function (img) {
   let el = dom.templatize(`
     <div class="d-flex align-items-center justify-content-center pointer position-relative" 
@@ -17893,7 +17922,7 @@ Medias.prototype.appendImage = function (img) {
     buttonDelete.remove();
     this.container.appendChild(el);
   }
-  if (this.multiple === false) {
+  if (this.multiple === false && this.plus) {
     this.plus.remove();
   }
 };
