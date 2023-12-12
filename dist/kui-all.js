@@ -8522,6 +8522,10 @@ FormLayout.prototype.build = async function(persisted) {
       // 指定字段的容器，以备不时只需。
       field.container = labelAndInput;
       row.appendChild(labelAndInput);
+      if (field.note) {
+        let el = pair.input.children[1];
+        el.innerHTML = field.note;
+      }
     }
     form.appendChild(row);
   }
@@ -8986,7 +8990,13 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   let label = dom.create('div', 'col-24-' + this.formatGridCount(labelGridCount),'col-form-label', (_required?'required':'norequired'));
   label.innerText = field.title + '：';
   inputGridCount += (labelGridCount + inputGridCount) * (field.columnCount - 1);
-  let group = dom.create('div', 'col-24-' + this.formatGridCount(inputGridCount), 'input-group');
+
+  let groupContainer = dom.create('div', 'col-24-' + this.formatGridCount(inputGridCount));
+  let group = dom.create('div', 'full-width', 'input-group');
+  let feedback = dom.create('div', 'small', 'text-muted', 'pt-1');
+  feedback.setAttribute('role', 'feedback');
+  groupContainer.appendChild(group);
+  groupContainer.appendChild(feedback);
 
   let input = null;
   if (field.input == 'code') {
@@ -9523,7 +9533,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(field.widgetCustom);
   }
 
-  return {label: label, input: group};
+  return {label: label, input: groupContainer};
 };
 
 /**
