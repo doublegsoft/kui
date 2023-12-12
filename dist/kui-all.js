@@ -6206,6 +6206,20 @@ utils.nameAttribute = (objname, attrname, domainType) => {
   return attrname;
 };
 
+utils.merge = (older, newer) => {
+  let ret = {...older};
+  for (let key in newer) {
+    let val = newer[key];
+    let type = typeof val;
+    if (type === 'string' || type === 'number' || type === 'boolean') {
+      ret[key] = val;
+    } else if (type === 'object') {
+      ret[key] = utils.merge(ret[key], val);
+    }
+  }
+  return ret;
+};
+
 var NO_ERRORS = 0;
 var REQUIRED_ERROR = 1;
 var FORMAT_ERROR = 2;
@@ -8698,7 +8712,7 @@ FormLayout.prototype.build = async function(persisted) {
   let containerButtons = dom.create('div');
   containerButtons.classList.add('buttons');
   let buttons = dom.create('div');
-	if(this.mode!='page'){
+	if(this.mode != 'page'){
 		buttons.classList.add('float-right');
 	}else{
 		buttons.classList.add('row-button');
@@ -9852,14 +9866,17 @@ FormLayout.prototype.getData = function () {
       });
       this.assignValue2Name(ret, field.name, values);
     } else if (field.input === 'image') {
-      let values = [];
       let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
       let img = container.querySelector('img');
       if (img == null) continue;
       let model = dom.model(img.parentElement);
       this.assignValue2Name(ret, field.name, model);
     } else if (field.input === 'video') {
-
+      let container = dom.find('div[data-medias-name="' + field.name + '"]', this.container);
+      let img = container.querySelector('img');
+      if (img == null) continue;
+      let model = dom.model(img.parentElement);
+      this.assignValue2Name(ret, field.name, model);
     } else if (field.input === 'videos') {
 
     }

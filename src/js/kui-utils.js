@@ -317,3 +317,17 @@ utils.nameAttribute = (objname, attrname, domainType) => {
   }
   return attrname;
 };
+
+utils.merge = (older, newer) => {
+  let ret = {...older};
+  for (let key in newer) {
+    let val = newer[key];
+    let type = typeof val;
+    if (type === 'string' || type === 'number' || type === 'boolean') {
+      ret[key] = val;
+    } else if (type === 'object') {
+      ret[key] = utils.merge(ret[key], val);
+    }
+  }
+  return ret;
+};
