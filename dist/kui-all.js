@@ -17774,7 +17774,7 @@ Medias.prototype.render = function (containerId, value) {
       // row is object
       this.appendMedia(row);
     }
-  } else  {
+  } else if (value) {
     this.appendMedia(value);
   }
   if (this.readonly === false) {
