@@ -9862,6 +9862,9 @@ FormLayout.prototype.compare = function (data) {
 
 FormLayout.prototype.getData = function () {
   let ret = dom.formdata(this.container);
+  for (let key in ret) {
+    this.assignValue2Name(ret, key, ret[key]);
+  }
   for (let i = 0; i < this.fields.length; i++) {
     let field = this.fields[i];
     if (field.input === 'images') {
@@ -9909,8 +9912,11 @@ FormLayout.prototype.assignValue2Name = function (owner, name, value) {
     return;
   }
   let hierarchy = name.substring(0, dotIndex);
-  owner[hierarchy] = {};
-  this.assignValue2Name(owner[hierarchy], name.substring(dotIndex + 1), value);;
+  if (!owner[hierarchy]) {
+    owner[hierarchy] = {};
+  }
+  this.assignValue2Name(owner[hierarchy], name.substring(dotIndex + 1), value);
+  delete owner[name];
 };
 /**
  * 
