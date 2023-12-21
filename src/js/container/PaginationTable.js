@@ -1038,6 +1038,51 @@ PaginationTable.prototype.appendRow = function (row, rowIndex) {
   tbody.append(tr);
 };
 
+PaginationTable.prototype.appendOrReplaceRow = function (row, rowIndex) {
+  let tbody = dom.find('tbody', this.container);
+  let nodata = dom.find('tr.no-hover', tbody);
+  if (nodata != null) {
+    nodata.remove();
+  }
+  let tr = dom.create('tr');
+  dom.model(tr, row);
+  tr.style.height = this.columnHeight;
+  for (let j = 0; j < this.mappingColumns.length; ++j) {
+    let col = this.mappingColumns[j];
+    let td = dom.create('td');
+    // 冻结列
+    if (j < this.frozenColumnCount) td.classList.add('headcol');
+    if (col.style) {
+      td.style = col.style;
+    } else {
+      td.style = "text-align: center; vertical-align:middle;";
+    }
+    if (typeof col.width !== 'undefined') td.css('width', col.width);
+    if (col.template) {
+      let html = col.template.toString();
+      for (let k in row) {
+        row[k] = row[k] == null ? "-" : row[k];
+        html = this.replace(html, "\\{" + k + "\\}", row[k]);
+      }
+      if (html.indexOf('{') == 0 && html.indexOf('}') != -1) {
+        html = '-';
+      }
+      td.html(html);
+    }
+    if (col.display) {
+      col.display(row, td, j, (typeof(rowIndex) === 'undefined' ? -1 : rowIndex), this.start);
+    }
+    tr.appendChild(td);
+  }
+  if (typeof rowIndex !== 'undefined') {
+    let oldTr = tbody.rows[rowIndex];
+    tbody.replaceChild(tr, oldTr);
+  } else {
+    tbody.appendChild(tr);
+  }
+
+};
+
 PaginationTable.prototype.getData = function () {
   let ret = [];
   let tbody = $(this.table.find('tbody')).get(0);
