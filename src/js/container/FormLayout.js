@@ -307,7 +307,6 @@ FormLayout.prototype.build = async function(persisted) {
       // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'image') {
-      console.log(field);
       new Medias({
         ...field.options,
         mediaType: 'image',
