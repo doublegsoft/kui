@@ -4100,6 +4100,19 @@ utils.nameAttribute = (objname, attrname, domainType) => {
   return attrname;
 };
 
+utils.safeValue = (obj, name) => {
+  if (!obj) return '';
+  let names = name.split('.');
+  let ret = obj;
+  for (let i = 0; i < names.length; i++) {
+    ret = ret[names[i]];
+    if (!ret) {
+      return '';
+    }
+  }
+  return ret || '';
+};
+
 utils.merge = (older, newer) => {
   let ret = {...older};
   for (let key in newer) {

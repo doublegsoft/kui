@@ -6206,6 +6206,19 @@ utils.nameAttribute = (objname, attrname, domainType) => {
   return attrname;
 };
 
+utils.safeValue = (obj, name) => {
+  if (!obj) return '';
+  let names = name.split('.');
+  let ret = obj;
+  for (let i = 0; i < names.length; i++) {
+    ret = ret[names[i]];
+    if (!ret) {
+      return '';
+    }
+  }
+  return ret || '';
+};
+
 utils.merge = (older, newer) => {
   let ret = {...older};
   for (let key in newer) {
@@ -8666,7 +8679,6 @@ FormLayout.prototype.build = async function(persisted) {
       // DEPRECATED
       new ImageUpload(field.options).render(dom.find('div[data-imageupload-name=\'' + field.name + '\']', this.container));
     } else if (field.input == 'image') {
-      console.log(field);
       new Medias({
         ...field.options,
         mediaType: 'image',
