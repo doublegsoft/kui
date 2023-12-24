@@ -1,0 +1,118 @@
+<style>
+  .ql-snow .ql-size .ql-picker-item[data-value="14px"]::before {
+    content: "14px";
+    font-size: 14px !important;
+  }
+
+  .ql-snow .ql-size .ql-picker-item[data-value="16px"]::before {
+    content: "16px";
+    font-size: 16px !important;
+  }
+  .ql-snow .ql-size .ql-picker-item[data-value="18px"]::before {
+    content: "18px";
+    font-size: 18px !important;
+  }
+
+  .ql-snow .ql-size .ql-picker-item[data-value="20px"]::before {
+    content: "20px";
+    font-size: 20px !important;
+  }
+
+  .ql-snow .ql-size .ql-picker-item[data-value="22px"]::before {
+    content: "22px";
+    font-size: 22px !important;
+  }
+  .ql-snow .ql-size .ql-picker-item[data-value="24px"]::before {
+    content: "24px";
+    font-size: 24px !important;
+  }
+</style>
+<div id="pageArticleEdit" class="page card">
+  <div class="card-header pl-3 pr-3">
+    <i class="fas fa-edit"></i>
+    <strong>文章编辑</strong>
+  </div>
+  <div class="card-body row mr-0 ml-0">
+    <div class="col-md-6">
+      <div widget-id="widgetContentArticle" class="full-width pr-3 pl-3"></div>
+    </div>
+    <div widget-id="widgetPreview" class="col-md-6 d-flex position-relative">
+<!--      <img widget-id="imageMobile" src="/img/emulator/iphone-bg.png" class="m-auto"-->
+<!--           style="width: 360px; height: 900px; margin-top: 30px;">-->
+<!--      <iframe widget-id="frameMobile" frameborder="none"-->
+<!--              src="preview.html"-->
+<!--              class="position-absolute border-less"></iframe>-->
+    </div>
+  </div>
+</div>
+<script>
+function PageArticleEdit() {
+  this.page = dom.find('#pageArticleEdit');
+}
+
+PageArticleEdit.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+
+  dom.autoheight(this.widgetContentArticle, document.body, 48 /*QUILL CONSTANT*/);
+  dom.autoheight(this.widgetPreview);
+
+  let size = Quill.import('attributors/style/size');
+  size.whitelist = ['14px', '16px', '18px', '20px', '22px', '24px'];
+  Quill.register(size, true);
+  this.quill = new Quill(this.widgetContentArticle, {
+    modules: {
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        [{'header': [1, 2, 3, 4, 5, 6, false]}],
+        [{'color': []}, {'background': []}],          // dropdown with defaults from theme
+        [{'font': []}],
+        [{'size': size.whitelist}],
+        ['link', 'image'],
+      ],
+    },
+    theme: 'snow'
+  });
+
+  this.quill.on('text-change', (delta, oldDelta, source) => {
+    this.preview();
+  });
+
+  this.previewer = new MobileFrame({
+    url: 'html/application/aow/preview.html',
+  });
+  this.previewer.render(this.widgetPreview);
+};
+
+PageArticleEdit.prototype.preview = function () {
+  clearTimeout(this.delayToRender);
+  this.delayToRender = setTimeout(() => {
+    this.previewer.preview(this.quill.root.innerHTML);
+  }, 1000)
+};
+
+PageArticleEdit.prototype.saveData = function (params) {
+  xhr.post({
+    url: '/api/v3/common/script/stdbiz/cm/article/merge',
+    params: {
+      ...params,
+      modifierId: window.user.userId,
+      modifierType: 'STDBIZ.SAM.USER',
+    },
+    success: function (res) {
+      if (res.error && res.error.code == '-1') {
+        layer.msg(res.error.message);
+      } else {
+        layer.msg('数据保存成功');
+        setTimeout(() => {
+          pageArticleEdit.page.parentElement.remove();
+        }, 1000)
+      }
+    }
+  });
+};
+
+PageArticleEdit.prototype.show = function (params) {
+  this.initialize(params);
+};
+pageArticleEdit = new PageArticleEdit();
+</script>

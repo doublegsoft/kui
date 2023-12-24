@@ -107,13 +107,15 @@ gulp.task('dist', function() {
   // mobile css
   gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuim.css',
     'src/css/kui-timeline.css', 'src/css/kui-wizard.css', 'src/css/kui-tag.css',
-    'src/css/kui-calendar.css', 'src/css/kui-chat.css', 'src/css/kui-skeleton.css'])
+    'src/css/kui-calendar.css', 'src/css/kui-chat.css', 'src/css/kui-skeleton.css',
+    'src/css/kui-questionnaire.css'])
     .pipe(concat('./kui-all.mobile.css'))
     .pipe(gulp.dest('./dist/'));
 
   gulp.src(['src/css/coreui.css', 'src/css/coreui3-c.css', 'src/css/kuim.css',
     'src/css/kui-timeline.css', 'src/css/kui-wizard.css', 'src/css/kui-tag.css',
-    'src/css/kui-calendar.css', 'src/css/kui-chat.css', 'src/css/kui-skeleton.css'])
+    'src/css/kui-calendar.css', 'src/css/kui-chat.css', 'src/css/kui-skeleton.css',
+    'src/css/kui-questionnaire.css'])
     .pipe(concat('./kui-all.mobile.min.css'))
     .pipe(uglifycss())
     .pipe(gulp.dest('./dist/'));

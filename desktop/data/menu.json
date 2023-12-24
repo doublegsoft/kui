@@ -12,11 +12,11 @@
       "items": [{
         "text": "手机页面",
         "icon": "nav-icon icon-note font-16",
-        "url": "javascript:ajax.view({url: 'html/application/mobile/design.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/application/mobivas/design.html', containerId: 'container'});"
       },{
-        "text": "桌面页面",
+        "text": "文章编辑",
         "icon": "nav-icon icon-note font-16",
-        "url": "javascript:ajax.view({url: 'html/application/desktop/design.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/application/aow/edit.html', containerId: 'container'});"
       },{
         "text": "培训排课",
         "icon": "nav-icon icon-note font-16",

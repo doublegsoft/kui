@@ -18322,3 +18322,41 @@ span.tag-removable.danger > i:hover {
   width: 100%;
   height: 150px;
 }
+.questionnaire-question {
+
+}
+
+.questionnaire-question .questionnaire-answer {
+  border: solid 2px #cfcfcf;
+  line-height: 24px;
+  padding: 6px 12px;
+  margin: 6px;
+  font-size: 14px;
+  color: #cfcfcf;
+}
+
+.questionnaire-question .questionnaire-answer label {
+  color: rgba(0,0,0,0.5);
+  margin-bottom: 0!important;
+}
+
+.questionnaire-question .questionnaire-answer i {
+  position: relative;
+  top: 2px;
+  font-size: 18px;
+  margin-right: 12px;
+  color: #cfcfcf;
+}
+
+.questionnaire-question .questionnaire-answer.checked {
+  border-color: #0e90d2;
+}
+
+.questionnaire-question .questionnaire-answer.checked i {
+  color: #0e90d2;
+}
+
+.questionnaire-question .questionnaire-answer.checked label {
+  color: #0e90d2;
+  font-weight: bolder;
+}

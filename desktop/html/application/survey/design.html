@@ -1,17 +1,11 @@
 <div id="pageSurveyDesign" class="page" style="overflow-y: auto;">
   <div class="card" style="margin: auto; width: 100%; height: 100%;">
     <div widget-id="widgetSourceCode" class="card-body">
-      <div class="editor full-height">
-        <div class="editor-toolbar">
-          <span class="button-group">
-            <a widget-id="buttonClose" class="button text-danger"><i class="fas fa-times"></i></a>
-          </span>
-          <span class="separator"></span>
-          <span class="button-group">
-            <a widget-id="buttonSave" class="button text-success"><i class="fas fa-save"></i></a>
-          </span>
+      <div class="row full-height">
+        <div class="col-24-16" style="overflow: hidden;">
+          <div widget-id="widgetDesigner" class="row mx-0"></div>
         </div>
-        <div widget-id="widgetDesigner" class="row full-height full-width" style="overflow: hidden;"></div>
+        <div widget-id="widgetPreview" class="col-24-08 d-flex" style="overflow: hidden;"></div>
       </div>
     </div>
   </div>
@@ -20,21 +14,33 @@
 <script>
 function PageSurveyDesign() {
   this.page = dom.find('#pageSurveyDesign');
-  this.widgetSourceCode = dom.find('[widget-id=widgetSourceCode]', this.page);
-  this.widgetDesigner = dom.find('[widget-id=widgetDesigner]', this.page);
 }
 
 PageSurveyDesign.prototype.initialize = async function(params) {
+  dom.init(this, this.page);
 
-  dom.height(this.widgetSourceCode, 12, document.body);
-  dom.height(this.widgetDesigner, 12, document.body);
+  dom.autoheight(this.widgetDesigner);
+  dom.autoheight(this.widgetPreview);
 
   this.designer = new QuestionnaireDesigner({
     mobileFramePath: '/mobile/index.html',
   });
   this.designer.render(this.widgetDesigner, {});
 
-  this.page.classList.add('show');
+  this.previewer = new MobileFrame({
+    url: 'html/application/aow/preview.html',
+  });
+  this.previewer.render(this.widgetPreview);
+
+  setInterval(() => {
+    this.previewer.preview(this.designer.widgetQuestionnaireCanvas.innerHTML, container => {
+      let operations = dom.find('[widget-id=operations]', container);
+      if (operations != null) {
+        operations.parentElement.style.borderColor = 'transparent';
+        operations.remove();
+      }
+    });
+  }, 2000);
 };
 
 PageSurveyDesign.prototype.getType = function(type) {
@@ -48,5 +54,4 @@ PageSurveyDesign.prototype.show = function(params) {
 };
 
 pageSurveyDesign = new PageSurveyDesign();
-pageSurveyDesign.show();
 </script>

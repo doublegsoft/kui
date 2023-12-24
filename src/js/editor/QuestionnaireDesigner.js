@@ -5,7 +5,6 @@ function QuestionnaireDesigner(opt) {
   this.draggingTarget = null;
   this.onSave = opt.onSave || function(model) {};
   this.onDelete = opt.onDelete || function(model) {};
-  this.mobileFramePath = opt.mobileFramePath;
   QuestionnaireDesigner.instance = this;
 }
 
@@ -48,7 +47,7 @@ QuestionnaireDesigner.MODEL_SHORT_ANSWER = `
  * the palette component on left side;
  */
 QuestionnaireDesigner.prototype.palette = function() {
-  let ret = dom.element(`<div class="col-md-2" style="padding: 0; border-radius: unset;"></div>`);
+  let ret = dom.element(`<div class="col-md-4" style="padding: 0; border-radius: unset;"></div>`);
   let ul = dom.create('ul', 'list-group', 'mt-2', 'ml-4');
   let li = dom.create('li', 'list-group-item','grab');
   li.setAttribute('draggable', true);
@@ -86,7 +85,7 @@ QuestionnaireDesigner.prototype.palette = function() {
 QuestionnaireDesigner.prototype.canvas = function() {
   let self = this;
   let ret = dom.element(`
-    <div class="col-md-6 m-0">
+    <div class="col-md-8 m-0">
       <div widget-id="widgetQuestionnaireCanvas" 
            style="padding: 10px; 
            margin-top: 8px;
@@ -158,7 +157,6 @@ QuestionnaireDesigner.prototype.canvas = function() {
       }
       this.renderQuestion(this.widgetQuestionnaireCanvas, JSON.parse(data.model));
     }
-    self.refresh();
   });
 
   dom.bind(this.widgetQuestionnaireCanvas, 'click', ev => {
@@ -170,31 +168,6 @@ QuestionnaireDesigner.prototype.canvas = function() {
   return ret;
 };
 
-QuestionnaireDesigner.prototype.preview = function(container) {
-  let width = 365;
-  let height = 750;
-  let el = dom.element(`
-    <div class="col-md-4 m-0 d-flex position-relative">
-      <img src="img/emulator/iphone-full.png" class="m-auto" style="width: ${width}px; height: ${height}px;">
-      <iframe class="position-absolute" style="width: ${width - 52}px; height: ${height - 138}px; background-color: white;" frameborder="0"></iframe>
-    </div>
-  `);
-  container.appendChild(el);
-
-  // 重新计算位置
-  let img = dom.find('img', el);
-  this.ifPreview = dom.find('iframe', el);
-  let imgrect = img.getBoundingClientRect();
-  this.ifPreview.style.left = (img.offsetLeft + 25) + 'px';
-  this.ifPreview.style.top = (img.offsetTop + 82) + 'px';
-  this.ifPreview.src  = this.mobileFramePath;
-
-  this.ifPreview.onload = () => {
-    this.refresh();
-  };
-
-};
-
 QuestionnaireDesigner.prototype.render = function(containerId, params) {
   params = params || {};
   if (params.questions) {
@@ -204,7 +177,6 @@ QuestionnaireDesigner.prototype.render = function(containerId, params) {
   this.container.innerHTML = '';
   this.container.appendChild(this.palette());
   this.container.appendChild(this.canvas());
-  this.preview(this.container);
 };
 
 /**
@@ -438,6 +410,7 @@ QuestionnaireDesigner.prototype.edit = function(question) {
   });
   let questionId = question.id;
   question.options = [];
+  question.values = question.values || [];
   for (let i = 0; i < question.values.length; i++) {
     question.options.push({
       value: question.values[i],
@@ -543,11 +516,6 @@ QuestionnaireDesigner.prototype.edit = function(question) {
       self.refresh();
     }
   });
-};
-
-QuestionnaireDesigner.prototype.refresh = function() {
-  let ifbody = this.ifPreview.contentDocument.body || this.ifPreview.contentWindow.document.body;
-  ifbody.innerHTML = this.widgetQuestionnaireCanvas.innerHTML;
 };
 
 QuestionnaireDesigner.prototype.onCellFocus = function(input) {

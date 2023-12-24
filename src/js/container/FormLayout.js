@@ -826,7 +826,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     if (field.style === '')
       input.rows = 4;
     input.setAttribute('name', field.name);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
     input.innerHTML = field.value || '';
     if (this.readonly === true || field.readonly === true) {
       input.setAttribute('disabled', true);
@@ -850,7 +850,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     corner.style.borderStyle = 'solid';
     corner.style.borderColor = 'transparent transparent rgba(0, 0, 0, 0.3)';
     input.setAttribute('name', field.name);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
     input.innerHTML = field.value || '';
 
     div.appendChild(input);
@@ -947,8 +947,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(timeInput);
     return {label: label, input: group};
   } else if (field.input == 'tags') {
-    input = dom.create('input', 'form-control');
+    input = dom.create('input', 'full-width');
     input.name = field.name;
+    input.value = field.value;
     input.disabled = this.readonly || field.readonly || false;
   } else if (field.input == 'custom') {
     input = dom.create('input', 'form-control');
@@ -958,7 +959,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
     input.setAttribute('autocomplete', 'off');
     if (field.value) {
       input.value = field.value;
@@ -980,7 +981,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('placeholder', '请选择...');
   } else if (field.input.indexOf('number') == 0) {
     input.setAttribute('data-domain-type', field.input);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
   } else if (field.input == 'file') {
     input.setAttribute('readonly', true);
     let fileinput = dom.create('input');
@@ -1055,6 +1056,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(unit);
   }
 
+  /*!
+  ** 字段提示
+  */
   let tooltip = dom.element(`
     <div class="input-group-append">
       <span class="input-group-text width-36 icon-error"></span>
@@ -1105,7 +1109,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     field.input !== 'images' &&
     field.input !== 'video' &&
     field.input !== 'videos' &&
-    field.input !== 'files')
+    field.input !== 'files' &&
+    field.input !== 'tags')
     group.append(tooltip);
 
   // user input
@@ -1533,6 +1538,17 @@ FormLayout.prototype.getData = function () {
       this.assignValue2Name(ret, field.name, model);
     } else if (field.input === 'videos') {
 
+    } else if (field.input === 'tags') {
+      let container = dom.find('input[name="' + field.name + '"]', this.container).parentElement;
+      let tags = container.querySelectorAll('tag');
+      let value = '';
+      for (let i = 0; i < tags.length; i++) {
+        if (value != '') {
+          value += ','
+        }
+        value += tags[i].innerText;
+      }
+      ret[field.name] = value;
     }
   }
   return ret;

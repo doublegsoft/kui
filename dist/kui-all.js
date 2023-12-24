@@ -9198,7 +9198,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     if (field.style === '')
       input.rows = 4;
     input.setAttribute('name', field.name);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
     input.innerHTML = field.value || '';
     if (this.readonly === true || field.readonly === true) {
       input.setAttribute('disabled', true);
@@ -9222,7 +9222,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     corner.style.borderStyle = 'solid';
     corner.style.borderColor = 'transparent transparent rgba(0, 0, 0, 0.3)';
     input.setAttribute('name', field.name);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
     input.innerHTML = field.value || '';
 
     div.appendChild(input);
@@ -9319,8 +9319,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(timeInput);
     return {label: label, input: group};
   } else if (field.input == 'tags') {
-    input = dom.create('input', 'form-control');
+    input = dom.create('input', 'full-width');
     input.name = field.name;
+    input.value = field.value;
     input.disabled = this.readonly || field.readonly || false;
   } else if (field.input == 'custom') {
     input = dom.create('input', 'form-control');
@@ -9330,7 +9331,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input = dom.create('input', 'form-control');
     input.disabled = this.readonly || field.readonly || false;
     input.setAttribute('name', field.name);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
     input.setAttribute('autocomplete', 'off');
     if (field.value) {
       input.value = field.value;
@@ -9352,7 +9353,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     input.setAttribute('placeholder', '请选择...');
   } else if (field.input.indexOf('number') == 0) {
     input.setAttribute('data-domain-type', field.input);
-    input.setAttribute('placeholder', '请输入...');
+    input.setAttribute('placeholder', '请输入');
   } else if (field.input == 'file') {
     input.setAttribute('readonly', true);
     let fileinput = dom.create('input');
@@ -9427,6 +9428,9 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(unit);
   }
 
+  /*!
+  ** 字段提示
+  */
   let tooltip = dom.element(`
     <div class="input-group-append">
       <span class="input-group-text width-36 icon-error"></span>
@@ -9477,7 +9481,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     field.input !== 'images' &&
     field.input !== 'video' &&
     field.input !== 'videos' &&
-    field.input !== 'files')
+    field.input !== 'files' &&
+    field.input !== 'tags')
     group.append(tooltip);
 
   // user input
@@ -9905,6 +9910,17 @@ FormLayout.prototype.getData = function () {
       this.assignValue2Name(ret, field.name, model);
     } else if (field.input === 'videos') {
 
+    } else if (field.input === 'tags') {
+      let container = dom.find('input[name="' + field.name + '"]', this.container).parentElement;
+      let tags = container.querySelectorAll('tag');
+      let value = '';
+      for (let i = 0; i < tags.length; i++) {
+        if (value != '') {
+          value += ','
+        }
+        value += tags[i].innerText;
+      }
+      ret[field.name] = value;
     }
   }
   return ret;
@@ -22767,6 +22783,113 @@ MobileDesigner.GridButtons.prototype.placeholder = function() {
 };
 
 
+function MobileFrame(opts) {
+  /*!
+  ** 背景色，明亮模式和暗黑模式。
+  */
+  this.url = opts.url;
+  this.width = opts.width;
+}
+
+MobileFrame.prototype.render = function (containerId) {
+  /*!
+  ** 常量设置，和手机背景图片密切相关。
+  */
+  const MOBILE_AREA_ASPECT_RATIO = 1284 / 2778;
+  const MOBILE_IMAGE_WIDTH = 462;
+  const MOBILE_IMAGE_HEIGHT = 900;
+  const MOBILE_SAFE_AREA_TOP_LEFT_X = 15;
+  const MOBILE_SAFE_AREA_TOP_LEFT_Y = 60;
+  const MOBILE_SAFE_AREA_TOP_RIGHT_X = 446;
+  const MOBILE_SAFE_AREA_TOP_RIGHT_Y = 60;
+  const MOBILE_SAFE_AREA_BOT_LEFT_X = 15;
+  const MOBILE_SAFE_AREA_BOT_LEFT_Y = 836;
+  const MOBILE_SAFE_AREA_BOT_RIGHT_X = 446;
+  const MOBILE_SAFE_AREA_BOT_RIGHT_Y = 836;
+  const MOBILE_TOP_BAR_LEFT_X = 60;
+  const MOBILE_TOP_BAR_LEFT_Y = 13;
+  const MOBILE_TOP_BAR_RIGHT_X = 398;
+  const MOBILE_TOP_BAR_RIGHT_Y = 13;
+
+  const MOBILE_BOT_BAR_LEFT_X = 60;
+  const MOBILE_BOT_BAR_LEFT_Y = 890;
+  const MOBILE_BOT_BAR_RIGHT_X = 398;
+  const MOBILE_BOT_BAR_RIGHT_Y = 890;
+
+  const MOBILE_IMAGE_ASPECT_RATIO = MOBILE_IMAGE_WIDTH / MOBILE_IMAGE_HEIGHT;
+
+  this.container = dom.find(containerId);
+
+  let rect = this.container.getBoundingClientRect();
+  let ratio = rect.height / MOBILE_IMAGE_HEIGHT;
+
+  let width = this.width;
+  let height = 0;
+  if (!width) {
+    height = ratio * MOBILE_IMAGE_HEIGHT;
+    width = height * MOBILE_IMAGE_ASPECT_RATIO;
+  } else {
+    height = width / MOBILE_IMAGE_ASPECT_RATIO;
+  }
+  this.width = width;
+
+  this.scaleRatio = this.width / MOBILE_IMAGE_WIDTH;
+
+  this.safeAreaTopLeftX = MOBILE_SAFE_AREA_TOP_LEFT_X * this.scaleRatio;
+  this.safeAreaTopLeftY = MOBILE_SAFE_AREA_TOP_LEFT_Y * this.scaleRatio;
+  this.safeAreaTopRightX = MOBILE_SAFE_AREA_TOP_RIGHT_X * this.scaleRatio;
+  this.safeAreaTopRightY = MOBILE_SAFE_AREA_TOP_RIGHT_Y * this.scaleRatio;
+  this.safeAreaBotLeftX = MOBILE_SAFE_AREA_BOT_LEFT_X * this.scaleRatio;
+  this.safeAreaBotLeftY = MOBILE_SAFE_AREA_BOT_LEFT_Y * this.scaleRatio;
+  this.safeAreaBotRightX = MOBILE_SAFE_AREA_BOT_RIGHT_X * this.scaleRatio;
+  this.safeAreaBotRightY = MOBILE_SAFE_AREA_BOT_RIGHT_Y * this.scaleRatio;
+  this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
+  this.safeAreaHeight = this.safeAreaBotLeftY - this.safeAreaTopLeftY;
+
+  this.topBarLeftX = MOBILE_TOP_BAR_LEFT_X * this.scaleRatio;
+  this.topBarLeftY = MOBILE_TOP_BAR_LEFT_Y * this.scaleRatio;
+  this.topBarRightX = MOBILE_TOP_BAR_RIGHT_X * this.scaleRatio;
+  this.topBarRightY = MOBILE_TOP_BAR_RIGHT_Y * this.scaleRatio;
+
+  this.botBarLeftX = MOBILE_BOT_BAR_LEFT_X * this.scaleRatio;
+  this.botBarLeftY = MOBILE_BOT_BAR_LEFT_Y * this.scaleRatio;
+  this.botBarRightX = MOBILE_BOT_BAR_RIGHT_X * this.scaleRatio;
+  this.botBarRightY = MOBILE_BOT_BAR_RIGHT_Y * this.scaleRatio;
+
+  this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
+  this.safeAreaHeight = this.safeAreaBotRightY - this.safeAreaTopRightY;
+
+  this.paddingLeft = 12 * this.scaleRatio;
+  this.paddingRight = 12 * this.scaleRatio;
+
+  let img = dom.create('img', 'm-auto');
+  img.src = '/img/emulator/iphone-bg.png';
+  img.style.width = width + 'px';
+  img.style.height = height + 'px';
+
+  this.container.appendChild(img);
+
+  const top = img.offsetTop;
+  const left = img.offsetLeft;
+  this.iframe = dom.create('iframe', 'position-absolute', 'border-less');
+  this.iframe.frameborder = 'none';
+  this.iframe.src = this.url;
+  this.iframe.style.left = (left + this.safeAreaTopLeftX + 1) + 'px';
+  this.iframe.style.top = (top + this.safeAreaTopLeftY + 1) + 'px';
+  this.iframe.style.width = (this.safeAreaWidth - 2)  + 'px';
+  this.iframe.style.height = (this.safeAreaHeight - 2) + 'px';
+  this.container.appendChild(this.iframe);
+};
+
+MobileFrame.prototype.preview = function (html) {
+  let body = this.iframe.contentWindow.document.body;
+  body.innerHTML = html;
+  body.querySelectorAll('img').forEach(img => {
+    img.style.width = "100%";
+  })
+};
+
+
 
 function NetworkTopology(opts) {
   this.onCellDoubleClicked = opts.onCellDoubleClicked;
@@ -23720,7 +23843,6 @@ function QuestionnaireDesigner(opt) {
   this.draggingTarget = null;
   this.onSave = opt.onSave || function(model) {};
   this.onDelete = opt.onDelete || function(model) {};
-  this.mobileFramePath = opt.mobileFramePath;
   QuestionnaireDesigner.instance = this;
 }
 
@@ -23763,7 +23885,7 @@ QuestionnaireDesigner.MODEL_SHORT_ANSWER = `
  * the palette component on left side;
  */
 QuestionnaireDesigner.prototype.palette = function() {
-  let ret = dom.element(`<div class="col-md-2" style="padding: 0; border-radius: unset;"></div>`);
+  let ret = dom.element(`<div class="col-md-4" style="padding: 0; border-radius: unset;"></div>`);
   let ul = dom.create('ul', 'list-group', 'mt-2', 'ml-4');
   let li = dom.create('li', 'list-group-item','grab');
   li.setAttribute('draggable', true);
@@ -23801,7 +23923,7 @@ QuestionnaireDesigner.prototype.palette = function() {
 QuestionnaireDesigner.prototype.canvas = function() {
   let self = this;
   let ret = dom.element(`
-    <div class="col-md-6 m-0">
+    <div class="col-md-8 m-0">
       <div widget-id="widgetQuestionnaireCanvas" 
            style="padding: 10px; 
            margin-top: 8px;
@@ -23873,7 +23995,6 @@ QuestionnaireDesigner.prototype.canvas = function() {
       }
       this.renderQuestion(this.widgetQuestionnaireCanvas, JSON.parse(data.model));
     }
-    self.refresh();
   });
 
   dom.bind(this.widgetQuestionnaireCanvas, 'click', ev => {
@@ -23885,31 +24006,6 @@ QuestionnaireDesigner.prototype.canvas = function() {
   return ret;
 };
 
-QuestionnaireDesigner.prototype.preview = function(container) {
-  let width = 365;
-  let height = 750;
-  let el = dom.element(`
-    <div class="col-md-4 m-0 d-flex position-relative">
-      <img src="img/emulator/iphone-full.png" class="m-auto" style="width: ${width}px; height: ${height}px;">
-      <iframe class="position-absolute" style="width: ${width - 52}px; height: ${height - 138}px; background-color: white;" frameborder="0"></iframe>
-    </div>
-  `);
-  container.appendChild(el);
-
-  // 重新计算位置
-  let img = dom.find('img', el);
-  this.ifPreview = dom.find('iframe', el);
-  let imgrect = img.getBoundingClientRect();
-  this.ifPreview.style.left = (img.offsetLeft + 25) + 'px';
-  this.ifPreview.style.top = (img.offsetTop + 82) + 'px';
-  this.ifPreview.src  = this.mobileFramePath;
-
-  this.ifPreview.onload = () => {
-    this.refresh();
-  };
-
-};
-
 QuestionnaireDesigner.prototype.render = function(containerId, params) {
   params = params || {};
   if (params.questions) {
@@ -23919,7 +24015,6 @@ QuestionnaireDesigner.prototype.render = function(containerId, params) {
   this.container.innerHTML = '';
   this.container.appendChild(this.palette());
   this.container.appendChild(this.canvas());
-  this.preview(this.container);
 };
 
 /**
@@ -24153,6 +24248,7 @@ QuestionnaireDesigner.prototype.edit = function(question) {
   });
   let questionId = question.id;
   question.options = [];
+  question.values = question.values || [];
   for (let i = 0; i < question.values.length; i++) {
     question.options.push({
       value: question.values[i],
@@ -24258,11 +24354,6 @@ QuestionnaireDesigner.prototype.edit = function(question) {
       self.refresh();
     }
   });
-};
-
-QuestionnaireDesigner.prototype.refresh = function() {
-  let ifbody = this.ifPreview.contentDocument.body || this.ifPreview.contentWindow.document.body;
-  ifbody.innerHTML = this.widgetQuestionnaireCanvas.innerHTML;
 };
 
 QuestionnaireDesigner.prototype.onCellFocus = function(input) {
