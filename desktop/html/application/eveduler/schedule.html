@@ -2,7 +2,7 @@
 <div id="pageScheduleCourse" class="page view overflow-hidden">
   <div class="row mx-0">
     <div widget-id="widgetCourse" class="col-24-04">
-      <ul class="list-group-item">
+      <ul class="list-group-item border-less">
         <li class="list-group-item fc-event">
           <div class='fc-event-main'>编程课</div>
         </li>
@@ -36,25 +36,41 @@ PageScheduleCourse.prototype.initialize = function () {
     itemSelector: '.fc-event',
     eventData: function(eventEl) {
       return {
-        title: eventEl.innerText
+        title: eventEl.innerText,
+        type: eventEl.innerText,
       };
     }
   });
 
   this.calendar = new FullCalendar.Calendar(this.widgetCalendar, {
-    // plugins: [timeGridPlugin],
     initialView: 'timeGridWeek',
     locale: 'zh-cn',
     editable: true,
     allDaySlot: false,
     headerToolbar: {
+      left: '',
       center: 'title',
     },
     eventClick: info => {
-      console.log(info);
+      console.log(this.assembleEvents4Course());
     },
+    events: [{ title: 'Meeting', start: new Date() }]
   });
   this.calendar.render();
+};
+
+PageScheduleCourse.prototype.assembleEvents4Course = function () {
+  let events = this.calendar.getEvents();
+  let ret = [];
+  for (let i = 0; i < events.length; i++) {
+    let event = events[i];
+    event._def.extendedProps = event.extendedProps || {};
+    let row = {...event.extendedProps};
+    row.start = event._instance.range.start;
+    row.end = event._instance.range.end;
+    ret.push(row);
+  }
+  return ret;
 };
 
 PageScheduleCourse.prototype.show = function () {

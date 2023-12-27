@@ -2770,6 +2770,7 @@ dom.height2 = function(selector, offset, parent) {
 dom.autoheight = function (selector, ancestor, customOffset) {
   customOffset = customOffset || 0;
   let el = dom.find(selector);
+  if (el == null) return;
   ancestor = ancestor || document.body;
   let rectAncestor = ancestor.getBoundingClientRect();
 
@@ -5151,53 +5152,6 @@ PaginationGrid.prototype.showPageNumber = function () {
     this.nextPage.classList.add('disabled');
     this.lastPage.classList.add('disabled');
   }
-};
-
-PaginationGrid.skeleton = function() {
-  return dom.element(`
-    <div style="display: flex; flex-wrap: wrap; margin: 0px -8px; width: 100%;">
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-          </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-    </div>
-  `);
 };
 
 function Timeline(opt) {

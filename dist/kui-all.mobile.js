@@ -2519,6 +2519,7 @@ dom.height2 = function(selector, offset, parent) {
 dom.autoheight = function (selector, ancestor, customOffset) {
   customOffset = customOffset || 0;
   let el = dom.find(selector);
+  if (el == null) return;
   ancestor = ancestor || document.body;
   let rectAncestor = ancestor.getBoundingClientRect();
 

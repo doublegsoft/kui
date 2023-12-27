@@ -32,16 +32,13 @@
     <i class="fas fa-edit"></i>
     <strong>文章编辑</strong>
   </div>
-  <div class="card-body row mr-0 ml-0">
-    <div class="col-md-6">
-      <div widget-id="widgetContentArticle" class="full-width pr-3 pl-3"></div>
-    </div>
-    <div widget-id="widgetPreview" class="col-md-6 d-flex position-relative">
-<!--      <img widget-id="imageMobile" src="/img/emulator/iphone-bg.png" class="m-auto"-->
-<!--           style="width: 360px; height: 900px; margin-top: 30px;">-->
-<!--      <iframe widget-id="frameMobile" frameborder="none"-->
-<!--              src="preview.html"-->
-<!--              class="position-absolute border-less"></iframe>-->
+  <div class="card-body">
+    <div class="row mx-0">
+      <div class="col-md-6">
+        <div widget-id="widgetArticle" class="full-width"></div>
+      </div>
+      <div widget-id="widgetPreview" class="col-md-6 d-flex position-relative">
+      </div>
     </div>
   </div>
 </div>
@@ -53,13 +50,13 @@ function PageArticleEdit() {
 PageArticleEdit.prototype.initialize = async function (params) {
   dom.init(this, this.page);
 
-  dom.autoheight(this.widgetContentArticle, document.body, 48 /*QUILL CONSTANT*/);
+  dom.autoheight(this.widgetArticle, document.body, 48 /*QUILL CONSTANT*/);
   dom.autoheight(this.widgetPreview);
 
   let size = Quill.import('attributors/style/size');
   size.whitelist = ['14px', '16px', '18px', '20px', '22px', '24px'];
   Quill.register(size, true);
-  this.quill = new Quill(this.widgetContentArticle, {
+  this.quill = new Quill(this.widgetArticle, {
     modules: {
       toolbar: [
         ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -78,7 +75,7 @@ PageArticleEdit.prototype.initialize = async function (params) {
   });
 
   this.previewer = new MobileFrame({
-    url: 'html/application/aow/preview.html',
+    url: 'html/misc/preview/mobile.html',
   });
   this.previewer.render(this.widgetPreview);
 };

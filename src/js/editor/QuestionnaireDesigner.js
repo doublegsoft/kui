@@ -157,6 +157,10 @@ QuestionnaireDesigner.prototype.canvas = function() {
       }
       this.renderQuestion(this.widgetQuestionnaireCanvas, JSON.parse(data.model));
     }
+    /*!
+    ** 事件通知其他组件。
+    */
+    this.dispatchEvent();
   });
 
   dom.bind(this.widgetQuestionnaireCanvas, 'click', ev => {
@@ -513,7 +517,7 @@ QuestionnaireDesigner.prototype.edit = function(question) {
         ...question,
         id: questionId,
       });
-      self.refresh();
+      self.dispatchEvent();
     }
   });
 };
@@ -589,4 +593,18 @@ QuestionnaireDesigner.prototype.selectText = function (el){
       range.select(); //make selection.
     }
   }
-}
+};
+
+QuestionnaireDesigner.prototype.dispatchEvent = function () {
+  let event = new CustomEvent("html-changed", {
+    bubbles: false,
+    detail: {
+      html: this.widgetQuestionnaireCanvas.innerHTML,
+    }
+  });
+  this.widgetQuestionnaireCanvas.dispatchEvent(event);
+};
+
+QuestionnaireDesigner.prototype.on = function (name, handler) {
+  this.widgetQuestionnaireCanvas.addEventListener(name, handler);
+};

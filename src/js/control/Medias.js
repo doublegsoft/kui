@@ -27,6 +27,8 @@ Medias.prototype.render = function (containerId, value) {
     }
   } else if (value) {
     this.appendMedia(value);
+    if (this.multiple === false)
+      return;
   }
   if (this.readonly === false) {
     let plus = this.createPlusElement();

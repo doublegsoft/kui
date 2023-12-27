@@ -26,21 +26,25 @@ PageSurveyDesign.prototype.initialize = async function(params) {
     mobileFramePath: '/mobile/index.html',
   });
   this.designer.render(this.widgetDesigner, {});
+  this.designer.on('html-changed', ev => {
+    this.previewer.preview(ev.detail.html);
+  })
 
   this.previewer = new MobileFrame({
-    url: 'html/application/aow/preview.html',
+    url: 'html/misc/preview/mobile.html',
   });
   this.previewer.render(this.widgetPreview);
 
-  setInterval(() => {
-    this.previewer.preview(this.designer.widgetQuestionnaireCanvas.innerHTML, container => {
-      let operations = dom.find('[widget-id=operations]', container);
-      if (operations != null) {
-        operations.parentElement.style.borderColor = 'transparent';
-        operations.remove();
-      }
-    });
-  }, 2000);
+
+  // setInterval(() => {
+  //   this.previewer.preview(this.designer.widgetQuestionnaireCanvas.innerHTML, container => {
+  //     let operations = dom.find('[widget-id=operations]', container);
+  //     if (operations != null) {
+  //       operations.parentElement.style.borderColor = 'transparent';
+  //       operations.remove();
+  //     }
+  //   });
+  // }, 2000);
 };
 
 PageSurveyDesign.prototype.getType = function(type) {

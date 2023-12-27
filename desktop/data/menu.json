@@ -20,11 +20,11 @@
       },{
         "text": "培训排课",
         "icon": "nav-icon icon-note font-16",
-        "url": "javascript:ajax.view({url: 'html/application/schedule/course.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/application/eveduler/schedule.html', containerId: 'container'});"
       },{
         "text": "随访设计",
         "icon": "nav-icon icon-note font-16",
-        "url": "javascript:ajax.view({url: 'html/application/survey/design.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/application/surd/design.html', containerId: 'container'});"
       },{
         "text": "报表设计",
         "icon": "nav-icon icon-note font-16",

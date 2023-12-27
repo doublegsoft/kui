@@ -3334,6 +3334,7 @@ dom.height2 = function(selector, offset, parent) {
 dom.autoheight = function (selector, ancestor, customOffset) {
   customOffset = customOffset || 0;
   let el = dom.find(selector);
+  if (el == null) return;
   ancestor = ancestor || document.body;
   let rectAncestor = ancestor.getBoundingClientRect();
 
@@ -13025,53 +13026,6 @@ PaginationGrid.prototype.showPageNumber = function () {
     this.lastPage.classList.add('disabled');
   }
 };
-
-PaginationGrid.skeleton = function() {
-  return dom.element(`
-    <div style="display: flex; flex-wrap: wrap; margin: 0px -8px; width: 100%;">
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-          <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-          </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-      <div style="flex-basis: 25%; margin-bottom: 24px; padding: 0px 8px;">
-        <div style="background-color: rgba(0, 0, 0, 0.3); border-radius: 2px; height: 80px; width: 100%;">
-        </div>
-      </div>
-    </div>
-  `);
-};
 /**
  * 分页表格显示组件。
  * <p>
@@ -17857,6 +17811,7 @@ function Medias(opts) {
 Medias.prototype.render = function (containerId, value) {
   this.value = value;
   this.container = dom.find(containerId);
+  let appended = false;
   if (Array.isArray(value)) {
     for (let i = 0; i < value.length; i++) {
       let row = value[i];
@@ -17865,6 +17820,8 @@ Medias.prototype.render = function (containerId, value) {
     }
   } else if (value) {
     this.appendMedia(value);
+    if (this.multiple === false)
+      return;
   }
   if (this.readonly === false) {
     let plus = this.createPlusElement();
@@ -22881,12 +22838,15 @@ MobileFrame.prototype.render = function (containerId) {
   this.container.appendChild(this.iframe);
 };
 
-MobileFrame.prototype.preview = function (html) {
+MobileFrame.prototype.preview = function (html, callback) {
   let body = this.iframe.contentWindow.document.body;
   body.innerHTML = html;
   body.querySelectorAll('img').forEach(img => {
     img.style.width = "100%";
-  })
+  });
+  if (callback) {
+    callback(body);
+  }
 };
 
 
@@ -23995,6 +23955,10 @@ QuestionnaireDesigner.prototype.canvas = function() {
       }
       this.renderQuestion(this.widgetQuestionnaireCanvas, JSON.parse(data.model));
     }
+    /*!
+    ** 事件通知其他组件。
+    */
+    this.dispatchEvent();
   });
 
   dom.bind(this.widgetQuestionnaireCanvas, 'click', ev => {
@@ -24351,7 +24315,7 @@ QuestionnaireDesigner.prototype.edit = function(question) {
         ...question,
         id: questionId,
       });
-      self.refresh();
+      self.dispatchEvent();
     }
   });
 };
@@ -24427,7 +24391,21 @@ QuestionnaireDesigner.prototype.selectText = function (el){
       range.select(); //make selection.
     }
   }
-}
+};
+
+QuestionnaireDesigner.prototype.dispatchEvent = function () {
+  let event = new CustomEvent("html-changed", {
+    bubbles: false,
+    detail: {
+      html: this.widgetQuestionnaireCanvas.innerHTML,
+    }
+  });
+  this.widgetQuestionnaireCanvas.dispatchEvent(event);
+};
+
+QuestionnaireDesigner.prototype.on = function (name, handler) {
+  this.widgetQuestionnaireCanvas.addEventListener(name, handler);
+};
 
 /**
  * 报表设计器构造函数。
