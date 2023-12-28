@@ -713,6 +713,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
   } else if (field.input == 'radiotext' || field.input == 'booltext') {
     let radios = [];
     let defaultValue = '';
+    field.values = field.values || [{value: '+', text: '正'},{value:'-', text: '负'}];
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
       if (!val.input) {
@@ -783,6 +784,8 @@ FormLayout.prototype.createInput = function (field, columnCount) {
       }
     }
   } else if (field.input == 'radio') {
+    group.classList.add('col-form-label');
+    field.values = field.values || [{value: '+', text: '正'},{value:'-', text: '负'}];
     for (let i = 0; i < field.values.length; i++) {
       let val = field.values[i];
       let radio = dom.element(`
