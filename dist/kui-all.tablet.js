@@ -25,7 +25,7 @@ xhr.request = function (opts, method) {
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
-  req.timeout = 10 * 1000;
+  // req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -121,7 +121,7 @@ xhr.upload = function(opts) {
   formdata.append('file', opts.file);
 
   let req  = new XMLHttpRequest();
-  req.timeout = 10 * 1000;
+  // req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -170,7 +170,7 @@ xhr.asyncUpload = async function (opts) {
     formdata.append('file', opts.file);
 
     let req  = new XMLHttpRequest();
-    req.timeout = 10 * 1000;
+    // req.timeout = 10 * 1000;
     req.onload = function () {
       let resp = req.responseText;
       if (type == 'json')
@@ -596,6 +596,12 @@ ajax.view = function(opt) {
     }
   }
 
+  if (window._current_view) {
+    if (window._current_view.destroy) {
+      window._current_view.destroy();
+    }
+    delete window._current_view;
+  }
   if (url) {
     xhr.get({
       url: url,
@@ -606,6 +612,7 @@ ajax.view = function(opt) {
         }
         if (fragment && fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
+          window._current_view = window[fragment.id];
         }
         if (callback)
           callback(title, fragment, params);
@@ -1500,8 +1507,9 @@ ajax.tabs = function(opts) {
       url: url,
       containerId: container,
       success: function() {
-        if (window[page])
+        if (window[page]) {
           window[page].show(data);
+        }
       }
     });
   }
@@ -4112,6 +4120,23 @@ utils.safeValue = (obj, name) => {
     }
   }
   return ret || '';
+};
+
+utils.safeSet = (obj, name, value) => {
+  if (!value) return;
+  let names = name.split('.');
+  let ret = obj;
+  for (let i = 0; i < names.length; i++) {
+    if (i == names.length - 1) {
+      ret[names[i]] = value;
+    } else {
+      if (typeof obj[names[i]] === 'undefined') {
+        obj[names[i]] = {};
+      }
+      ret = obj[names[i]];
+    }
+  }
+  return obj;
 };
 
 utils.merge = (older, newer) => {

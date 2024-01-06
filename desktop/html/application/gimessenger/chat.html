@@ -1,0 +1,592 @@
+<div id="pageChat" class="full-width full-height" style="overflow: hidden;">
+  <div widget-id="widgetChat" class="row ml-0 mr-0 ab-chat overflow-hidden">
+    <div class="col-md-4 pr-0">
+      <div class="search" style="margin: 6px 12px;">
+        <input type="text" name="" placeholder="搜索">
+        <a href="#"><i class="fas fa-search"></i></a>
+      </div>
+      <ul widget-id="widgetContacts" class="list-group radius-less"></ul>
+    </div>
+    <div class="col-md-8 position-relative">
+      <div widget-id="widgetContact" class="contact d-flex">
+        <div class="avatar bg-info ml-3">
+          <div widget-id="textInitialAvatar" class="initial font-18 font-weight-bold"></div>
+        </div>
+        <div style="margin-left: 20px; padding-top: 8px;">
+          <strong widget-id="textName" class="name font-18" widget-model-variable="userType"></strong>
+          <div widget-id="textStatus" class="seen on" widget-model-variable="status"></div>
+        </div>
+      </div>
+      <ul widget-id="widgetConversation" class="conversation">
+
+      </ul>
+      <div class="pr-2 pl-2"><!--typebar-->
+        <input name="fileImage" type="file" style="display: none" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|image/*">
+        <textarea widget-id="longtextMessage" disabled class="form-control" rows="2"
+                  placeholder="这里输入消息内容..."  style="resize:none;"></textarea>
+        <div>
+          <a widget-id="buttonImage" class="btn btn-link pointer disabled">
+            <i class="far fa-image text-info font-20"></i>
+          </a>
+          <a widget-id="buttonRecord" class="btn btn-link pointer disabled">
+            <i class="fas fa-microphone text-info font-20"></i>
+          </a>
+          <a widget-id="buttonPatient" class="btn btn-link pointer disabled">
+            <i class="fas fa-address-book text-info font-20"></i>
+          </a>
+          <a widget-id="buttonSend" class="btn text-info font-16 font-weight-bold disabled" style="float: right;">发送</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div widget-id="widgetRecord" class="ab-recorder text-center position-relative"
+       style="bottom: 0; overflow: hidden; background: rgb(46,46,46); z-index: -1;">
+    <canvas widget-id="canvasVisualizer" height="120px"></canvas>
+    <a widget-id="buttonStart" class="btn btn-link">
+      <i class="far fa-dot-circle text-danger font-64"></i>
+    </a>
+    <a widget-id="buttonStop" class="btn btn-link disabled">
+      <i class="far fa-stop-circle text-danger font-64"></i>
+    </a>
+    <a widget-id="buttonConfirm" class="btn btn-link disabled">
+      <i class="far fa-check-circle text-success font-64"></i>
+    </a>
+    <a widget-id="buttonCancel" class="btn btn-link pointer">
+      <i class="far fa-times-circle text-danger font-64"></i>
+    </a>
+  </div>
+</div>
+
+<script>
+function PageChat() {
+  this.page = dom.find('#pageChat');
+  this.selectedContact = null;
+}
+
+PageChat.prototype.initialize = async function(params) {
+  dom.init(this, this.page);
+  dom.autoheight(this.widgetContacts);
+  dom.autoheight(this.widgetConversation, document.body, 100);
+
+  this.userId = params.userId;
+  this.userType = params.userType;
+  gim.init('我是二号', '2', 'TEST', {
+    'login': res => {
+      gim.getConversations();
+      // if (gim.conversation && gim.conversation.conversationId) {
+      //   gim.enter(gim.conversation.conversationId, null, null, gim.sender.username);
+      // }
+    },
+    'getConversations': res => {
+      this.renderWithConversations(res.data);
+    },
+    'getMessages': res => {
+      let len = res.data.length;
+      for (let i = len - 1; i >= 0; i--) {
+        let msg = res.data[i];
+        this.renderMessage(msg.senderId == gim.sender.userId ? 'outgoing' : 'incoming', res.data[i]);
+      }
+    },
+    'receivedMessage': res => {
+      this.renderMessage('incoming', res.data);
+    },
+  });
+  gim.login();
+
+  this.chunks = [];
+
+  dom.bind(this.buttonRecord, 'click', ev => {
+    this.showRecorder(ev);
+  });
+
+  dom.bind(this.buttonPatient, 'click', ev => {
+    ajax.sidebar({
+      containerId: this.page,
+      url: 'html/misc/chat/rm/select.html',
+      allowClose: true,
+    })
+  });
+
+  dom.bind(this.buttonStart, 'click', ev => {
+    this.buttonStart.classList.add('disabled');
+    this.buttonStop.classList.remove('disabled');
+    if (!this.buttonConfirm.classList.contains('disabled')) {
+      this.buttonConfirm.classList.add('disabled');
+    }
+
+    this.mediaRecorder.start();
+  });
+
+  dom.bind(this.buttonStop, 'click', ev => {
+    this.buttonStart.classList.remove('disabled');
+    this.buttonStop.classList.add('disabled');
+    this.buttonConfirm.classList.remove('disabled');
+    this.mediaRecorder.stop();
+  });
+
+  dom.bind(this.buttonCancel, 'click', ev => {
+    this.hideRecorder(ev);
+    this.blobAudio = null;
+  });
+
+  dom.bind(this.buttonConfirm, 'click', ev => {
+    this.hideRecorder(ev);
+    let reader = new FileReader();
+    reader.readAsDataURL(this.blobAudio);
+    reader.onloadend = async () => {
+      await this.sendMessage({
+        messageType: Chat.MESSAGE_TYPE_AUDIO,
+        messageContent: {
+          size: this.blobAudio.size,
+          data: reader.result,
+        },
+      });
+      this.blobAudio = null;
+    }
+  });
+
+  dom.bind(this.buttonSend, 'click', ev => {
+    if (this.longtextMessage.value == '') return;
+    this.sendMessage({
+      messageType: 'TEXT',
+      messageContent: this.longtextMessage.value,
+    });
+    this.longtextMessage.value = '';
+  });
+
+  dom.bind(this.buttonImage, 'click', ev => {
+    this.fileImage.click();
+  });
+  this.fileImage.onchange = ev => {
+    ev.preventDefault();
+    ev.stopPropagation();
+    let file = this.fileImage.files[0];
+    let ext = file.name.substring(file.name.lastIndexOf('.') + 1);
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      let img = new Image();
+      img.onload = () => {
+        this.sendMessage({
+          messageType: Chat.MESSAGE_TYPE_IMAGE,
+          messageContent: {
+            height: img.height,
+            width: img.width,
+            data: img.src,
+            ext: ext,
+          },
+        });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 初始化会话列表
+
+  // 绑定消息框事件
+  dom.bind(this.longtextMessage, 'keypress', ev => {
+    if (this.selectedContact == null) return;
+    if (ev.keyCode == 13) {
+      ev.preventDefault();
+      this.sendMessage({
+        messageType: 'TEXT',
+        messageContent: this.longtextMessage.value,
+      });
+      this.longtextMessage.value = '';
+    }
+  });
+};
+
+PageChat.prototype.renderWithConversations = function(conversations) {
+  this.widgetContacts.innerHTML = '';
+  for (let i = 0; i < conversations.length; i++) {
+    let row = conversations[i];
+    row.name = row.alias;
+    row.group = row.conversationId;
+    row.createTime = moment(row.createTime).format('YYYY-MM-DD HH:mm');
+    let convo = dom.templatize(`
+      <li data-model-user-id="{{senderId}}"
+          data-model-user-type="{{name}}"
+          data-model-conversation-id="{{conversationId}}" style="height: unset;"
+          class="list-group-item list-group-item-action pointer d-flex contact border-less radius-less">
+        <div>
+          <div class="avatar bg-info ml-3">
+            <div class="initial font-18 font-weight-bold"></div>
+          </div>
+          <div class="indicator hide" style="left: 45px; bottom: 15px;"></div>
+        </div>
+        <div style="margin-left: 15px;">
+          <div class="name"><strong style="font-size: 18px;">{{name}}</strong><small class="text-success pl-2">{{lastConversationTime}}</small></div>
+          <div class="description">暂时没有消息</div>
+        </div>
+      </li>
+    `, row);
+    let initial = dom.find('.initial', convo);
+    initial.innerText = row.name.substring(0, 1);
+    dom.bind(convo, 'click', ev => {
+      this.makeConversation(ev);
+    });
+    this.widgetContacts.appendChild(convo);
+  }
+};
+
+PageChat.prototype.renderConversation = async function(params) {
+  this.widgetConversation.innerHTML = '';
+  this.textName.innerHTML = params.userType;
+  this.textInitialAvatar.innerText = params.userType.substring(0,1);
+  let messages = []; //await this.chat.fetchMessages(params.userId, params.userType, params.status);
+  for (let i = 0; i < messages.length; i++) {
+    let row = messages[i];
+    let time = dom.templatize(`
+    <li data-model-time="{{createTime}}" class="d-flex">
+      <span class="time m-auto">{{createTime}}</span>
+    </li>
+  `, row);
+    this.widgetConversation.appendChild(time);
+    for (let j = 0; j < row.groupingMessages.length; j++) {
+      let groupingMessage = row.groupingMessages[j];
+      for (let k = 0; k < groupingMessage.messages.length; k++) {
+        let msg = groupingMessage.messages[k];
+        let direction = msg.senderId === this.selectedContact.userId ? 'incoming' : 'outgoing';
+        if (msg.messageType === Chat.MESSAGE_TYPE_IMAGE ||
+          msg.messageType === Chat.MESSAGE_TYPE_AUDIO ||
+          msg.messageType === Chat.MESSAGE_TYPE_PATIENT) {
+          msg.messageContent = JSON.parse(msg.messageContent);
+        }
+        this.renderMessage(direction, msg);
+      }
+    }
+  }
+  this.widgetConversation.scrollTo(0, this.widgetConversation.scrollHeight);
+  this.longtextMessage.removeAttribute('disabled');
+};
+
+PageChat.prototype.resortConversations = async function(message) {
+  let atIndex = message.senderId.indexOf('@');
+  let senderId = message.senderId.substring(0, atIndex);
+  let senderType = message.senderId.substring(atIndex + 1);
+  let first = null;
+  for (let i = 0; i < this.widgetContacts.children.length; i++) {
+    let li = this.widgetContacts.children[i];
+    if (first == null) first = li;
+    let model = dom.model(li);
+    if (model.userId == senderId || model.userType == senderType) {
+      // 显示小红点
+      let elIndicator = dom.find('.indicator', li);
+      elIndicator.style.display = '';
+      // 置顶操作
+      if (first != null) {
+        this.widgetContacts.insertBefore(li, first);
+      }
+      break;
+    }
+  }
+  this.updateConversationTime(message);
+};
+
+PageChat.prototype.updateConversationTime = function(message) {
+  let messageTime = message.messageTime;
+  let atIndex = message.senderId.indexOf('@');
+  let senderId = message.senderId.substring(0, atIndex);
+  let senderType = message.senderId.substring(atIndex + 1);
+  for (let i = 0; i < this.widgetContacts.children.length; i++) {
+    let li = this.widgetContacts.children[i];
+    let model = dom.model(li);
+    if (model.userId == senderId || model.userType == senderType) {
+      // 更新最近消息时间
+      let elSmall = dom.find('small', li);
+      elSmall.innerText = messageTime;
+      break;
+    }
+  }
+};
+
+PageChat.prototype.makeConversation = async function(ev) {
+  for (let i = 0; i < this.widgetContacts.children.length; i++) {
+    let child = this.widgetContacts.children[i];
+    child.classList.remove('active');
+  }
+  let li = dom.ancestor(ev.target, 'li');
+  li.classList.add('active');
+  let params = dom.model(li);
+  this.renderConversation(params).then(async data => {
+    dom.find('.indicator', li).style.display = 'none';
+  });
+  // this.selectedContact = {
+  //   userId: params.userId,
+  //   userType: params.userType,
+  //   conversationId: params.conversationId,
+  // };
+  /*!
+  ** 进入某某会话（聊天室）。
+  */
+  gim.enter(params.conversationId, null, null, gim.sender.username);
+
+  gim.getMessages();
+
+  this.buttonSend.classList.remove('disabled');
+  this.buttonImage.classList.remove('disabled');
+  this.buttonRecord.classList.remove('disabled');
+  this.buttonPatient.classList.remove('disabled');
+};
+
+PageChat.prototype.showRecorder = async function(ev) {
+  this.widgetRecord.classList.remove('hide');
+  this.widgetRecord.classList.add('show');
+  this.canvasVisualizer.width = document.body.clientWidth;
+  navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+    this.mediaRecorder = new MediaRecorder(stream);
+    this.visualize(stream);
+    this.mediaRecorder.ondataavailable = (ev) => {
+      this.chunks.push(ev.data);
+    };
+    // 收集音频数据
+    this.mediaRecorder.onstop = (ev) => {
+      this.blobAudio = new Blob(this.chunks, { type: 'audio/ogg; codecs=opus' });
+      this.chunks = [];
+    };
+  });
+};
+
+PageChat.prototype.hideRecorder = async function(ev) {
+  this.widgetRecord.classList.add('hide');
+  this.widgetRecord.onanimationend = () => {
+    if (this.widgetRecord.classList.contains('hide')) {
+      this.widgetRecord.classList.remove('show');
+    } else {
+      this.widgetRecord.classList.remove('hide');
+    }
+  };
+  if (this.mediaRecorder.state == 'active')
+    this.mediaRecorder.stop();
+};
+
+PageChat.prototype.sendMessage = async function(message) {
+  let sending = dom.element(`
+    <li class="messages text-center">
+      <div class="typing m-auto">
+        <div class="bubble">
+          <div class="ellipsis one"></div>
+          <div class="ellipsis two"></div>
+          <div class="ellipsis three"></div>
+        </div>
+      </div>
+    </li>
+  `);
+  this.widgetConversation.appendChild(sending);
+  let timSend;
+  if (message.messageType === 'IMAGE') {
+    timSend = this.chat.sendImageMessage(this.selectedContact.userId, this.selectedContact.userType,
+      message.messageContent, this.selectedContact.conversationId)
+  } else if (message.messageType === 'AUDIO') {
+    timSend = this.chat.sendAudioMessage(this.selectedContact.userId, this.selectedContact.userType,
+      message.messageContent, this.selectedContact.conversationId)
+  } else {
+    message.messageContent = message.messageContent.replaceAll('\n', '<br>');
+    gim.sendText(message);
+    this.renderMessage('outgoing', message);
+    setTimeout(() => {
+      sending.remove();
+    }, 1000);
+  }
+  // timSend.then(resp => {
+  //   sending.remove();
+  //   if (resp.data.message.type === 'TIMCustomElem') {
+  //     this.renderMessage('outgoing', JSON.parse(resp.data.message.payload.data));
+  //   } else {
+  //     this.renderMessage('outgoing', message);
+  //   }
+  // }).catch(err => {
+  //   sending.remove();
+  //   this.renderMessage('outgoing', message);
+  // });
+};
+
+PageChat.prototype.renderMessage = function(direction, message) {
+  let now = moment(message.messageTime).format('YYYY-MM-DD HH:mm');
+  let appended = false;
+  for (let i = 0; i < this.widgetConversation.children.length; i++) {
+    let li = this.widgetConversation.children[i];
+    let time = li.getAttribute('data-model-time');
+    if (time === now) {
+      appended = true;
+    }
+  }
+  if (appended === false) {
+    let el = dom.templatize(`
+    <li data-model-time="{{createTime}}" class="d-flex">
+      <span class="time m-auto">{{createTime}}</span>
+    </li>
+  `, {createTime: now});
+    this.widgetConversation.appendChild(el);
+  }
+
+  let el;
+  // if (message.messageType === Chat.MESSAGE_TYPE_IMAGE) {
+  //   el = dom.templatize(`
+  //   <li class="messages {{direction}}">
+  //     {{#each messages}}
+  //     <div class="message">
+  //       <img class="pointer" data-model-imagepath="{{messageContent.imagepath}}" src="{{messageContent.thumbnail}}">
+  //     </div>
+  //     {{/each}}
+  //   </li>
+  // `, {
+  //     direction: direction,
+  //     messages: [{messageContent: message.messageContent}]
+  //   });
+  //   let imgs = el.querySelectorAll('img');
+  //   for (let i = 0; i < imgs.length; i++) {
+  //     let img = imgs[i];
+  //     dom.bind(img, 'click', ev => {
+  //       document.body.querySelectorAll('.viewer-container').forEach((el, idx) => {
+  //         el.remove();
+  //       });
+  //       let viewer = new Viewer(img, {
+  //         title: false,
+  //         toolbar: false,
+  //         navbar: false,
+  //         url: 'data-model-imagepath',
+  //       });
+  //       viewer.show();
+  //     })
+  //   }
+  // } else if (message.messageType === Chat.MESSAGE_TYPE_AUDIO) {
+  //   el = dom.templatize(`
+  //   <li class="messages {{direction}}">
+  //     {{#each messages}}
+  //     <div class="message">
+  //       <div class="voice pointer">
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <div class="bar"></div>
+  //         <audio controls style="display: none;">
+  //           <source src="{{messageContent.audiopath}}" type="audio/ogg">
+  //         </audio>
+  //       </div>
+  //     </div>
+  //     {{/each}}
+  //   </li>
+  // `, {
+  //     direction: direction,
+  //     messages: [{messageContent: message.messageContent}]
+  //   });
+  //   let voices = el.querySelectorAll('.voice');
+  //   for (let i = 0; i < voices.length; i++) {
+  //     let voice = voices[i];
+  //     let audio = dom.find('audio', voice);
+  //     dom.bind(voice, 'click', (ev) => {
+  //       voice.classList.add('playing');
+  //       audio.play();
+  //     });
+  //     audio.onended = function(){
+  //       voice.classList.remove('playing');
+  //     }
+  //   }
+  // } else if (message.messageType === Chat.MESSAGE_TYPE_PATIENT) {
+  //   el = dom.templatize(`
+  //   <li class="messages {{direction}}">
+  //     {{#each messages}}
+  //     <div class="message pointer"
+  //          data-model-archive-id="{{messageContent.archiveId}}"
+  //          data-model-female-patient-id="{{messageContent.femalePatientId}}"
+  //          data-model-male-patient-id="{{messageContent.malePatientId}}">
+  //       <div class="text-danger"><i class="fas fa-female font-18 mr-2"></i>{{messageContent.femalePatientName}}</div>
+  //       <div class="text-black-50"><i class="fas fa-male font-18 mr-2"></i>{{messageContent.malePatientName}}</div>
+  //     </div>
+  //     {{/each}}
+  //   </li>
+  // `, {
+  //     direction: direction,
+  //     messages: [{messageContent: message.messageContent}]
+  //   });
+  //   let pointer = dom.find('.pointer', el);
+  //   dom.bind(pointer, 'click', ev => {
+  //     let model = dom.model(pointer);
+  //     model.infertilityId = model.archiveId;
+  //     ajax.sidebar({
+  //       url: 'html/juno/mobile/rm/record-in.html',
+  //       containerId: this.page,
+  //       autoClose: true,
+  //       success: function() {
+  //         pageMobileRmRecordIn.show(model);
+  //       }
+  //     })
+  //   })
+  // } else {
+    el = dom.templatize(`
+    <li class="messages {{direction}}">
+      {{#each messages}}
+      <div class="message">{{{messageContent}}}</div>
+      {{/each}}
+    </li>
+  `, {
+      direction: direction,
+      messages: [message]
+    });
+  // }
+
+  this.widgetConversation.appendChild(el);
+  this.widgetConversation.scrollTo(0, this.widgetConversation.scrollHeight);
+};
+
+PageChat.prototype.visualize = function(stream) {
+  let self = this;
+  let audioCtx = new AudioContext();
+  let canvasCtx = self.canvasVisualizer.getContext('2d');
+
+  const source = audioCtx.createMediaStreamSource(stream);
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  source.connect(analyser);
+
+  draw();
+  function draw() {
+    const WIDTH = self.canvasVisualizer.width
+    const HEIGHT = self.canvasVisualizer.height;
+    requestAnimationFrame(draw);
+    analyser.getByteTimeDomainData(dataArray);
+    canvasCtx.fillStyle = 'rgb(55, 111, 171)';
+    canvasCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+    canvasCtx.lineWidth = 2;
+    canvasCtx.strokeStyle = 'rgb(255,255,255)';
+
+    canvasCtx.beginPath();
+
+    let sliceWidth = WIDTH * 1.0 / bufferLength;
+    let x = 0;
+
+    for(let i = 0; i < bufferLength; i++) {
+      let v = dataArray[i] / 128.0;
+      let y = v * HEIGHT/2;
+      if(i === 0) {
+        canvasCtx.moveTo(x, y);
+      } else {
+        canvasCtx.lineTo(x, y);
+      }
+      x += sliceWidth;
+    }
+
+    canvasCtx.lineTo(self.canvasVisualizer.width, self.canvasVisualizer.height/2);
+    canvasCtx.stroke();
+  }
+};
+
+PageChat.prototype.show = async function(params) {
+  this.initialize(params);
+};
+
+pageChat = new PageChat();
+</script>

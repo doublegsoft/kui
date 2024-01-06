@@ -331,6 +331,23 @@ utils.safeValue = (obj, name) => {
   return ret || '';
 };
 
+utils.safeSet = (obj, name, value) => {
+  if (!value) return;
+  let names = name.split('.');
+  let ret = obj;
+  for (let i = 0; i < names.length; i++) {
+    if (i == names.length - 1) {
+      ret[names[i]] = value;
+    } else {
+      if (typeof obj[names[i]] === 'undefined') {
+        obj[names[i]] = {};
+      }
+      ret = obj[names[i]];
+    }
+  }
+  return obj;
+};
+
 utils.merge = (older, newer) => {
   let ret = {...older};
   for (let key in newer) {

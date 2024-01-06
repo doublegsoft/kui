@@ -25,7 +25,7 @@ xhr.request = function (opts, method) {
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
-  req.timeout = 10 * 1000;
+  // req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -121,7 +121,7 @@ xhr.upload = function(opts) {
   formdata.append('file', opts.file);
 
   let req  = new XMLHttpRequest();
-  req.timeout = 10 * 1000;
+  // req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -170,7 +170,7 @@ xhr.asyncUpload = async function (opts) {
     formdata.append('file', opts.file);
 
     let req  = new XMLHttpRequest();
-    req.timeout = 10 * 1000;
+    // req.timeout = 10 * 1000;
     req.onload = function () {
       let resp = req.responseText;
       if (type == 'json')
@@ -596,6 +596,12 @@ ajax.view = function(opt) {
     }
   }
 
+  if (window._current_view) {
+    if (window._current_view.destroy) {
+      window._current_view.destroy();
+    }
+    delete window._current_view;
+  }
   if (url) {
     xhr.get({
       url: url,
@@ -606,6 +612,7 @@ ajax.view = function(opt) {
         }
         if (fragment && fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
+          window._current_view = window[fragment.id];
         }
         if (callback)
           callback(title, fragment, params);
@@ -1500,8 +1507,9 @@ ajax.tabs = function(opts) {
       url: url,
       containerId: container,
       success: function() {
-        if (window[page])
+        if (window[page]) {
           window[page].show(data);
+        }
       }
     });
   }
@@ -3066,6 +3074,23 @@ utils.safeValue = (obj, name) => {
     }
   }
   return ret || '';
+};
+
+utils.safeSet = (obj, name, value) => {
+  if (!value) return;
+  let names = name.split('.');
+  let ret = obj;
+  for (let i = 0; i < names.length; i++) {
+    if (i == names.length - 1) {
+      ret[names[i]] = value;
+    } else {
+      if (typeof obj[names[i]] === 'undefined') {
+        obj[names[i]] = {};
+      }
+      ret = obj[names[i]];
+    }
+  }
+  return obj;
 };
 
 utils.merge = (older, newer) => {
@@ -7168,4 +7193,149 @@ if (typeof flutter === 'undefined')
 flutter.log = (data) => {
   if (!window.print) return;
   print.postMessage(data);
+};
+/*
+**              o8o
+**              `"'
+**   .oooooooo oooo  ooo. .oo.  .oo.
+**  888' `88b  `888  `888P"Y88bP"Y88b
+**  888   888   888   888   888   888
+**  `88bod8P'   888   888   888   888
+**  `8oooooo.  o888o o888o o888o o888o
+**  d"     YD
+**  "Y88888P'
+*/
+if (typeof gim === 'undefined') {
+  gim = {};
+}
+
+gim.init = (username, userId, userType, handlers) => {
+  gim.sender = {
+    username: username,
+    userId: userId,
+    userType: userType,
+  };
+  gim.handlers = handlers;
+};
+
+/*!
+** login on im server.
+*/
+gim.login = async () => {
+  return new Promise(function (resolve, reject) {
+    gim.websocket = new WebSocket('wss://gim.cq-fyy.com');
+    gim.websocket.onopen = () => {
+      let requestText = {
+        operation: 'login',
+        userId: gim.sender.userId,
+        userType: gim.sender.userType,
+        payload: {},
+      };
+      gim.websocket.send(JSON.stringify(requestText));
+    };
+    gim.websocket.onclose = () => {
+      // alert('closed');
+    };
+    gim.websocket.onmessage = resp => {
+      if (resp.data) {
+        let res = JSON.parse(resp.data);
+        let op = res.op;
+        if (gim.handlers[op]) {
+          gim.handlers[op](res);
+        }
+      }
+    };
+    gim.websocket.onerror = function(err) {
+      reject(err);
+    };
+    resolve();
+  });
+};
+
+/*!
+** 进入某个房间。conversationId可以为null，直接填写后续的参数。
+*/
+gim.enter = (conversationId, receiverId, receiverType, receiverAlias) => {
+  gim.conversation = {
+    conversationId: conversationId,
+    receiverId: receiverId,
+    receiverType: receiverType,
+    receiverAlias: receiverAlias,
+  };
+};
+
+gim.logout = () => {
+  let requestText = {
+    operation: 'logout',
+    userId: gim.sender.userId,
+    userType: gim.sender.userType,
+    payload: {},
+  };
+  gim.websocket.send(JSON.stringify(requestText));
+
+  setTimeout(() => {
+    gim.websocket.close();
+  });
+  delete gim.conversation;
+  delete gim.sender;
+  delete gim.handlers;
+};
+
+gim.sendText = message => {
+  if (!gim.conversation) {
+    throw '您还没有进入任何会话，无法发送文本，请先调用enter函数！';
+  }
+  let conversation = {};
+  if (gim.conversation.conversationId) {
+    conversation.conversationId = gim.conversation.conversationId;
+  } else {
+    conversation.receiverId = gim.conversation.receiverId;
+    conversation.receiverType = gim.conversation.receiverType;
+    conversation.receiverAlias = gim.conversation.receiverAlias;
+  }
+  let requestText = {
+    operation: 'sendMessage',
+    userId: gim.sender.userId,
+    userType: gim.sender.userType,
+    payload: {
+      ...conversation,
+      messageType: 'TEXT',
+      messageContent: message,
+      senderAlias: gim.sender.username,
+    },
+  };
+  gim.websocket.send(JSON.stringify(requestText));
+};
+
+gim.getConversations = () => {
+  let requestText = {
+    operation: 'getConversations',
+    userId: gim.sender.userId,
+    userType: gim.sender.userType,
+    payload: {},
+  };
+  gim.websocket.send(JSON.stringify(requestText));
+};
+
+gim.getMessages = () => {
+  if (!gim.conversation) {
+    throw '您还没有进入任何会话，无法获取历史会话消息，请先调用enter函数！';
+  }
+  let conversation = {};
+  if (gim.conversation.conversationId) {
+    conversation.conversationId = gim.conversation.conversationId;
+  } else {
+    conversation.receiverId = gim.conversation.receiverId;
+    conversation.receiverType = gim.conversation.receiverType;
+    conversation.receiverAlias = gim.conversation.receiverAlias;
+  }
+  let requestText = {
+    operation: 'getMessages',
+    userId: gim.sender.userId,
+    userType: gim.sender.userType,
+    payload: {
+      ...conversation,
+    },
+  };
+  gim.websocket.send(JSON.stringify(requestText));
 };

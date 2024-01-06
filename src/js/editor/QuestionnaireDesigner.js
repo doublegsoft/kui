@@ -406,6 +406,12 @@ QuestionnaireDesigner.prototype.renderQuestion = function(container, question) {
   }
 };
 
+QuestionnaireDesigner.prototype.renderQuestions = function(questions) {
+  for (let i = 0; i < questions.length; i++) {
+    this.renderQuestion(this.widgetQuestionnaireCanvas, questions[i]);
+  }
+};
+
 QuestionnaireDesigner.prototype.edit = function(question) {
   let self = this;
   Handlebars.registerHelper('ifne', function (a, b, options) {

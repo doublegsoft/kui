@@ -190,6 +190,12 @@ ajax.view = function(opt) {
     }
   }
 
+  if (window._current_view) {
+    if (window._current_view.destroy) {
+      window._current_view.destroy();
+    }
+    delete window._current_view;
+  }
   if (url) {
     xhr.get({
       url: url,
@@ -200,6 +206,7 @@ ajax.view = function(opt) {
         }
         if (fragment && fragment.id && window[fragment.id] && window[fragment.id].show && !callback) {
           window[fragment.id].show(params);
+          window._current_view = window[fragment.id];
         }
         if (callback)
           callback(title, fragment, params);
@@ -1094,8 +1101,9 @@ ajax.tabs = function(opts) {
       url: url,
       containerId: container,
       success: function() {
-        if (window[page])
+        if (window[page]) {
           window[page].show(data);
+        }
       }
     });
   }

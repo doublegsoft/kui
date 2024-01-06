@@ -22,6 +22,10 @@
         "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/eveduler/schedule.html', containerId: 'container'});"
       },{
+        "text": "客户聊天",
+        "icon": "nav-icon icon-note font-16",
+        "url": "javascript:ajax.view({url: 'html/application/gimessenger/chat.html', containerId: 'container'});"
+      },{
         "text": "随访设计",
         "icon": "nav-icon icon-note font-16",
         "url": "javascript:ajax.view({url: 'html/application/surd/design.html', containerId: 'container'});"

@@ -25,7 +25,7 @@ xhr.request = function (opts, method) {
   let usecase = opts.usecase || ''; 
 
   let req  = new XMLHttpRequest();
-  req.timeout = 10 * 1000;
+  // req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -121,7 +121,7 @@ xhr.upload = function(opts) {
   formdata.append('file', opts.file);
 
   let req  = new XMLHttpRequest();
-  req.timeout = 10 * 1000;
+  // req.timeout = 10 * 1000;
   req.onload = function () {
     let resp = req.responseText;
     if (type == 'json')
@@ -170,7 +170,7 @@ xhr.asyncUpload = async function (opts) {
     formdata.append('file', opts.file);
 
     let req  = new XMLHttpRequest();
-    req.timeout = 10 * 1000;
+    // req.timeout = 10 * 1000;
     req.onload = function () {
       let resp = req.responseText;
       if (type == 'json')

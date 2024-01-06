@@ -33,6 +33,102 @@ function MobileCanvas(opts) {
   this.skeletonStroke = 'rgba(235,235,235)';
   this.propertiesEditor = opts.propertiesEditor;
   this.onSelectedElement = opts.onSelectedElement;
+
+  this.contextMenu = dom.element(`
+    <div class="context-menu" style="display: none;">
+      <div class="context-menu-options">
+        <div class="context-menu-option" widget-id="buttonCopy">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">content_copy</i>
+          <span>复制</span>
+        </div>
+        <div class="context-menu-option" widget-id="buttonPaste">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">content_paste</i>
+          <span>粘贴</span>
+        </div>
+      </div>
+      <div style="border-bottom: 2px solid rgba(196,196,196,1);"></div>
+      <div class="context-menu-options">
+        <div class="context-menu-option" widget-id="buttonAlignLeft">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">format_align_left</i>
+          <span>居左对齐</span>
+        </div>
+        <div class="context-menu-option" widget-id="buttonAlignCenter">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">format_align_center</i>
+          <span>居中对齐</span>
+        </div>
+        <div class="context-menu-option" widget-id="buttonAlignRight">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">format_align_right</i>
+          <span>居右对齐</span>
+        </div>
+        <div class="context-menu-option" widget-id="buttonAlignJustify">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">format_align_justify</i>
+          <span>两端对齐</span>
+        </div>
+      </div>
+      <div style="border-bottom: 2px solid rgba(196,196,196,1);"></div>
+      <div class="context-menu-options">
+<!--        <div class="context-menu-option" widget-id="buttonAlignVerticalSpace">-->
+<!--          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">align_space_even</i>-->
+<!--          <span>上下间距</span>-->
+<!--        </div>-->
+        <div class="context-menu-option" widget-id="buttonAlignHorizontalSpace">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">align_justify_space_even</i>
+          <span>左右间距</span>
+        </div>
+        <div class="context-menu-option" widget-id="buttonAlignTop">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">align_start</i>
+          <span>顶端对齐</span>
+        </div>
+        <div class="context-menu-option" widget-id="buttonAlignBottom">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">align_end</i>
+          <span>底端对齐</span>
+        </div>
+      </div>
+      <div style="border-bottom: 2px solid rgba(196,196,196,1);"></div>
+      <div class="context-menu-options">
+        <div class="context-menu-option text-danger font-bold" widget-id="buttonRemove">
+          <i class="material-symbols-outlined font-16 position-relative" style="top: 3px;">delete</i>
+          <span>删除</span>
+        </div>
+      </div>
+    </div>
+  `);
+  dom.init(this, this.contextMenu);
+  dom.bind(this.buttonCopy,  'click', async ev => {
+    this.copyElements();
+  });
+  dom.bind(this.buttonPaste,  'click', ev => {
+    this.pasteElements();
+  });
+
+  dom.bind(this.buttonAlignLeft,  'click', ev => {
+    this.alignLeft();
+  });
+  dom.bind(this.buttonAlignCenter,  'click', ev => {
+    this.alignCenter();
+  });
+  dom.bind(this.buttonAlignRight,  'click', ev => {
+    this.alignRight();
+  });
+  dom.bind(this.buttonAlignJustify,  'click', ev => {
+    this.alignJustify();
+  });
+  dom.bind(this.buttonAlignVerticalSpace,  'click', ev => {
+    this.alignVerticalSpace();
+  });
+  dom.bind(this.buttonAlignHorizontalSpace,  'click', ev => {
+    this.alignHorizontalSpace();
+  });
+  dom.bind(this.buttonAlignTop,  'click', ev => {
+    this.alignTop();
+  });
+  dom.bind(this.buttonAlignBottom,  'click', ev => {
+    this.alignBottom();
+  });
+  dom.bind(this.buttonRemove, 'click', ev => {
+    this.removeElements();
+  });
+
   /*!
   ** 用户设置的宽度。
   */
@@ -73,15 +169,21 @@ function MobileCanvas(opts) {
   this.botBarRightX = MOBILE_BOT_BAR_RIGHT_X * this.scaleRatio;
   this.botBarRightY = MOBILE_BOT_BAR_RIGHT_Y * this.scaleRatio;
 
-  this.safeAreaWidth = this.safeAreaTopRightX - this.safeAreaTopLeftX;
-  this.safeAreaHeight = this.safeAreaBotRightY - this.safeAreaTopRightY;
-
   this.paddingLeft = 12 * this.scaleRatio;
   this.paddingRight = 12 * this.scaleRatio;
 }
 
 MobileCanvas.prototype.render = function (containerId) {
   this.container = dom.find(containerId);
+  this.container.appendChild(this.contextMenu);
+  /*!
+  ** 容器的鼠标点击，同样释放画布的事件，通常用于拖拽等鼠标操作。
+  */
+  dom.bind(this.container, 'mouseup', ev => {
+    ev.stopPropagation();
+    const mouseup = new Event("mouseup");
+    this.canvas.dispatchEvent(mouseup);
+  });
   this.canvas = document.createElement('canvas');
   this.canvas.style.width = this.width + 'px';
   this.canvas.style.height = this.height + 'px';
@@ -137,7 +239,14 @@ MobileCanvas.prototype.redraw = function () {
   this.context.closePath();
 
   for (let i = 0; i < this.drawnElements.length; i++) {
-    this.drawElement(this.drawnElements[i]);
+    let el = this.drawnElements[i];
+    this.drawElement(el);
+    /*!
+    ** 在此属性值调整
+    */
+    if (el.selected === true) {
+      this.propertiesEditor.render(this.getElementProperties(el));
+    }
   }
 
   this.buildOuter();
@@ -156,25 +265,6 @@ MobileCanvas.prototype.redraw = function () {
 MobileCanvas.prototype.buildSafeArea = function () {
   this.context.fillStyle = this.background;
   this.context.fillRect(this.safeAreaTopLeftX, this.safeAreaTopLeftY, this.safeAreaWidth, this.safeAreaHeight);
-};
-
-/*!
-** 初始渲染安全区域上方。
-*/
-MobileCanvas.prototype.buildTopBar = function () {
-  this.context.beginPath();
-  this.context.fillStyle = this.background;
-  this.context.strokeStyle = this.background;
-  this.context.moveTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY);
-  // this.context.arcTo(0, 0, this.topBarLeftX, this.topBarLeftY, 30);
-  this.context.fillStyle = 'black';
-  this.context.arc(this.safeAreaTopLeftX + 35, this.safeAreaTopLeftY, 35, Math.PI, Math.PI * 1.5);
-  // this.context.lineTo(this.topBarRightX, this.topBarRightY);
-  // this.context.arcTo(this.width, 0, this.safeAreaBotRightX, this.safeAreaTopRightY, 30);
-  // this.context.lineTo(this.safeAreaTopRightX, this.safeAreaTopRightY + 1 /* there is a bug what i have no idea*/);
-  // this.context.lineTo(this.safeAreaTopLeftX, this.safeAreaTopLeftY + 1 /* there is a bug what i have no idea*/);
-  this.context.fill();
-  this.context.closePath();
 };
 
 MobileCanvas.prototype.buildOuter = function () {
@@ -226,26 +316,6 @@ MobileCanvas.prototype.buildOuter = function () {
   this.context.lineTo(this.width, this.height);
   this.context.fill();
   this.context.closePath();
-
-  // bottom-right
-
-};
-
-/*!
-** 初始渲染安全区域下方。
-*/
-MobileCanvas.prototype.buildBotBar = function () {
-  this.context.beginPath();
-  this.context.fillStyle = this.background;
-  this.context.strokeStyle = this.background;
-  this.context.moveTo(this.safeAreaBotLeftX, this.safeAreaBotLeftY);
-  this.context.arcTo(0, this.height, this.botBarLeftX, this.botBarLeftY, 30);
-  this.context.lineTo(this.botBarRightX, this.botBarRightY);
-  this.context.arcTo(this.width - 10, this.height - 10, this.safeAreaBotRightX, this.safeAreaTopRightY, 30);
-  this.context.lineTo(this.safeAreaBotRightX, this.safeAreaBotRightY - 1);
-  this.context.lineTo(this.safeAreaBotLeftX, this.safeAreaBotLeftY - 1);
-  this.context.fill();
-  this.context.closePath();
 };
 
 /*!
@@ -257,25 +327,67 @@ MobileCanvas.prototype.initialize = function () {
     this.drawNewElement(x, y, data);
   });
 
-  dom.bind(this.canvas, 'mousedown', ev => {
+  this.canvas.addEventListener('contextmenu', ev => {
+    ev.preventDefault();
     if (this.mode == 'simulate') return;
-    let found = this.findElementByXY(ev.layerX - this.canvas.offsetLeft, ev.layerY - this.canvas.offsetTop);
-    this.clearSelected();
+    let ox = ev.layerX - this.canvas.offsetLeft;
+    let oy = ev.layerY - this.canvas.offsetTop;
+    this.contextX = ox;
+    this.contextY = oy;
+    let found = this.findElementByXY(ox, oy);
     if (found != null) {
-      this.canvas.style.cursor = 'move';
+      // this.clearSelected();
+      found.selected = true;
+      this.redraw();
+    }
+    this.contextMenu.style.display = '';
+    this.contextMenu.style.left = (ev.layerX + 5) + 'px';
+    this.contextMenu.style.top = (ev.layerY + 5) + 'px';
+  });
+
+  dom.bind(this.canvas, 'mousedown', ev => {
+    if (ev.which == 3 && ev.button == 2) return;
+    /*!
+    ** 模拟模式忽略。
+    */
+    if (this.mode == 'simulate') return;
+    let isShift = !!ev.shiftKey;
+    let found = this.findElementByXY(ev.layerX - this.canvas.offsetLeft, ev.layerY - this.canvas.offsetTop);
+    /*!
+    ** 没按住Shift键，就是单选。
+    */
+    if (!isShift) {
+      this.clearSelected();
+    }
+    if (found != null) {
+      found.selected = true;
       let ox = ev.layerX - this.canvas.offsetLeft;
       let oy = ev.layerY - this.canvas.offsetTop;
-      found.selected = true;
-      this.movingElement = found;
-      this.movingOffsetX = ox - found.x;
-      this.movingOffsetY = oy - found.y;
+      if (this.canvas.style.cursor == 'w-resize' ||
+          this.canvas.style.cursor == 'e-resize' ||
+          this.canvas.style.cursor == 'n-resize' ||
+          this.canvas.style.cursor == 's-resize') {
+        this.resizingElement = found;
+        this.resizingOffsetX = ox - found.x;
+        this.resizingOffsetY = oy - found.y;
+        this.resizingLeft = this.resizingElement.x;
+        this.resizingRight = this.resizingElement.x + this.resizingElement.w;
+        this.resizingTop = this.resizingElement.y;
+        this.resizingBottom = this.resizingElement.y + this.resizingElement.h;
+      } else {
+        this.canvas.style.cursor = 'move';
+        this.movingElement = found;
+        this.movingOffsetX = ox - found.x;
+        this.movingOffsetY = oy - found.y;
+
+        // if (this.propertiesEditor) {
+        //   this.propertiesEditor.render(this.getElementProperties(this.movingElement));
+        // }
+        if (this.onSelectedElement) {
+          this.onSelectedElement(this.movingElement);
+        }
+      }
       this.redraw();
-      if (this.propertiesEditor) {
-        this.propertiesEditor.render(this.getElementProperties(this.movingElement));
-      }
-      if (this.onSelectedElement) {
-        this.onSelectedElement(this.movingElement);
-      }
     } else {
       this.propertiesEditor.render({groups: []});
       for (let i = 0; i < this.drawnElements.length; i++) {
@@ -284,24 +396,43 @@ MobileCanvas.prototype.initialize = function () {
       this.redraw();
     }
   });
+
   dom.bind(this.canvas, 'mouseup', ev => {
+    ev.stopPropagation();
     if (this.mode == 'simulate') return;
     this.canvas.style.cursor = 'default';
     this.movingElement = null;
+    this.resizingElement = null;
+    if (ev.which == 3 && ev.button == 2) return;
+    this.contextMenu.style.display = 'none';
   });
   dom.bind(this.canvas, 'mousemove', ev => {
     if (this.mode == 'simulate') return;
-    if (this.movingElement != null) {
-      let ox = ev.layerX - this.canvas.offsetLeft;
-      let oy = ev.layerY - this.canvas.offsetTop;
-      this.movingElement.x = ox - this.movingOffsetX;
-      this.movingElement.y = oy - this.movingOffsetY;
-      this.movingElement.rx = (this.movingElement.x - this.safeAreaTopLeftX) / this.scaleRatio;
-      this.movingElement.ry = (this.movingElement.y - this.wheelDeltaY - this.topBarLeftY) / this.scaleRatio;
-      if (this.propertiesEditor) {
-        this.propertiesEditor.render(this.getElementProperties(this.movingElement));
+    /*!
+    ** 移动所选的对象。
+    */
+    let ox = ev.layerX - this.canvas.offsetLeft;
+    let oy = ev.layerY - this.canvas.offsetTop;
+    if (this.movingElement) {
+      this.resizingElement = null;
+      this.moveElement(this.movingElement, ox, oy);
+    } else if (this.resizingElement) {
+      this.movingElement = null;
+      /*!
+      ** 改变对象的大小。
+      */
+      if (this.canvas.style.cursor == 'w-resize') {
+        this.resizeElementToWest(this.resizingElement, ox, oy);
+      } else if (this.canvas.style.cursor == 'e-resize') {
+        this.resizeElementToEast(this.resizingElement, ox, oy);
+      } else if (this.canvas.style.cursor == 'n-resize') {
+        this.resizeElementToNorth(this.resizingElement, ox, oy);
+      } else if (this.canvas.style.cursor == 's-resize') {
+        this.resizeElementToSouth(this.resizingElement, ox, oy);
       }
-      this.redraw();
+
+    } else {
+      this.switchElementCursor(ev.layerX - this.canvas.offsetLeft, ev.layerY - this.canvas.offsetTop);
     }
   });
   dom.bind(this.canvas, 'wheel', ev => {
@@ -336,12 +467,91 @@ MobileCanvas.prototype.initialize = function () {
   });
 };
 
+MobileCanvas.prototype.switchElementCursor = function (x, y) {
+  const THRESHOLD = 5;
+  this.canvas.style.cursor = 'default';
+  let found = this.findElementByXY(x, y);
+  if (found == null) {
+    return;
+  }
+  for (let i = 0; i < this.drawnElements.length; i++) {
+
+    let el = this.drawnElements[i];
+    if ((y - el.y) <= THRESHOLD && (y - el.y) > 0) {
+      this.canvas.style.cursor = 'n-resize';
+    }
+    if ((el.y + el.h - y) <= THRESHOLD && (el.y + el.h - y) > 0) {
+      this.canvas.style.cursor = 's-resize';
+    }
+    if ((x - el.x) <= THRESHOLD && (x - el.x) > 0) {
+      this.canvas.style.cursor = 'w-resize';
+    }
+    if ((el.x + el.w - x) <= THRESHOLD && (el.x + el.w - x) > 0) {
+      this.canvas.style.cursor = 'e-resize';
+    }
+  }
+};
+
+MobileCanvas.prototype.moveElement = function (el, ox, oy) {
+  el.x = ox - this.movingOffsetX;
+  el.y = oy - this.movingOffsetY;
+  el.rx = (el.x - this.safeAreaTopLeftX) / this.scaleRatio;
+  el.ry = (el.y - this.wheelDeltaY - this.topBarLeftY) / this.scaleRatio;
+  this.propertiesEditor.render(this.getElementProperties(el));
+  this.redraw();
+}
+
+MobileCanvas.prototype.resizeElementToWest = function (el, ox, oy) {
+  el.x = ox - this.resizingOffsetX;
+  el.rx = el.x / this.scaleRatio;
+  el.w = this.resizingRight - el.x;
+  el.rw = el.w / this.scaleRatio;
+  if (el.type === 'avatar') {
+    el.h = el.w;
+    el.rh = el.h / this.scaleRatio;
+  }
+  this.redraw();
+};
+
+MobileCanvas.prototype.resizeElementToEast = function (el, ox, oy) {
+  el.w = ox - this.resizingLeft;
+  el.rw = el.w / this.scaleRatio;
+  if (el.type === 'avatar') {
+    el.h = el.w;
+    el.rh = el.h / this.scaleRatio;
+  }
+  this.redraw();
+};
+
+MobileCanvas.prototype.resizeElementToNorth = function (el, ox, oy) {
+  el.y = oy - this.resizingOffsetY;
+  el.ry = el.y / this.scaleRatio;
+  el.h = this.resizingBottom - el.y;
+  el.rh = el.h / this.scaleRatio;
+  if (el.type === 'avatar') {
+    el.w = el.h;
+    el.rw = el.w / this.scaleRatio;
+  }
+  this.redraw();
+};
+
+MobileCanvas.prototype.resizeElementToSouth = function (el, ox, oy) {
+  el.h = oy - this.resizingTop;
+  el.rh = el.h / this.scaleRatio;
+  if (el.type === 'avatar') {
+    el.w = el.h;
+    el.rw = el.w / this.scaleRatio;
+  }
+  this.redraw();
+};
+
 MobileCanvas.prototype.drawParagraph = function (el) {
   this.context.fillStyle = this.skeletonBackground;
   this.context.beginPath();
   let startX = el.x;
   let startY = el.y;
-  for (let i = 0; i < 4; i++) {
+  let count = el.h / 28 - 1;
+  for (let i = 0; i < count; i++) {
     this.context.fillRect(startX, startY, el.w, 20);
     startY += 28;
   }
@@ -461,20 +671,20 @@ MobileCanvas.prototype.drawElement = function (el) {
     this.drawText(el);
   } else if (el.type == 'paragraph') {
     el.w = el.w || this.safeAreaWidth;
-    el.h = 132;
+    el.h = el.h || 132;
     el.rw = el.w / this.scaleRatio;
     el.rh = el.h / this.scaleRatio;
     this.drawParagraph(el);
   } else if (el.type == 'block') {
     if (!el.w) {
       el.w = el.h = 60;
-      el.rw = el.w / this.scaleRatio;
-      el.rh = el.h / this.scaleRatio;
     }
+    el.rw = el.w / this.scaleRatio;
+    el.rh = el.h / this.scaleRatio;
     this.drawBlock(el);
   } else if (el.type == 'image') {
     el.w = el.w || this.safeAreaWidth;
-    el.h = 120;
+    el.h = el.h || 120;
     el.rw = el.w / this.scaleRatio;
     el.rh = el.h / this.scaleRatio;
     this.drawImage(el);
@@ -503,7 +713,7 @@ MobileCanvas.prototype.drawElement = function (el) {
   }
 };
 
-MobileCanvas.prototype.drawNewElement = function (x, y, data, translated/*坐标是否已经转换*/) {
+ MobileCanvas.prototype.drawNewElement = function (x, y, data, translated/*坐标是否已经转换*/) {
   translated = translated === true;
   let el;
   if (!translated) {
@@ -581,16 +791,14 @@ MobileCanvas.prototype.clearSelected = function () {
   }
 };
 
-MobileCanvas.prototype.removeElement = function () {
-  let found = -1;
+MobileCanvas.prototype.removeElements = function () {
+  let newElements = [];
   for (let i = 0; i < this.drawnElements.length; i++) {
-    if (this.drawnElements[i].selected === true) {
-      found = i;
-      break;
+    if (this.drawnElements[i].selected !== true) {
+      newElements.push(this.drawnElements[i]);
     }
   }
-  if (found == -1) return;
-  this.drawnElements.splice(found, 1);
+  this.drawnElements = newElements;
   this.redraw();
 };
 
@@ -665,5 +873,157 @@ MobileCanvas.prototype.getElementProperties = function (el) {
       }],
     }]
   };
+  return ret;
+};
+
+MobileCanvas.prototype.copyElements = function () {
+  let els = this.getSelectedElements();
+  if (els.length == 0) return;
+  this.copiedElements = els;
+};
+
+MobileCanvas.prototype.pasteElements = function () {
+  for (let i = 0; i < this.copiedElements.length; i++) {
+    let el = this.copiedElements[i];
+    let cloned = {...el};
+    cloned.x = this.contextX;
+    cloned.y = this.contextY;
+    this.drawNewElement(this.contextX, this.contextY, cloned, false);
+  }
+};
+
+MobileCanvas.prototype.alignLeft = function () {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.selected) {
+      el.x = this.safeAreaBotLeftX;
+      el.rx = (el.x - this.safeAreaTopLeftX) / this.scaleRatio;
+      this.redraw();
+      break;
+    }
+  }
+};
+
+MobileCanvas.prototype.alignCenter = function () {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.selected) {
+      el.x = (this.safeAreaTopRightX - el.w) / 2;
+      el.rx = (el.x - this.safeAreaTopLeftX) / this.scaleRatio;
+      this.redraw();
+      break;
+    }
+  }
+};
+
+MobileCanvas.prototype.alignRight = function () {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.selected) {
+      el.x = this.safeAreaTopRightX - el.w;
+      el.rx = (el.x - this.safeAreaTopLeftX) / this.scaleRatio;
+      this.redraw();
+      break;
+    }
+  }
+};
+
+MobileCanvas.prototype.alignJustify = function () {
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.selected) {
+      el.x = this.safeAreaBotLeftX;
+      el.rx = (el.x - this.safeAreaTopLeftX) / this.scaleRatio;
+      el.w = this.safeAreaWidth;
+      el.rw = el.w / this.scaleRatio;
+      this.redraw();
+      break;
+    }
+  }
+};
+
+MobileCanvas.prototype.alignVerticalSpace = function () {
+  let selectedElements = this.getSelectedElements();
+  let len = selectedElements.length;
+  if (len <= 2) return;
+};
+
+MobileCanvas.prototype.alignHorizontalSpace = function () {
+  let selectedElements = this.getSelectedElements();
+  let len = selectedElements.length;
+  if (len <= 1) return;
+  let occupiedSpace = 0;
+  for (let i = 0; i < selectedElements.length; i++) {
+    let el = selectedElements[i];
+    occupiedSpace += el.w;
+  }
+  let space = (this.safeAreaWidth - occupiedSpace) / (len + 1);
+  if (space < 0) return;
+  selectedElements.sort((a, b) => {
+    if (a.x < b.x) {
+      return;
+    }
+    return -1;
+  });
+  let offsetX = this.safeAreaTopLeftX;
+  for (let i = 0; i < selectedElements.length; i++) {
+    offsetX += space;
+    let el = selectedElements[i];
+    el.x = offsetX;
+    el.rx = el.x / this.scaleRatio;
+    offsetX += el.w;
+  }
+  this.redraw();
+};
+
+MobileCanvas.prototype.alignTop = function () {
+  let selectedElements = this.getSelectedElements();
+  let len = selectedElements.length;
+  if (len <= 1) return;
+  let minY = 999999, minEl = null;
+  for (let i = 0; i < selectedElements.length; i++) {
+    let el = selectedElements[i];
+    if (el.y < minY) {
+      minY = el.y;
+      minEl = el;
+    }
+  }
+  for (let i = 0; i < selectedElements.length; i++) {
+    let el = selectedElements[i];
+    el.y = minEl.y;
+    el.ry = minEl.ry;
+  }
+  this.redraw();
+};
+
+MobileCanvas.prototype.alignBottom = function () {
+  let selectedElements = this.getSelectedElements();
+  let len = selectedElements.length;
+  if (len <= 1) return;
+  let maxY = 0, maxEl = null;
+  for (let i = 0; i < selectedElements.length; i++) {
+    let el = selectedElements[i];
+    if ((el.y + el.h) > maxY) {
+      maxY = el.y + el.h;
+      maxEl = el;
+    }
+  }
+  for (let i = 0; i < selectedElements.length; i++) {
+    let el = selectedElements[i];
+    el.y = (maxEl.y + maxEl.h) - el.h;
+    el.ry = el.y / this.scaleRatio;
+  }
+  this.redraw();
+};
+
+
+
+MobileCanvas.prototype.getSelectedElements = function () {
+  let ret = [];
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    if (this.drawnElements[i].selected === true) {
+      ret.push(this.drawnElements[i]);
+    }
+  }
   return ret;
 };
