@@ -7186,14 +7186,6 @@ document.addEventListener("touchend", ev => {
     }
   }
 }, false);
-
-if (typeof flutter === 'undefined')
-  flutter = {};
-
-flutter.log = (data) => {
-  if (!window.print) return;
-  print.postMessage(data);
-};
 /*
 **              o8o
 **              `"'
@@ -7222,8 +7214,9 @@ gim.init = (username, userId, userType, handlers) => {
 ** login on im server.
 */
 gim.login = async () => {
+  console.log('login');
   return new Promise(function (resolve, reject) {
-    gim.websocket = new WebSocket('wss://gim.cq-fyy.com');
+    gim.websocket = new WebSocket('wss://gim.cq-fyy.com'); //  // ws://192.168.0.200:9999
     gim.websocket.onopen = () => {
       let requestText = {
         operation: 'login',
@@ -7235,6 +7228,7 @@ gim.login = async () => {
     };
     gim.websocket.onclose = () => {
       // alert('closed');
+      gim.login();
     };
     gim.websocket.onmessage = resp => {
       if (resp.data) {
@@ -7300,7 +7294,7 @@ gim.sendText = message => {
     payload: {
       ...conversation,
       messageType: 'TEXT',
-      messageContent: message,
+      messageContent: message.messageContent,
       senderAlias: gim.sender.username,
     },
   };

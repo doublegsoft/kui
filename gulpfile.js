@@ -62,7 +62,7 @@ gulp.task('dist', function() {
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
     'src/js/mobile/PopupRuler.js',
-    'src/js/kuim.js', 'src/js/flutter.js'])
+    'src/js/kuim.js'])
     .pipe(babel({
       presets: [['@babel/preset-env', {modules: false}]]
     }))
@@ -78,7 +78,7 @@ gulp.task('dist', function() {
     'src/js/mobile/Numpad.js', 'src/js/mobile/DistrictPicker.js', 'src/js/mobile/Calendar.js',
     'src/js/mobile/CascadePicker.js', 'src/js/mobile/ActionSheet.js', 'src/js/mobile/Weekdays.js',
     'src/js/mobile/PopupRuler.js',
-    'src/js/kuim.js', 'src/js/flutter.js', 'src/js/application/gim.js'])
+    'src/js/kuim.js', 'src/js/application/gim.js'])
     .pipe(concat('./kui-all.mobile.js'))
     .pipe(gulp.dest('./dist/'));
 
