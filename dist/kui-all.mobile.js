@@ -7214,7 +7214,6 @@ gim.init = (username, userId, userType, handlers) => {
 ** login on im server.
 */
 gim.login = async () => {
-  console.log('login');
   return new Promise(function (resolve, reject) {
     gim.websocket = new WebSocket('wss://gim.cq-fyy.com'); //  // ws://192.168.0.200:9999
     gim.websocket.onopen = () => {

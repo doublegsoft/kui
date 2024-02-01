@@ -213,8 +213,30 @@ MobileCanvas.prototype.restore = function () {
     el.y -= oldWheelDeltaY;
   }
   this.wheelDeltaY = 0;
-
   this.redraw();
+};
+
+function restoreWithAnimation() {
+  let self = window['pageMobileDesign'].mobile;
+  if (self.wheelDeltaY <= 0) {
+    return;
+  }
+  const SPEED = 10;
+  for (let i = 0; i < self.drawnElements.length; i++) {
+    let el = self.drawnElements[i];
+    el.y -= SPEED;
+  }
+  self.wheelDeltaY -= SPEED;
+  if (self.wheelDeltaY < 0) {
+    // 微调
+    for (let i = 0; i < self.drawnElements.length; i++) {
+      let el = self.drawnElements[i];
+      el.y -= self.wheelDeltaY;
+    }
+    self.wheelDeltaY = 0;
+  }
+  self.redraw();
+  window.requestAnimationFrame(restoreWithAnimation);
 };
 
 MobileCanvas.prototype.redraw = function () {
@@ -223,20 +245,20 @@ MobileCanvas.prototype.redraw = function () {
   this.buildSafeArea();
 
   // zero-y line
-  this.context.beginPath();
-  this.context.strokeStyle = 'rgba(0,0,0,0.17)';
-  this.context.setLineDash([10, 10]);
-  this.context.lineWidth = 3;
-  this.context.moveTo(
-    this.safeAreaBotLeftX,
-    this.topBarLeftY + this.wheelDeltaY,
-  );
-  this.context.lineTo(
-    this.safeAreaBotRightX,
-    this.topBarLeftY + this.wheelDeltaY,
-  );
-  this.context.stroke();
-  this.context.closePath();
+  // this.context.beginPath();
+  // this.context.strokeStyle = 'rgba(0,0,0,0.17)';
+  // this.context.setLineDash([10, 10]);
+  // this.context.lineWidth = 3;
+  // this.context.moveTo(
+  //   this.safeAreaBotLeftX,
+  //   this.topBarLeftY + this.wheelDeltaY,
+  // );
+  // this.context.lineTo(
+  //   this.safeAreaBotRightX,
+  //   this.topBarLeftY + this.wheelDeltaY,
+  // );
+  // this.context.stroke();
+  // this.context.closePath();
 
   for (let i = 0; i < this.drawnElements.length; i++) {
     let el = this.drawnElements[i];
@@ -436,35 +458,44 @@ MobileCanvas.prototype.initialize = function () {
     }
   });
   dom.bind(this.canvas, 'wheel', ev => {
-    // 所有元素都在顶部
-    let areAllOverTop = true;
-    for (let i = 0; i < this.drawnElements.length; i++) {
-      let el = this.drawnElements[i];
-      if ((el.y + el.h) > 0) {
-        areAllOverTop = false;
-        break;
-      }
+    if (this.wheelDeltaY > 0 && ev.wheelDeltaY >= 0) {
+      clearTimeout(this.toPull2Refresh);
+      this.toPull2Refresh = setTimeout(() => {
+        restoreWithAnimation();
+      }, 150);
     }
-    if (areAllOverTop === true && ev.wheelDeltaY < 0) return;
-
-    let areAllUnderBottom = true;
-    for (let i = 0; i < this.drawnElements.length; i++) {
-      let el = this.drawnElements[i];
-      if (el.y < this.height) {
-        areAllUnderBottom = false;
-        break;
-      }
-    }
-    if (areAllUnderBottom === true && ev.wheelDeltaY > 0) return;
-
-    for (let i = 0; i < this.drawnElements.length; i++) {
-      let el = this.drawnElements[i];
-      // el.x += ev.wheelDeltaX / 5;
-      el.y += ev.wheelDeltaY / 5;
-    }
-    this.wheelDeltaY += ev.wheelDeltaY / 5;
-    this.redraw();
+    this.renderAfterScrolling(ev.wheelDeltaY);
   });
+};
+
+MobileCanvas.prototype.renderAfterScrolling = function (deltaY) {
+  // 所有元素都在顶部
+  let areAllOverTop = true;
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if ((el.y + el.h) > 0) {
+      areAllOverTop = false;
+      break;
+    }
+  }
+  if (areAllOverTop === true && deltaY < 0) return;
+
+  let areAllUnderBottom = true;
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.y < this.height) {
+      areAllUnderBottom = false;
+      break;
+    }
+  }
+  if (areAllUnderBottom === true && deltaY > 0) return;
+
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    el.y += deltaY / 5;
+  }
+  this.wheelDeltaY += deltaY / 5;
+  this.redraw();
 };
 
 MobileCanvas.prototype.switchElementCursor = function (x, y) {

@@ -6517,7 +6517,6 @@ gim.init = (username, userId, userType, handlers) => {
 ** login on im server.
 */
 gim.login = async () => {
-  console.log('login');
   return new Promise(function (resolve, reject) {
     gim.websocket = new WebSocket('wss://gim.cq-fyy.com'); //  // ws://192.168.0.200:9999
     gim.websocket.onopen = () => {
@@ -6612,123 +6611,6 @@ gim.getConversations = () => {
     payload: {},
   };
   gim.websocket.send(JSON.stringify(requestText));
-};
-
-gim.getMessages = () => {
-  if (!gim.conversation) {
-    throw '您还没有进入任何会话，无法获取历史会话消息，请先调用enter函数！';
-  }
-  let conversation = {};
-  if (gim.conversation.conversationId) {
-    conversation.conversationId = gim.conversation.conversationId;
-  } else {
-    conversation.receiverId = gim.conversation.receiverId;
-    conversation.receiverType = gim.conversation.receiverType;
-    conversation.receiverAlias = gim.conversation.receiverAlias;
-  }
-  let requestText = {
-    operation: 'getMessages',
-    userId: gim.sender.userId,
-    userType: gim.sender.userType,
-    payload: {
-      ...conversation,
-    },
-  };
-  gim.websocket.send(JSON.stringify(requestText));
-};
-
-/*
-**              o8o
-**              `"'
-**   .oooooooo oooo  ooo. .oo.  .oo.
-**  888' `88b  `888  `888P"Y88bP"Y88b
-**  888   888   888   888   888   888
-**  `88bod8P'   888   888   888   888
-**  `8oooooo.  o888o o888o o888o o888o
-**  d"     YD
-**  "Y88888P'
-*/
-if (typeof gim === 'undefined') {
-  gim = {};
-}
-
-gim.init = (username, userId, userType, handlers) => {
-  gim.sender = {
-    username: username,
-    userId: userId,
-    userType: userType,
-  };
-  gim.handlers = handlers;
-};
-
-/*!
-** login on im server.
-*/
-gim.login = async () => {
-  return true;
-};
-
-/*!
-** 进入某个房间。conversationId可以为null，直接填写后续的参数。
-*/
-gim.enter = (conversationId, receiverId, receiverType, receiverAlias) => {
-  gim.conversation = {
-    conversationId: conversationId,
-    receiverId: receiverId,
-    receiverType: receiverType,
-    receiverAlias: receiverAlias,
-  };
-};
-
-gim.logout = () => {
-
-};
-
-gim.sendText = message => {
-  if (!gim.conversation) {
-    throw '您还没有进入任何会话，无法发送文本，请先调用enter函数！';
-  }
-  let conversation = {};
-  if (gim.conversation.conversationId) {
-    conversation.conversationId = gim.conversation.conversationId;
-  } else {
-    conversation.receiverId = gim.conversation.receiverId;
-    conversation.receiverType = gim.conversation.receiverType;
-    conversation.receiverAlias = gim.conversation.receiverAlias;
-  }
-  let requestText = {
-    operation: 'sendMessage',
-    userId: gim.sender.userId,
-    userType: gim.sender.userType,
-    payload: {
-      ...conversation,
-      messageType: 'TEXT',
-      messageContent: message,
-      senderAlias: gim.sender.username,
-    },
-  };
-  gim.websocket.send(JSON.stringify(requestText));
-};
-
-gim.getConversations = () => {
-  let requestText = {
-    operation: 'getConversations',
-    userId: gim.sender.userId,
-    userType: gim.sender.userType,
-    payload: {},
-  };
-  gim.websocket.send(JSON.stringify(requestText));
-
-  return {
-    op: 'getConversations',
-    data: [{
-      conversationId: '1',
-      alias: '一号',
-    },{
-      conversationId: '2',
-      alias: '二号',
-    }],
-  }
 };
 
 gim.getMessages = () => {
@@ -11627,7 +11509,11 @@ function PaginationTable(opts) {
   this.buildMatrix(this.columns, 0);
   this.buildMappingColumns(this.columns);
 
-  // 改版后的功能按钮（传统模式，FIXME: 暂时兼容）
+  /*
+  ** 改版后的功能按钮（传统模式，FIXME: 暂时兼容）
+  **
+  ** 重新升级 20240201
+  */
   if (opts.filter) {
     opts.filter.query = {
       callback: function(params) {
@@ -12048,7 +11934,7 @@ PaginationTable.prototype.tableTopActions = function () {
 
   if (this.widgetFilter) {
     // let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
-    let containerQuery = dom.create('div', 'card', 'widget-query',);
+    let containerQuery = dom.create('div', 'card', 'widget-query');
     this.widgetFilter.render(containerQuery);
     this.container.appendChild(containerQuery);
 
@@ -12064,7 +11950,7 @@ PaginationTable.prototype.tableTopActions = function () {
         query.classList.add('show');
       }
     });
-    // actions.appendChild(action);
+    actions.appendChild(action);
   }
   if (this.refreshable) {
     let action = dom.element('' +
@@ -12968,12 +12854,17 @@ function QueryLayout(opts) {
   this.fields = opts.fields;
   this.actions = opts.actions || [];
   this.queryOpt = opts.query || {};
-
+  this.columnCount = opts.columnCount || 1;
   // 查询值转换函数，用于复杂查询
   this.convert = opts.convert;
 }
 
 QueryLayout.prototype.render = function (containerId, read, data) {
+  function formatCols(cols) {
+    if (cols < 10)
+      return '0' + cols;
+    return cols;
+  }
   let self = this;
   if (typeof containerId === 'string') {
     this.container = document.querySelector(containerId);
@@ -12988,7 +12879,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   data = data || {};
 
-  let form = dom.create('div', 'card-body');
+  let form = dom.create('div', 'card-body', 'row', 'mx-0');
   let columnCount = this.columnCount;
   let hiddenFields = [];
   let shownFields = [];
@@ -13003,22 +12894,10 @@ QueryLayout.prototype.render = function (containerId, read, data) {
     }
   }
 
-  let rows = [];
-  let len = shownFields.length;
   for (let i = 0; i < shownFields.length; i++) {
     let field = shownFields[i];
-    rows.push({
-      first: field,
-      second: (i + 1 < len) ? shownFields[i + 1] : null
-    });
-    if (columnCount == 2)
-      i += 1;
-  }
-
-  for (let i = 0; i < rows.length; i++) {
-    let row = rows[i];
-    let formGroup = dom.create('div', (row.first&&row.first.input=='check'?'form-group-check':'form-group'), 'row', 'ml-0', 'mr-0');
-    let group = this.createInput(row.first, columnCount);
+    let formGroup = dom.create('div', (field && field.input == 'check'? 'form-group-check' : 'form-group'), 'col-24-' + formatCols(24 / this.columnCount), 'row', 'mx-0');
+    let group = this.createInput(field, columnCount);
 
     formGroup.appendChild(group.label);
     formGroup.appendChild(group.input);
@@ -13047,7 +12926,12 @@ QueryLayout.prototype.render = function (containerId, read, data) {
       let opts = field.options;
       // 加载值或者默认值
       opts.selection = field.value;
-      $(this.container).find(' select[name=' + field.name + ']').searchselect(opts);
+      $(this.container).find('select[name=' + field.name + ']').searchselect(opts);
+      let select = dom.find('select[name=' + field.name + ']', this.container);
+      setTimeout(() => {
+        console.log(select.nextSibling);
+        select.nextSibling.style.width = '100%';
+      }, 200);
     } else if (field.input == 'cascade') {
       let opts = field.options;
       // 加载值或者默认值
@@ -13072,10 +12956,10 @@ QueryLayout.prototype.render = function (containerId, read, data) {
     }
   }
 
-  let buttonRow = dom.element('<div class="row ml-0 mr-0"><div class="col-md-12"></div></div>');
+  let buttonRow = dom.element('<div class="row ml-0 mr-0 full-width"><div class="full-width"></div></div>');
   let buttons = dom.create('div', 'float-right');
   buttons.style.paddingRight = '15px';
-  let buttonQuery = dom.create('button', 'btn', 'btn-query');
+  let buttonQuery = dom.create('button', 'btn', 'btn-query', 'btn-sm');
   buttonQuery.textContent = '搜索';
   dom.bind(buttonQuery, 'click', function() {
     if (self.queryOpt.callback) {
@@ -13089,7 +12973,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
   });
   buttons.appendChild(buttonQuery);
   buttons.append(' ');
-  let buttonReset = dom.create('button', 'btn', 'btn-reset');
+  let buttonReset = dom.create('button', 'btn', 'btn-reset', 'btn-sm');
   buttonReset.textContent = '清除';
   dom.bind(buttonReset, 'click', function() {
     $(self.container).formdata({});
@@ -13135,14 +13019,15 @@ QueryLayout.prototype.getQuery = function() {
 QueryLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
   columnCount = columnCount || 1;
+  let minCols = 24 / (columnCount * 3);
   // let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-4', 'col-form-label');
-  let label = dom.create('div', 'col-form-label');
+  let label = dom.create('div', 'col-form-label', 'col-24-08', 'pl-3');
   label.innerText = field.title + '：';
-  let group = dom.create('div', columnCount == 2 ? 'col-md-4' : 'col-md-8', 'input-group');
+  let group = dom.create('div', 'col-24-16', 'input-group');
 
   let input = null;
   if (field.input == 'select') {
-    input = dom.create('select', 'form-control' ,'sm30');
+    input = dom.create('select', 'form-control');
     input.style.width = '100%';
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
@@ -13176,7 +13061,7 @@ QueryLayout.prototype.createInput = function (field, columnCount) {
       group.append(check);
     }
   } else {
-    input = dom.create('input', 'form-control','sm30');
+    input = dom.create('input', 'form-control');
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请输入...');
@@ -16510,6 +16395,7 @@ Medias.prototype.play = function (path) {
     }
   });
 };
+
 
 /**
  * 报表设计器构造函数。
@@ -20731,8 +20617,30 @@ MobileCanvas.prototype.restore = function () {
     el.y -= oldWheelDeltaY;
   }
   this.wheelDeltaY = 0;
-
   this.redraw();
+};
+
+function restoreWithAnimation() {
+  let self = window['pageMobileDesign'].mobile;
+  if (self.wheelDeltaY <= 0) {
+    return;
+  }
+  const SPEED = 10;
+  for (let i = 0; i < self.drawnElements.length; i++) {
+    let el = self.drawnElements[i];
+    el.y -= SPEED;
+  }
+  self.wheelDeltaY -= SPEED;
+  if (self.wheelDeltaY < 0) {
+    // 微调
+    for (let i = 0; i < self.drawnElements.length; i++) {
+      let el = self.drawnElements[i];
+      el.y -= self.wheelDeltaY;
+    }
+    self.wheelDeltaY = 0;
+  }
+  self.redraw();
+  window.requestAnimationFrame(restoreWithAnimation);
 };
 
 MobileCanvas.prototype.redraw = function () {
@@ -20741,20 +20649,20 @@ MobileCanvas.prototype.redraw = function () {
   this.buildSafeArea();
 
   // zero-y line
-  this.context.beginPath();
-  this.context.strokeStyle = 'rgba(0,0,0,0.17)';
-  this.context.setLineDash([10, 10]);
-  this.context.lineWidth = 3;
-  this.context.moveTo(
-    this.safeAreaBotLeftX,
-    this.topBarLeftY + this.wheelDeltaY,
-  );
-  this.context.lineTo(
-    this.safeAreaBotRightX,
-    this.topBarLeftY + this.wheelDeltaY,
-  );
-  this.context.stroke();
-  this.context.closePath();
+  // this.context.beginPath();
+  // this.context.strokeStyle = 'rgba(0,0,0,0.17)';
+  // this.context.setLineDash([10, 10]);
+  // this.context.lineWidth = 3;
+  // this.context.moveTo(
+  //   this.safeAreaBotLeftX,
+  //   this.topBarLeftY + this.wheelDeltaY,
+  // );
+  // this.context.lineTo(
+  //   this.safeAreaBotRightX,
+  //   this.topBarLeftY + this.wheelDeltaY,
+  // );
+  // this.context.stroke();
+  // this.context.closePath();
 
   for (let i = 0; i < this.drawnElements.length; i++) {
     let el = this.drawnElements[i];
@@ -20954,35 +20862,44 @@ MobileCanvas.prototype.initialize = function () {
     }
   });
   dom.bind(this.canvas, 'wheel', ev => {
-    // 所有元素都在顶部
-    let areAllOverTop = true;
-    for (let i = 0; i < this.drawnElements.length; i++) {
-      let el = this.drawnElements[i];
-      if ((el.y + el.h) > 0) {
-        areAllOverTop = false;
-        break;
-      }
+    if (this.wheelDeltaY > 0 && ev.wheelDeltaY >= 0) {
+      clearTimeout(this.toPull2Refresh);
+      this.toPull2Refresh = setTimeout(() => {
+        restoreWithAnimation();
+      }, 150);
     }
-    if (areAllOverTop === true && ev.wheelDeltaY < 0) return;
-
-    let areAllUnderBottom = true;
-    for (let i = 0; i < this.drawnElements.length; i++) {
-      let el = this.drawnElements[i];
-      if (el.y < this.height) {
-        areAllUnderBottom = false;
-        break;
-      }
-    }
-    if (areAllUnderBottom === true && ev.wheelDeltaY > 0) return;
-
-    for (let i = 0; i < this.drawnElements.length; i++) {
-      let el = this.drawnElements[i];
-      // el.x += ev.wheelDeltaX / 5;
-      el.y += ev.wheelDeltaY / 5;
-    }
-    this.wheelDeltaY += ev.wheelDeltaY / 5;
-    this.redraw();
+    this.renderAfterScrolling(ev.wheelDeltaY);
   });
+};
+
+MobileCanvas.prototype.renderAfterScrolling = function (deltaY) {
+  // 所有元素都在顶部
+  let areAllOverTop = true;
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if ((el.y + el.h) > 0) {
+      areAllOverTop = false;
+      break;
+    }
+  }
+  if (areAllOverTop === true && deltaY < 0) return;
+
+  let areAllUnderBottom = true;
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    if (el.y < this.height) {
+      areAllUnderBottom = false;
+      break;
+    }
+  }
+  if (areAllUnderBottom === true && deltaY > 0) return;
+
+  for (let i = 0; i < this.drawnElements.length; i++) {
+    let el = this.drawnElements[i];
+    el.y += deltaY / 5;
+  }
+  this.wheelDeltaY += deltaY / 5;
+  this.redraw();
 };
 
 MobileCanvas.prototype.switchElementCursor = function (x, y) {

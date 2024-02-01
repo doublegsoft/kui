@@ -114,7 +114,11 @@ function PaginationTable(opts) {
   this.buildMatrix(this.columns, 0);
   this.buildMappingColumns(this.columns);
 
-  // 改版后的功能按钮（传统模式，FIXME: 暂时兼容）
+  /*
+  ** 改版后的功能按钮（传统模式，FIXME: 暂时兼容）
+  **
+  ** 重新升级 20240201
+  */
   if (opts.filter) {
     opts.filter.query = {
       callback: function(params) {
@@ -535,7 +539,7 @@ PaginationTable.prototype.tableTopActions = function () {
 
   if (this.widgetFilter) {
     // let containerQuery = dom.create('div', 'card', 'widget-query', 'fade', 'fadeIn');
-    let containerQuery = dom.create('div', 'card', 'widget-query',);
+    let containerQuery = dom.create('div', 'card', 'widget-query');
     this.widgetFilter.render(containerQuery);
     this.container.appendChild(containerQuery);
 
@@ -551,7 +555,7 @@ PaginationTable.prototype.tableTopActions = function () {
         query.classList.add('show');
       }
     });
-    // actions.appendChild(action);
+    actions.appendChild(action);
   }
   if (this.refreshable) {
     let action = dom.element('' +

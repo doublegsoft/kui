@@ -17216,17 +17216,17 @@ div.search:hover > a {
 }
 
 .widget-query {
-  width: 400px;
-  top: 30px;
-  right: 10px;
-  position: absolute;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  max-height: 0;
-  z-index: 1000;
-  transitproperty: all;
-  transitduration: 0.5s;
-  transittiming-function: cubic-bezier(0, 1, 0.5, 1);
+  /*width: 400px;*/
+  /*top: 30px;*/
+  /*right: 10px;*/
+  /*position: absolute;*/
+  /*overflow-x: hidden;*/
+  /*overflow-y: hidden;*/
+  /*max-height: 0;*/
+  /*z-index: 1000;*/
+  /*transitproperty: all;*/
+  /*transitduration: 0.5s;*/
+  /*transittiming-function: cubic-bezier(0, 1, 0.5, 1);*/
 }
 
 .widget-query.show {

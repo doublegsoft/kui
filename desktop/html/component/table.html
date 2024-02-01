@@ -22,31 +22,6 @@
     <strong>分页表</strong>
   </div>
   <div class="card-body">
-    <div id="formSpecial" class="col-md-12 form-horizontal">
-      <div class="form-group row">
-        <label class="col-form-label col-md-2">电子邮箱：</label>
-        <div class="col-md-4 input-group">
-          <div class="input-group-prepend">
-            <span class="input-group-text">
-              <i class="far fa-envelope"></i>
-            </span>
-          </div>
-          <input value='hello.world' class="form-control" name="email" data-domain-type='email' data-required='电子邮箱'>
-        </div>
-        <label class="col-form-label col-md-2">正则式：</label>
-        <div class="col-md-4">
-          <input value="1898331977X" class="form-control" name="string3" data-domain-type="regexp(^\d$)" data-required='regexp(^\d$)'
-                 data-invalid-message="regexp(^\d$)表示只允许填写数字">
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-12">
-          <div class="float-right form-buttons">
-            <button data-role="save" class="btn btn-sm btn-save">保存</button>
-          </div>
-        </div>
-      </div>
-    </div>
     <div id="paginationTable" class="col-md-12 pl-0 pr-0"></div>
   </div>
 </div>
@@ -165,7 +140,32 @@ var paginationTable = new PaginationTable({
       a.text(alarm);
       td.append(a);
     }
-  }]
+  }],
+  filter: {
+    columnCount: 3,
+    fields: [{
+      title: '手机号',
+      name: 'mobile',
+      input: 'text',
+    },{
+      title: '邮箱',
+      name: 'email',
+      input: 'text',
+    },{
+      title: '类型',
+      input: 'select',
+      name: 'type',
+      options: {
+        placeholder: '请选择...',
+        searchable: false,
+        values: [{value: '类型A', text:'类型A'},{value: '类型B', text:'类型B'},{value: '类型C', text:'类型C'}]
+      },
+    },{
+      title: '日期',
+      name: 'date',
+      input: 'date',
+    }]
+  },
 });
 paginationTable.render('#paginationTable');
 </script>

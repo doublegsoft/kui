@@ -5,12 +5,17 @@ function QueryLayout(opts) {
   this.fields = opts.fields;
   this.actions = opts.actions || [];
   this.queryOpt = opts.query || {};
-
+  this.columnCount = opts.columnCount || 1;
   // 查询值转换函数，用于复杂查询
   this.convert = opts.convert;
 }
 
 QueryLayout.prototype.render = function (containerId, read, data) {
+  function formatCols(cols) {
+    if (cols < 10)
+      return '0' + cols;
+    return cols;
+  }
   let self = this;
   if (typeof containerId === 'string') {
     this.container = document.querySelector(containerId);
@@ -25,7 +30,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   data = data || {};
 
-  let form = dom.create('div', 'card-body');
+  let form = dom.create('div', 'card-body', 'row', 'mx-0');
   let columnCount = this.columnCount;
   let hiddenFields = [];
   let shownFields = [];
@@ -40,22 +45,10 @@ QueryLayout.prototype.render = function (containerId, read, data) {
     }
   }
 
-  let rows = [];
-  let len = shownFields.length;
   for (let i = 0; i < shownFields.length; i++) {
     let field = shownFields[i];
-    rows.push({
-      first: field,
-      second: (i + 1 < len) ? shownFields[i + 1] : null
-    });
-    if (columnCount == 2)
-      i += 1;
-  }
-
-  for (let i = 0; i < rows.length; i++) {
-    let row = rows[i];
-    let formGroup = dom.create('div', (row.first&&row.first.input=='check'?'form-group-check':'form-group'), 'row', 'ml-0', 'mr-0');
-    let group = this.createInput(row.first, columnCount);
+    let formGroup = dom.create('div', (field && field.input == 'check'? 'form-group-check' : 'form-group'), 'col-24-' + formatCols(24 / this.columnCount), 'row', 'mx-0');
+    let group = this.createInput(field, columnCount);
 
     formGroup.appendChild(group.label);
     formGroup.appendChild(group.input);
@@ -84,7 +77,12 @@ QueryLayout.prototype.render = function (containerId, read, data) {
       let opts = field.options;
       // 加载值或者默认值
       opts.selection = field.value;
-      $(this.container).find(' select[name=' + field.name + ']').searchselect(opts);
+      $(this.container).find('select[name=' + field.name + ']').searchselect(opts);
+      let select = dom.find('select[name=' + field.name + ']', this.container);
+      // FIXME
+      setTimeout(() => {
+        select.nextSibling.style.width = '100%';
+      }, 200);
     } else if (field.input == 'cascade') {
       let opts = field.options;
       // 加载值或者默认值
@@ -109,10 +107,10 @@ QueryLayout.prototype.render = function (containerId, read, data) {
     }
   }
 
-  let buttonRow = dom.element('<div class="row ml-0 mr-0"><div class="col-md-12"></div></div>');
+  let buttonRow = dom.element('<div class="row ml-0 mr-0 full-width"><div class="full-width"></div></div>');
   let buttons = dom.create('div', 'float-right');
   buttons.style.paddingRight = '15px';
-  let buttonQuery = dom.create('button', 'btn', 'btn-query');
+  let buttonQuery = dom.create('button', 'btn', 'btn-query', 'btn-sm');
   buttonQuery.textContent = '搜索';
   dom.bind(buttonQuery, 'click', function() {
     if (self.queryOpt.callback) {
@@ -126,7 +124,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
   });
   buttons.appendChild(buttonQuery);
   buttons.append(' ');
-  let buttonReset = dom.create('button', 'btn', 'btn-reset');
+  let buttonReset = dom.create('button', 'btn', 'btn-reset', 'btn-sm');
   buttonReset.textContent = '清除';
   dom.bind(buttonReset, 'click', function() {
     $(self.container).formdata({});
@@ -172,14 +170,15 @@ QueryLayout.prototype.getQuery = function() {
 QueryLayout.prototype.createInput = function (field, columnCount) {
   let self = this;
   columnCount = columnCount || 1;
+  let minCols = 24 / (columnCount * 3);
   // let label = dom.create('div', columnCount == 2 ? 'col-md-2' : 'col-md-4', 'col-form-label');
-  let label = dom.create('div', 'col-form-label');
+  let label = dom.create('div', 'col-form-label', 'col-24-08', 'pl-3');
   label.innerText = field.title + '：';
-  let group = dom.create('div', columnCount == 2 ? 'col-md-4' : 'col-md-8', 'input-group');
+  let group = dom.create('div', 'col-24-16', 'input-group');
 
   let input = null;
   if (field.input == 'select') {
-    input = dom.create('select', 'form-control' ,'sm30');
+    input = dom.create('select', 'form-control');
     input.style.width = '100%';
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
@@ -213,7 +212,7 @@ QueryLayout.prototype.createInput = function (field, columnCount) {
       group.append(check);
     }
   } else {
-    input = dom.create('input', 'form-control','sm30');
+    input = dom.create('input', 'form-control');
     input.disabled = this.readonly;
     input.setAttribute('name', field.name);
     input.setAttribute('placeholder', '请输入...');
