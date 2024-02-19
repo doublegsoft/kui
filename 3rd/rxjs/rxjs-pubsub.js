@@ -19,6 +19,12 @@
       Rx.Subject.prototype.subscribe.call(this, handler);
     }
   };
+  CustomSubject.prototype.unsubscribe = function (handler, force) {
+    if (this.handlerSources[handler.toString()] !== true) {
+      this.handlerSources[handler.toString()] = true;
+      Rx.Subject.prototype.subscribe.call(this, handler);
+    }
+  };
   CustomSubject.prototype.onError = function (error) {
     this.error = error;
     this.observers.forEach(function (o) {
@@ -37,6 +43,14 @@
       }
     }
 
+    function unsubscribe(channel) {
+      let listener = listeners[channel];
+      if (listener != null) {
+        console.log(listener);
+        delete listeners[channel];
+      }
+    }
+
     function subscribe(channel) {
       let listener = listeners[channel];
       if (listener == null) {
@@ -45,6 +59,7 @@
       return listener;
     }
     subscribe.publish = publish;
+    subscribe.unsubscribe = unsubscribe;
     return subscribe;
   }
 
