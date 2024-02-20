@@ -16206,7 +16206,7 @@ function Medias(opts) {
   // 读取已上传的图片的配置项
   this.fetch = opts.fetch;
   // 单个删除已上传的图片的配置项
-  this.remove = opts.remove;
+  this.onRemove = opts.onRemove;
   // 媒体类型
   this.mediaType = opts.mediaType || 'image';
 }
@@ -16354,16 +16354,16 @@ Medias.prototype.appendImage = function (img) {
   if (this.readonly === false) {
     this.container.insertBefore(el, this.plus);
     dom.bind(buttonDelete, 'click', ev => {
+      let model = dom.model(buttonDelete.parentElement);
       ev.preventDefault();
       ev.stopPropagation();
-      if (this.remove) {
-
-      } else {
-        el.remove();
-      }
+      buttonDelete.parentElement.remove();
       if (this.multiple === false) {
         let plus = this.createPlusElement();
         this.container.appendChild(plus);
+      }
+      if (this.onRemove) {
+        this.onRemove(model);
       }
     });
   } else {
