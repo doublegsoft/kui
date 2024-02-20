@@ -46,7 +46,6 @@
     function unsubscribe(channel) {
       let listener = listeners[channel];
       if (listener != null) {
-        console.log(listener);
         delete listeners[channel];
       }
     }

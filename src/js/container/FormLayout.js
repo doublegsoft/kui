@@ -300,6 +300,7 @@ FormLayout.prototype.build = async function(persisted) {
       let container = dom.find('div[data-fileupload-name=\'' + field.name + '\']', this.container);
       await new FileUpload({
         ...field.options,
+        local: persisted[field.name] || [],
         name: field.name,
       }).render(container);
       field.container = container.parentElement.parentElement;

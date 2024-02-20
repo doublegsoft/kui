@@ -17,6 +17,7 @@ function FileUpload(opts) {
   this.uploadUrl = opts.url.upload || '/api/v3/common/upload';
   this.local = opts.local;
   this.params = opts.params;
+  this.onRemove = opts.onRemove || function (model) {};
 }
 
 FileUpload.prototype.fetch = async function (containerId) {
@@ -43,41 +44,72 @@ FileUpload.prototype.append = function (item) {
   let ul = dom.find('ul', this.container);
   let li = dom.create('li', 'list-group-item', 'list-group-item-input');
   li.style.lineHeight = '32px';
-  let link = dom.create('span', 'text-info');
-  link.style.paddingBottom = '8px';
-  link.innerText = item.filename;
-  let icon = null;
-  if (item.extension === 'xls' || item.extension === 'xlsx') {
-    icon = dom.element(FILE_TYPE_EXCEL);
-  } else if (item.extension === 'doc' || item.extension === 'docx') {
-    icon = dom.element(FILE_TYPE_WORD);
-  } else if (item.extension === 'ppt' || item.extension === 'pptx') {
-    icon = dom.element(FILE_TYPE_POWERPOINT);
-  } else if (item.extension === 'pdf') {
-    icon = dom.element(FILE_TYPE_PDF);
-  } else if (item.extension === 'png' || item.extension === 'jpg') {
-    icon = dom.element(FILE_TYPE_IMAGE);
-  } else {
-    icon = dom.element(FILE_TYPE_FILE);
-  }
-  icon.classList.add('mr-2');
-  li.appendChild(icon);
-  li.appendChild(link);
+
+  let div = dom.templatize(`
+    <div class="full-width d-flex">
+      <a class="btn-link">
+        <i class="far fa-file-alt mr-2"></i>
+      </a>
+      <span class="text-info" style="padding-bottom: 8px;">{{filename}}</span>
+      <a class="btn-link ml-auto pointer">
+        <i class="fas fa-trash-alt text-danger"></i>
+      </a>
+    </div>
+  `, item);
+  let link = div.children[1];
+  let remove = div.children[2];
+  // let link = dom.create('span', 'text-info');
+  // link.style.paddingBottom = '8px';
+  // link.innerText = item.filename;
+  // let icon = null;
+  // if (item.extension === 'xls' || item.extension === 'xlsx') {
+  //   icon = dom.element(FILE_TYPE_EXCEL);
+  // } else if (item.extension === 'doc' || item.extension === 'docx') {
+  //   icon = dom.element(FILE_TYPE_WORD);
+  // } else if (item.extension === 'ppt' || item.extension === 'pptx') {
+  //   icon = dom.element(FILE_TYPE_POWERPOINT);
+  // } else if (item.extension === 'pdf') {
+  //   icon = dom.element(FILE_TYPE_PDF);
+  // } else if (item.extension === 'png' || item.extension === 'jpg') {
+  //   icon = dom.element(FILE_TYPE_IMAGE);
+  // } else {
+  //   icon = dom.element(FILE_TYPE_FILE);
+  // }
+  // icon.classList.add('mr-2');
+
+  // li.appendChild(icon);
+  // li.appendChild(link);
+  li.appendChild(div);
   link.setAttribute('data-img-url', item.filepath);
   link.setAttribute('data-file-path', item.filepath);
   link.setAttribute('data-file-name', item.filename);
   link.setAttribute('data-file-type', item.type);
   link.setAttribute('data-file-size', item.size);
   link.setAttribute('data-file-ext', item.extension);
+  if (item.storedFileId) {
+    link.setAttribute('data-file-id', item.storedFileId);
+  }
 
   li.setAttribute('data-file-path', item.filepath);
   li.setAttribute('data-file-name', item.filename);
   li.setAttribute('data-file-type', item.type);
   li.setAttribute('data-file-size', item.size);
   li.setAttribute('data-file-ext', item.extension);
-  let img = dom.element('<img widget-id="widget-' + url + '" src="' + url + '" width="48" height="48" style="display: none;">');
-  // li.appendChild(img);
+  if (item.storedFileId) {
+    li.setAttribute('data-file-id', item.storedFileId);
+  }
   ul.appendChild(li);
+
+  dom.bind(remove, 'click', ev => {
+    let li = dom.ancestor(ev.target, 'li');
+    let fileId = li.getAttribute('data-file-id');
+    dialog.confirm('确定删除此附件？', () => {
+      li.remove();
+      if (this.onRemove) {
+        this.onRemove(fileId);
+      }
+    });
+  });
 };
 
 FileUpload.prototype.render = async function(containerId) {
