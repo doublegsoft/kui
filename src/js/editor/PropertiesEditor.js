@@ -371,7 +371,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         };
         reader.readAsDataURL(this.files[0]);
       });
-    } else if (prop.input === 'offset') {
+    } else if (prop.input === 'inset') {
       let table = dom.templatize(`
         <table property-model-name="{{name}}">
           <tr><td width="33.33%"></td><td width="33.33%"><input name="top" type="number" value="0" style="width: 45px;"></td><td width="33.33%"></td></tr>

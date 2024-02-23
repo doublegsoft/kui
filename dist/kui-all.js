@@ -6518,7 +6518,7 @@ gim.init = (username, userId, userType, handlers) => {
 */
 gim.login = async () => {
   return new Promise(function (resolve, reject) {
-    gim.websocket = new WebSocket('wss://gim.cq-fyy.com'); //  // ws://192.168.0.200:9999
+    gim.websocket = new WebSocket('ws://101.200.219.9:9999'); //  // ws://192.168.0.200:9999
     gim.websocket.onopen = () => {
       let requestText = {
         operation: 'login',
@@ -22304,7 +22304,7 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
         };
         reader.readAsDataURL(this.files[0]);
       });
-    } else if (prop.input === 'offset') {
+    } else if (prop.input === 'inset') {
       let table = dom.templatize(`
         <table property-model-name="{{name}}">
           <tr><td width="33.33%"></td><td width="33.33%"><input name="top" type="number" value="0" style="width: 45px;"></td><td width="33.33%"></td></tr>

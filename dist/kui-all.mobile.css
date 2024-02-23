@@ -15090,6 +15090,22 @@ footer {
   overflow-y: auto;
 }
 
+.line-height-24 {
+  line-height: 24px!important;
+}
+
+.line-height-28 {
+  line-height: 28px!important;
+}
+
+.line-height-32 {
+  line-height: 32px!important;
+}
+
+.line-height-36 {
+  line-height: 36px!important;
+}
+
 .avatar {
   background-color: var(--color-secondary);
   border-radius: 9999px;

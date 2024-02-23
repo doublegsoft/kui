@@ -45,8 +45,8 @@
   <script src="/3rd/three/GLTFLoader.js"></script>
   <script src="/3rd/three/OrbitControls.js"></script>
 
-  <script src="/dist/kui-all.mobile.min.js"></script>
-  <script src="/src/js/jim.js"></script>
+  <script src="/dist/kui-all.mobile.js"></script>
+  <script src="/src/js/application/gim.js"></script>
 </head>
 <body>
   <header class="header-bar">
@@ -138,7 +138,7 @@ PageIndex.prototype.initialize = async function (params) {
       el.className = '';
     });
     this.buttonHome.classList.add('active');
-    kuim.navigateTo('mhtml/home.html', {
+    kuim.navigateTo('/mobile/mhtml/home.html', {
       title: '首页',
       icon: '<i class="fas fa-home text-white button icon"></i>',
     }, true);
@@ -151,7 +151,7 @@ PageIndex.prototype.initialize = async function (params) {
       el.className = '';
     });
     this.buttonComponent.classList.add('active');
-    kuim.navigateTo('mhtml/example/main.html', {
+    kuim.navigateTo('/mobile/mhtml/example/main.html', {
       title: '组件示例',
       icon: '<i class="fas fa-window-maximize text-white button icon"></i>',
     }, true);
@@ -164,7 +164,7 @@ PageIndex.prototype.initialize = async function (params) {
       el.className = '';
     });
     this.buttonApplication.classList.add('active');
-    kuim.navigateTo('mhtml/demo/main.html', {
+    kuim.navigateTo('/mobile/mhtml/demo/main.html', {
       title: '页面示例',
       icon: '<i class="fab fa-app-store-ios text-white button icon"></i>',
     }, true);
@@ -177,7 +177,7 @@ PageIndex.prototype.initialize = async function (params) {
       el.className = '';
     });
     this.buttonUser.classList.add('active');
-    kuim.navigateTo('mhtml/personal/main.html', {
+    kuim.navigateTo('/mobile/mhtml/personal/main.html', {
       title: '用户',
       icon: '<i class="fas fa-user text-white button icon"></i>',
     }, true);
