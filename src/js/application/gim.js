@@ -27,7 +27,7 @@ gim.init = (username, userId, userType, handlers) => {
 */
 gim.login = async () => {
   return new Promise(function (resolve, reject) {
-    gim.websocket = new WebSocket('wss://gim.cq-fyy.com'); //  // ws://192.168.0.200:9999
+    gim.websocket = new WebSocket('ws://101.200.219.9:9999'); //  // ws://192.168.0.200:9999
     gim.websocket.onopen = () => {
       let requestText = {
         operation: 'login',
