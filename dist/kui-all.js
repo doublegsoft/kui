@@ -10010,6 +10010,33 @@ MobileForm.prototype.root = async function() {
         dom.find('textarea', el).setAttribute('placeholder', '');
         dom.find('textarea', el).setAttribute('readonly', true);
       }
+    } else if (field.input === 'icon') {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18"></div>
+        </div>
+      `, field);
+      let input = field.create(field.value);
+      el.children[1].appendChild(input);
+    } else if (field.input === 'icons') {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18"></div>
+        </div>
+      `, field);
+      let input = field.create(field.value);
+      el.children[1].appendChild(input);
+    } else if (field.input === 'rating') {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18"></div>
+        </div>
+      `, field);
+      let input = field.create(field.value);
+      el.children[1].appendChild(input);
     } else {
       el = dom.templatize(`
         <div class="form-group row">
@@ -12897,7 +12924,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   for (let i = 0; i < shownFields.length; i++) {
     let field = shownFields[i];
-    let formGroup = dom.create('div', (field && field.input == 'check'? 'form-group-check' : 'form-group'), 'col-24-' + formatCols(24 / this.columnCount), 'row', 'mx-0');
+    let formGroup = dom.create('div', (field && field.input == 'check'? 'form-group' : 'form-group'), 'col-24-' + formatCols(24 / this.columnCount), 'row', 'mx-0');
     let group = this.createInput(field, columnCount);
 
     formGroup.appendChild(group.label);
@@ -22092,12 +22119,13 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       // 【区域值】
       //
       let input = document.createElement('input');
+      prop.unit = prop.unit || '';
       input.setAttribute('property-model-name', prop.name);
       input.setAttribute('type', 'range');
       input.setAttribute('step', '1');
       input.setAttribute('min', prop.min);
       input.setAttribute('max', prop.max);
-      input.setAttribute('data-unit', prop.unit);
+      input.setAttribute('data-unit', prop.unit || '');
       input.valueAsNumber = prop.value;
       input.classList.add('group-item-input');
       labelProp.textContent = (prop.label || prop.title) + '：' + prop.value + prop.unit;

@@ -159,12 +159,13 @@ PropertiesEditor.prototype.renderProperties = function(container, properties) {
       // 【区域值】
       //
       let input = document.createElement('input');
+      prop.unit = prop.unit || '';
       input.setAttribute('property-model-name', prop.name);
       input.setAttribute('type', 'range');
       input.setAttribute('step', '1');
       input.setAttribute('min', prop.min);
       input.setAttribute('max', prop.max);
-      input.setAttribute('data-unit', prop.unit);
+      input.setAttribute('data-unit', prop.unit || '');
       input.valueAsNumber = prop.value;
       input.classList.add('group-item-input');
       labelProp.textContent = (prop.label || prop.title) + '：' + prop.value + prop.unit;

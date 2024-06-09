@@ -59,6 +59,33 @@ MobileForm.prototype.root = async function() {
         dom.find('textarea', el).setAttribute('placeholder', '');
         dom.find('textarea', el).setAttribute('readonly', true);
       }
+    } else if (field.input === 'icon') {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18"></div>
+        </div>
+      `, field);
+      let input = field.create(field.value);
+      el.children[1].appendChild(input);
+    } else if (field.input === 'icons') {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18"></div>
+        </div>
+      `, field);
+      let input = field.create(field.value);
+      el.children[1].appendChild(input);
+    } else if (field.input === 'rating') {
+      el = dom.templatize(`
+        <div class="form-group row">
+          <label class="col-form-label col-24-06">{{title}}</label>
+          <div class="col-24-18"></div>
+        </div>
+      `, field);
+      let input = field.create(field.value);
+      el.children[1].appendChild(input);
     } else {
       el = dom.templatize(`
         <div class="form-group row">

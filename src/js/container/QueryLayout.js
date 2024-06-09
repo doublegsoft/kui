@@ -47,7 +47,7 @@ QueryLayout.prototype.render = function (containerId, read, data) {
 
   for (let i = 0; i < shownFields.length; i++) {
     let field = shownFields[i];
-    let formGroup = dom.create('div', (field && field.input == 'check'? 'form-group-check' : 'form-group'), 'col-24-' + formatCols(24 / this.columnCount), 'row', 'mx-0');
+    let formGroup = dom.create('div', (field && field.input == 'check'? 'form-group' : 'form-group'), 'col-24-' + formatCols(24 / this.columnCount), 'row', 'mx-0');
     let group = this.createInput(field, columnCount);
 
     formGroup.appendChild(group.label);
