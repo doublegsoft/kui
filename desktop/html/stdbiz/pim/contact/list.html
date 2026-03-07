@@ -1,0 +1,24 @@
+<div id="pageContactList" class="page view">
+  
+</div>
+<script>
+function PageContactList() {
+  this.page = dom.find('#pageContactList');
+}
+
+PageContactList.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  
+};
+
+PageContactList.prototype.destroy = function () {
+  delete pageContactList;
+};
+
+PageContactList.prototype.show = function (params) {
+  params = params || {};
+  this.initialize(params);
+};
+
+pageContactList = new PageContactList();
+</script>

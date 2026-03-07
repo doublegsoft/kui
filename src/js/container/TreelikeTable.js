@@ -487,6 +487,7 @@ TreelikeTable.prototype.pagination = function () {
   let a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.top = '6px';
   // a.innerText = '首页';
   a.innerHTML = '<i class="material-icons">first_page</i>';
   dom.bind(a, 'click', function() {
@@ -500,6 +501,7 @@ TreelikeTable.prototype.pagination = function () {
   a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.top = '6px';
   // a.innerText = '上一页';
   a.innerHTML = '<i class="material-icons">chevron_left</i>';
   dom.bind(a, 'click', function() {
@@ -523,6 +525,7 @@ TreelikeTable.prototype.pagination = function () {
   a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.top = '6px';
   // a.innerText = '下一页';
   a.innerHTML = '<i class="material-icons">chevron_right</i>';
   dom.bind(a, 'click', function () {
@@ -535,6 +538,7 @@ TreelikeTable.prototype.pagination = function () {
   a = dom.create('a', 'page-link', 'b-a-0', 'pt-0');
   a.setAttribute('href', 'javascript:void(0)');
   a.style.paddingBottom = '0px';
+  a.style.top = '6px';
   // a.innerText = '末页';
   a.innerHTML = '<i class="material-icons">last_page</i>';
   dom.bind(a, 'click', function () {

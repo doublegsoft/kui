@@ -1,0 +1,21 @@
+<script>
+function PageContactSelect() {
+  this.page = dom.find('#pageContactSelect');
+}
+
+PageContactSelect.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  
+};
+
+PageContactSelect.prototype.destroy = function () {
+  delete pageContactSelect;
+};
+
+PageContactSelect.prototype.show = function (params) {
+  params = params || {};
+  this.initialize(params);
+};
+
+pageContactSelect = new PageContactSelect();
+</script>

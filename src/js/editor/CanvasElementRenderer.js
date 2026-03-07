@@ -94,7 +94,8 @@ LongtextElementRenderer.prototype.render = function(context, element) {
   let lineHeight = model.fontSize + model.lineSpace;
   let line = '';
   let x = model.x;
-  let y = model.y + lineHeight;
+  let y = model.y;
+  console.log("y", y)
   let height = 0;
   let chars = model.text.split('');
   for(let i = 0; i < chars.length; i++) {

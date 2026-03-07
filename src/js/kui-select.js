@@ -412,7 +412,7 @@ $.fn.cascadeselect = function(opts) {
       popup.style.overflowY = 'auto';
       popup.style.width = widthContainer + 'px';
       popup.style.maxHeight = '200px';
-      popup.style.position = 'relative';
+      popup.style.position = 'fixed';
       popup.style.zIndex = 99999;
       popup.style.backgroundColor = 'white';
     }

@@ -1,0 +1,230 @@
+<div id="pageContactEdit" class="page view">
+  <div class="gx-p-8" widget-id="widgetFormContact"></div>
+</div>
+<script>
+function PageContactEdit() {
+  this.page = dom.find('#pageContactEdit');
+}
+
+PageContactEdit.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  this.formContact = new EditableForm({
+    fields:[{
+      name: "contactId",     
+      title: "联系人", 
+      input: "hidden",
+    },{
+      name: "personId",     
+      title: "个人", 
+      input: "hidden",
+    },{
+      name: "personName",     
+      title: "姓名", 
+      input: "text",
+    },{
+      name: "firstName",     
+      title: "名", 
+      input: "text",
+    },{
+      name: "lastName",     
+      title: "姓", 
+      input: "text",
+    },{
+      name: "nickName",     
+      title: "昵称", 
+      input: "text",
+    },{
+      name: "idCardNumber",     
+      title: "身份证件号", 
+      input: "text",
+    },{
+      name: "idCardTypeCode",     
+      title: "身份证件类型", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "birthDate",     
+      title: "出生日期", 
+      input: "date",
+    },{
+      name: "avatar",     
+      title: "头像", 
+      input: "text",
+    },{
+      name: "genderCode",     
+      title: "性别", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "citizenshipCode",     
+      title: "国籍", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "chineseNationCode",     
+      title: "民族", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "nativePlaceChineseDistrictCode",     
+      title: "籍贯", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "martialStatusCode",     
+      title: "婚姻状况", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "politicalAffiliationCode",     
+      title: "健康状况", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "educationBackgroundCode",     
+      title: "教育程度", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "healthStateCode",     
+      title: "健康状况", 
+      input: "select",
+      options: {
+        values: [{
+          text: '选项A', value: 'A',
+        },{
+          text: '选项B', value: 'B',
+        },{
+          text: '选项C', value: 'C',
+        }],     
+      },  
+    },{
+      name: "homeAddress",     
+      title: "家庭住址", 
+      input: "text",
+    },{
+      name: "officeAddress",     
+      title: "办公地址", 
+      input: "text",
+    },{
+      name: "mobile",     
+      title: "手机号", 
+      input: "mobile",
+    },{
+      name: "phone",     
+      title: "座机号", 
+      input: "text",
+    },{
+      name: "email",     
+      title: "电子邮箱", 
+      input: "email",
+    },{
+      name: "note",     
+      title: "备注", 
+      input: "text",
+    },{
+      name: "createdDate",     
+      title: "创建日期", 
+      input: "date",
+    },{
+      name: "contactName",     
+      title: "联系人", 
+      input: "text",
+    },{
+      name: "position",     
+      title: "职位", 
+      input: "text",
+    },{
+      name: "placeholderA",     
+      title: "占位A", 
+      input: "text",
+    },{
+      name: "placeholderA",     
+      title: "占位B", 
+      input: "text",
+    },{
+      name: "placeholderA",     
+      title: "占位C", 
+      input: "text",
+    }],
+    onSave: (data) => {
+    },
+  });
+  this.formContact.render(this.widgetFormContact);
+};
+
+PageContactEdit.prototype.destroy = function () {
+  delete pageContactEdit;
+};
+
+PageContactEdit.prototype.show = function (params) {
+  params = params || {};
+  this.initialize(params);
+};
+
+pageContactEdit = new PageContactEdit();
+</script>

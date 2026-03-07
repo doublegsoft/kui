@@ -1,0 +1,171 @@
+<div class="card">
+  <div class="card-header pl-3 pr-3">
+    <i class="fa fa-list"></i>
+    <strong>分页表</strong>
+  </div>
+  <div class="card-body">
+    <div id="paginationTable" class="col-md-12 pl-0 pr-0"></div>
+  </div>
+  <div class="card-body">
+    <textarea id="longtextTable1">
+var paginationTable = new PaginationTable({
+  url: 'data/paginationtable.json',
+  limit: 10,
+  columns: [{
+    title: '水库名称',
+    template: '{rsnm}',
+    order: 'rsnm'
+  }, {
+    title: '工程规模',
+    template: '{prscnm}',
+    order: 'prscnm'
+  }, {
+    title: '行政区划',
+    template: '{addvnm}',
+    order: 'addvnm'
+  }, {
+    title: '当前水位（m）',
+    template: '{rz}'
+  }, {
+    title: '当前累计雨量（mm）',
+    template: '{dyp}'
+  }, {
+    title: '最新水位上报时间',
+    template: '{dt}'
+  }, {
+    title: '报警',
+    display: function (obj, td) {
+      if (typeof obj.lvl === 'undefined') {
+        td.append('无');
+        return;
+      }
+      var alarm = '无';
+      switch (obj.lvl + '') {
+        case '1': alarm = '红色'; break;
+        case '2': alarm = '橙色'; break;
+        case '3': alarm = '黄色'; break;
+        case '4': alarm = '蓝色'; break;
+      }
+      var a = $('<a href="#">');
+      a.on('click', function () {
+
+      });
+      a.text(alarm);
+      td.append(a);
+    }
+  }],
+  filter: {
+    columnCount: 3,
+    fields: [{
+      title: '手机号',
+      name: 'mobile',
+      input: 'text',
+    },{
+      title: '邮箱',
+      name: 'email',
+      input: 'text',
+    },{
+      title: '类型',
+      input: 'select',
+      name: 'type',
+      options: {
+        placeholder: '请选择...',
+        searchable: false,
+        values: [{value: '类型A', text:'类型A'},{value: '类型B', text:'类型B'},{value: '类型C', text:'类型C'}]
+      },
+    },{
+      title: '日期',
+      name: 'date',
+      input: 'date',
+    }]
+  },
+});
+paginationTable.render('#paginationTable');
+    </textarea>
+  </div>
+</div>
+
+<script>
+var paginationTable = new PaginationTable({
+  url: 'data/paginationtable.json',
+  limit: 10,
+  columns: [{
+    title: '水库名称',
+    template: '{rsnm}',
+    order: 'rsnm'
+  }, {
+    title: '工程规模',
+    template: '{prscnm}',
+    order: 'prscnm'
+  }, {
+    title: '行政区划',
+    template: '{addvnm}',
+    order: 'addvnm'
+  }, {
+    title: '当前水位（m）',
+    template: '{rz}'
+  }, {
+    title: '当前累计雨量（mm）',
+    template: '{dyp}'
+  }, {
+    title: '最新水位上报时间',
+    template: '{dt}'
+  }, {
+    title: '报警',
+    display: function (obj, td) {
+      if (typeof obj.lvl === 'undefined') {
+        td.append('无');
+        return;
+      }
+      var alarm = '无';
+      switch (obj.lvl + '') {
+        case '1': alarm = '红色'; break;
+        case '2': alarm = '橙色'; break;
+        case '3': alarm = '黄色'; break;
+        case '4': alarm = '蓝色'; break;
+      }
+      var a = $('<a href="#">');
+      a.on('click', function () {
+
+      });
+      a.text(alarm);
+      td.append(a);
+    }
+  }],
+  filter: {
+    columnCount: 3,
+    fields: [{
+      title: '手机号',
+      name: 'mobile',
+      input: 'text',
+    },{
+      title: '邮箱',
+      name: 'email',
+      input: 'text',
+    },{
+      title: '类型',
+      input: 'select',
+      name: 'type',
+      options: {
+        placeholder: '请选择...',
+        searchable: false,
+        values: [{value: '类型A', text:'类型A'},{value: '类型B', text:'类型B'},{value: '类型C', text:'类型C'}]
+      },
+    },{
+      title: '日期',
+      name: 'date',
+      input: 'date',
+    }]
+  },
+});
+paginationTable.render('#paginationTable');
+
+codeview = CodeMirror.fromTextArea(dom.find('#longtextTable1'), {
+  mode: 'javascript',
+  lineNumbers: true,
+  editable: false,
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 300);
+</script>

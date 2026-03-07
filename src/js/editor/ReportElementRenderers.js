@@ -32,7 +32,6 @@ TextElementRenderer.prototype.render = function(context, element) {
   let model = element.model;
   context.fillStyle = model.fontColor;
   context.font = model.font();
-
   model.width = context.measureText(model.text).width;
 
   // 文本的高度设置特殊性
@@ -65,7 +64,7 @@ LongtextElementRenderer.prototype.render = function(context, element) {
   let lineHeight = model.fontSize + model.lineSpace;
   let line = '';
   let x = model.x;
-  let y = model.y + lineHeight;
+  let y = model.y + lineHeight - model.lineSpace;
   let height = 0;
   let chars = model.text.split('');
   for(let i = 0; i < chars.length; i++) {
@@ -83,7 +82,7 @@ LongtextElementRenderer.prototype.render = function(context, element) {
     height += lineHeight + model.lineSpace;
     context.fillText(line, x, y);
   }
-
+  height -= model.lineSpace;
   model.height = height;
 
   this.renderSelected(context, model);
@@ -346,3 +345,23 @@ ChartElementRenderer.prototype.render = function (context, element) {
 };
 
 Object.assign(ChartElementRenderer.prototype, ReportElementRenderer.prototype);
+
+function RectElementRenderer() {
+
+}
+
+RectElementRenderer.prototype.render = function (context, element) {
+  let model = element.model;
+  context.strokeStyle = model.borderColor || 'black';
+  context.lineWidth = model.borderWidth;
+
+  context.beginPath();
+  context.roundRect(model.x, model.y, model.width, model.height, model.radius);
+  context.stroke();
+  context.closePath();
+
+  context.lineWidth = 1;
+  this.renderSelected(context, model);
+};
+
+Object.assign(RectElementRenderer.prototype, ReportElementRenderer.prototype);

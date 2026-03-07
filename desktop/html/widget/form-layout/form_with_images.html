@@ -40,6 +40,43 @@ PageFormWithImagesEdit.prototype.initialize = async function (params) {
       required: true,
       input: 'number',
     },{
+      title: '下拉单选',
+      name: 'anySelect',
+      input: 'select',
+      required: true,
+      options: {
+        url: 'data/checklist.json',
+        placeholder: '请选择...',
+        searchable: false,
+        fields: {value: 'id', text: 'name'}
+      }
+    },{
+      title: '级联选择',
+      name: 'anyCascade',
+      input: 'cascade',
+      required: true,
+      options: {
+        levels: [{
+          name: 'departmentId',
+          fields: {
+            value: 'id',
+            text: 'name'
+          },
+          text: '部门',
+          width: 'calc(49% - 3px)',
+          url: 'data/component/form/department.json',
+        }, {
+          name: 'employeeId',
+          fields: {
+            value: 'id',
+            text: 'name'
+          },
+          text: '员工',
+          width: 'calc(49% - 3px)',
+          url: 'data/component/form/employee.json'
+        }]
+      }
+    },{
       title: '图片',
       name: 'imgs',
       required: false,

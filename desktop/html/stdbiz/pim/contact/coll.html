@@ -1,0 +1,24 @@
+<div id="pageContactColl" class="page view">
+  
+</div>
+<script>
+function PageContactColl() {
+  this.page = dom.find('#pageContactColl');
+}
+
+PageContactColl.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  
+};
+
+PageContactColl.prototype.destroy = function () {
+  delete pageContactColl;
+};
+
+PageContactColl.prototype.show = function (params) {
+  params = params || {};
+  this.initialize(params);
+};
+
+pageContactColl = new PageContactColl();
+</script>

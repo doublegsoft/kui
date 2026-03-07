@@ -1,0 +1,148 @@
+<div class="card">
+  <div class="card-header pl-3 pr-3">
+    <i class="fa fa-list"></i>
+    <strong>分页表</strong>
+  </div>
+  <div class="card-body">
+    <div id="paginationTable" class="col-md-12 pl-0 pr-0"></div>
+  </div>
+  <div class="card-body">
+    <textarea id="longtextGrid1">
+var paginationTable = new PaginationTable({
+  url: 'data/paginationtable.json',
+  limit: 10,
+  columns: [{
+    title: '水库名称',
+    template: '{rsnm}',
+    order: 'rsnm'
+  }, {
+    title: '工程规模',
+    template: '{prscnm}',
+    order: 'prscnm'
+  }, {
+    title: '行政区划',
+    template: '{addvnm}',
+    order: 'addvnm'
+  }, {
+    title: '当前水位（m）',
+    template: '{rz}'
+  }, {
+    title: '当前累计雨量（mm）',
+    template: '{dyp}'
+  }, {
+    title: '最新水位上报时间',
+    template: '{dt}'
+  }, {
+    title: '报警',
+    display: function (obj, td) {
+      if (typeof obj.lvl === 'undefined') {
+        td.append('无');
+        return;
+      }
+      var alarm = '无';
+      switch (obj.lvl + '') {
+        case '1': alarm = '红色'; break;
+        case '2': alarm = '橙色'; break;
+        case '3': alarm = '黄色'; break;
+        case '4': alarm = '蓝色'; break;
+      }
+      var a = $('<a href="#">');
+      a.on('click', function () {
+
+      });
+      a.text(alarm);
+      td.append(a);
+    }
+  }],
+  filter: {
+    columnCount: 3,
+    fields: [{
+      title: '手机号',
+      name: 'mobile',
+      input: 'text',
+    },{
+      title: '邮箱',
+      name: 'email',
+      input: 'text',
+    },{
+      title: '类型',
+      input: 'select',
+      name: 'type',
+      options: {
+        placeholder: '请选择...',
+        searchable: false,
+        values: [{value: '类型A', text:'类型A'},{value: '类型B', text:'类型B'},{value: '类型C', text:'类型C'}]
+      },
+    },{
+      title: '日期',
+      name: 'date',
+      input: 'date',
+    }]
+  },
+});
+paginationTable.render('#paginationTable');
+    </textarea>
+  </div>
+</div>
+
+<script>
+gridContact = new PaginationGrid({
+  url: '/api/v3/common/script/stdbiz/pcm/doctor/paginate',
+  filters: {
+    _other_select: 'persId.avt as avatar, persId.mob as mobile, persId.eml as email '
+  },
+  limit: 15,
+  colspan: 3,
+  favourite: false,
+  borderless: true,
+  render: function (container, row, index) {
+    row.avatar = row.avatar || 'img/user.png';
+    let el = dom.templatize(`
+      <div class="col-md-12">
+        <div class="card border" style="min-height: 125px;">
+          <div class="card-body">
+            <div class="d-flex">
+              <div class="pl-2">
+                <strong>{{doctorName}}</strong>
+                <span class="small text-muted">{{professionalTitle}}</span>
+                <div class="small text-muted">{{hospitalName}}</div>
+              </div>
+              <div class="ml-auto">
+                <img class="avatar avatar-36" src="{{avatar}}">
+              </div>
+            </div>
+            <div class="ml-2 mt-2">
+              <i class="fas fa-phone-alt mr-1"></i>
+              <a class="btn-link" href="tel: {{mobile}}">{{mobile}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `, row);
+    let buttonChat = dom.find('[widget-id=buttonChat]', el);
+    dom.bind(buttonChat, 'click', function () {
+      let model = dom.model(this);
+      ajax.sidebar({
+        containerId: self.page,
+        title: model.doctorName,
+        url: 'html/stdbiz-ex/pim/contact/chat.html',
+        allowClose: true,
+        close: function () {
+          pageContactChat.close();
+        }
+      });
+    });
+    container.appendChild(el);
+  }
+})
+paginationTable.render('#paginationTable');
+
+codeview = CodeMirror.fromTextArea(dom.find('#longtextGrid1'), {
+  mode: 'javascript',
+  lineNumbers: true,
+  editable: false,
+  tabSize: 2,
+  background: '#565656'
+});
+codeview.setSize('100%', 300);
+</script>

@@ -54,7 +54,7 @@ function TextElement(opts) {
     return this.fontSize + 'px ' + this.fontFamily;
   };
   this.model.fontFamily = opts.fontFamily || '宋体';
-  this.model.fontSize = opts.fontSize || 18;
+  this.model.fontSize = opts.fontSize || 16;
   this.model.fontColor = 'black';
   this.model.height = this.model.fontSize;
   this.model.type = 'text';
@@ -67,6 +67,14 @@ function TextElement(opts) {
 
 TextElement.prototype.getProperties = function () {
   return [{
+    title: '编程',
+    properties: [{
+      id: 'variable',
+      label: '变量名',
+      input: 'text',
+      value: this.model.variable || 0
+    }],
+  },{
     title: '显示',
     properties: [{
       id: 'x',
@@ -83,7 +91,7 @@ TextElement.prototype.getProperties = function () {
       label: '宽度',
       input: 'number',
       value: this.model.width || 0
-    }, {
+    },{
       id: 'height',
       label: '高度',
       input: 'number',
@@ -101,7 +109,13 @@ TextElement.prototype.getProperties = function () {
       label: '字体名称',
       input: 'select',
       value: this.model.fontFamily || '宋体',
-      values: ['宋体','黑体','楷体','仿宋体']
+      values: [{
+        value: '宋体', text: '宋体'
+      },{
+        value: 'arial-unicode', text: 'Arial'
+      },{
+        value: 'arial-unicode-bold', text: 'Arial Bold'
+      }]
     },{
       id: 'fontSize',
       label: '字体大小',
@@ -114,7 +128,7 @@ TextElement.prototype.getProperties = function () {
       id: 'fontColor',
       label: '字体颜色',
       input: 'color',
-      value: this.model.color || 'black',
+      value: this.model.fontColor || 'black',
     }]
   }];
 };
@@ -134,7 +148,7 @@ function LongtextElement(opts) {
     return this.fontSize + 'px ' + this.fontFamily;
   };
   this.model.fontFamily = opts.fontFamily || '宋体';
-  this.model.fontSize = opts.fontSize || 18;
+  this.model.fontSize = opts.fontSize || 12;
   this.model.fontColor = 'black';
   this.model.height = 100;
   this.model.width = 200;
@@ -197,7 +211,7 @@ LongtextElement.prototype.getProperties = function () {
       id: 'fontColor',
       label: '字体颜色',
       input: 'color',
-      value: this.model.color || 'black',
+      value: this.model.fontColor || 'black',
     },{
       id: 'lineSpace',
       label: '行间距',
@@ -463,3 +477,81 @@ ChartElement.prototype.getProperties = function () {
 };
 
 Object.assign(ChartElement.prototype, ReportElement.prototype);
+
+/**
+ * 【图表】元素。
+ */
+function RectElement(opts) {
+  this.model = {};
+  this.model.font = function () {
+    return this.fontSize + 'px ' + this.fontFamily;
+  };
+  this.modelChangedListeners = [];
+  this.model.type = 'rect';
+  this.model.id = this.model.type + '-' + moment().valueOf();
+  this.model.width = 500;
+  this.model.height = 360;
+  this.model.fontSize = 12;
+  this.model.borderWidth = 5;
+  this.model.borderColor = 'black';
+  this.model.fontFamily = ReportDesigner.TEXT_FONT_FAMILY;
+  for (let key in opts) {
+    this.model[key] = opts[key];
+  }
+  this.renderer = new RectElementRenderer();
+}
+
+RectElement.prototype.getProperties = function () {
+  return [{
+    title: '编程',
+    properties: [{
+      id: 'variable',
+      label: '变量名',
+      input: 'text',
+      value: this.model.variable || 0
+    }],
+  },{
+    title: '位置',
+    properties: [{
+      id: 'x',
+      label: '左',
+      input: 'number',
+      value: this.model.x || 0
+    },{
+      id: 'y',
+      label: '顶',
+      input: 'number',
+      value: this.model.y || 0
+    },{
+      id: 'width',
+      label: '宽度',
+      input: 'number',
+      value: this.model.width || 600
+    },{
+      id: 'height',
+      label: '高度',
+      input: 'number',
+      value: this.model.height || 400
+    }],
+  },{
+    title: '样式',
+    properties:[{
+      id: 'radius',
+      label: '拐角半径',
+      input: 'number',
+      value: (typeof this.model.radius === 'undefined') ? 20 : this.model.radius,
+    },{
+      id: 'borderWidth',
+      label: '线条宽度',
+      input: 'number',
+      value: (typeof this.model.borderWidth === 'undefined') ? 2 : this.model.borderWidth,
+    },{
+      id: 'borderColor',
+      label: '线条颜色',
+      input: 'color',
+      value:  this.model.borderColor || 'black',
+    }]
+  }];
+};
+
+Object.assign(RectElement.prototype, ReportElement.prototype);

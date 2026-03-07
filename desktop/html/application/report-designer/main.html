@@ -1,9 +1,11 @@
 
 <div class="row">
   <div class="btn-group" role="group" aria-label="Basic example">
-    <button class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
-    <button class="btn btn-primary" type="button"><i class="fa fa-file-export"></i></button>
-    <button class="btn btn-primary" type="button"><i class="fa fa-trash-alt"></i></button>
+    <button id="buttonSave" class="btn btn-primary" type="button"><i class="fa fa-save"></i></button>
+    <button id="buttonExport" class="btn btn-primary" type="button"><i class="fa fa-file-export"></i></button>
+    <button id="buttonImport" class="btn btn-primary" type="button"><i class="fa fa-file-import"></i></button>
+    <input type="file" id="fileImport" accept=".json" style="display:none;">
+    <button id="buttonRemove" class="btn btn-primary" type="button"><i class="fa fa-trash-alt"></i></button>
   </div>
 </div>
 <div id="designer_container" class="row">
@@ -14,9 +16,11 @@
       <li id="image-part" data-type='image' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图片</li>
       <li id="chart-part" data-type='chart' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">图表</li>
       <li id="table-part" data-type='table' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">表格</li>
+      <li id="rect-part" data-type='rect' draggable="true" ondragstart="drag(event);" class="list-group-item" style="cursor: grab">方框</li>
     </ul>
   </div>
-  <div class="col-md-8" id="canvas_container" style="background-color: #fff; padding: 0;"></div>
+  <div class="col-md-8" id="canvas_container" style="background-color: #f4f4f4; padding: 0;">
+  </div>
   <div id="properties_container" class="col-md-2 properties-container">
   </div>
 
@@ -30,10 +34,6 @@
 var designerContainer = document.getElementById('designer_container');
 var canvasContainer = document.getElementById('canvas_container');
 
-// var height = 900;// document.body.clientHeight - 100;
-// designerContainer.style.height = height + 'px';
-// canvasContainer.style.height = height + 'px';
-
 dom.autoheight(canvasContainer);
 dom.autoheight('#properties_container');
 
@@ -46,12 +46,66 @@ var propertiesEditor = new PropertiesEditor({
 
 window.designer = new ReportDesigner({
   containerId: '#canvas_container',
-  // canvasHeight: 800,
   propertiesEditor: propertiesEditor
 });
 
 function drag(ev) {
   designer.drag(ev);
 }
+
+document.getElementById('buttonExport').addEventListener('click', async () => {
+  designer.renderToExport();
+  const canvas = document.getElementById('canvas_container').firstElementChild;
+  const canvasImg = canvas.toDataURL("image/png", 1.0);
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    orientation: 'portrait', // 横向 A4
+    unit: 'px',
+    format: [canvas.width, canvas.height] // 根据 Canvas 尺寸设置 PDF 尺寸
+  });
+  pdf.addImage(canvasImg, 'PNG', 0, 0, canvas.width, canvas.height);
+  pdf.save("canvas.pdf");
+  designer.render();
+});
+
+document.getElementById('buttonImport').addEventListener('click', function(event) {
+  document.getElementById('fileImport').click();
+});
+
+document.getElementById('fileImport').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (file.type !== "application/json" && !file.name.endsWith(".json")) {
+    alert("请选择正确的文件！");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let els = JSON.parse(e.target.result);
+      designer.setElementModels(els);
+    } catch (err) {
+      alert("请选择正确的文件！");
+    }
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('buttonSave').addEventListener('click', async () => {
+  const json = JSON.stringify(designer.getElementModels(), null, 2); // null, 2 = 格式化输出
+  const blob = new Blob([json], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "design.json";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+});
+
+document.getElementById('buttonRemove').addEventListener('click', async () => {
+  designer.removeSelected();
+});
 
 </script>

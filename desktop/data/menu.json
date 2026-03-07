@@ -65,50 +65,58 @@
       "text": "单一示例",
       "icon": "nav-icon fa fa-cubes",
       "items": [{
-        "text": "表单",
+        "text": "编辑表单",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/form.html', containerId: 'container'});"
+        "url": "javascript:ajax.view({url: 'html/widget/form-layout/demo.html', containerId: 'container'});"
+      },{
+        "text": "分页表格",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/widget/pagination-table/demo.html', containerId: 'container'});"
+      },{
+        "text": "分页栅格",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/widget/pagination-grid/demo.html', containerId: 'container'});"
+      },{
+        "text": "树型表格",
+        "icon": "nav-icon icon-note",
+        "url": "javascript:ajax.view({url: 'html/widget/treelike-table/demo.html', containerId: 'container'});"
       },{
         "text": "多选",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/multiselect.html', containerId: 'container'});"
-      }, {
-        "text": "表格",
-        "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/table.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/multiselect.html', containerId: 'container'});"
+      },{
         "text": "列表",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/list.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/list.html', containerId: 'container'});"
+      },{
         "text": "DataSheet",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/datasheet.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/datasheet.html', containerId: 'container'});"
+      },{
         "text": "广义表A",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/spreadsheet.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/spreadsheet.html', containerId: 'container'});"
+      },{
         "text": "广义表B",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/spreadsheet2.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/spreadsheet2.html', containerId: 'container'});"
+      },{
         "text": "图表",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/chart.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/chart.html', containerId: 'container'});"
+      },{
         "text": "特殊输入",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/input.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/input.html', containerId: 'container'});"
+      },{
         "text": "特殊显示",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/display.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/display.html', containerId: 'container'});"
+      },{
         "text": "分栏显示",
         "icon": "nav-icon icon-note",
-        "url": "javascript:ajax.view({url: 'html/component/splitter.html', containerId: 'container'});"
-      }, {
+        "url": "javascript:ajax.view({url: 'html/widget/splitter.html', containerId: 'container'});"
+      },{
         "text": "泳道图示",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/diagram/swimlane.html', containerId: 'container'});"
@@ -140,28 +148,28 @@
         "text": "DOM",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/function/dom.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "ReactiveX",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/function/rx.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "Couch",
         "icon": "nav-icon icon-note",
         "url": "javascript:ajax.view({url: 'html/function/couch.html', containerId: 'container'});"
       }]
     }]
-  }, {
+  },{
     "title": "布局示例",
     "menus": [{
       "text": "列表布局",
       "icon": "nav-icon fa fa-list",
       "url": "javascript:ajax.view({url: 'html/layout/list.html', containerId: 'container'});"
-    }, {
+    },{
       "text": "网格布局",
       "icon": "nav-icon fa fa-th",
       "url": "javascript:ajax.view({url: 'html/layout/grid.html', containerId: 'container'});"
     }]
-  }, {
+  },{
     "title": "页面示例",
     "menus": [{
       "text": "样式设计",
@@ -170,7 +178,7 @@
         "text": "文档归类",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/design/document/category.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "项目团队",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/design/team/members.html', containerId: 'container'});"
@@ -182,17 +190,17 @@
         "text": "人员信息",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/business/person.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "水库概览",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/common/list-statistics.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "水库列表",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/common/list-general.html', containerId: 'container'});"
       }]  
     }]
-  }, {
+  },{
     "title": "样式设计",
     "menus": [{
       "text": "设计规范",
@@ -200,10 +208,10 @@
       "items": [{
         "text": "按钮",
         "icon": "nav-icon fa fa-user",
-        "url": "javascript:ajax.view('component/buttons.html', 'container');"
+        "url": "javascript:ajax.view('widget/buttons.html', 'container');"
       }]  
     }]
-  }, {
+  },{
     "title": "GUIDBASE测试",
     "menus": [{
       "text": "组件测试",
@@ -212,29 +220,29 @@
         "text": "表单",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guidbase/form.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "表格",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guidbase/table.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "树",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guidbase/tree.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "图表",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guidbase/chart.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "列表",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guidbase/list.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "主题线",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guidbase/thread.html', containerId: 'container'});"
       }]  
     }]
-  }, {
+  },{
     "title": "其他",
     "menus": [{
       "text": "GUARDWATCH",
@@ -243,19 +251,19 @@
         "text": "驾驶舱",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guardwatch/database/dashboard.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "问题列表",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guardwatch/database/issues.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "慢查询分析",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guardwatch/database/slow_queries.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "阻塞分析",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guardwatch/database/blocks.html', containerId: 'container'});"
-      }, {
+      },{
         "text": "性能分析",
         "icon": "nav-icon fa fa-user",
         "url": "javascript:ajax.view({url: 'html/guardwatch/database/performances.html', containerId: 'container'});"

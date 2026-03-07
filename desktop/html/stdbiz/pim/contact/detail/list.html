@@ -1,0 +1,21 @@
+<script>
+function PageDetailList() {
+  this.page = dom.find('#pageDetailList');
+}
+
+PageDetailList.prototype.initialize = async function (params) {
+  dom.init(this, this.page);
+  
+};
+
+PageDetailList.prototype.destroy = function () {
+  delete pageDetailList;
+};
+
+PageDetailList.prototype.show = function (params) {
+  params = params || {};
+  this.initialize(params);
+};
+
+pageDetailList = new PageDetailList();
+</script>

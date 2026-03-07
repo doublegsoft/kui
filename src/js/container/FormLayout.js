@@ -878,6 +878,7 @@ FormLayout.prototype.createInput = function (field, columnCount) {
     group.appendChild(div);
     return {label: label, input: group};
   } else if (field.input == 'cascade') {
+    group.style.overflow = 'hidden';
     input = dom.create('div', 'form-control');
     if (this.readonly)
       input.style.backgroundColor = 'rgb(240, 243, 245)';

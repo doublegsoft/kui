@@ -11,6 +11,20 @@
 function ReportDesigner(options) {
   let self = this;
 
+  const arialUnicode = new FontFace('arial-unicode', 'url(/font/arial-unicode-ms.ttf');
+  arialUnicode.load().then(font => {
+
+  }).catch(err => {
+    console.error('字体加载失败：', err);
+  });
+
+  const arialUnicodeBold = new FontFace('arial-unicode-bold', 'url(/font/arial-unicode-ms-bold.ttf');
+  arialUnicodeBold.load().then(font => {
+
+  }).catch(err => {
+    console.error('字体加载失败：', err);
+  });
+
   this.elements = [];
   // 页面元素
   this.containerId = options.containerId;
@@ -30,7 +44,7 @@ function ReportDesigner(options) {
   // this.canvas.setAttribute('width', this.containerWidth);
   // this.canvas.setAttribute('height', options.canvasHeight);
 
-  this.canvas.style = 'width: 100%; height: 100%;';
+  this.canvas.style = 'width: 595px; height: 842px;';
 
   //
   // 鼠标点击，只支持删除对象
@@ -57,8 +71,8 @@ function ReportDesigner(options) {
 
   let dpr = window.devicePixelRatio || 1;
   let rect = this.canvas.getBoundingClientRect();
-  this.canvas.width = rect.width * dpr;
-  this.canvas.height = rect.height * dpr;
+  this.canvas.width = 595 * dpr;// rect.width * dpr;
+  this.canvas.height = 842 *dpr;// rect.height * dpr;
   this.canvas.getContext('2d').scale(dpr, dpr);
 
   // 数据结构定义
@@ -77,7 +91,7 @@ ReportDesigner.STROKE_STYLE_SELECTED = '#20a8d8';
 ReportDesigner.STROKE_STYLE_ALIGNMENT = '#ffc107';
 ReportDesigner.STROKE_STYLE_DEFAULT = 'black';
 
-ReportDesigner.prototype.unselectAll = function (element) {
+ReportDesigner.prototype.unselectAll = function () {
   for (let i = 0; i < this.elements.length; i++)
     this.elements[i].unselect();
   this.selectedElement = null;
@@ -120,23 +134,29 @@ ReportDesigner.prototype.addAndRenderElement = function (element) {
  * @param {number} y 
  *        the coordinate y in canvas
  */
-ReportDesigner.prototype.addText = function (text, x, y) {
+ReportDesigner.prototype.addText = function (text, x, y, model) {
+  model = model || {};
   let elementText = new TextElement({
     x: x,
     y: y,
     text: text,
-    selected: true
+    selected: true,
+    fontFamily: 'arial-unicode',
+    ...model,
   });
   // 添加文本元素
   this.addAndRenderElement(elementText);
 };
 
-ReportDesigner.prototype.addLongtext = function (text, x, y) {
+ReportDesigner.prototype.addLongtext = function (text, x, y, model) {
+  model = model || {};
   let elementText = new LongtextElement({
     x: x,
     y: y,
     text: text,
-    selected: true
+    selected: true,
+    fontFamily: 'arial-unicode',
+    ...model,
   });
   // 添加文本元素
   this.addAndRenderElement(elementText);
@@ -170,31 +190,61 @@ ReportDesigner.prototype.addChart = function (x, y) {
   this.addAndRenderElement(elementChart);
 };
 
+ReportDesigner.prototype.addRect = function (x, y, model) {
+  model = model || {};
+  let elementTable = new RectElement({
+    x: x,
+    y: y,
+    width: 100,
+    height: 100,
+    radius: 10,
+    selected: true,
+    ...model,
+  });
+  this.addAndRenderElement(elementTable);
+};
+
 ReportDesigner.prototype.drawGrid = function (w, h, strokeStyle, step) {
   let ctx = this.canvas.getContext('2d');
-  for (let x = 0.5; x < w; x += step){
+  let canvas = this.canvas;
+  for (let x = 0.5; x < w; x += step) {
     ctx.moveTo(x, 0);
     ctx.lineTo(x, h);
   }
-  
+
   for (let y = 0.5; y < h; y += step) {
     ctx.moveTo(0, y);
     ctx.lineTo(w, y);
   }
-  
+
   ctx.strokeStyle = strokeStyle;
   ctx.stroke();
+
+  const dpr = window.devicePixelRatio || 1;
+  if (this.background) {
+    ctx.drawImage(this.background, 0, 0, this.background.naturalWidth, this.background.naturalHeight,
+      0, 0, canvas.width / dpr, canvas.height / dpr);
+  } else {
+    this.background = new Image();
+    let bg = this.background;
+    this.background.src = '/desktop/img/pdf/background.png';
+    this.background.onload = function () {
+      ctx.drawImage(bg, 0, 0, bg.naturalWidth, bg.naturalHeight,
+        0, 0, canvas.width / dpr, canvas.height / dpr);
+    };
+  }
 };
 
 
-ReportDesigner.prototype.render = function () {
+ReportDesigner.prototype.render = function (renderGrid) {
   let ctx = this.canvas.getContext('2d');
 
   // 清除画布
   ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
   // 网格线
-  this.drawGrid(this.canvas.width, this.canvas.height, '#eee', 10);
+  if (renderGrid !== false)
+    this.drawGrid(this.canvas.width, this.canvas.height, '#eee', 10);
 
   // 逐个画元素（根据元素的模型数据）
   for (let i = 0; i < this.elements.length; i++) {
@@ -254,6 +304,8 @@ ReportDesigner.prototype.drop = function (self, ev) {
     self.addImage(x, y);
   } else if (dragType == 'chart') {
     self.addChart(x, y);
+  } else if (dragType == 'rect') {
+    self.addRect(x, y);
   }
 };
 
@@ -343,4 +395,42 @@ ReportDesigner.prototype.move = function (self, ev) {
 
   // 渲染
   self.render();
+};
+
+ReportDesigner.prototype.renderToExport = function () {
+  this.unselectAll();
+  this.render(false);
+};
+
+ReportDesigner.prototype.getElementModels = function () {
+  let retVal = [];
+  for (let el of this.elements) {
+    retVal.push(el.model);
+  }
+  return retVal;
+};
+
+ReportDesigner.prototype.setElementModels = function (elements) {
+  this.elements = [];
+  for (let el of elements) {
+    if (el.type == 'text') {
+      this.addText(el.text, el.x, el.y, el);
+    } else if (el.type == 'rect') {
+      this.addRect(el.x, el.y, el);
+    } else if (el.type == 'longtext') {
+      this.addLongtext(el.text, el.x, el.y, el);
+    }
+  }
+};
+
+ReportDesigner.prototype.removeSelected = function () {
+  let i = 0;
+  for (let el of this.elements) {
+    if (el.model.selected === true) {
+      this.elements.splice(i, 1);
+      break;
+    }
+    i++;
+  }
+  this.render();
 };
